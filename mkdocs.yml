@@ -1,0 +1,5 @@
+site_name: Dokumentation Quasi II
+
+nav:
+- Inhalt: 'index.md'
+- Technische Beschreibung der Hauptkomponenten: 'Technische_Beschreibung.md'
