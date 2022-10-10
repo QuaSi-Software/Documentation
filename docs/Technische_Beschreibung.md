@@ -28,8 +28,7 @@ Da auch die bisher nicht betrachteten Temperaturen der ein- und austretenden Wä
 
 $$\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})$$
 
-\
-Inputs und Outputs der Wärmepumpe:
+**Inputs und Outputs der Wärmepumpe:**
 
 Formelzeichen| Beschreibung | Einheit
 -------- | -------- | --------
@@ -42,8 +41,7 @@ Formelzeichen| Beschreibung | Einheit
 \(T_{WP,Quelle,in}\)   | Verdampfer-Eintrittstemperatur   | [°C]
 \(T_{WP,Quelle,out}\)   | Verdampfer-Austrittstemperatur   | [°C]
 
-\
-Weitere Parameter der Wärmepumpe:
+**Weitere Parameter der Wärmepumpe:**
 
 Formelzeichen| Beschreibung | Einheit
 -------- | -------- | --------
@@ -52,8 +50,7 @@ Formelzeichen| Beschreibung | Einheit
 \(\eta_{WP,LE}\)  | Wirkungsgrad der Leistungselektronik für Wärmepumpe    | [-]
 \(TL_{WP,min}\)  | minimal mögliche Teilllast    | [-]
 
-\
-Zustandsvariablen:
+**Zustandsvariablen:**
 
 Formelzeichen| Beschreibung | Einheit
 -------- | -------- | --------
