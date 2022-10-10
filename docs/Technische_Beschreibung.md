@@ -8,9 +8,9 @@ Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe: \
 Abb. 2: Energiebilanz der modellierten Wärmepumpe: \
 <img src="fig/WP_Energies.png" alt="drawing" width="500"/>
 
-Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung $P_{el,WP}$, um die Temperatur eines Massenstroms von dem Temperaturniveau $T_{WP,Quelle,in}$ auf $T_{WP,Senke,out}$ anzuheben: 
+Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung $$P_{el,WP}$$, um die Temperatur eines Massenstroms von dem Temperaturniveau $T_{WP,Quelle,in}$ auf $T_{WP,Senke,out}$ anzuheben: 
 
-$\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )$
+$$\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )$$
 
 Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen.
 
