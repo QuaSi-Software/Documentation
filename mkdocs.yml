@@ -17,8 +17,17 @@ sphinx:
 
 # Explicitly set the version of Python and its requirements
 python:
+  version: 2 # for unicode
+  setup_py_install: true
   install:
     - requirements: docs/requirements.txt
 
 # set theme
-theme: readthedocs    
+theme: readthedocs
+
+# activate markdown math for latex 
+markdown_extensions:
+  - mdx_math
+    # enable_dollar_delimiter: True #for use of inline $..$
+
+extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']
