@@ -93,22 +93,28 @@
               
                 <h1 id="technische-beschreibung-von-hauptkomponenten">Technische Beschreibung von Hauptkomponenten</h1>
 <h2 id="warmepumpe">Wärmepumpe</h2>
-<p>Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe: \
-<img src="fig/WP_overview.png" alt="drawing" width="300"/></p>
-<p>Abb. 2: Energiebilanz der modellierten Wärmepumpe: \
-<img src="fig/WP_Energies.png" alt="drawing" width="500"/></p>
-<p>Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung <script type="math/tex; mode=display">P_{el,WP}</script>, um die Temperatur eines Massenstroms von dem Temperaturniveau $T_{WP,Quelle,in}$ auf $T_{WP,Senke,out}$ anzuheben: </p>
+<p>Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe
+<img alt="Image title" src="../fig/WP_overview.png" /></p>
+<p>Abb. 2: Energiebilanz der modellierten Wärmepumpe:
+<img alt="Image title" src="../fig/WP_Energies.png" /></p>
+<p>Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung <script type="math/tex">P_{el,WP}</script>, um die Temperatur eines Massenstroms von dem Temperaturniveau <script type="math/tex">T_{WP,Quelle,in}</script> auf <script type="math/tex">T_{WP,Senke,out}</script> anzuheben: </p>
 <p>
 <script type="math/tex; mode=display">\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )</script>
 </p>
 <p>Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen.</p>
 <p>Die Energiebilanz (bzw. Leistungsbilanz) der Wärmepumpe lässt sich nach Abbildung 2 aufstellen sowie ein Zusammenhang zwischen zu- und abgeführter Wärmeleistung in Abhängigkeit der Leistungszahl bestimmen: </p>
-<p>$\dot{Q}<em>{WP,ab} = \frac{\epsilon</em>{WP}}{\epsilon_{WP} -1} \ \dot{Q}<em>{WP,zu} \mathrm{\quad mit \quad} \dot{Q}</em>{WP,ab} = \dot{Q}<em>{WP,zu} + P</em>{WP,el}$</p>
+<p>
+<script type="math/tex; mode=display">\dot{Q}_{WP,ab} = \frac{\epsilon_{WP}}{\epsilon_{WP} -1} \ \dot{Q}_{WP,zu} \mathrm{\quad mit \quad} \dot{Q}_{WP,ab} = \dot{Q}_{WP,zu} + P_{WP,el}</script>
+</p>
 <p>Die Leistung des Strombezugs der Wärmepumpe inklusive der Verluste der Leistungselektronik ergibt sich als: </p>
-<p>$P_{el,WP,Bezug} = \frac{P_{el,WP}}{\eta_{WP,LE}}$</p>
+<p>
+<script type="math/tex; mode=display">P_{el,WP,Bezug} = \frac{P_{el,WP}}{\eta_{WP,LE}}</script>
+</p>
 <p><strong>Annahme:</strong> Thermische Verluste der WP sind bereits in Leistungszahl mit einberechnet.</p>
-<p>Da auch die bisher nicht betrachteten Temperaturen der ein- und austretenden Wärmeströme in bzw. aus der Wärmepumpe von Relevanz sind, können die Wärmeleistungen anhand des jeweiligen Massenstroms $\dot{m}$ und der physikalischen Eigenschaften des Wärmeträgermediums (spezifische Wärmekapazität $c_{p}$ sowie ggf. der Dichte $\rho$) durch Umstellen der folgenden Gleichung berechnet werden:</p>
-<p>$\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})$</p>
+<p>Da auch die bisher nicht betrachteten Temperaturen der ein- und austretenden Wärmeströme in bzw. aus der Wärmepumpe von Relevanz sind, können die Wärmeleistungen anhand des jeweiligen Massenstroms <script type="math/tex">\dot{m}</script> und der physikalischen Eigenschaften des Wärmeträgermediums (spezifische Wärmekapazität <script type="math/tex">c_{p}</script> sowie ggf. der Dichte <script type="math/tex">\rho</script>) durch Umstellen der folgenden Gleichung berechnet werden:</p>
+<p>
+<script type="math/tex; mode=display">\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})</script>
+</p>
 <p>\
 Inputs und Outputs der Wärmepumpe:</p>
 <table>
@@ -121,60 +127,124 @@ Inputs und Outputs der Wärmepumpe:</p>
 </thead>
 <tbody>
 <tr>
-<td>$\dot{Q}_{WP,zu}$</td>
+<td>
+<script type="math/tex">\dot{Q}_{WP,zu}</script>
+</td>
 <td>Der WP zugeführte Wärmestrom (Wärmequelle)</td>
 <td>[MW]</td>
 </tr>
 <tr>
-<td>$\dot{Q}_{WP,ab}$</td>
+<td>
+<script type="math/tex">\dot{Q}_{WP,ab}</script>
+</td>
 <td>Der WP abgeführte Wärmestrom (Wärmesenke)</td>
 <td>[MW]</td>
 </tr>
 <tr>
-<td>$P_{el,WP}$</td>
+<td>
+<script type="math/tex">P_{el,WP}</script>
+</td>
 <td>Elektrische Leistungsaufnahme der WP</td>
 <td>[MW]</td>
 </tr>
 <tr>
-<td>$P_{el,WP,Bezug}$</td>
+<td>
+<script type="math/tex">P_{el,WP,Bezug}</script>
+</td>
 <td>Elektrische Leistungsaufnahme der WP inkl. Verluste der Leistungselektronik</td>
 <td>[MW]</td>
 </tr>
 <tr>
-<td>$T_{WP,Senke,in}$</td>
+<td>
+<script type="math/tex">T_{WP,Senke,in}</script>
+</td>
 <td>Kondensator-Eintrittstemperatur</td>
 <td>[°C]</td>
 </tr>
 <tr>
-<td>$T_{WP,Senke,out}$</td>
+<td>
+<script type="math/tex">T_{WP,Senke,out}</script>
+</td>
 <td>Kondensator-Austrittstemperatur</td>
 <td>[°C]</td>
 </tr>
 <tr>
-<td>$T_{WP,Quelle,in}$</td>
+<td>
+<script type="math/tex">T_{WP,Quelle,in}</script>
+</td>
 <td>Verdampfer-Eintrittstemperatur</td>
 <td>[°C]</td>
 </tr>
 <tr>
-<td>$T_{WP,Quelle,out}$</td>
+<td>
+<script type="math/tex">T_{WP,Quelle,out}</script>
+</td>
 <td>Verdampfer-Austrittstemperatur</td>
 <td>[°C]</td>
 </tr>
 </tbody>
 </table>
 <p>\
-Weitere Parameter der Wärmepumpe:
-Formelzeichen| Beschreibung | Einheit
--------- | -------- | --------
-$\epsilon_{WP}$  | Leistungszahl (COP) der Wärmepumpe inkl. thermische Verluste in Abhängigkeit von $T_{WP,Senke,out}$ und $T_{WP,Quelle,in}$ und von Teilllast??? | [-]
-$\eta_{Carnot}$  | Carnot-Wirkungsgrad   | [-]
-$\eta_{WP,LE}$  | Wirkungsgrad der Leistungselektronik für Wärmepumpe    | [-]
-$TL_{WP,min}$  | minimal mögliche Teilllast    | [-]</p>
+Weitere Parameter der Wärmepumpe:</p>
+<table>
+<thead>
+<tr>
+<th>Formelzeichen</th>
+<th>Beschreibung</th>
+<th>Einheit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">\epsilon_{WP}</script>
+</td>
+<td>Leistungszahl (COP) der Wärmepumpe inkl. thermische Verluste in Abhängigkeit von <script type="math/tex">T_{WP,Senke,out}</script> und <script type="math/tex">T_{WP,Quelle,in}</script> und von Teilllast???</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{Carnot}</script>
+</td>
+<td>Carnot-Wirkungsgrad</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{WP,LE}</script>
+</td>
+<td>Wirkungsgrad der Leistungselektronik für Wärmepumpe</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">TL_{WP,min}</script>
+</td>
+<td>minimal mögliche Teilllast</td>
+<td>[-]</td>
+</tr>
+</tbody>
+</table>
 <p>\
-Zustandsvariablen:
-Formelzeichen| Beschreibung | Einheit
--------- | -------- | --------
-$x_{WP}$  | Aktueller Betriebspunkt (an, aus, Teilllast)   | [%]</p>
+Zustandsvariablen:</p>
+<table>
+<thead>
+<tr>
+<th>Formelzeichen</th>
+<th>Beschreibung</th>
+<th>Einheit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">x_{WP}</script>
+</td>
+<td>Aktueller Betriebspunkt (an, aus, Teilllast)</td>
+<td>[%]</td>
+</tr>
+</tbody>
+</table>
 <p><strong>ToDo</strong>: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
 Anpassung des COPs über lineare oder quadratische Funktion? Quadratische Funktion nicht invertierbar --&gt; Iterative Lösung notwendig? Oder lineare Anpassung des Wirkungsgrades in Teillast? Oder konstander Wirkungsgrad in Teillast?</p>
 <p>Beispiel für quadratische Teillast: \
