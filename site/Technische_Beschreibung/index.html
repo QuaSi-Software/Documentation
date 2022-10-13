@@ -93,15 +93,19 @@
               
                 <h1 id="technische-beschreibung-von-hauptkomponenten">Technische Beschreibung von Hauptkomponenten</h1>
 <h2 id="warmepumpe">Wärmepumpe</h2>
+<p>Als Wärmepumpe können elektrisch betriebene Kompressor-Wärmepumpen in das Modell eingebunden werden. Deren allgemeines Anlagenschema ist Abbildung 1 zu entnehmen. </p>
 <p>Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe
 <img alt="Image title" src="../fig/WP_overview.png" /></p>
-<p>Abb. 2: Energiebilanz der modellierten Wärmepumpe:
+<p>Die Energiebilanz an der Wärmepumpe setzt sich aus dem zugeführten Strom, der zugeführten Wärme auf niedrigem Temperaturniveau sowie dem abgeführten Wärmestrom auf höherem Temperaturniveau zusammen. Der Wirkungsgrad der Wärmepumpe wird dabei definiert über die Leistungszahl (COP) in Abhängigkeit der Kondensator-Austrittstemperatur sowie der Verdampfer-Eintrittstemperatur (vgl. Abbildung 2).</p>
+<p>Abb. 2: Energiebilanz der modellierten Wärmepumpe
 <img alt="Image title" src="../fig/WP_Energies.png" /></p>
-<p>Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung <script type="math/tex">P_{el,WP}</script>, um die Temperatur eines Massenstroms von dem Temperaturniveau <script type="math/tex">T_{WP,Quelle,in}</script> auf <script type="math/tex">T_{WP,Senke,out}</script> anzuheben: </p>
+<p>Die Leistungszahl bestimmt die benötigte elektrische Leistung <script type="math/tex">P_{el,WP}</script>, um die Temperatur eines Massenstroms von dem Temperaturniveau <script type="math/tex">T_{WP,Quelle,in}</script> auf <script type="math/tex">T_{WP,Senke,out}</script> anzuheben: </p>
 <p>
 <script type="math/tex; mode=display">\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )</script>
 </p>
-<p>Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen.</p>
+<p>Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen. Beispielhat ist ein Kennfeld einer Hochtemperatur-Wärmepumpe in der folgenden Abbildung als Kurvenschar gezeigt.</p>
+<p>Abb. 3: Kennfeld einer Hochtemperaturwärmepumpe als Kurvenschar
+<img alt="Image title" src="../fig/COP_Kennfeld_Beispiel.png" /></p>
 <p>Die Energiebilanz (bzw. Leistungsbilanz) der Wärmepumpe lässt sich nach Abbildung 2 aufstellen sowie ein Zusammenhang zwischen zu- und abgeführter Wärmeleistung in Abhängigkeit der Leistungszahl bestimmen: </p>
 <p>
 <script type="math/tex; mode=display">\dot{Q}_{WP,ab} = \frac{\epsilon_{WP}}{\epsilon_{WP} -1} \ \dot{Q}_{WP,zu} \mathrm{\quad mit \quad} \dot{Q}_{WP,ab} = \dot{Q}_{WP,zu} + P_{WP,el}</script>

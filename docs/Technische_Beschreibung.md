@@ -1,18 +1,24 @@
 # Technische Beschreibung von Hauptkomponenten
 
 ## Wärmepumpe
+Als Wärmepumpe können elektrisch betriebene Kompressor-Wärmepumpen in das Modell eingebunden werden. Deren allgemeines Anlagenschema ist Abbildung 1 zu entnehmen. 
 
 Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe
 ![Image title](fig/WP_overview.png)
 
-Abb. 2: Energiebilanz der modellierten Wärmepumpe:
+Die Energiebilanz an der Wärmepumpe setzt sich aus dem zugeführten Strom, der zugeführten Wärme auf niedrigem Temperaturniveau sowie dem abgeführten Wärmestrom auf höherem Temperaturniveau zusammen. Der Wirkungsgrad der Wärmepumpe wird dabei definiert über die Leistungszahl (COP) in Abhängigkeit der Kondensator-Austrittstemperatur sowie der Verdampfer-Eintrittstemperatur (vgl. Abbildung 2).
+
+Abb. 2: Energiebilanz der modellierten Wärmepumpe
 ![Image title](fig/WP_Energies.png)
  
-Die Leistungszahl (COP) bestimmt die benötigte elektrische Leistung \(P_{el,WP}\), um die Temperatur eines Massenstroms von dem Temperaturniveau \(T_{WP,Quelle,in}\) auf \(T_{WP,Senke,out}\) anzuheben: 
+Die Leistungszahl bestimmt die benötigte elektrische Leistung \(P_{el,WP}\), um die Temperatur eines Massenstroms von dem Temperaturniveau \(T_{WP,Quelle,in}\) auf \(T_{WP,Senke,out}\) anzuheben: 
 
 $$\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )$$
 
-Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen.
+Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad, der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen. Beispielhat ist ein Kennfeld einer Hochtemperatur-Wärmepumpe in der folgenden Abbildung als Kurvenschar gezeigt.
+
+Abb. 3: Kennfeld einer Hochtemperaturwärmepumpe als Kurvenschar
+![Image title](fig/COP_Kennfeld_Beispiel.png)
 
 Die Energiebilanz (bzw. Leistungsbilanz) der Wärmepumpe lässt sich nach Abbildung 2 aufstellen sowie ein Zusammenhang zwischen zu- und abgeführter Wärmeleistung in Abhängigkeit der Leistungszahl bestimmen: 
 

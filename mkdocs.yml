@@ -1,8 +1,5 @@
 site_name: Dokumentation Quasi II
 
-page:
-- Technische Beschreibung der Hauptkomponenten: 'docs\Technische_Beschreibung.md'
-
 version: 2
 
 build:
