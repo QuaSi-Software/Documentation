@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Technische Beschreibung von Hauptkomponenten - Dokumentation Quasi II</title>
+    <title>Technical description of main components - Dokumentation Quasi II</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Technische Beschreibung von Hauptkomponenten";
+        var mkdocs_page_name = "Technical description of main components";
         var mkdocs_page_input_path = "Technische_Beschreibung.md";
         var mkdocs_page_url = null;
       </script>
@@ -45,27 +45,61 @@
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Technische Beschreibung von Hauptkomponenten</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Technical description of main components</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#warmepumpe">Wärmepumpe</a>
+    <li class="toctree-l2"><a class="reference internal" href="#heat-pump-hp">Heat pump (HP)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#elektrolyseur">Elektrolyseur</a>
+    <li class="toctree-l2"><a class="reference internal" href="#electrolyser">Electrolyser</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#ruckkuhlung-fur-elektrolyseur">Rückkühlung für Elektrolyseur</a>
+    <li class="toctree-l2"><a class="reference internal" href="#combined-heat-and-power-plant-chp">Combined heat and power plant (CHP)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#brennstoffzelle">Brennstoffzelle</a>
+    <li class="toctree-l2"><a class="reference internal" href="#gas-boiler-peak-load">Gas boiler (peak load)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#bhkw">BHKW</a>
+    <li class="toctree-l2"><a class="reference internal" href="#woodchip-boiler">Woodchip boiler</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#spitzenlastkessel-erdgas">Spitzenlastkessel (Erdgas)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#heat-sources">Heat sources</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#soil">Soil</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pufferspeicher">Pufferspeicher</a>
+    <li class="toctree-l3"><a class="reference internal" href="#water">Water</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#langzeitwarmespeicher">Langzeitwärmespeicher</a>
+    <li class="toctree-l3"><a class="reference internal" href="#air">Air</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#warmequellen">Wärmequellen</a>
+        </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#wasserstoffverdichter">Wasserstoffverdichter</a>
+    <li class="toctree-l2"><a class="reference internal" href="#chiller">Chiller</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#simple-model-for-electrolyser">Simple model for electrolyser</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#general-model-for-cooling-purposes">General model for cooling purposes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#short-term-heat-storage">Short-term heat storage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#tank-thermal-energy-storage-ttes">Tank thermal energy storage (TTES)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pit-thermal-energy-storage-ptes">Pit thermal energy storage (PTES)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#aquifer-thermal-energy-storage-ates">Aquifer thermal energy storage (ATES)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ice-storage">Ice storage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-fuel-cell">Hydrogen fuel cell</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#photovoltaik-pv">Photovoltaik (PV)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#wind-power">Wind power</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#battery">Battery</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-compressor">Hydrogen compressor</a>
     </li>
     </ul>
                 </li>
@@ -84,7 +118,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-      <li>Technische Beschreibung von Hauptkomponenten</li>
+      <li>Technical description of main components</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -93,183 +127,261 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="technische-beschreibung-von-hauptkomponenten">Technische Beschreibung von Hauptkomponenten</h1>
-<h2 id="warmepumpe">Wärmepumpe</h2>
-<p>Als Wärmepumpe können elektrisch betriebene Kompressor-Wärmepumpen in das Modell eingebunden werden. Deren allgemeines Anlagenschema ist Abbildung 1 zu entnehmen. </p>
-<p>Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe</p>
-<p><img alt="Image title" src="../fig/WP_overview.png" /></p>
-<p>Die Energiebilanz an der Wärmepumpe setzt sich aus dem zugeführten Strom, der zugeführten Wärme auf niedrigem Temperaturniveau sowie dem abgeführten Wärmestrom auf höherem Temperaturniveau zusammen. Der Wirkungsgrad der Wärmepumpe wird dabei definiert über die Leistungszahl (COP) in Abhängigkeit der Kondensator-Austrittstemperatur sowie der Verdampfer-Eintrittstemperatur (vgl. Abbildung 2).</p>
-<p>Abb. 2: Energiebilanz der modellierten Wärmepumpe</p>
+                <h1 id="technical-description-of-main-components">Technical description of main components</h1>
+<h2 id="heat-pump-hp">Heat pump (HP)</h2>
+<p>As heat pumps, electrically driven variable-speed compressor heat pumps can be integrated into the simulation model. Their general system diagram is shown in figure 1. </p>
+<p>Fig. 1: General system chart of a heat pump</p>
+<p><img alt="Image title" src="../fig/221018_WP_Anlagenschema.png" /></p>
+<p>The energy balance at the heat pump is composed of the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).</p>
+<p>Fig. 2: Energy balance of the heat pump model</p>
 <p><img alt="Image title" src="../fig/221006_W%C3%A4rmepumpe_Energiefluss.png" /></p>
-<p>Die Leistungszahl bestimmt die benötigte elektrische Leistung <script type="math/tex">P_{el,WP}</script>, um die Temperatur eines Massenstroms von dem Temperaturniveau <script type="math/tex">T_{WP,Quelle,in}</script> auf <script type="math/tex">T_{WP,Senke,out}</script> anzuheben: </p>
+<p>The coefficient of performance (COP) determines the electrical power required <script type="math/tex">P_{el,HP}</script> to raise the temperature of a mass flow from the lower temperature level <script type="math/tex">T_{HP,source,in}</script> to <script type="math/tex">T_{HP,sink,out}</script>: </p>
 <p>
-<script type="math/tex; mode=display">\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )</script>
+<script type="math/tex; mode=display">COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}}{T_{HP,sink,out}-T_{HP,source,in} } </script>
 </p>
-<p>Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad (<script type="math/tex">\eta_{Carnot}</script>), der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen. Beispielhat ist ein Kennfeld einer Hochtemperatur-Wärmepumpe in der folgenden Abbildung als Kurvenschar gezeigt.</p>
-<p>Abb. 3: Kennfeld einer Hochtemperaturwärmepumpe als Kurvenschar</p>
+<p>
+<script type="math/tex; mode=display"> COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 </script>
+</p>
+<p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, a COP chart is given for various representative heat pumps, on which the further calculations are based. For example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature.</p>
+<p>Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves</p>
 <p><img alt="Image title" src="../fig/COP_Kennfeld_Beispiel.png" /></p>
-<p>Die Energiebilanz (bzw. Leistungsbilanz) der Wärmepumpe lässt sich nach Abbildung 2 aufstellen sowie ein Zusammenhang zwischen zu- und abgeführter Wärmeleistung in Abhängigkeit der Leistungszahl bestimmen: </p>
+<p>The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: </p>
 <p>
-<script type="math/tex; mode=display">\dot{Q}_{WP,ab} = \frac{\epsilon_{WP}}{\epsilon_{WP} -1} \ \dot{Q}_{WP,zu} \mathrm{\quad mit \quad} \dot{Q}_{WP,ab} = \dot{Q}_{WP,zu} + P_{WP,el}</script>
+<script type="math/tex; mode=display">\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\quad mit \quad} \dot{Q}_{HP,out} = \dot{Q}_{HP,in} + P_{HP,el} </script>
 </p>
-<p>Die Leistung des Strombezugs der Wärmepumpe inklusive der Verluste der Leistungselektronik ergibt sich als: </p>
+<p>The power of the heat pump's electric supply, including the losses of the power electronics, is given as: </p>
 <p>
-<script type="math/tex; mode=display">P_{el,WP,Bezug} = \frac{P_{el,WP}}{\eta_{WP,LE}}</script>
+<script type="math/tex; mode=display">P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}</script>
 </p>
-<p><strong>Annahme:</strong> Thermische Verluste der WP sind bereits in Leistungszahl mit einberechnet. </p>
-<p>Da auch die bisher nicht betrachteten Temperaturen der ein- und austretenden Wärmeströme in bzw. aus der Wärmepumpe von Relevanz sind, können die Wärmeleistungen anhand des jeweiligen Massenstroms <script type="math/tex">\dot{m}</script> und der physikalischen Eigenschaften des Wärmeträgermediums (spezifische Wärmekapazität <script type="math/tex">c_{p}</script> sowie ggf. der Dichte <script type="math/tex">\rho</script>) durch Umstellen der folgenden Gleichung berechnet werden:</p>
+<p><strong>Assumption:</strong> Thermal losses of the HP are already included in the coefficient of performance. </p>
+<p><strong>Assumption:</strong> The heat output of the heat pump behaves linearly in part load operation between <script type="math/tex">\dot{Q}_{HP,min}</script> at <script type="math/tex">PL_{HP,min}</script> and <script type="math/tex">\dot{Q}_{HP,max}</script> at 100% compressor speed:</p>
+<p><img alt="Image title" src="../fig/221018_WP_Teillast_Heizleistung.png" /></p>
+<p>The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?!:</p>
+<p><img alt="Image title" src="../fig/COP_Teillast.png" /></p>
+<p>Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</p>
+<p>Exemplary correction curve for the COP at partial load and a 4<script type="math/tex">^{th}</script> grade fitting polynome:</p>
+<p><img alt="Image title" src="../fig/221020_COP_curve_PL.png" /></p>
+<p>Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow <script type="math/tex">\dot{m}</script> and the physical properties of the heat transfer medium (specific heat capacity <script type="math/tex">c_{p}</script> and, if applicable, the density <script type="math/tex">\rho</script>) by rearranging the following equation:</p>
 <p>
 <script type="math/tex; mode=display">\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})</script>
 </p>
-<p><strong>Inputs und Outputs der Wärmepumpe:</strong></p>
+<p><strong>Inputs und Outputs of the Heat Pump:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>
-<script type="math/tex">\dot{Q}_{WP,zu}</script>
+<script type="math/tex">\dot{Q}_{HP,in}</script>
 </td>
-<td>Der WP zugeführte Wärmestrom (Wärmequelle)</td>
+<td>heat flow supplied to the HP (heat source)</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\dot{Q}_{WP,ab}</script>
+<script type="math/tex">\dot{Q}_{HP,out}</script>
 </td>
-<td>Der WP abgeführte Wärmestrom (Wärmesenke)</td>
+<td>heat flow leaving the HP (heat sink)</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">P_{el,WP}</script>
+<script type="math/tex">P_{el,HP}</script>
 </td>
-<td>Elektrische Leistungsaufnahme der WP</td>
+<td>electric power demand of the HP</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">P_{el,WP,Bezug}</script>
+<script type="math/tex">P_{el,HP,supply}</script>
 </td>
-<td>Elektrische Leistungsaufnahme der WP inkl. Verluste der Leistungselektronik</td>
+<td>electric power demand of the HP incl. losses of the power electronics</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{WP,Senke,in}</script>
+<script type="math/tex">T_{HP,sink,in}</script>
 </td>
-<td>Kondensator-Eintrittstemperatur</td>
+<td>condenser inlet temperature</td>
 <td>[°C]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{WP,Senke,out}</script>
+<script type="math/tex">T_{HP,sink,out}</script>
 </td>
-<td>Kondensator-Austrittstemperatur</td>
+<td>condenser outlet temperature</td>
 <td>[°C]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{WP,Quelle,in}</script>
+<script type="math/tex">T_{HP,source,in}</script>
 </td>
-<td>Verdampfer-Eintrittstemperatur</td>
+<td>evaporator inlet temperature</td>
 <td>[°C]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{WP,Quelle,out}</script>
+<script type="math/tex">T_{HP,source,out}</script>
 </td>
-<td>Verdampfer-Austrittstemperatur</td>
+<td>evaporator outlet temperature</td>
 <td>[°C]</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Weitere Parameter der Wärmepumpe:</strong></p>
+<p><strong>Parameter of the Heat Pump:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>
-<script type="math/tex">\epsilon_{WP}</script>
+<script type="math/tex">\dot{Q}_{HP,max}</script>
 </td>
-<td>Leistungszahl (COP) der Wärmepumpe inkl. thermische Verluste in Abhängigkeit von <script type="math/tex">T_{WP,Senke,out}</script> und <script type="math/tex">T_{WP,Quelle,in}</script> und von Teilllast???</td>
+<td>maximum thermal power of the heat pump</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{HP,min}</script>
+</td>
+<td>minimum thermal power of the heat pump at <script type="math/tex">PL_{HP,min}</script>
+</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">PL_{HP,min}</script>
+</td>
+<td>minimum possible part load of the heat pump [%]</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">COP_{HP}(T_{HP,sink,out}, T_{HP,source,in}, x_{HP})</script>
+</td>
+<td>coefficient of performance (COP) of the heat pump incl. thermal losses depending on <script type="math/tex">T_{HP,sink,out}</script> and <script type="math/tex">T_{HP,source,in}</script> and on current state <script type="math/tex">x_{HP}</script>
+</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\eta_{WP,LE}</script>
+<script type="math/tex">\eta_{HP,PE}</script>
 </td>
-<td>Wirkungsgrad der Leistungselektronik für Wärmepumpe</td>
+<td>efficiency of power electronics of heat pump</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">TL_{WP,min}</script>
+<script type="math/tex">\eta_{Carnot}</script>
 </td>
-<td>minimal mögliche Teilllast der Wärmepume</td>
+<td>efficiency factor of heat pump, reduces the Carnot-COP</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">MB_{WP}</script>
+<script type="math/tex">MOT_{HP}</script>
 </td>
-<td>Mindestbetriebszeit der Wärmepumpe</td>
+<td>minimum operating time of heat pump</td>
 <td>[min]</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Zustandsvariablen der Wärmepumpe:</strong></p>
+<p><strong>State Variables of Heat Pump:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>
-<script type="math/tex">x_{WP}</script>
+<script type="math/tex">x_{HP}</script>
 </td>
-<td>Aktueller Betriebspunkt (an, aus, Teilllast)</td>
+<td>current operating state (on, off, part load)</td>
 <td>[%]</td>
 </tr>
 </tbody>
 </table>
 <p><strong>ToDo</strong>: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
-Anpassung des COPs über lineare oder quadratische Funktion? Quadratische Funktion nicht invertierbar --&gt; Iterative Lösung notwendig? Oder lineare Anpassung des Wirkungsgrades in Teillast? Oder konstander Wirkungsgrad in Teillast?</p>
-<p>Beispiel für quadratische Teillast: </p>
+Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?</p>
+<p>Beispiel für quadratische Teillastverhalten des COPs: </p>
 <p><img alt="Image title" src="../fig/Beispiel_fuer_Teillast.png" />
-Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf</p>
-<h2 id="elektrolyseur">Elektrolyseur</h2>
-<p>Der Elektrolyseur verwendet elektrische Energie, um Wasser in die Bestandteile Wasserstoff (<script type="math/tex">H_2</script>) und Sauerstoff (<script type="math/tex">O_2</script>) aufzuspalten. Die dabei entstehende Abwärme kann direkt oder über eine Wärmepume nutzbar gemacht werden.</p>
-<p>Abb. 3: Energie- und Stoffströme am Elektrolyseur</p>
+Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf</p>
+<p><strong>ToDo:</strong> COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?</p>
+<h2 id="electrolyser">Electrolyser</h2>
+<p>The electrolyzer uses electrical energy to split water into its components hydrogen (<script type="math/tex">H_2</script>) and oxygen (<script type="math/tex">O_2</script>) as shown in the following reaction equation: </p>
+<p>
+<script type="math/tex; mode=display"> 2 \ H_2O \rightarrow 2 \ H_2 + O_2 </script>
+</p>
+<p>If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyzer. </p>
+<p>The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.</p>
+<p>Fig. 3: Energy and mass flows in the electrolyser</p>
 <p><img alt="Image title" src="../fig/221013_Elektrolyseur.png" /></p>
-<p>
-<script type="math/tex; mode=display">\dot{Q}_{Ely,Abwärme} = \eta_{Ely,Wärmeauskopplung} \ (1-\eta_{Ely,H_2}) \ P_{el,Ely} = \eta_{Ely,Wärmeauskopplung} \ (P_{el,Ely} - \dot{E}_{Ely,H_2,out}) </script>
+<p>The relationship between supplied hydrogen of the electrolysis (energy (<script type="math/tex">\dot{E}_{Ely,H_2}</script>) or mass flow (<script type="math/tex">\dot{m}_{Ely,H_2}</script>)) and the consumption of electrical energy (<script type="math/tex"> P_{el,Ely} </script>) is given in the following equation, where <script type="math/tex">e_{H_2}</script> can be either the net or the gross calorific value of the hydrogen:
+<script type="math/tex; mode=display">
+\begin{align}
+\dot{E}_{Ely,H_2}=  P_{el,Ely} \enspace \eta_{Ely,H_2}
+\end{align}
+</script>
 </p>
 <p>
-<script type="math/tex; mode=display"> \dot{E}_{Ely,H_2,out}=  P_{el,Ely}\eta_{Ely,H_2} </script>
+<script type="math/tex; mode=display"> 
+\begin{equation}
+\dot{m}_{Ely,H_2} =  \frac{\dot{E}_{Ely,H_2}}{e_{H_2}} 
+\end{equation}
+</script>
 </p>
-<p><strong>Inputs und Outputs des Elektrolyseurs:</strong></p>
+<p>Due to the purification losses of the hydrogen caused by the reduction of oxygen molecules contained in the hydrogen gas in the catalyst, depending on the electrolysis technology, the actually obtained hydrogen energy or mass flow is reduced by the proportion of the hydrogen losses <script type="math/tex">\eta_{H_2 \ purification}</script> to the energy or mass flows, supplemented with index <script type="math/tex">out</script>:
+<script type="math/tex; mode=display"> \dot{E}_{Ely,H_2,out}=  (1-\eta_{H_2 \ purification}) \ \dot{E}_{Ely,H_2} </script>
+</p>
+<p>
+<script type="math/tex; mode=display"> \dot{m}_{Ely,H_2,out} = (1-\eta_{H_2 \ purification}) \ \dot{m}_{Ely,H_2} </script>
+</p>
+<p>Conversely, by rearranging and substituting the previous equations from a required hydrogen mass flow, the electrical power consumption can be calculated as follows:
+<script type="math/tex; mode=display"> P_{el,Ely} =  \frac{\dot{m}_{Ely,H_2,out} \ e_{H_2}}{\eta_{Ely,H_2} \ (1 - \eta_{H_2 \ purification})}  </script>
+</p>
+<p>The usable waste heat from the electrolysis process <script type="math/tex">\dot{Q}_{Ely,waste heat}</script> is determined, depending on the available information, as
+<script type="math/tex; mode=display">\dot{Q}_{Ely,waste heat} = \eta_{Ely,heat} \enspace (1-\eta_{Ely,H_2}) \enspace P_{el,Ely} = \frac{(1 - \eta_{Ely,H_2}) \ \eta_{Ely,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{Ely,H_2} } \ \dot{E}_{Ely,H_2,out} </script>
+</p>
+<p>With a known mass flow <script type="math/tex">\dot{m}_{HP,cool}</script> and the specific heat capacity of the heat transfer medium of the heat recovery <script type="math/tex">c_{p,cool}</script> as well as a known inlet temperature <script type="math/tex">T_{Ely,cool,in}</script>, the outlet temperature of the heat transfer medium from the cooling circuit <script type="math/tex">T_{Ely,cool,out}</script> can be determined by rearranging the following equation:
+<script type="math/tex; mode=display">\dot{Q}_{Ely,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{Ely,hot,out} - T_{Ely,cool,in})</script>
+</p>
+<p>The heat loss <script type="math/tex">\dot{Q}_{Ely,loss}</script>, which cannot be used and is dissipated to the environment via heat transport mechanisms, is calculated as follows</p>
+<p>
+<script type="math/tex; mode=display">  \dot{Q}_{Ely,loss} = P_{el,Ely} - \dot{Q}_{Ely,waste heat} - \dot{E}_{Ely,H_2} \\ =  P_{el,Ely} \ (1 - \eta_{Ely,heat} + \eta_{Ely,heat} \ \eta_{Ely,H_2} - \eta_{Ely,H_2}) </script>
+</p>
+<p>The actual needed power supply of the electrolyzer <script type="math/tex">P_{el,Ely,supply}</script> increases by losses in the power electronics and results from the electrical reference power <script type="math/tex">P_{el,Ely}</script> and the losses in the power electronics <script type="math/tex">\eta_{Ely,PE}</script> to
+<script type="math/tex; mode=display"> P_{el,Ely,supply} = \frac{P_{el,Ely}}{\eta_{Ely,PE}} </script>
+</p>
+<p>Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow <script type="math/tex">\dot{m}_{Ely,O_2,out}</script> is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:</p>
+<p>
+<script type="math/tex; mode=display">  \dot{m}_{Ely,O_2,out} =  v_{O_2,H_2} \enspace  \dot{m}_{Ely,H_2} </script>
+<script type="math/tex; mode=display"> \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{atomic \ mass \ 2 \ H_2} = \frac{2 * 15,9990 \ u}{2*2*1,0008 \ u} = 7,9386 </script>
+</p>
+<p>The required mass flow of water <script type="math/tex">\dot{m}_{Ely,H_2O,in}</script> can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses <script type="math/tex">\eta_{H_2O \ treatment}</script>.
+<script type="math/tex; mode=display"> \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} </script>
+</p>
+<p><strong>Assumption:</strong> The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. </p>
+<p><strong>Inputs and Outputs of the Electrolyser:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
@@ -277,142 +389,205 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/w
 <td>
 <script type="math/tex">P_{el,Ely}</script>
 </td>
-<td>Elektrische Leistungsaufnahme des Elektrolyseurs</td>
+<td>electrical power requirement of the electrolyser</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">P_{el,Ely,Bezug}</script>
+<script type="math/tex">P_{el,Ely,supply}</script>
 </td>
-<td>Elektrische Leistungsaufnahme des Elektrolyseurs inkl. Verluste der Leistungselektronik</td>
+<td>electrical power requirement of the electrolyser incl. losses of power electronics</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\dot{m}_{Ely,H_2O}</script>
+<script type="math/tex">\dot{m}_{Ely,H_2O,in}</script>
 </td>
-<td>Dem Elektrolyseur zugeführter Wasser-Massenstrom</td>
-<td>[kg/dt]</td>
+<td>water mass flow fed to the electrolyser</td>
+<td>[kg/h]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">\dot{m}_{Ely,O_2,out}</script>
 </td>
-<td>Dem Elektrolyseur abgeführter Sauerstoff-Massenstrom</td>
-<td>[kg/dt]</td>
+<td>oxygen mass flow delivered by the electrolyser</td>
+<td>[kg/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{m}_{Ely,H_2}</script>
+</td>
+<td>hydrogen mass flow produced by the electrolyser (before <script type="math/tex">H_2</script>-cleaning losses)</td>
+<td>[kg/h]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">\dot{m}_{Ely,H_2,out}</script>
 </td>
-<td>Dem Elektrolyseur abgeführter Wasserstoff-Massenstrom</td>
-<td>[kg/dt]</td>
+<td>hydrogen mass flow provided by the electrolyser (after <script type="math/tex">H_2</script>-cleaning losses)</td>
+<td>[kg/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{E}_{Ely,H_2}</script>
+</td>
+<td>hydrogen energy flow discharged from the electrolyser (before <script type="math/tex">H_2</script>-cleaning losses)</td>
+<td>[MW]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">\dot{E}_{Ely,H_2,out}</script>
 </td>
-<td>Dem Elektrolyseur abgeführter Wasserstoff-Energiestrom</td>
+<td>hydrogen energy flow provided by the electrolyser <script type="math/tex">after (H_2</script>-cleaning losses)</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{Ely,kühl,in}</script>
+<script type="math/tex">T_{Ely,cooling,in}</script>
 </td>
-<td>Kühlwassereintrittstemperatur Elektrolyseur</td>
+<td>cooling fluid inlet temperature of electrolyser</td>
 <td>[°C]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">T_{Ely,kühl,out}</script>
+<script type="math/tex">T_{Ely,cooling,out}</script>
 </td>
-<td>Kühlwasseraustrittstemperatur Elektrolyseur</td>
+<td>cooling fluid outlet temperature of electrolyser</td>
 <td>[°C]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\dot{Q}_{Ely,Abwärme}</script>
+<script type="math/tex">\dot{Q}_{Ely,waste heat}</script>
 </td>
-<td>Dem Elektrolyseur abgeführte Abwärme</td>
+<td>waste heat provided by the electrolyser</td>
 <td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\dot{Q}_{Ely,Verlust}</script>
+<script type="math/tex">\dot{Q}_{Ely,loss}</script>
 </td>
-<td>Verluste im Elektrolyseur (ungenutze Abwärme)</td>
+<td>thermal losses in elektrolyser (unused waste heat))</td>
 <td>[MW]</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Weitere Parameter des Elektrolyseurs:</strong></p>
+<p><strong>Parameter of the Electrolyser:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>
-<script type="math/tex">\eta_{Ely,H_2}</script>
+<script type="math/tex">P_{el,Ely,max}</script>
 </td>
-<td>Wirkungsgrad der Wasserstoffgewinnung des Elektrolyseurs ( <script type="math/tex">\dot{E}_{Ely,H_2,out}</script> bezogen auf <script type="math/tex">P_{el,Ely}</script> )</td>
+<td>electric power consumption of the electrolyser under full load (operating state 100 %) [MW].</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,max})</script>
+</td>
+<td>efficiency of hydrogen production of the electrolyser (<script type="math/tex">\dot{E}_{Ely,H_2,out}</script> related to <script type="math/tex">P_{el,Ely}</script> as a function of operating state, plant size and plant type)</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\eta_{Ely,Wärmeauskopplung}</script>
+<script type="math/tex">\eta_{Ely,heat}</script>
 </td>
-<td>Wirkungsgrad der nutzbaren Wärmeauskopplung des Elektrolyseurs (bezogen auf <script type="math/tex">1-\eta_{Ely,H_2}</script>)</td>
-<td>[-]</td>
-</tr>
-<tr>
-<td>
-<script type="math/tex">\eta_{Ely,O_2}</script>
-</td>
-<td>Verhältnis von Sauerstoff- zu Wasserstoffgewinnung (Stöchiometrie)</td>
+<td>efficiency of the usable heat extraction of the electrolyzer (related to <script type="math/tex">1-\eta_{Ely,H_2}</script>)</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">\eta_{Ely,LE}</script>
 </td>
-<td>Wirkungsgrad der Leistungselektronik des Elektrolyseurs</td>
+<td>efficiency of the power electronics of the electrolyser</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">TL_{Ely,min}</script>
+<script type="math/tex">PL_{Ely,min}</script>
 </td>
-<td>minimal mögliche Teilllast des Elektrolyseurs</td>
+<td>minimum allowed partial load of the electrolyzer</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">MB_{Ely}</script>
 </td>
-<td>Mindestbetriebszeit des Elektrolyseurs</td>
+<td>minimum operating time of the electrolyser</td>
 <td>[min]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">AN_{Ely}</script>
 </td>
-<td>Anlaufdauer des Elektrolyseurs bis zur vollen Wärmeauskopplung (linearer Verlauf)</td>
+<td>start-up time of the electrolyser until full heat extraction (linear curve)</td>
 <td>[min]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">e_{H_2} </script>
+</td>
+<td>mass-related energy of hydrogen (net calorific value or gross calorific value)</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">v_{O_2,H_2} </script>
+</td>
+<td>stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis</td>
+<td>[kg <script type="math/tex">O_2</script> / kg <script type="math/tex">H_2</script>]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{H_2 \ purification} </script>
+</td>
+<td>percentage of purification losses in hydrogen purification</td>
+<td>[%]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{H_2O \ treatment} </script>
+</td>
+<td>percentage of purification losses in water treatment</td>
+<td>[%]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">p_{H_2,Ely} </script>
+</td>
+<td>pressure of hydrogen supply</td>
+<td>[bar]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">p_{O_2,Ely} </script>
+</td>
+<td>pressure of oxygen supply</td>
+<td>[bar]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">T_{Ely,cooling,in,max}</script>
+</td>
+<td>max. temperature of cooling medium input</td>
+<td>[°C]</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Zustandsvariablen des Elektrolyseurs:</strong></p>
+<p><strong>State variables of the Electrolyser:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Formelzeichen</th>
-<th>Beschreibung</th>
-<th>Einheit</th>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
 </tr>
 </thead>
 <tbody>
@@ -420,20 +595,50 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/w
 <td>
 <script type="math/tex">x_{Ely}</script>
 </td>
-<td>Aktueller Betriebspunkt (an, aus, Teilllast)</td>
+<td>current  operating state (on, off, part load)</td>
 <td>[%]</td>
 </tr>
 </tbody>
 </table>
-<h2 id="ruckkuhlung-fur-elektrolyseur">Rückkühlung für Elektrolyseur</h2>
-<h2 id="brennstoffzelle">Brennstoffzelle</h2>
-<h2 id="bhkw">BHKW</h2>
-<h2 id="spitzenlastkessel-erdgas">Spitzenlastkessel (Erdgas)</h2>
-<h2 id="pufferspeicher">Pufferspeicher</h2>
-<h2 id="langzeitwarmespeicher">Langzeitwärmespeicher</h2>
-<h2 id="warmequellen">Wärmequellen</h2>
+<h2 id="combined-heat-and-power-plant-chp">Combined heat and power plant (CHP)</h2>
+<h2 id="gas-boiler-peak-load">Gas boiler (peak load)</h2>
+<h2 id="woodchip-boiler">Woodchip boiler</h2>
+<h2 id="heat-sources">Heat sources</h2>
+<h3 id="soil">Soil</h3>
+<ul>
+<li>geothermal probes</li>
+<li>geothermal collector </li>
+</ul>
+<h3 id="water">Water</h3>
+<ul>
+<li>groundwater well</li>
+<li>surface waters</li>
+<li>waste heat from industrial processes</li>
+<li>wastewater</li>
+<li>solar thermal collector</li>
+</ul>
+<h3 id="air">Air</h3>
+<ul>
+<li>ambient air</li>
+<li>exhaust air</li>
+<li>hot air absorber</li>
+</ul>
 <p>(Vergleich FutureHeatPump II Projekt)</p>
-<h2 id="wasserstoffverdichter">Wasserstoffverdichter</h2>
+<h2 id="chiller">Chiller</h2>
+<h3 id="simple-model-for-electrolyser">Simple model for electrolyser</h3>
+<h3 id="general-model-for-cooling-purposes">General model for cooling purposes</h3>
+<h2 id="short-term-heat-storage">Short-term heat storage</h2>
+<h2 id="seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</h2>
+<h3 id="tank-thermal-energy-storage-ttes">Tank thermal energy storage (TTES)</h3>
+<h3 id="pit-thermal-energy-storage-ptes">Pit thermal energy storage (PTES)</h3>
+<h3 id="borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</h3>
+<h3 id="aquifer-thermal-energy-storage-ates">Aquifer thermal energy storage (ATES)</h3>
+<h2 id="ice-storage">Ice storage</h2>
+<h2 id="hydrogen-fuel-cell">Hydrogen fuel cell</h2>
+<h2 id="photovoltaik-pv">Photovoltaik (PV)</h2>
+<h2 id="wind-power">Wind power</h2>
+<h2 id="battery">Battery</h2>
+<h2 id="hydrogen-compressor">Hydrogen compressor</h2>
               
             </div>
           </div><footer>

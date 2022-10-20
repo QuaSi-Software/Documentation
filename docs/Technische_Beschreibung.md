@@ -1,151 +1,272 @@
-# Technische Beschreibung von Hauptkomponenten
+# Technical description of main components
 
-## Wärmepumpe
-Als Wärmepumpe können elektrisch betriebene Kompressor-Wärmepumpen in das Modell eingebunden werden. Deren allgemeines Anlagenschema ist Abbildung 1 zu entnehmen. 
+## Heat pump (HP)
+As heat pumps, electrically driven variable-speed compressor heat pumps can be integrated into the simulation model. Their general system diagram is shown in figure 1. 
 
-Abb. 1: Allgemeines Anlagenschema einer Wärmepumpe
+Fig. 1: General system chart of a heat pump
 
-![Image title](fig/WP_overview.png)
+![Image title](fig/221018_WP_Anlagenschema.png)
 
-Die Energiebilanz an der Wärmepumpe setzt sich aus dem zugeführten Strom, der zugeführten Wärme auf niedrigem Temperaturniveau sowie dem abgeführten Wärmestrom auf höherem Temperaturniveau zusammen. Der Wirkungsgrad der Wärmepumpe wird dabei definiert über die Leistungszahl (COP) in Abhängigkeit der Kondensator-Austrittstemperatur sowie der Verdampfer-Eintrittstemperatur (vgl. Abbildung 2).
+The energy balance at the heat pump is composed of the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).
 
-Abb. 2: Energiebilanz der modellierten Wärmepumpe
+Fig. 2: Energy balance of the heat pump model
 
 ![Image title](fig/221006_Wärmepumpe_Energiefluss.png)
  
-Die Leistungszahl bestimmt die benötigte elektrische Leistung \(P_{el,WP}\), um die Temperatur eines Massenstroms von dem Temperaturniveau \(T_{WP,Quelle,in}\) auf \(T_{WP,Senke,out}\) anzuheben: 
+The coefficient of performance (COP) determines the electrical power required \(P_{el,HP}\) to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
-$$\epsilon_{WP} = \frac{\dot{Q}_{WP,ab}}{P_{el,WP}} \quad ( < \frac{1}{\eta_{Carnot}} = \frac{T_{WP,Senke,out}}{T_{WP,Senke,out}-T_{WP,Quelle,in} } )$$
 
-Die Leistungszahl ist dabei immer kleiner als der maximal mögliche Carnot-Wirkungsgrad (\(\eta_{Carnot}\)), der aus der Kondensator-Austritts- und Verdampfer-Eintrittstemperatur berechnet wird. In Quasi II ist ein COP-Kennfeld für verschiedene representative Wärmepumpen gegeben, auf denen die weiteren Berechnungen aufbauen. Beispielhat ist ein Kennfeld einer Hochtemperatur-Wärmepumpe in der folgenden Abbildung als Kurvenschar gezeigt.
+$$COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}}{T_{HP,sink,out}-T_{HP,source,in} } $$
 
-Abb. 3: Kennfeld einer Hochtemperaturwärmepumpe als Kurvenschar
+$$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
+
+The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, a COP chart is given for various representative heat pumps, on which the further calculations are based. For example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature.
+
+Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
 ![Image title](fig/COP_Kennfeld_Beispiel.png)
 
-Die Energiebilanz (bzw. Leistungsbilanz) der Wärmepumpe lässt sich nach Abbildung 2 aufstellen sowie ein Zusammenhang zwischen zu- und abgeführter Wärmeleistung in Abhängigkeit der Leistungszahl bestimmen: 
+The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: 
 
-$$\dot{Q}_{WP,ab} = \frac{\epsilon_{WP}}{\epsilon_{WP} -1} \ \dot{Q}_{WP,zu} \mathrm{\quad mit \quad} \dot{Q}_{WP,ab} = \dot{Q}_{WP,zu} + P_{WP,el}$$
+$$\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\quad mit \quad} \dot{Q}_{HP,out} = \dot{Q}_{HP,in} + P_{HP,el} $$
 
-Die Leistung des Strombezugs der Wärmepumpe inklusive der Verluste der Leistungselektronik ergibt sich als: 
+The power of the heat pump's electric supply, including the losses of the power electronics, is given as: 
 
-$$P_{el,WP,Bezug} = \frac{P_{el,WP}}{\eta_{WP,LE}}$$
+$$P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
 
-**Annahme:** Thermische Verluste der WP sind bereits in Leistungszahl mit einberechnet. 
+**Assumption:** Thermal losses of the HP are already included in the coefficient of performance. 
 
-Da auch die bisher nicht betrachteten Temperaturen der ein- und austretenden Wärmeströme in bzw. aus der Wärmepumpe von Relevanz sind, können die Wärmeleistungen anhand des jeweiligen Massenstroms \(\dot{m}\) und der physikalischen Eigenschaften des Wärmeträgermediums (spezifische Wärmekapazität \(c_{p}\) sowie ggf. der Dichte \(\rho\)) durch Umstellen der folgenden Gleichung berechnet werden:
+**Assumption:** The heat output of the heat pump behaves linearly in part load operation between \(\dot{Q}_{HP,min}\) at \(PL_{HP,min}\) and \(\dot{Q}_{HP,max}\) at 100% compressor speed:
+
+![Image title](fig/221018_WP_Teillast_Heizleistung.png)
+
+The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?!:
+
+![Image title](fig/COP_Teillast.png)
+
+Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf
+
+Exemplary correction curve for the COP at partial load and a 4\(^{th}\) grade fitting polynome:
+
+![Image title](fig/221020_COP_curve_PL.png)
+
+
+Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
 
 $$\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})$$
 
-**Inputs und Outputs der Wärmepumpe:**
 
-Formelzeichen| Beschreibung | Einheit
+**Inputs und Outputs of the Heat Pump:**
+
+Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{WP,zu}\)  | Der WP zugeführte Wärmestrom (Wärmequelle)   | [MW]
-\(\dot{Q}_{WP,ab}\)   | Der WP abgeführte Wärmestrom (Wärmesenke)   | [MW]
-\(P_{el,WP}\)   | Elektrische Leistungsaufnahme der WP   | [MW]
-\(P_{el,WP,Bezug}\)   | Elektrische Leistungsaufnahme der WP inkl. Verluste der Leistungselektronik   | [MW]
-\(T_{WP,Senke,in}\)   | Kondensator-Eintrittstemperatur   | [°C]
-\(T_{WP,Senke,out}\)   | Kondensator-Austrittstemperatur   | [°C]
-\(T_{WP,Quelle,in}\)   | Verdampfer-Eintrittstemperatur   | [°C]
-\(T_{WP,Quelle,out}\)   | Verdampfer-Austrittstemperatur   | [°C]
+\(\dot{Q}_{HP,in}\) | heat flow supplied to the HP (heat source) | [MW]
+\(\dot{Q}_{HP,out}\) | heat flow leaving the HP (heat sink) | [MW]
+\(P_{el,HP}\) | electric power demand of the HP | [MW]
+\(P_{el,HP,supply}\) | electric power demand of the HP incl. losses of the power electronics | [MW]
+\(T_{HP,sink,in}\) | condenser inlet temperature | [°C]
+\(T_{HP,sink,out}\) | condenser outlet temperature | [°C]
+\(T_{HP,source,in}\) | evaporator inlet temperature | [°C]
+\(T_{HP,source,out}\) | evaporator outlet temperature | [°C]
 
-**Weitere Parameter der Wärmepumpe:**
+**Parameter of the Heat Pump:**
 
-Formelzeichen| Beschreibung | Einheit
+Symbol | Description | Unit
 -------- | -------- | --------
-\(\epsilon_{WP}\)  | Leistungszahl (COP) der Wärmepumpe inkl. thermische Verluste in Abhängigkeit von \(T_{WP,Senke,out}\) und \(T_{WP,Quelle,in}\) und von Teilllast??? | [-]
-\(\eta_{WP,LE}\)  | Wirkungsgrad der Leistungselektronik für Wärmepumpe    | [-]
-\(TL_{WP,min}\)  | minimal mögliche Teilllast der Wärmepume    | [-]
-\(MB_{WP}\)  | Mindestbetriebszeit der Wärmepumpe    | [min]
+\(\dot{Q}_{HP,max}\) | maximum thermal power of the heat pump | [MW]
+\(\dot{Q}_{HP,min}\) | minimum thermal power of the heat pump at \(PL_{HP,min}\) | [MW]
+\(PL_{HP,min}\) | minimum possible part load of the heat pump [%]
+\(COP_{HP}(T_{HP,sink,out}, T_{HP,source,in}, x_{HP})\) | coefficient of performance (COP) of the heat pump incl. thermal losses depending on \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) and on current state \(x_{HP}\) | [-]
+\(\eta_{HP,PE}\) | efficiency of power electronics of heat pump | [-]
+\(\eta_{Carnot}\) | efficiency factor of heat pump, reduces the Carnot-COP | [-]
+\(MOT_{HP}\) | minimum operating time of heat pump | [min]
 
-**Zustandsvariablen der Wärmepumpe:**
+**State Variables of Heat Pump:**
 
-Formelzeichen| Beschreibung | Einheit
+Symbol | Description | Unit
 -------- | -------- | --------
-\(x_{WP}\)  | Aktueller Betriebspunkt (an, aus, Teilllast)   | [%]
+\(x_{HP}\)  | current operating state (on, off, part load)   | [%]
 
 **ToDo**: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
-Anpassung des COPs über lineare oder quadratische Funktion? Quadratische Funktion nicht invertierbar --> Iterative Lösung notwendig? Oder lineare Anpassung des Wirkungsgrades in Teillast? Oder konstander Wirkungsgrad in Teillast?
+Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?
 
-Beispiel für quadratische Teillast: 
+Beispiel für quadratische Teillastverhalten des COPs: 
 
 ![Image title](fig/Beispiel_fuer_Teillast.png)
-Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf
+Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf
+
+**ToDo:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?
 
 
-## Elektrolyseur
-Der Elektrolyseur verwendet elektrische Energie, um Wasser in die Bestandteile Wasserstoff (\(H_2\)) und Sauerstoff (\(O_2\)) aufzuspalten. Die dabei entstehende Abwärme kann direkt oder über eine Wärmepume nutzbar gemacht werden.
+## Electrolyser
+The electrolyzer uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
 
-Abb. 3: Energie- und Stoffströme am Elektrolyseur
+$$ 2 \ H_2O \rightarrow 2 \ H_2 + O_2 $$
+
+If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyzer. 
+
+The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
+
+Fig. 3: Energy and mass flows in the electrolyser
 
 ![Image title](fig/221013_Elektrolyseur.png)
 
+The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{Ely,H_2}\)) or mass flow (\(\dot{m}_{Ely,H_2}\))) and the consumption of electrical energy (\( P_{el,Ely} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
+$$
+\begin{align}
+\dot{E}_{Ely,H_2}=  P_{el,Ely} \enspace \eta_{Ely,H_2}
+\end{align}
+$$
 
-$$\dot{Q}_{Ely,Abwärme} = \eta_{Ely,Wärmeauskopplung} \ (1-\eta_{Ely,H_2}) \ P_{el,Ely} = \eta_{Ely,Wärmeauskopplung} \ (P_{el,Ely} - \dot{E}_{Ely,H_2,out}) $$
+$$ 
+\begin{equation}
+\dot{m}_{Ely,H_2} =  \frac{\dot{E}_{Ely,H_2}}{e_{H_2}} 
+\end{equation}
+$$
+
+Due to the purification losses of the hydrogen caused by the reduction of oxygen molecules contained in the hydrogen gas in the catalyst, depending on the electrolysis technology, the actually obtained hydrogen energy or mass flow is reduced by the proportion of the hydrogen losses \(\eta_{H_2 \ purification}\) to the energy or mass flows, supplemented with index \(out\):
+$$ \dot{E}_{Ely,H_2,out}=  (1-\eta_{H_2 \ purification}) \ \dot{E}_{Ely,H_2} $$
+
+$$ \dot{m}_{Ely,H_2,out} = (1-\eta_{H_2 \ purification}) \ \dot{m}_{Ely,H_2} $$
 
 
-$$ \dot{E}_{Ely,H_2,out}=  P_{el,Ely}\eta_{Ely,H_2} $$
+Conversely, by rearranging and substituting the previous equations from a required hydrogen mass flow, the electrical power consumption can be calculated as follows:
+$$ P_{el,Ely} =  \frac{\dot{m}_{Ely,H_2,out} \ e_{H_2}}{\eta_{Ely,H_2} \ (1 - \eta_{H_2 \ purification})}  $$
+
+The usable waste heat from the electrolysis process \(\dot{Q}_{Ely,waste heat}\) is determined, depending on the available information, as
+$$\dot{Q}_{Ely,waste heat} = \eta_{Ely,heat} \enspace (1-\eta_{Ely,H_2}) \enspace P_{el,Ely} = \frac{(1 - \eta_{Ely,H_2}) \ \eta_{Ely,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{Ely,H_2} } \ \dot{E}_{Ely,H_2,out} $$ 
+
+With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{Ely,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{Ely,cool,out}\) can be determined by rearranging the following equation:
+$$\dot{Q}_{Ely,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{Ely,hot,out} - T_{Ely,cool,in})$$
+
+The heat loss \(\dot{Q}_{Ely,loss}\), which cannot be used and is dissipated to the environment via heat transport mechanisms, is calculated as follows
+
+$$  \dot{Q}_{Ely,loss} = P_{el,Ely} - \dot{Q}_{Ely,waste heat} - \dot{E}_{Ely,H_2} \\ =  P_{el,Ely} \ (1 - \eta_{Ely,heat} + \eta_{Ely,heat} \ \eta_{Ely,H_2} - \eta_{Ely,H_2}) $$
+
+The actual needed power supply of the electrolyzer \(P_{el,Ely,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,Ely}\) and the losses in the power electronics \(\eta_{Ely,PE}\) to
+$$ P_{el,Ely,supply} = \frac{P_{el,Ely}}{\eta_{Ely,PE}} $$
+
+Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{Ely,O_2,out}\) is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:
+
+$$  \dot{m}_{Ely,O_2,out} =  v_{O_2,H_2} \enspace  \dot{m}_{Ely,H_2} $$
+$$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{atomic \ mass \ 2 \ H_2} = \frac{2 * 15,9990 \ u}{2*2*1,0008 \ u} = 7,9386 $$
+
+The required mass flow of water \(\dot{m}_{Ely,H_2O,in}\) can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses \(\eta_{H_2O \ treatment}\).
+$$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
+
+**Assumption:** The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
 
 
+**Inputs and Outputs of the Electrolyser:**
 
-**Inputs und Outputs des Elektrolyseurs:**
-
-Formelzeichen| Beschreibung | Einheit
+Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,Ely}\)   | Elektrische Leistungsaufnahme des Elektrolyseurs   | [MW]
-\(P_{el,Ely,Bezug}\)   | Elektrische Leistungsaufnahme des Elektrolyseurs inkl. Verluste der Leistungselektronik   | [MW]
-\(\dot{m}_{Ely,H_2O}\)  | Dem Elektrolyseur zugeführter Wasser-Massenstrom  | [kg/dt]
-\(\dot{m}_{Ely,O_2,out}\)  | Dem Elektrolyseur abgeführter Sauerstoff-Massenstrom  | [kg/dt]
-\(\dot{m}_{Ely,H_2,out}\)  | Dem Elektrolyseur abgeführter Wasserstoff-Massenstrom  | [kg/dt]
-\(\dot{E}_{Ely,H_2,out}\)  | Dem Elektrolyseur abgeführter Wasserstoff-Energiestrom  | [MW]
-\(T_{Ely,kühl,in}\)   | Kühlwassereintrittstemperatur Elektrolyseur   | [°C]
-\(T_{Ely,kühl,out}\)   | Kühlwasseraustrittstemperatur Elektrolyseur   | [°C]
-\(\dot{Q}_{Ely,Abwärme}\)  | Dem Elektrolyseur abgeführte Abwärme  | [MW]
-\(\dot{Q}_{Ely,Verlust}\)  | Verluste im Elektrolyseur (ungenutze Abwärme)  | [MW]
+\(P_{el,Ely}\)   | electrical power requirement of the electrolyser   | [MW]
+\(P_{el,Ely,supply}\)   | electrical power requirement of the electrolyser incl. losses of power electronics   | [MW]
+\(\dot{m}_{Ely,H_2O,in}\)  | water mass flow fed to the electrolyser  | [kg/h]
+\(\dot{m}_{Ely,O_2,out}\)  | oxygen mass flow delivered by the electrolyser  | [kg/h]
+\(\dot{m}_{Ely,H_2}\)  | hydrogen mass flow produced by the electrolyser (before \(H_2\)-cleaning losses)  | [kg/h]
+\(\dot{m}_{Ely,H_2,out}\)  | hydrogen mass flow provided by the electrolyser (after \(H_2\)-cleaning losses)  | [kg/h]
+\(\dot{E}_{Ely,H_2}\)  | hydrogen energy flow discharged from the electrolyser (before \(H_2\)-cleaning losses) | [MW]
+\(\dot{E}_{Ely,H_2,out}\)  | hydrogen energy flow provided by the electrolyser \(after (H_2\)-cleaning losses) | [MW]
+\(T_{Ely,cooling,in}\)   | cooling fluid inlet temperature of electrolyser   | [°C]
+\(T_{Ely,cooling,out}\)   | cooling fluid outlet temperature of electrolyser   | [°C]
+\(\dot{Q}_{Ely,waste heat}\)  | waste heat provided by the electrolyser  | [MW]
+\(\dot{Q}_{Ely,loss}\)  | thermal losses in elektrolyser (unused waste heat))  | [MW]
 
-**Weitere Parameter des Elektrolyseurs:**
+**Parameter of the Electrolyser:**
 
-Formelzeichen| Beschreibung | Einheit
+Symbol | Description | Unit
 -------- | -------- | --------
-\(\eta_{Ely,H_2}\)  | Wirkungsgrad der Wasserstoffgewinnung des Elektrolyseurs ( \(\dot{E}_{Ely,H_2,out}\) bezogen auf \(P_{el,Ely}\) )    | [-]
-\(\eta_{Ely,Wärmeauskopplung}\)  | Wirkungsgrad der nutzbaren Wärmeauskopplung des Elektrolyseurs (bezogen auf \(1-\eta_{Ely,H_2}\))   | [-]
-\(\eta_{Ely,O_2}\)  | Verhältnis von Sauerstoff- zu Wasserstoffgewinnung (Stöchiometrie)   | [-]
-\(\eta_{Ely,LE}\)  | Wirkungsgrad der Leistungselektronik des Elektrolyseurs    | [-]
-\(TL_{Ely,min}\)  | minimal mögliche Teilllast des Elektrolyseurs    | [-]
-\(MB_{Ely}\)  | Mindestbetriebszeit des Elektrolyseurs    | [min]
-\(AN_{Ely}\)  | Anlaufdauer des Elektrolyseurs bis zur vollen Wärmeauskopplung (linearer Verlauf)   | [min]
+\(P_{el,Ely,max}\) | electric power consumption of the electrolyser under full load (operating state 100 %) [MW].
+\(\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,max})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type) | [-]
+\(\eta_{Ely,heat}\) | efficiency of the usable heat extraction of the electrolyzer (related to \(1-\eta_{Ely,H_2}\))   | [-]
+\(\eta_{Ely,LE}\) | efficiency of the power electronics of the electrolyser | [-]
+\(PL_{Ely,min}\) | minimum allowed partial load of the electrolyzer | [-]
+\(MB_{Ely}\) | minimum operating time of the electrolyser | [min]
+\(AN_{Ely}\) | start-up time of the electrolyser until full heat extraction (linear curve) | [min]
+\(e_{H_2} \) | mass-related energy of hydrogen (net calorific value or gross calorific value)
+\(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
+\(\eta_{H_2 \ purification} \) | percentage of purification losses in hydrogen purification | [%]
+\(\eta_{H_2O \ treatment} \) | percentage of purification losses in water treatment | [%]
+\(p_{H_2,Ely} \) | pressure of hydrogen supply | [bar]
+\(p_{O_2,Ely} \) | pressure of oxygen supply | [bar]
+\(T_{Ely,cooling,in,max}\) | max. temperature of cooling medium input | [°C]
 
 
-**Zustandsvariablen des Elektrolyseurs:**
+**State variables of the Electrolyser:**
 
-Formelzeichen| Beschreibung | Einheit
+Symbol | Description | Unit
 -------- | -------- | --------
-\(x_{Ely}\)  | Aktueller Betriebspunkt (an, aus, Teilllast)   | [%]
-
-## Rückkühlung für Elektrolyseur 
+\(x_{Ely}\)  | current 	operating state (on, off, part load)   | [%]
 
 
-## Brennstoffzelle
+## Combined heat and power plant (CHP)
 
 
-## BHKW
+## Gas boiler (peak load)
 
 
-## Spitzenlastkessel (Erdgas)
+## Woodchip boiler
 
 
-## Pufferspeicher
+## Heat sources 
+### Soil
+- geothermal probes
+- geothermal collector 
+
+### Water
+- groundwater well
+- surface waters
+- waste heat from industrial processes
+- wastewater
+- solar thermal collector
+
+### Air 
+- ambient air
+- exhaust air
+- hot air absorber
 
 
-## Langzeitwärmespeicher
 
-
-## Wärmequellen 
 (Vergleich FutureHeatPump II Projekt)
 
 
-## Wasserstoffverdichter
+## Chiller 
+### Simple model for electrolyser
+
+### General model for cooling purposes
+
+
+## Short-term heat storage
+
+
+## Seasonal thermal energy storage (STES)
+### Tank thermal energy storage (TTES)
+
+### Pit thermal energy storage (PTES)
+
+### Borehole thermal energy storage (BTES)
+
+### Aquifer thermal energy storage (ATES)
+
+
+## Ice storage
+
+
+## Hydrogen fuel cell
+
+
+## Photovoltaik (PV)
+
+
+## Wind power
+
+
+## Battery
+
+
+## Hydrogen compressor
 
 
 
