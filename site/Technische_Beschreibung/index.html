@@ -51,11 +51,13 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#electrolyser">Electrolyser</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reduction-of-usable-heat-during-start-up">Reduction of usable heat during start-up</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#combined-heat-and-power-plant-chp">Combined heat and power plant (CHP)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#gas-boiler-peak-load">Gas boiler (peak load)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#gas-boiler-gb">Gas boiler (GB)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#woodchip-boiler">Woodchip boiler</a>
+    <li class="toctree-l2"><a class="reference internal" href="#woodchip-boiler-wb">Woodchip boiler (WB)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#heat-sources">Heat sources</a>
         <ul>
@@ -67,7 +69,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#chiller">Chiller</a>
+    <li class="toctree-l2"><a class="reference internal" href="#chiller-ch">Chiller (CH)</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#simple-model-for-electrolyser">Simple model for electrolyser</a>
     </li>
@@ -75,7 +77,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#short-term-heat-storage">Short-term heat storage</a>
+    <li class="toctree-l2"><a class="reference internal" href="#short-term-thermal-energy-storage-sttes">Short-term thermal energy storage (STTES)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</a>
         <ul>
@@ -89,17 +91,17 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#ice-storage">Ice storage</a>
+    <li class="toctree-l2"><a class="reference internal" href="#ice-storage-is">Ice storage (IS)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-fuel-cell">Hydrogen fuel cell</a>
+    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-fuel-cell-fc">Hydrogen fuel cell (FC)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#photovoltaik-pv">Photovoltaik (PV)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#wind-power">Wind power</a>
+    <li class="toctree-l2"><a class="reference internal" href="#wind-power-wp">Wind power (WP)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#battery">Battery</a>
+    <li class="toctree-l2"><a class="reference internal" href="#battery-ba">Battery (BA)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-compressor">Hydrogen compressor</a>
+    <li class="toctree-l2"><a class="reference internal" href="#hydrogen-compressor-hc">Hydrogen compressor (HC)</a>
     </li>
     </ul>
                 </li>
@@ -132,7 +134,7 @@
 <p>As heat pumps, electrically driven variable-speed compressor heat pumps can be integrated into the simulation model. Their general system diagram is shown in figure 1. </p>
 <p>Fig. 1: General system chart of a heat pump</p>
 <p><img alt="Image title" src="../fig/221018_WP_Anlagenschema.png" /></p>
-<p>The energy balance at the heat pump is composed of the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).</p>
+<p>The energy balance at the heat pump is built up from the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).</p>
 <p>Fig. 2: Energy balance of the heat pump model</p>
 <p><img alt="Image title" src="../fig/221006_W%C3%A4rmepumpe_Energiefluss.png" /></p>
 <p>The coefficient of performance (COP) determines the electrical power required <script type="math/tex">P_{el,HP}</script> to raise the temperature of a mass flow from the lower temperature level <script type="math/tex">T_{HP,source,in}</script> to <script type="math/tex">T_{HP,sink,out}</script>: </p>
@@ -145,6 +147,7 @@
 <p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, a COP chart is given for various representative heat pumps, on which the further calculations are based. For example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature.</p>
 <p>Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves</p>
 <p><img alt="Image title" src="../fig/COP_Kennfeld_Beispiel.png" /></p>
+<p>In part load operation, the COP of a heat pump is variing. </p>
 <p>The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: </p>
 <p>
 <script type="math/tex; mode=display">\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\quad mit \quad} \dot{Q}_{HP,out} = \dot{Q}_{HP,in} + P_{HP,el} </script>
@@ -155,12 +158,13 @@
 </p>
 <p><strong>Assumption:</strong> Thermal losses of the HP are already included in the coefficient of performance. </p>
 <p><strong>Assumption:</strong> The heat output of the heat pump behaves linearly in part load operation between <script type="math/tex">\dot{Q}_{HP,min}</script> at <script type="math/tex">PL_{HP,min}</script> and <script type="math/tex">\dot{Q}_{HP,max}</script> at 100% compressor speed:</p>
+<p>Fig. 4: Linear behaviour of thermal output power in part load operation</p>
 <p><img alt="Image title" src="../fig/221018_WP_Teillast_Heizleistung.png" /></p>
-<p>The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?!:</p>
+<p>The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?! TODO:</p>
 <p><img alt="Image title" src="../fig/COP_Teillast.png" /></p>
 <p>Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</p>
 <p>Exemplary correction curve for the COP at partial load and a 4<script type="math/tex">^{th}</script> grade fitting polynome:</p>
-<p><img alt="Image title" src="../fig/221020_COP_curve_PL.png" /></p>
+<p><img alt="Image title" src="../fig/221020_COP_curve_PL_2.png" /></p>
 <p>Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow <script type="math/tex">\dot{m}</script> and the physical properties of the heat transfer medium (specific heat capacity <script type="math/tex">c_{p}</script> and, if applicable, the density <script type="math/tex">\rho</script>) by rearranging the following equation:</p>
 <p>
 <script type="math/tex; mode=display">\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})</script>
@@ -294,6 +298,13 @@
 <td>minimum operating time of heat pump</td>
 <td>[min]</td>
 </tr>
+<tr>
+<td>
+<script type="math/tex">SUP_{HP}</script>
+</td>
+<td>start-up time of the HP until full heat supply (linear curve)</td>
+<td>[min]</td>
+</tr>
 </tbody>
 </table>
 <p><strong>State Variables of Heat Pump:</strong></p>
@@ -315,12 +326,12 @@
 </tr>
 </tbody>
 </table>
-<p><strong>ToDo</strong>: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
+<p><strong>TODO</strong>: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
 Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?</p>
 <p>Beispiel für quadratische Teillastverhalten des COPs: </p>
 <p><img alt="Image title" src="../fig/Beispiel_fuer_Teillast.png" />
 Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf</p>
-<p><strong>ToDo:</strong> COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?</p>
+<p><strong>TODO:</strong> COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?</p>
 <h2 id="electrolyser">Electrolyser</h2>
 <p>The electrolyzer uses electrical energy to split water into its components hydrogen (<script type="math/tex">H_2</script>) and oxygen (<script type="math/tex">O_2</script>) as shown in the following reaction equation: </p>
 <p>
@@ -328,7 +339,7 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 </p>
 <p>If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyzer. </p>
 <p>The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.</p>
-<p>Fig. 3: Energy and mass flows in the electrolyser</p>
+<p>Fig. 5: Energy and mass flows in the electrolyser</p>
 <p><img alt="Image title" src="../fig/221013_Elektrolyseur.png" /></p>
 <p>The relationship between supplied hydrogen of the electrolysis (energy (<script type="math/tex">\dot{E}_{Ely,H_2}</script>) or mass flow (<script type="math/tex">\dot{m}_{Ely,H_2}</script>)) and the consumption of electrical energy (<script type="math/tex"> P_{el,Ely} </script>) is given in the following equation, where <script type="math/tex">e_{H_2}</script> can be either the net or the gross calorific value of the hydrogen:
 <script type="math/tex; mode=display">
@@ -375,6 +386,7 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <script type="math/tex; mode=display"> \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} </script>
 </p>
 <p><strong>Assumption:</strong> The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. </p>
+<p><strong>TODO:</strong> Efficiency decrease (el.) due to degradation?</p>
 <p><strong>Inputs and Outputs of the Electrolyser:</strong></p>
 <table>
 <thead>
@@ -483,14 +495,14 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <tbody>
 <tr>
 <td>
-<script type="math/tex">P_{el,Ely,max}</script>
+<script type="math/tex">P_{el,Ely,rated}</script>
 </td>
-<td>electric power consumption of the electrolyser under full load (operating state 100 %) [MW].</td>
-<td></td>
+<td>electric power consumption of the electrolyser under full load (operating state 100 %)</td>
+<td>[MW]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,max})</script>
+<script type="math/tex">\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,rated})</script>
 </td>
 <td>efficiency of hydrogen production of the electrolyser (<script type="math/tex">\dot{E}_{Ely,H_2,out}</script> related to <script type="math/tex">P_{el,Ely}</script> as a function of operating state, plant size and plant type)</td>
 <td>[-]</td>
@@ -518,16 +530,16 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 </tr>
 <tr>
 <td>
-<script type="math/tex">MB_{Ely}</script>
+<script type="math/tex">MOT_{Ely}</script>
 </td>
 <td>minimum operating time of the electrolyser</td>
 <td>[min]</td>
 </tr>
 <tr>
 <td>
-<script type="math/tex">AN_{Ely}</script>
+<script type="math/tex">SUP_{Ely}</script>
 </td>
-<td>start-up time of the electrolyser until full heat extraction (linear curve)</td>
+<td>start-up time of the electrolyser until full heat supply (linear curve)</td>
 <td>[min]</td>
 </tr>
 <tr>
@@ -576,7 +588,7 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <td>
 <script type="math/tex">T_{Ely,cooling,in,max}</script>
 </td>
-<td>max. temperature of cooling medium input</td>
+<td>max. allowed temperature of cooling medium input</td>
 <td>[°C]</td>
 </tr>
 </tbody>
@@ -600,9 +612,175 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 </tr>
 </tbody>
 </table>
+<h2 id="reduction-of-usable-heat-during-start-up">Reduction of usable heat during start-up</h2>
+<p>Linear warm-up during start-up:
+<script type="math/tex; mode=display">
+ \dot{Q}_{out,reduced} = 
+\begin{cases}
+\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} < \text{minimum operating time} \\
+\dot{Q}_{out} & \text{actual operating time} \geq  \text{minimum operating time}
+\end{cases} 
+</script>
+</p>
 <h2 id="combined-heat-and-power-plant-chp">Combined heat and power plant (CHP)</h2>
-<h2 id="gas-boiler-peak-load">Gas boiler (peak load)</h2>
-<h2 id="woodchip-boiler">Woodchip boiler</h2>
+<p><img alt="Image title" src="../fig/221021_CHP.png" /></p>
+<p>Definiton of power-to-heat ratio of CHP:
+<script type="math/tex; mode=display"> r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  </script>
+</p>
+<p>Energy balance on CHP:
+<script type="math/tex; mode=display">  \dot{E}_{CHP,gas,in} = P_{el,CHP,out} + \dot{Q}_{CHP,out} + \dot{Q}_{CHP,loss} </script>
+</p>
+<p>Calculation of electric power output:
+<script type="math/tex; mode=display">  P_{el,CHP,out} = \eta_{CHP,el} \ \dot{E}_{CHP,gas,in}   </script>
+</p>
+<p>Calculation of thermal power output:
+<script type="math/tex; mode=display">  \dot{Q}_{CHP,out} = \eta_{CHP,thermal} \ \dot{E}_{CHP,gas,in}   </script>
+</p>
+<p>Calculation of thermal losses in CHP:
+<script type="math/tex; mode=display"> \dot{Q}_{CHP,loss} = (1-\eta_{CHP,thermal}+\eta_{CHP,el}) \ \dot{E}_{CHP,gas,in} </script>
+</p>
+<p>Relation of electric and thermal power output:
+<script type="math/tex; mode=display"> P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out} =  r_{CHP,PTH}  \ \dot{Q}_{CHP,out}  </script>
+</p>
+<p><strong>TODO:</strong> Part load efficiency reduction?</p>
+<p><strong>Inputs and Outputs of the CHP:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">P_{el,CHP,out}</script>
+</td>
+<td>electric power output of the CHP</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">P_{el,CHP}</script>
+</td>
+<td>electric power provided by the CHP</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{CHP,out}</script>
+</td>
+<td>thermal power output of the CHP</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{E}_{CHP,gas,in}</script>
+</td>
+<td>energy demand of the CHP, natural or green gas (NCV/GCV? TODO)</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{CHP,loss}</script>
+</td>
+<td>thermal energy losses of the CHP</td>
+<td>[MW]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameter of the CHP:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">P_{el,CHP,rated}</script>
+</td>
+<td>rated electric power output of the CHP under full load (operating state 100 %)</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{CHP,rated}</script>
+</td>
+<td>rated thermal power output of the CHP under full load (operating state 100 %)</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{CHP,thermal}</script>
+</td>
+<td>thermal efficiency of CHP</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{CHP,el}</script>
+</td>
+<td>electrical efficiency of CHP, including selfe-use of electrical energy</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">r_{CHP,PTH}</script>
+</td>
+<td>power-to-heat ratio of CHP</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">PL_{CHP,min}</script>
+</td>
+<td>minimum allowed partial load of the CHP</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">MOT_{CHP}</script>
+</td>
+<td>minimum operating time of the CHP</td>
+<td>[min]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">SUP_{CHP}</script>
+</td>
+<td>start-up time of the CHP until full heat supply (linear curve)</td>
+<td>[min]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>State variables of the CHP:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">x_{CHP}</script>
+</td>
+<td>current operating state of the CHP (on, off, part load)</td>
+<td>[%]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gas-boiler-gb">Gas boiler (GB)</h2>
+<p><img alt="Image title" src="../fig/221021_Gaskessel.png" /></p>
+<h2 id="woodchip-boiler-wb">Woodchip boiler (WB)</h2>
+<p>consider?</p>
 <h2 id="heat-sources">Heat sources</h2>
 <h3 id="soil">Soil</h3>
 <ul>
@@ -624,21 +802,28 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <li>hot air absorber</li>
 </ul>
 <p>(Vergleich FutureHeatPump II Projekt)</p>
-<h2 id="chiller">Chiller</h2>
+<h2 id="chiller-ch">Chiller (CH)</h2>
 <h3 id="simple-model-for-electrolyser">Simple model for electrolyser</h3>
 <h3 id="general-model-for-cooling-purposes">General model for cooling purposes</h3>
-<h2 id="short-term-heat-storage">Short-term heat storage</h2>
+<p>or just one general model?</p>
+<h2 id="short-term-thermal-energy-storage-sttes">Short-term thermal energy storage (STTES)</h2>
+<p><img alt="Image title" src="../fig/221021_STTES.png" /></p>
+<p>with or without losses to ambient?</p>
 <h2 id="seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</h2>
+<p><img alt="Image title" src="../fig/221021_STES_layers.png" /></p>
 <h3 id="tank-thermal-energy-storage-ttes">Tank thermal energy storage (TTES)</h3>
 <h3 id="pit-thermal-energy-storage-ptes">Pit thermal energy storage (PTES)</h3>
 <h3 id="borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</h3>
 <h3 id="aquifer-thermal-energy-storage-ates">Aquifer thermal energy storage (ATES)</h3>
-<h2 id="ice-storage">Ice storage</h2>
-<h2 id="hydrogen-fuel-cell">Hydrogen fuel cell</h2>
+<h2 id="ice-storage-is">Ice storage (IS)</h2>
+<h2 id="hydrogen-fuel-cell-fc">Hydrogen fuel cell (FC)</h2>
 <h2 id="photovoltaik-pv">Photovoltaik (PV)</h2>
-<h2 id="wind-power">Wind power</h2>
-<h2 id="battery">Battery</h2>
-<h2 id="hydrogen-compressor">Hydrogen compressor</h2>
+<p>pvlib</p>
+<h2 id="wind-power-wp">Wind power (WP)</h2>
+<p>windpowerlib </p>
+<p>Achtung: Winddaten von EPW nicht geeignet!</p>
+<h2 id="battery-ba">Battery (BA)</h2>
+<h2 id="hydrogen-compressor-hc">Hydrogen compressor (HC)</h2>
               
             </div>
           </div><footer>

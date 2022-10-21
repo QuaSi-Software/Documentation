@@ -7,7 +7,7 @@ Fig. 1: General system chart of a heat pump
 
 ![Image title](fig/221018_WP_Anlagenschema.png)
 
-The energy balance at the heat pump is composed of the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).
+The energy balance at the heat pump is built up from the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).
 
 Fig. 2: Energy balance of the heat pump model
 
@@ -26,6 +26,9 @@ Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
 ![Image title](fig/COP_Kennfeld_Beispiel.png)
 
+In part load operation, the COP of a heat pump is variing. 
+
+
 The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: 
 
 $$\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\quad mit \quad} \dot{Q}_{HP,out} = \dot{Q}_{HP,in} + P_{HP,el} $$
@@ -38,9 +41,11 @@ $$P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
 
 **Assumption:** The heat output of the heat pump behaves linearly in part load operation between \(\dot{Q}_{HP,min}\) at \(PL_{HP,min}\) and \(\dot{Q}_{HP,max}\) at 100% compressor speed:
 
+Fig. 4: Linear behaviour of thermal output power in part load operation
+
 ![Image title](fig/221018_WP_Teillast_Heizleistung.png)
 
-The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?!:
+The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?! TODO:
 
 ![Image title](fig/COP_Teillast.png)
 
@@ -48,7 +53,7 @@ Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-
 
 Exemplary correction curve for the COP at partial load and a 4\(^{th}\) grade fitting polynome:
 
-![Image title](fig/221020_COP_curve_PL.png)
+![Image title](fig/221020_COP_curve_PL_2.png)
 
 
 Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
@@ -80,6 +85,7 @@ Symbol | Description | Unit
 \(\eta_{HP,PE}\) | efficiency of power electronics of heat pump | [-]
 \(\eta_{Carnot}\) | efficiency factor of heat pump, reduces the Carnot-COP | [-]
 \(MOT_{HP}\) | minimum operating time of heat pump | [min]
+\(SUP_{HP}\) | start-up time of the HP until full heat supply (linear curve) | [min]
 
 **State Variables of Heat Pump:**
 
@@ -87,7 +93,7 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(x_{HP}\)  | current operating state (on, off, part load)   | [%]
 
-**ToDo**: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
+**TODO**: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
 Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?
 
 Beispiel für quadratische Teillastverhalten des COPs: 
@@ -95,7 +101,7 @@ Beispiel für quadratische Teillastverhalten des COPs:
 ![Image title](fig/Beispiel_fuer_Teillast.png)
 Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf
 
-**ToDo:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?
+**TODO:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?
 
 
 ## Electrolyser
@@ -107,7 +113,7 @@ If the electrical energy is provided by renewable energies, the resulting hydrog
 
 The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
 
-Fig. 3: Energy and mass flows in the electrolyser
+Fig. 5: Energy and mass flows in the electrolyser
 
 ![Image title](fig/221013_Elektrolyseur.png)
 
@@ -156,6 +162,7 @@ $$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- 
 
 **Assumption:** The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
 
+**TODO:** Efficiency decrease (el.) due to degradation?
 
 **Inputs and Outputs of the Electrolyser:**
 
@@ -178,20 +185,20 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,Ely,max}\) | electric power consumption of the electrolyser under full load (operating state 100 %) [MW].
-\(\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,max})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type) | [-]
+\(P_{el,Ely,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [MW]
+\(\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type) | [-]
 \(\eta_{Ely,heat}\) | efficiency of the usable heat extraction of the electrolyzer (related to \(1-\eta_{Ely,H_2}\))   | [-]
 \(\eta_{Ely,LE}\) | efficiency of the power electronics of the electrolyser | [-]
 \(PL_{Ely,min}\) | minimum allowed partial load of the electrolyzer | [-]
-\(MB_{Ely}\) | minimum operating time of the electrolyser | [min]
-\(AN_{Ely}\) | start-up time of the electrolyser until full heat extraction (linear curve) | [min]
+\(MOT_{Ely}\) | minimum operating time of the electrolyser | [min]
+\(SUP_{Ely}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
 \(e_{H_2} \) | mass-related energy of hydrogen (net calorific value or gross calorific value)
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
 \(\eta_{H_2 \ purification} \) | percentage of purification losses in hydrogen purification | [%]
 \(\eta_{H_2O \ treatment} \) | percentage of purification losses in water treatment | [%]
 \(p_{H_2,Ely} \) | pressure of hydrogen supply | [bar]
 \(p_{O_2,Ely} \) | pressure of oxygen supply | [bar]
-\(T_{Ely,cooling,in,max}\) | max. temperature of cooling medium input | [°C]
+\(T_{Ely,cooling,in,max}\) | max. allowed temperature of cooling medium input | [°C]
 
 
 **State variables of the Electrolyser:**
@@ -200,15 +207,75 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(x_{Ely}\)  | current 	operating state (on, off, part load)   | [%]
 
+## Reduction of usable heat during start-up
+Linear warm-up during start-up:
+$$
+ \dot{Q}_{out,reduced} = 
+\begin{cases}
+\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} < \text{minimum operating time} \\
+\dot{Q}_{out} & \text{actual operating time} \geq  \text{minimum operating time}
+\end{cases} 
+$$
+
 
 ## Combined heat and power plant (CHP)
+![Image title](fig/221021_CHP.png)
+
+Definiton of power-to-heat ratio of CHP:
+$$ r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  $$
+
+Energy balance on CHP:
+$$  \dot{E}_{CHP,gas,in} = P_{el,CHP,out} + \dot{Q}_{CHP,out} + \dot{Q}_{CHP,loss} $$ 
+
+Calculation of electric power output:
+$$  P_{el,CHP,out} = \eta_{CHP,el} \ \dot{E}_{CHP,gas,in}   $$ 
+
+Calculation of thermal power output:
+$$  \dot{Q}_{CHP,out} = \eta_{CHP,thermal} \ \dot{E}_{CHP,gas,in}   $$ 
+
+Calculation of thermal losses in CHP:
+$$ \dot{Q}_{CHP,loss} = (1-\eta_{CHP,thermal}+\eta_{CHP,el}) \ \dot{E}_{CHP,gas,in} $$
+
+Relation of electric and thermal power output:
+$$ P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out} =  r_{CHP,PTH}  \ \dot{Q}_{CHP,out}  $$
+
+**TODO:** Part load efficiency reduction?
+
+**Inputs and Outputs of the CHP:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(P_{el,CHP,out}\) | electric power output of the CHP | [MW]
+\(P_{el,CHP}\) | electric power provided by the CHP | [MW]
+\(\dot{Q}_{CHP,out}\) | thermal power output of the CHP | [MW]
+\(\dot{E}_{CHP,gas,in}\) | energy demand of the CHP, natural or green gas (NCV/GCV? TODO)  | [MW]
+\(\dot{Q}_{CHP,loss}\) | thermal energy losses of the CHP | [MW]
+
+**Parameter of the CHP:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(P_{el,CHP,rated}\) | rated electric power output of the CHP under full load (operating state 100 %) | [MW]
+\(\dot{Q}_{CHP,rated}\) | rated thermal power output of the CHP under full load (operating state 100 %) | [MW]
+\(\eta_{CHP,thermal}\) | thermal efficiency of CHP | [-]
+\(\eta_{CHP,el}\) | electrical efficiency of CHP, including selfe-use of electrical energy | [-]
+\(r_{CHP,PTH}\) | power-to-heat ratio of CHP | [-]
+\(PL_{CHP,min}\) | minimum allowed partial load of the CHP | [-]
+\(MOT_{CHP}\) | minimum operating time of the CHP | [min]
+\(SUP_{CHP}\) | start-up time of the CHP until full heat supply (linear curve) | [min]
+
+**State variables of the CHP:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{CHP}\)  | current operating state of the CHP (on, off, part load)   | [%]
+
+## Gas boiler (GB)
+![Image title](fig/221021_Gaskessel.png)
 
 
-## Gas boiler (peak load)
-
-
-## Woodchip boiler
-
+## Woodchip boiler (WB)
+consider?
 
 ## Heat sources 
 ### Soil
@@ -232,16 +299,21 @@ Symbol | Description | Unit
 (Vergleich FutureHeatPump II Projekt)
 
 
-## Chiller 
+## Chiller (CH)
 ### Simple model for electrolyser
 
 ### General model for cooling purposes
+or just one general model?
 
+## Short-term thermal energy storage (STTES)
+![Image title](fig/221021_STTES.png)
 
-## Short-term heat storage
-
+with or without losses to ambient?
 
 ## Seasonal thermal energy storage (STES)
+![Image title](fig/221021_STES_layers.png
+)
+
 ### Tank thermal energy storage (TTES)
 
 ### Pit thermal energy storage (PTES)
@@ -251,22 +323,24 @@ Symbol | Description | Unit
 ### Aquifer thermal energy storage (ATES)
 
 
-## Ice storage
+## Ice storage (IS)
 
 
-## Hydrogen fuel cell
+## Hydrogen fuel cell (FC)
 
 
 ## Photovoltaik (PV)
+pvlib
+
+## Wind power (WP)
+windpowerlib 
+
+Achtung: Winddaten von EPW nicht geeignet!
+
+## Battery (BA)
 
 
-## Wind power
-
-
-## Battery
-
-
-## Hydrogen compressor
+## Hydrogen compressor (HC)
 
 
 
