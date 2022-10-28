@@ -57,7 +57,11 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#gas-boiler-gb">Gas boiler (GB)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#woodchip-boiler-wb">Woodchip boiler (WB)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#oil-heating-oh">Oil heating (OH)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#elecric-heating-rod-hr">Elecric heating rod (HR)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#biomass-boiler-wb">Biomass boiler (WB)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#heat-sources">Heat sources</a>
         <ul>
@@ -66,6 +70,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#water">Water</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#air">Air</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#external-source">External source</a>
     </li>
         </ul>
     </li>
@@ -81,9 +87,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#tank-thermal-energy-storage-ttes">Tank thermal energy storage (TTES)</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#pit-thermal-energy-storage-ptes">Pit thermal energy storage (PTES)</a>
+    <li class="toctree-l3"><a class="reference internal" href="#tank-ttes-and-pit-ptes-thermal-energy-storage">Tank (TTES) and Pit (PTES) thermal energy storage</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</a>
     </li>
@@ -102,6 +106,8 @@
     <li class="toctree-l2"><a class="reference internal" href="#battery-ba">Battery (BA)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#hydrogen-compressor-hc">Hydrogen compressor (HC)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
     </li>
     </ul>
                 </li>
@@ -139,15 +145,14 @@
 <p><img alt="Image title" src="../fig/221006_W%C3%A4rmepumpe_Energiefluss.png" /></p>
 <p>The coefficient of performance (COP) determines the electrical power required <script type="math/tex">P_{el,HP}</script> to raise the temperature of a mass flow from the lower temperature level <script type="math/tex">T_{HP,source,in}</script> to <script type="math/tex">T_{HP,sink,out}</script>: </p>
 <p>
-<script type="math/tex; mode=display">COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}}{T_{HP,sink,out}-T_{HP,source,in} } </script>
+<script type="math/tex; mode=display">COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } </script>
 </p>
 <p>
 <script type="math/tex; mode=display"> COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 </script>
 </p>
-<p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, a COP chart is given for various representative heat pumps, on which the further calculations are based. For example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature.</p>
+<p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the <script type="math/tex">COP_{Carnot}</script> or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor <script type="math/tex">\eta_{Carnot}</script>, which is according to [Arpagaus2019] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.</p>
 <p>Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves</p>
 <p><img alt="Image title" src="../fig/COP_Kennfeld_Beispiel.png" /></p>
-<p>In part load operation, the COP of a heat pump is variing. </p>
 <p>The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: </p>
 <p>
 <script type="math/tex; mode=display">\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\quad mit \quad} \dot{Q}_{HP,out} = \dot{Q}_{HP,in} + P_{HP,el} </script>
@@ -156,18 +161,21 @@
 <p>
 <script type="math/tex; mode=display">P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}</script>
 </p>
+<p>The maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium.</p>
+<p>Stiebel-Eltron: Thermische Leistung konstant über verschiedene Vorlauftemperaturen, aber verändert über verschiedene Quellentemperaturen.
+Elektrische Leistung konstant über verschiedene Quelltemperaturen, aber verändert über unterschiedliche Vorlauftemperaturen. --&gt; Zu komplex, Entscheidung nötig, ob Wärmeleistung oder elektrische Leistung konstant ist! ToDo</p>
 <p><strong>Assumption:</strong> Thermal losses of the HP are already included in the coefficient of performance. </p>
 <p><strong>Assumption:</strong> The heat output of the heat pump behaves linearly in part load operation between <script type="math/tex">\dot{Q}_{HP,min}</script> at <script type="math/tex">PL_{HP,min}</script> and <script type="math/tex">\dot{Q}_{HP,max}</script> at 100% compressor speed:</p>
 <p>Fig. 4: Linear behaviour of thermal output power in part load operation</p>
 <p><img alt="Image title" src="../fig/221018_WP_Teillast_Heizleistung.png" /></p>
-<p>The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?! TODO:</p>
+<p>The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the part load operation. The relation of the COP and the partial load is assumed to be non-linear. The COP can be corrected using a non-linear part load factor. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear too. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?! TODO:</p>
 <p><img alt="Image title" src="../fig/COP_Teillast.png" /></p>
 <p>Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</p>
 <p>Exemplary correction curve for the COP at partial load and a 4<script type="math/tex">^{th}</script> grade fitting polynome:</p>
 <p><img alt="Image title" src="../fig/221020_COP_curve_PL_2.png" /></p>
 <p>Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow <script type="math/tex">\dot{m}</script> and the physical properties of the heat transfer medium (specific heat capacity <script type="math/tex">c_{p}</script> and, if applicable, the density <script type="math/tex">\rho</script>) by rearranging the following equation:</p>
 <p>
-<script type="math/tex; mode=display">\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})</script>
+<script type="math/tex; mode=display"> \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) </script>
 </p>
 <p><strong>Inputs und Outputs of the Heat Pump:</strong></p>
 <table>
@@ -330,7 +338,7 @@
 Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?</p>
 <p>Beispiel für quadratische Teillastverhalten des COPs: </p>
 <p><img alt="Image title" src="../fig/Beispiel_fuer_Teillast.png" />
-Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf</p>
+Quelle [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
 <p><strong>TODO:</strong> COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?</p>
 <h2 id="electrolyser">Electrolyser</h2>
 <p>The electrolyzer uses electrical energy to split water into its components hydrogen (<script type="math/tex">H_2</script>) and oxygen (<script type="math/tex">O_2</script>) as shown in the following reaction equation: </p>
@@ -617,8 +625,8 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <script type="math/tex; mode=display">
  \dot{Q}_{out,reduced} = 
 \begin{cases}
-\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} < \text{minimum operating time} \\
-\dot{Q}_{out} & \text{actual operating time} \geq  \text{minimum operating time}
+\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} \ < \text{minimum operating time} \\
+\dot{Q}_{out} & \text{actual operating time} \ \geq  \text{minimum operating time}
 \end{cases} 
 </script>
 </p>
@@ -678,7 +686,7 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <td>
 <script type="math/tex">\dot{E}_{CHP,gas,in}</script>
 </td>
-<td>energy demand of the CHP, natural or green gas (NCV/GCV? TODO)</td>
+<td>energy demand of the CHP, natural or green gas (NCV or GCV)</td>
 <td>[MW]</td>
 </tr>
 <tr>
@@ -718,14 +726,14 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <td>
 <script type="math/tex">\eta_{CHP,thermal}</script>
 </td>
-<td>thermal efficiency of CHP</td>
+<td>thermal efficiency of CHP (regading NCV or GCV, needs to correspond to <script type="math/tex">\dot{E}_{CHP,gas,in}</script>)</td>
 <td>[-]</td>
 </tr>
 <tr>
 <td>
 <script type="math/tex">\eta_{CHP,el}</script>
 </td>
-<td>electrical efficiency of CHP, including selfe-use of electrical energy</td>
+<td>electrical efficiency of CHP, including selfe-use of electrical energy (regading NCV or GCV, needs to correspond to <script type="math/tex">\dot{E}_{CHP,gas,in}</script>)</td>
 <td>[-]</td>
 </tr>
 <tr>
@@ -779,14 +787,120 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 </table>
 <h2 id="gas-boiler-gb">Gas boiler (GB)</h2>
 <p><img alt="Image title" src="../fig/221021_Gaskessel.png" /></p>
-<h2 id="woodchip-boiler-wb">Woodchip boiler (WB)</h2>
-<p>consider?</p>
+<p>Energy balance of gas boilder:
+<script type="math/tex; mode=display">  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB} \ \dot{E}_{GB,gas,in}   </script>
+</p>
+<p><strong>TODO:</strong> Part load efficiency reduction?</p>
+<p><strong>Inputs and Outputs of the GB:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{GB,out}</script>
+</td>
+<td>thermal power output of the GB</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{E}_{GB,gas,in}</script>
+</td>
+<td>energy demand of the GB, natural or green gas (NCV or GCV)</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{GB,loss}</script>
+</td>
+<td>thermal losses of the GB</td>
+<td>[MW]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameter of the GB:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">Q_{GB,rated}</script>
+</td>
+<td>rated thermal power output of the GB under full load (operating state 100 %)</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex"> \eta_{GB}</script>
+</td>
+<td>thermal efficiency of gas boiler (regading NCV or GCV, needs to correspond to <script type="math/tex">\dot{E}_{GB,gas,in}</script>)</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">PL_{GB,min}</script>
+</td>
+<td>minimum allowed partial load of the GB</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">MOT_{GB}</script>
+</td>
+<td>minimum operating time of the GB</td>
+<td>[min]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">SUP_{GB}</script>
+</td>
+<td>start-up time of the GB until full heat supply (linear curve)</td>
+<td>[min]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>State variables of the GB:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">x_{GB}</script>
+</td>
+<td>current operating state of the GB (on, off, part load)</td>
+<td>[%]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="oil-heating-oh">Oil heating (OH)</h2>
+<h2 id="elecric-heating-rod-hr">Elecric heating rod (HR)</h2>
+<h2 id="biomass-boiler-wb">Biomass boiler (WB)</h2>
 <h2 id="heat-sources">Heat sources</h2>
 <h3 id="soil">Soil</h3>
 <ul>
 <li>geothermal probes</li>
 <li>geothermal collector </li>
+<li>...</li>
 </ul>
+<p>Regernation von Wärmequellen --&gt; Erdwärmesonden sind eher Speicher als Wärmequellen</p>
 <h3 id="water">Water</h3>
 <ul>
 <li>groundwater well</li>
@@ -801,6 +915,10 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <li>exhaust air</li>
 <li>hot air absorber</li>
 </ul>
+<h3 id="external-source">External source</h3>
+<ul>
+<li>district heating network</li>
+</ul>
 <p>(Vergleich FutureHeatPump II Projekt)</p>
 <h2 id="chiller-ch">Chiller (CH)</h2>
 <h3 id="simple-model-for-electrolyser">Simple model for electrolyser</h3>
@@ -808,13 +926,178 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <p>or just one general model?</p>
 <h2 id="short-term-thermal-energy-storage-sttes">Short-term thermal energy storage (STTES)</h2>
 <p><img alt="Image title" src="../fig/221021_STTES.png" /></p>
-<p>with or without losses to ambient?</p>
+<p>Simplified short-term energy storage without thermal losses to ambient and with two adiabatically separated temperature layers, represented as an ideally layered storage.</p>
+<p>
+<script type="math/tex; mode=display"> Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) </script>
+</p>
+<p>
+<script type="math/tex; mode=display">  Q_{STTES,in,t} = \dot{Q}_{STTES,in,t} \ \Delta t = \dot{m}_{STTES,in} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t </script>
+</p>
+<p>
+<script type="math/tex; mode=display">  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t </script>
+</p>
+<p>
+<script type="math/tex; mode=display"> x_{STTES,t+1} = x_{STTES,t} + \frac{Q_{STTES,in,t} - Q_{STTES,out,t}}{Q_{STTES,rated}}   </script>
+</p>
+<p>
+<script type="math/tex; mode=display"> Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t} </script>
+</p>
+<p>Limits of thermal power in- and output (limit to current energy content and maximum c-rate of STTES):
+<script type="math/tex; mode=display"> \frac{Q_{STTES,rated} - {Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,in} \stackrel{!}{\leq}  c_{STTES,max,load} \ Q_{STTES,rated}  </script>
+<script type="math/tex; mode=display"> \frac{{Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,out} \stackrel{!}{\leq}  c_{STTES,max,unload} \ Q_{STTES,rated}  </script>
+</p>
+<p><strong>Inputs and Outputs of the STTES:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{STTES,in}</script>
+</td>
+<td>thermal power input in the STTES</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{Q}_{STTES,out}</script>
+</td>
+<td>thermal power output of the STTES</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{m}_{STTES,in}</script>
+</td>
+<td>current mass flow rate into the STTES</td>
+<td>[kg/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\dot{m}_{STTES,out}</script>
+</td>
+<td>current mass flow rate out of the STTES</td>
+<td>[kg/h]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameter of the STTES:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">c_{STTES,max,load}</script>
+</td>
+<td>maximum charging rate (C-rate) of STTES</td>
+<td>[1/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">c_{STTES,max,unload}</script>
+</td>
+<td>maximum discharging rate (C-rate) of STTES</td>
+<td>[1/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">Q_{STTES,rated}</script>
+</td>
+<td>rated thermal energy capacity of the STTES</td>
+<td>[MWh]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">x_{STTES,start}</script>
+</td>
+<td>thermal energy contend of the STTES at the beginning of the simulation in relation to <script type="math/tex">Q_{STTES,rated}</script>
+</td>
+<td>[%]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">V_{STTES}</script>
+</td>
+<td>volume of the STTES</td>
+<td>[m<script type="math/tex">^3</script>]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\rho_{STTES}</script>
+</td>
+<td>densitiy of the heat carrier medium in the STTES</td>
+<td>[kg/m<script type="math/tex">^3</script>]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">cp_{STTES}</script>
+</td>
+<td>specifiy heat capacity of the heat carrier medium in the STTES</td>
+<td>[kJ/(kg K)]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">T_{STTES,hot}</script>
+</td>
+<td>rated upper temperature of the STTES</td>
+<td>[°C]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">T_{STTES,cold}</script>
+</td>
+<td>rated lower temperature of the STTES</td>
+<td>[°C]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>State variables of the STTES:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">{Q}_{STTES}</script>
+</td>
+<td>current amount of thermal energy stored in the STTES</td>
+<td>[MWh]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">x_{STTES}</script>
+</td>
+<td>current charging state of the STTES</td>
+<td>[%]</td>
+</tr>
+</tbody>
+</table>
 <h2 id="seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</h2>
-<p><img alt="Image title" src="../fig/221021_STES_layers.png" /></p>
-<h3 id="tank-thermal-energy-storage-ttes">Tank thermal energy storage (TTES)</h3>
-<h3 id="pit-thermal-energy-storage-ptes">Pit thermal energy storage (PTES)</h3>
+<p>Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.</p>
+<h3 id="tank-ttes-and-pit-ptes-thermal-energy-storage">Tank (TTES) and Pit (PTES) thermal energy storage</h3>
+<p><img alt="Image title" src="../fig/221025_LZWSP_Geometrie.png" />
+<img alt="Image title" src="../fig/221021_STES_layers.png" /></p>
+<p>Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken</p>
 <h3 id="borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</h3>
+<p>Borehole thermal energy storages are not implemented yet.</p>
 <h3 id="aquifer-thermal-energy-storage-ates">Aquifer thermal energy storage (ATES)</h3>
+<p>Aquifer thermal energy storages are not implemented yet.</p>
 <h2 id="ice-storage-is">Ice storage (IS)</h2>
 <h2 id="hydrogen-fuel-cell-fc">Hydrogen fuel cell (FC)</h2>
 <h2 id="photovoltaik-pv">Photovoltaik (PV)</h2>
@@ -823,7 +1106,188 @@ Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/H
 <p>windpowerlib </p>
 <p>Achtung: Winddaten von EPW nicht geeignet!</p>
 <h2 id="battery-ba">Battery (BA)</h2>
+<p><img alt="Image title" src="../fig/221025_battery.png" /></p>
+<p>Energy balance of battery in every timestep:
+<script type="math/tex; mode=display">  E_{GB,t+1} = E_{GB,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) </script>
+</p>
+<p>Self-Discharge losses of battery:
+<script type="math/tex; mode=display"> P_{el,BA,loss,self} = r_{BA,self \ discharge} \ \frac{1 \ h}{\Delta t} \ E_{GB,t} </script>
+</p>
+<p>Charging losses of battery:
+<script type="math/tex; mode=display"> P_{el,BA,loss,charge} = (1 - \eta_{BA,charge}) \ P_{el,BA,in} </script>
+</p>
+<p>Discharging losses of battery:
+<script type="math/tex; mode=display"> P_{el,BA,loss,discharge} = \frac{1 - \eta_{BA,discharge}}{\eta_{BA,discharge}} \ P_{el,BA,out} </script>
+</p>
+<p>Current maximum capacity of the battery:
+<script type="math/tex; mode=display"> E_{GB,max,current} = E_{GB,rated} \ (1-r_{GB,CapReduction}) ^{ n_{cycles \ performed}} </script>
+<script type="math/tex; mode=display"> \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{GB,rated}} </script>
+</p>
+<p>Limits of electrical power in- and output (limit to current energy content and maximum c-rate of battery):
+<script type="math/tex; mode=display"> \frac{E_{GB,max,current} - E_{GB}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{GB,max,current}  </script>
+<script type="math/tex; mode=display"> \eta_{BA,discharge} \ \frac{E_{GB}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{GB,max,current} </script>
+</p>
+<p>Relation beween current charging state in percent and in energy content:
+<script type="math/tex; mode=display"> E_{GB} = E_{GB,max,current} \ x_{GB} </script>
+</p>
+<p><strong>Inputs and Outputs of the BA:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">P_{el,BA,in}</script>
+</td>
+<td>electrical power input in the BA</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">P_{el,BA,out}</script>
+</td>
+<td>electrical power output of the BA</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">P_{el,BA,loss,self}</script>
+</td>
+<td>electrical power losses of the BA due to self-discharging</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">P_{el,BA,loss,charge}</script>
+</td>
+<td>electrical power losses of the BA while charging</td>
+<td>[MW]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">P_{el,BA,loss,discharge}</script>
+</td>
+<td>electrical power losses of the BA while discharging</td>
+<td>[MW]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameter of the BA:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">\eta_{BA,charge}</script>
+</td>
+<td>charging efficiency of battery</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">\eta_{BA,discharge}</script>
+</td>
+<td>discharging efficiency of battery</td>
+<td>[-]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">r_{BA,self \ discharge}</script>
+</td>
+<td>self-discharge rate of battery (% losses per hour regarding current energy content)</td>
+<td>[1/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">c_{BA,max,charge}</script>
+</td>
+<td>maximum charging rate (C-rate) of battery</td>
+<td>[1/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">c_{BA,max,discharge}</script>
+</td>
+<td>maximum discharging rate (C-rate) of battery</td>
+<td>[1/h]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">{E}_{GB,rated}</script>
+</td>
+<td>rated electrical energy capacity of the battery</td>
+<td>[MWh]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">r_{GB,CapReduction}</script>
+</td>
+<td>percentage of the reduction of the current battery capacity due to one full charge cycle</td>
+<td>[%/cycle]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">{E}_{GB,start}</script>
+</td>
+<td>electrical energy contend of the battery at the beginning of the simulation</td>
+<td>[MWh]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>State variables of the BA:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<script type="math/tex">{E}_{GB}</script>
+</td>
+<td>current amount of energy stored in the battery</td>
+<td>[MWh]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">{E}_{GB,max,current}</script>
+</td>
+<td>current maximum capacity of the battery depending on the number of charging cycles already performed</td>
+<td>[MWh]</td>
+</tr>
+<tr>
+<td>
+<script type="math/tex">x_{GB}</script>
+</td>
+<td>current charging state of the battery</td>
+<td>[%]</td>
+</tr>
+</tbody>
+</table>
 <h2 id="hydrogen-compressor-hc">Hydrogen compressor (HC)</h2>
+<h2 id="references">References</h2>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
               
             </div>
           </div><footer>

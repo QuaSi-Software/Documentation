@@ -20,5 +20,6 @@ theme: readthedocs
 # activate markdown math for latex 
 markdown_extensions:
   - mdx_math
-
+  - footnotes 
+  
 extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']

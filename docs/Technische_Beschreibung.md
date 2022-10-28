@@ -16,17 +16,15 @@ Fig. 2: Energy balance of the heat pump model
 The coefficient of performance (COP) determines the electrical power required \(P_{el,HP}\) to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
 
-$$COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}}{T_{HP,sink,out}-T_{HP,source,in} } $$
+$$COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } $$
 
 $$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
 
-The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, a COP chart is given for various representative heat pumps, on which the further calculations are based. For example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature.
+The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2019] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
 
 Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
 ![Image title](fig/COP_Kennfeld_Beispiel.png)
-
-In part load operation, the COP of a heat pump is variing. 
 
 
 The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: 
@@ -37,6 +35,11 @@ The power of the heat pump's electric supply, including the losses of the power 
 
 $$P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
 
+The maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium.
+
+Stiebel-Eltron: Thermische Leistung konstant über verschiedene Vorlauftemperaturen, aber verändert über verschiedene Quellentemperaturen.
+Elektrische Leistung konstant über verschiedene Quelltemperaturen, aber verändert über unterschiedliche Vorlauftemperaturen. --> Zu komplex, Entscheidung nötig, ob Wärmeleistung oder elektrische Leistung konstant ist! ToDo
+
 **Assumption:** Thermal losses of the HP are already included in the coefficient of performance. 
 
 **Assumption:** The heat output of the heat pump behaves linearly in part load operation between \(\dot{Q}_{HP,min}\) at \(PL_{HP,min}\) and \(\dot{Q}_{HP,max}\) at 100% compressor speed:
@@ -45,7 +48,7 @@ Fig. 4: Linear behaviour of thermal output power in part load operation
 
 ![Image title](fig/221018_WP_Teillast_Heizleistung.png)
 
-The COP of the modeled heat pump, on the other hand, is not linear in partial load operation. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?! TODO:
+The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the part load operation. The relation of the COP and the partial load is assumed to be non-linear. The COP can be corrected using a non-linear part load factor. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear too. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?! TODO:
 
 ![Image title](fig/COP_Teillast.png)
 
@@ -55,11 +58,9 @@ Exemplary correction curve for the COP at partial load and a 4\(^{th}\) grade fi
 
 ![Image title](fig/221020_COP_curve_PL_2.png)
 
-
 Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
 
-$$\dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min})$$
-
+$$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
 
 **Inputs und Outputs of the Heat Pump:**
 
@@ -99,7 +100,11 @@ Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wir
 Beispiel für quadratische Teillastverhalten des COPs: 
 
 ![Image title](fig/Beispiel_fuer_Teillast.png)
-Quelle [Wemhöner2020]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/HP_cw.pdf
+Quelle [Wemhöner2020][^1]
+
+
+[^1]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf
+
 
 **TODO:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?
 
@@ -212,8 +217,8 @@ Linear warm-up during start-up:
 $$
  \dot{Q}_{out,reduced} = 
 \begin{cases}
-\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} < \text{minimum operating time} \\
-\dot{Q}_{out} & \text{actual operating time} \geq  \text{minimum operating time}
+\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} \ < \text{minimum operating time} \\
+\dot{Q}_{out} & \text{actual operating time} \ \geq  \text{minimum operating time}
 \end{cases} 
 $$
 
@@ -248,7 +253,7 @@ Symbol | Description | Unit
 \(P_{el,CHP,out}\) | electric power output of the CHP | [MW]
 \(P_{el,CHP}\) | electric power provided by the CHP | [MW]
 \(\dot{Q}_{CHP,out}\) | thermal power output of the CHP | [MW]
-\(\dot{E}_{CHP,gas,in}\) | energy demand of the CHP, natural or green gas (NCV/GCV? TODO)  | [MW]
+\(\dot{E}_{CHP,gas,in}\) | energy demand of the CHP, natural or green gas (NCV or GCV)  | [MW]
 \(\dot{Q}_{CHP,loss}\) | thermal energy losses of the CHP | [MW]
 
 **Parameter of the CHP:**
@@ -257,8 +262,8 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,CHP,rated}\) | rated electric power output of the CHP under full load (operating state 100 %) | [MW]
 \(\dot{Q}_{CHP,rated}\) | rated thermal power output of the CHP under full load (operating state 100 %) | [MW]
-\(\eta_{CHP,thermal}\) | thermal efficiency of CHP | [-]
-\(\eta_{CHP,el}\) | electrical efficiency of CHP, including selfe-use of electrical energy | [-]
+\(\eta_{CHP,thermal}\) | thermal efficiency of CHP (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
+\(\eta_{CHP,el}\) | electrical efficiency of CHP, including selfe-use of electrical energy (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
 \(r_{CHP,PTH}\) | power-to-heat ratio of CHP | [-]
 \(PL_{CHP,min}\) | minimum allowed partial load of the CHP | [-]
 \(MOT_{CHP}\) | minimum operating time of the CHP | [min]
@@ -273,14 +278,53 @@ Symbol | Description | Unit
 ## Gas boiler (GB)
 ![Image title](fig/221021_Gaskessel.png)
 
+Energy balance of gas boilder:
+$$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB} \ \dot{E}_{GB,gas,in}   $$
 
-## Woodchip boiler (WB)
-consider?
+**TODO:** Part load efficiency reduction?
+
+**Inputs and Outputs of the GB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{GB,out}\) | thermal power output of the GB | [MW]
+\(\dot{E}_{GB,gas,in}\) | energy demand of the GB, natural or green gas (NCV or GCV)  | [MW]
+\(\dot{Q}_{GB,loss}\) | thermal losses of the GB | [MW]
+
+
+**Parameter of the GB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{GB,rated}\) | rated thermal power output of the GB under full load (operating state 100 %) | [MW]
+\( \eta_{GB}\) | thermal efficiency of gas boiler (regading NCV or GCV, needs to correspond to \(\dot{E}_{GB,gas,in}\)) | [-]
+\(PL_{GB,min}\) | minimum allowed partial load of the GB | [-]
+\(MOT_{GB}\) | minimum operating time of the GB | [min]
+\(SUP_{GB}\) | start-up time of the GB until full heat supply (linear curve) | [min]
+
+**State variables of the GB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{GB}\)  | current operating state of the GB (on, off, part load)   | [%]
+
+
+## Oil heating (OH)
+
+
+## Elecric heating rod (HR)
+
+
+## Biomass boiler (WB)
+
 
 ## Heat sources 
 ### Soil
 - geothermal probes
 - geothermal collector 
+- ...
+
+Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmequellen
 
 ### Water
 - groundwater well
@@ -293,6 +337,9 @@ consider?
 - ambient air
 - exhaust air
 - hot air absorber
+
+### External source
+- district heating network
 
 
 
@@ -308,19 +355,71 @@ or just one general model?
 ## Short-term thermal energy storage (STTES)
 ![Image title](fig/221021_STTES.png)
 
-with or without losses to ambient?
+Simplified short-term energy storage without thermal losses to ambient and with two adiabatically separated temperature layers, represented as an ideally layered storage.
+
+$$ Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) $$
+
+$$  Q_{STTES,in,t} = \dot{Q}_{STTES,in,t} \ \Delta t = \dot{m}_{STTES,in} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t $$
+
+$$  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t $$
+
+$$ x_{STTES,t+1} = x_{STTES,t} + \frac{Q_{STTES,in,t} - Q_{STTES,out,t}}{Q_{STTES,rated}}   $$
+
+$$ Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t} $$
+
+Limits of thermal power in- and output (limit to current energy content and maximum c-rate of STTES):
+$$ \frac{Q_{STTES,rated} - {Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,in} \stackrel{!}{\leq}  c_{STTES,max,load} \ Q_{STTES,rated}  $$
+$$ \frac{{Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,out} \stackrel{!}{\leq}  c_{STTES,max,unload} \ Q_{STTES,rated}  $$
+
+
+
+**Inputs and Outputs of the STTES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{STTES,in}\) | thermal power input in the STTES | [MW]
+\(\dot{Q}_{STTES,out}\) | thermal power output of the STTES | [MW]
+\(\dot{m}_{STTES,in}\)  | current mass flow rate into the STTES | [kg/h]
+\(\dot{m}_{STTES,out}\)  | current mass flow rate out of the STTES | [kg/h]
+
+**Parameter of the STTES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(c_{STTES,max,load}\) | maximum charging rate (C-rate) of STTES | [1/h]
+\(c_{STTES,max,unload}\) | maximum discharging rate (C-rate) of STTES | [1/h]
+\(Q_{STTES,rated}\)  | rated thermal energy capacity of the STTES | [MWh]
+\(x_{STTES,start}\)  | thermal energy contend of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
+\(V_{STTES}\)  | volume of the STTES | [m\(^3\)]
+\(\rho_{STTES}\)  | densitiy of the heat carrier medium in the STTES | [kg/m\(^3\)]
+\(cp_{STTES}\)  | specifiy heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
+\(T_{STTES,hot}\)  | rated upper temperature of the STTES | [°C]
+\(T_{STTES,cold}\)  | rated lower temperature of the STTES | [°C]
+
+**State variables of the STTES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\({Q}_{STTES}\)  | current amount of thermal energy stored in the STTES | [MWh]
+\(x_{STTES}\)  | current charging state of the STTES   | [%]
+
 
 ## Seasonal thermal energy storage (STES)
-![Image title](fig/221021_STES_layers.png
-)
+Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.
 
-### Tank thermal energy storage (TTES)
+### Tank (TTES) and Pit (PTES) thermal energy storage 
+![Image title](fig/221025_LZWSP_Geometrie.png)
+![Image title](fig/221021_STES_layers.png)
 
-### Pit thermal energy storage (PTES)
+Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken
 
 ### Borehole thermal energy storage (BTES)
 
+Borehole thermal energy storages are not implemented yet.
+
 ### Aquifer thermal energy storage (ATES)
+
+Aquifer thermal energy storages are not implemented yet.
 
 
 ## Ice storage (IS)
@@ -339,8 +438,68 @@ Achtung: Winddaten von EPW nicht geeignet!
 
 ## Battery (BA)
 
+![Image title](fig/221025_battery.png)
+
+Energy balance of battery in every timestep:
+$$  E_{GB,t+1} = E_{GB,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) $$
+
+Self-Discharge losses of battery:
+$$ P_{el,BA,loss,self} = r_{BA,self \ discharge} \ \frac{1 \ h}{\Delta t} \ E_{GB,t} $$
+
+Charging losses of battery:
+$$ P_{el,BA,loss,charge} = (1 - \eta_{BA,charge}) \ P_{el,BA,in} $$
+
+Discharging losses of battery:
+$$ P_{el,BA,loss,discharge} = \frac{1 - \eta_{BA,discharge}}{\eta_{BA,discharge}} \ P_{el,BA,out} $$
+
+Current maximum capacity of the battery:
+$$ E_{GB,max,current} = E_{GB,rated} \ (1-r_{GB,CapReduction}) ^{ n_{cycles \ performed}} $$
+$$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{GB,rated}} $$
+
+Limits of electrical power in- and output (limit to current energy content and maximum c-rate of battery):
+$$ \frac{E_{GB,max,current} - E_{GB}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{GB,max,current}  $$
+$$ \eta_{BA,discharge} \ \frac{E_{GB}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{GB,max,current} $$
+
+Relation beween current charging state in percent and in energy content:
+$$ E_{GB} = E_{GB,max,current} \ x_{GB} $$
+
+**Inputs and Outputs of the BA:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(P_{el,BA,in}\) | electrical power input in the BA | [MW]
+\(P_{el,BA,out}\) | electrical power output of the BA | [MW]
+\(P_{el,BA,loss,self}\) | electrical power losses of the BA due to self-discharging | [MW]
+\(P_{el,BA,loss,charge}\) | electrical power losses of the BA while charging| [MW]
+\(P_{el,BA,loss,discharge}\) | electrical power losses of the BA while discharging| [MW]
+
+**Parameter of the BA:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\eta_{BA,charge}\) | charging efficiency of battery | [-]
+\(\eta_{BA,discharge}\) | discharging efficiency of battery | [-]
+\(r_{BA,self \ discharge}\) | self-discharge rate of battery (% losses per hour regarding current energy content) | [1/h]
+\(c_{BA,max,charge}\) | maximum charging rate (C-rate) of battery | [1/h]
+\(c_{BA,max,discharge}\) | maximum discharging rate (C-rate) of battery | [1/h]
+\({E}_{GB,rated}\)  | rated electrical energy capacity of the battery | [MWh]
+\(r_{GB,CapReduction}\)  | percentage of the reduction of the current battery capacity due to one full charge cycle | [%/cycle]
+\({E}_{GB,start}\)  | electrical energy contend of the battery at the beginning of the simulation   | [MWh]
+
+
+**State variables of the BA:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\({E}_{GB}\)  | current amount of energy stored in the battery   | [MWh]
+\({E}_{GB,max,current}\)  | current maximum capacity of the battery depending on the number of charging cycles already performed  | [MWh]
+\(x_{GB}\)  | current charging state of the battery   | [%]
+
 
 ## Hydrogen compressor (HC)
 
 
 
+
+## References
+///Footnotes Go Here///
