@@ -16,17 +16,13 @@ Fig. 2: Energy balance of the heat pump model
 The coefficient of performance (COP) determines the electrical power required \(P_{el,HP}\) to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
 
-$$
-\begin{equation}
-COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} }
-\end{equation} 
-$$
+$$ COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } $$
 
 $$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
 
 The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^3] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
 
-[^3]: Arpagaus C. et al: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy* (2018), doi: [10.1016/j.energy.2018.03.166](https:\\doi.org\10.1016/j.energy.2018.03.166)
+[^3]: Arpagaus C. et al.: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy* (2018), doi: [10.1016/j.energy.2018.03.166](https://doi.org\10.1016/j.energy.2018.03.166)
 
 Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
@@ -221,6 +217,9 @@ Symbol | Description | Unit
 \(x_{Ely}\)  | current 	operating state (on, off, part load)   | [%]
 
 ## Reduction of usable heat during start-up
+
+![Image title](fig/221028_Start-up-Reduction_general.svg)
+
 Linear warm-up during start-up:
 $$
  \dot{Q}_{out,reduced} = 
@@ -318,12 +317,13 @@ Symbol | Description | Unit
 
 
 ## Oil heating (OH)
+![Image title](fig/221028_Oelkessel.png)
 
+## Elecric heating rod (ER)
+![Image title](fig/221028_ElectricRod.png)
 
-## Elecric heating rod (HR)
-
-
-## Biomass boiler (WB)
+## Biomass boiler (BB)
+![Image title](fig/221028_BiomassBoiler.png)
 
 
 ## Heat sources 
@@ -361,21 +361,27 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 or just one general model?
 
 ## Short-term thermal energy storage (STTES)
-![Image title](fig/221021_STTES.png)
+![Image title](fig/221028_STTES.png)
 
-Simplified short-term energy storage without thermal losses to ambient and with two adiabatically separated temperature layers, represented as an ideally layered storage.
+![Image title](fig/221021_STTES_scetch.png)
 
+The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally layered storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.
+
+The rated thermal energy content \(Q_{STTES,rated}\) of the STTES can be calculated using the volume \(V_{STTES}\), the density \(\rho_{STTES}\), the specific thermal capacity of the medium in the storage \(cp_{STTES}\) and the temperature span within the STTES:
 $$ Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) $$
 
+The amount of the total input (\(Q_{STTES,in,t}\)) and output energy (\(Q_{STTES,out,t}\)) in every timestep is defined as
 $$  Q_{STTES,in,t} = \dot{Q}_{STTES,in,t} \ \Delta t = \dot{m}_{STTES,in} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t $$
+and
+$$  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t. $$
 
-$$  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t $$
-
+The current charging state \(x_{STTES,t+1}\) can be calculated using the following equation and the charging state of the previous timestep (\(x_{STTES,t}\)) as well as the input and output energy
 $$ x_{STTES,t+1} = x_{STTES,t} + \frac{Q_{STTES,in,t} - Q_{STTES,out,t}}{Q_{STTES,rated}}   $$
 
-$$ Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t} $$
+leading to the total energy content in every timestep as
+$$ Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t}. $$
 
-Limits of thermal power in- and output (limit to current energy content and maximum c-rate of STTES):
+The limits of the thermal power in- and output (\(\dot{Q}_{STTES,in}\) and \(\dot{Q}_{STTES,out}\)) due to the current energy content and maximum c-rate of the STTES are given as
 $$ \frac{Q_{STTES,rated} - {Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,in} \stackrel{!}{\leq}  c_{STTES,max,load} \ Q_{STTES,rated}  $$
 $$ \frac{{Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,out} \stackrel{!}{\leq}  c_{STTES,max,unload} \ Q_{STTES,rated}  $$
 
@@ -416,7 +422,10 @@ Symbol | Description | Unit
 Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.
 
 ### Tank (TTES) and Pit (PTES) thermal energy storage 
+![Image title](fig/221028_STES.png)
+
 ![Image title](fig/221025_LZWSP_Geometrie.png)
+
 ![Image title](fig/221021_STES_layers.png)
 
 Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken

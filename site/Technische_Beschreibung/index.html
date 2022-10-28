@@ -59,9 +59,9 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#oil-heating-oh">Oil heating (OH)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#elecric-heating-rod-hr">Elecric heating rod (HR)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#elecric-heating-rod-er">Elecric heating rod (ER)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#biomass-boiler-wb">Biomass boiler (WB)</a>
+    <li class="toctree-l2"><a class="reference internal" href="#biomass-boiler-bb">Biomass boiler (BB)</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#heat-sources">Heat sources</a>
         <ul>
@@ -145,11 +145,7 @@
 <p><img alt="Image title" src="../fig/221006_W%C3%A4rmepumpe_Energiefluss.png" /></p>
 <p>The coefficient of performance (COP) determines the electrical power required <script type="math/tex">P_{el,HP}</script> to raise the temperature of a mass flow from the lower temperature level <script type="math/tex">T_{HP,source,in}</script> to <script type="math/tex">T_{HP,sink,out}</script>: </p>
 <p>
-<script type="math/tex; mode=display">
-\begin{equation}
-COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} }
-\end{equation} 
-</script>
+<script type="math/tex; mode=display"> COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } </script>
 </p>
 <p>
 <script type="math/tex; mode=display"> COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 </script>
@@ -625,6 +621,9 @@ Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1"
 </tbody>
 </table>
 <h2 id="reduction-of-usable-heat-during-start-up">Reduction of usable heat during start-up</h2>
+<p><img alt="Image title" src="../fig/221028_Start-up-Reduction_general.svg" />
+<img alt="Image title" src="../fig/221028_Start-up-Reduction_general.png" />
+<img alt="Image title" src="../fig/221028_Start-up-Reduction_general.pdf" /></p>
 <p>Linear warm-up during start-up:
 <script type="math/tex; mode=display">
  \dot{Q}_{out,reduced} = 
@@ -895,8 +894,11 @@ Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1"
 </tbody>
 </table>
 <h2 id="oil-heating-oh">Oil heating (OH)</h2>
-<h2 id="elecric-heating-rod-hr">Elecric heating rod (HR)</h2>
-<h2 id="biomass-boiler-wb">Biomass boiler (WB)</h2>
+<p><img alt="Image title" src="../fig/221028_Oelkessel.png" /></p>
+<h2 id="elecric-heating-rod-er">Elecric heating rod (ER)</h2>
+<p><img alt="Image title" src="../fig/221028_ElectricRod.png" /></p>
+<h2 id="biomass-boiler-bb">Biomass boiler (BB)</h2>
+<p><img alt="Image title" src="../fig/221028_BiomassBoiler.png" /></p>
 <h2 id="heat-sources">Heat sources</h2>
 <h3 id="soil">Soil</h3>
 <ul>
@@ -929,24 +931,24 @@ Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1"
 <h3 id="general-model-for-cooling-purposes">General model for cooling purposes</h3>
 <p>or just one general model?</p>
 <h2 id="short-term-thermal-energy-storage-sttes">Short-term thermal energy storage (STTES)</h2>
-<p><img alt="Image title" src="../fig/221021_STTES.png" /></p>
-<p>Simplified short-term energy storage without thermal losses to ambient and with two adiabatically separated temperature layers, represented as an ideally layered storage.</p>
-<p>
+<p><img alt="Image title" src="../fig/221028_STTES.png" /></p>
+<p><img alt="Image title" src="../fig/221021_STTES_scetch.png" /></p>
+<p>The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally layered storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.</p>
+<p>The rated thermal energy content <script type="math/tex">Q_{STTES,rated}</script> of the STTES can be calculated using the volume <script type="math/tex">V_{STTES}</script>, the density <script type="math/tex">\rho_{STTES}</script>, the specific thermal capacity of the medium in the storage <script type="math/tex">cp_{STTES}</script> and the temperature span within the STTES:
 <script type="math/tex; mode=display"> Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) </script>
 </p>
-<p>
+<p>The amount of the total input (<script type="math/tex">Q_{STTES,in,t}</script>) and output energy (<script type="math/tex">Q_{STTES,out,t}</script>) in every timestep is defined as
 <script type="math/tex; mode=display">  Q_{STTES,in,t} = \dot{Q}_{STTES,in,t} \ \Delta t = \dot{m}_{STTES,in} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t </script>
+and
+<script type="math/tex; mode=display">  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t. </script>
 </p>
-<p>
-<script type="math/tex; mode=display">  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t </script>
-</p>
-<p>
+<p>The current charging state <script type="math/tex">x_{STTES,t+1}</script> can be calculated using the following equation and the charging state of the previous timestep (<script type="math/tex">x_{STTES,t}</script>) as well as the input and output energy
 <script type="math/tex; mode=display"> x_{STTES,t+1} = x_{STTES,t} + \frac{Q_{STTES,in,t} - Q_{STTES,out,t}}{Q_{STTES,rated}}   </script>
 </p>
-<p>
-<script type="math/tex; mode=display"> Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t} </script>
+<p>leading to the total energy content in every timestep as
+<script type="math/tex; mode=display"> Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t}. </script>
 </p>
-<p>Limits of thermal power in- and output (limit to current energy content and maximum c-rate of STTES):
+<p>The limits of the thermal power in- and output (<script type="math/tex">\dot{Q}_{STTES,in}</script> and <script type="math/tex">\dot{Q}_{STTES,out}</script>) due to the current energy content and maximum c-rate of the STTES are given as
 <script type="math/tex; mode=display"> \frac{Q_{STTES,rated} - {Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,in} \stackrel{!}{\leq}  c_{STTES,max,load} \ Q_{STTES,rated}  </script>
 <script type="math/tex; mode=display"> \frac{{Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,out} \stackrel{!}{\leq}  c_{STTES,max,unload} \ Q_{STTES,rated}  </script>
 </p>
@@ -1095,8 +1097,9 @@ Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1"
 <h2 id="seasonal-thermal-energy-storage-stes">Seasonal thermal energy storage (STES)</h2>
 <p>Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.</p>
 <h3 id="tank-ttes-and-pit-ptes-thermal-energy-storage">Tank (TTES) and Pit (PTES) thermal energy storage</h3>
-<p><img alt="Image title" src="../fig/221025_LZWSP_Geometrie.png" />
-<img alt="Image title" src="../fig/221021_STES_layers.png" /></p>
+<p><img alt="Image title" src="../fig/221028_STES.png" /></p>
+<p><img alt="Image title" src="../fig/221025_LZWSP_Geometrie.png" /></p>
+<p><img alt="Image title" src="../fig/221021_STES_layers.png" /></p>
 <p>Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken</p>
 <h3 id="borehole-thermal-energy-storage-btes">Borehole thermal energy storage (BTES)</h3>
 <p>Borehole thermal energy storages are not implemented yet.</p>
@@ -1288,7 +1291,7 @@ Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1"
 <hr />
 <ol>
 <li id="fn:3">
-<p>Arpagaus C. et al: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, <em>Energy</em> (2018), doi: <a href="https:\doi.org\10.1016/j.energy.2018.03.166">10.1016/j.energy.2018.03.166</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>Arpagaus C. et al.: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, <em>Energy</em> (2018), doi: <a href="https://doi.org\10.1016/j.energy.2018.03.166">10.1016/j.energy.2018.03.166</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
 <p><a href="https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf">https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
