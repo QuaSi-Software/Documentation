@@ -16,11 +16,17 @@ Fig. 2: Energy balance of the heat pump model
 The coefficient of performance (COP) determines the electrical power required \(P_{el,HP}\) to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
 
-$$COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } $$
+$$
+\begin{equation}
+COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} }
+\end{equation} 
+$$
 
 $$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
 
-The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2019] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
+The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^3] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
+
+[^3]: Arpagaus C. et al: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy* (2018), doi: [10.1016/j.energy.2018.03.166](https:\\doi.org\10.1016/j.energy.2018.03.166)
 
 Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
@@ -52,7 +58,9 @@ The COP of the modeled heat pump depends not only on the temperatures of the sin
 
 ![Image title](fig/COP_Teillast.png)
 
-Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf
+Image from [^2]
+
+[^2]: [https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf](https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf)
 
 Exemplary correction curve for the COP at partial load and a 4\(^{th}\) grade fitting polynome:
 
@@ -100,10 +108,10 @@ Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wir
 Beispiel für quadratische Teillastverhalten des COPs: 
 
 ![Image title](fig/Beispiel_fuer_Teillast.png)
-Quelle [Wemhöner2020][^1]
+Image from [Wemhöner2020][^1]
 
 
-[^1]: https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf
+[^1]: [https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf](https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf)
 
 
 **TODO:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?

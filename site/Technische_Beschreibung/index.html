@@ -145,12 +145,16 @@
 <p><img alt="Image title" src="../fig/221006_W%C3%A4rmepumpe_Energiefluss.png" /></p>
 <p>The coefficient of performance (COP) determines the electrical power required <script type="math/tex">P_{el,HP}</script> to raise the temperature of a mass flow from the lower temperature level <script type="math/tex">T_{HP,source,in}</script> to <script type="math/tex">T_{HP,sink,out}</script>: </p>
 <p>
-<script type="math/tex; mode=display">COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} } </script>
+<script type="math/tex; mode=display">
+\begin{equation}
+COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} = \frac{T_{HP,sink,out}[K]}{T_{HP,sink,out}-T_{HP,source,in} }
+\end{equation} 
+</script>
 </p>
 <p>
 <script type="math/tex; mode=display"> COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 </script>
 </p>
-<p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the <script type="math/tex">COP_{Carnot}</script> or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor <script type="math/tex">\eta_{Carnot}</script>, which is according to [Arpagaus2019] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.</p>
+<p>The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (<script type="math/tex">COP_{Carnot}</script>), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the <script type="math/tex">COP_{Carnot}</script> or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor <script type="math/tex">\eta_{Carnot}</script>, which is according to [Arpagaus2018]<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">1</a></sup> around 45% for high temperature heat pumps and around 40% for conventional heat pumps.</p>
 <p>Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves</p>
 <p><img alt="Image title" src="../fig/COP_Kennfeld_Beispiel.png" /></p>
 <p>The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: </p>
@@ -170,7 +174,7 @@ Elektrische Leistung konstant über verschiedene Quelltemperaturen, aber veränd
 <p><img alt="Image title" src="../fig/221018_WP_Teillast_Heizleistung.png" /></p>
 <p>The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the part load operation. The relation of the COP and the partial load is assumed to be non-linear. The COP can be corrected using a non-linear part load factor. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear too. The coefficient of performance in partial load operation is approximated using the following correction function. Example --&gt; Generalize?! TODO:</p>
 <p><img alt="Image title" src="../fig/COP_Teillast.png" /></p>
-<p>Image from: https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</p>
+<p>Image from <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
 <p>Exemplary correction curve for the COP at partial load and a 4<script type="math/tex">^{th}</script> grade fitting polynome:</p>
 <p><img alt="Image title" src="../fig/221020_COP_curve_PL_2.png" /></p>
 <p>Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow <script type="math/tex">\dot{m}</script> and the physical properties of the heat transfer medium (specific heat capacity <script type="math/tex">c_{p}</script> and, if applicable, the density <script type="math/tex">\rho</script>) by rearranging the following equation:</p>
@@ -338,7 +342,7 @@ Elektrische Leistung konstant über verschiedene Quelltemperaturen, aber veränd
 Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?</p>
 <p>Beispiel für quadratische Teillastverhalten des COPs: </p>
 <p><img alt="Image title" src="../fig/Beispiel_fuer_Teillast.png" />
-Quelle [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+Image from [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">3</a></sup></p>
 <p><strong>TODO:</strong> COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?</p>
 <h2 id="electrolyser">Electrolyser</h2>
 <p>The electrolyzer uses electrical energy to split water into its components hydrogen (<script type="math/tex">H_2</script>) and oxygen (<script type="math/tex">O_2</script>) as shown in the following reaction equation: </p>
@@ -1283,8 +1287,14 @@ Quelle [Wemhöner2020]<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</
 <div class="footnote">
 <hr />
 <ol>
+<li id="fn:3">
+<p>Arpagaus C. et al: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, <em>Energy</em> (2018), doi: <a href="https:\doi.org\10.1016/j.energy.2018.03.166">10.1016/j.energy.2018.03.166</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p><a href="https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf">https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
 <li id="fn:1">
-<p>https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p><a href="https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf">https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
