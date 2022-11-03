@@ -20,9 +20,9 @@ $$ COP_{HP} = \frac{\dot{Q}_{HP,ab}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} =
 
 $$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
 
-The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^3] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
+The coefficient of performance is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. In Quasi, either the \(COP_{Carnot}\) or a COP chart as lookup table can be used to get the current COP in every timestep. The COP chart is given as universal chart for varius heat pumps. For computational efficiency, the COP chart is fitted to a polynom during initialisation of the simulation. As example, the following figure shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm. The Carnot-COP calculated from the temperatures is computationally more efficient compared to the COP chart. The Carnot-COP is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^Arpagaus2018] around 45% for high temperature heat pumps and around 40% for conventional heat pumps.
 
-[^3]: Arpagaus C. et al.: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy* (2018), doi: [10.1016/j.energy.2018.03.166](https://doi.org\10.1016/j.energy.2018.03.166)
+[^Arpagaus2018]: Arpagaus C. et al.: High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy* (2018), doi: [10.1016/j.energy.2018.03.166](https://doi.org/10.1016/j.energy.2018.03.166)
 
 Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
@@ -133,10 +133,10 @@ Berechnungsschritte Wärmepumpe stromgeführt:
 Beispiel für quadratische Teillastverhalten des COPs: 
 
 ![Image title](fig/Beispiel_fuer_Teillast.png)
-Image from [Wemhöner2020][^1]
+Image from [Wemhöner2020][^Wemhöner2020]
 
 
-[^1]: [https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf](https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf)
+[^Wemhöner2020]: [https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf](https://www.uibk.ac.at/bauphysik/aktuell/news/doc/2020/wp_cw.pdf)
 
 
 **TODO:** COP über Kennfeld und Fit auf Polynom oder über COP mit Gütegrad?
@@ -451,13 +451,109 @@ Symbol | Description | Unit
 Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.
 
 ### Tank (TTES) and Pit (PTES) thermal energy storage 
-![<Energy flow of STES](fig/221028_STES.svg)
+
+Neglected: Thermal capacity of the surrounding soil, gravel-water storages
+
+#### Generalized geometry for TTES and PTES
+![Geometry of STES](fig/221028_STES_Geometry.png)
+Figure and method of generalized geometry definition based on [Steinacker2022][^Steinacker2022].
+
+Ratio between height and mean radius of the STES:
+$$ hr_{STES} = \frac{h_{STES}}{\bar{r}_{STES}}  = \frac{h_{STES}}{\frac{R_{STES}+r_{STES}}{2}} $$ 
+
+Upper radius of the STES in dependence of the Volume and \(hr_{STES}\):
+$$
+R_{STES} = \sqrt[3]{ \frac{3 \ V_{STES}}{\pi \ \tan(\alpha_{STES})  \ \left( 1 - \beta^3 \right) } }   \quad \mathrm{with} \quad  \beta = \frac{2 \ \tan(\alpha_{STES}) - hr_{STES}}{2 \ \tan(\alpha_{STES})+hr_{STES}}
+$$
+Lower radius of the STES in dependence of the upper radius \(R_{STES}\):
+$$ r_{STES} = R_{STES}  \ \beta $$
+
+Slope angle has to be in the range of
+$$    180° - \arctan{\left(\frac{hr_{STES}}{2} \right)}	\geq \alpha_{STES} \geq \arctan{\left(\frac{hr_{STES}}{2} \right)} $$
+to ensure the shape of a zylinder, a cone or a truncated cone. Analogously, the ratio beween the height and the mean radius of the STES \(hr_{LZWSP}\) has to be smaller as
+$$	hr_{LZWSP} \leq 2 \ \tan(\alpha_{LZWSP}) \mathrm{\quad with \quad}   0 ° < \alpha_{LZWSP} < 90 ° $$
+
+The heigt of the STES can be calculated as
+$$ h_{STES} = hr_{STES} \ \frac{R_{STES}+r_{STES}}{2}   $$
+resulting with the number of layers \(n_l\) into the thickness of each layer
+$$ \Delta z_{l} = \frac{h_{STES}}{n_l} = \text{constant for all layers} $$
+
+Lateral surface of each layer with heigt \(h_l\), upper radius \(R_l\) and lower radius \(r_l\) of each layer:
+$$ M_{STES,l} = (R_l + r_l) \ \pi \ \sqrt{(R_l - r_l)^2 + h_l^2}  $$
+
+Volume of each layer:
+$$ V_{STES,l} = \frac{h_l}{3} \pi \ (R_l^2 + R_l \ r_l \ + r_l^2)  $$
+
+
+#### Thermal model for stratisfied storage
+
+![Energy flow of STES](fig/221028_STES.svg)
+
+General energy balance in every timestep \(t\):
+$$ 	
+Q_{STES,t} = Q_{STES,t-1} + (\dot{Q}_{STES,load} - \dot{Q}_{STES,unload} - \dot{Q}_{STES,loss,amb}) \ \Delta t
+$$
 
 ![Layer model of STES](fig/221021_STES_layers.png)
+Figure adapted from [Steinacker2022][^Steinacker2022].
 
-![Geometry of STES](fig/221028_STES_Geometry.png)
+Stratisfied storage model based on [Lago2019][^Lago2019] and modified to account for cones according to [Steinacker2022][^Steinacker2022] and for half-burried storages.
 
-Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken, Wärmediffussion? (hat kaum Einfluss ggü. Konvektion)
+[^Lago2019]: Lago, J. et al.: A 1-dimensional continuous and smooth model for thermally stratified
+storage tanks including mixing and buoyancy, *Applied Energy* 248 (2019), S. 640–
+655: doi: [10.1016/j.apenergy.2019.04.139](https://doi.org/10.1016/j.apenergy.2019.04.139).
+
+[^Steinacker2022]: Steinacker, H: Entwicklung eines dynamischen Simulationsmodells zur Optimierung von wärmegekoppelten Wasserstoffkonzepten für die klimaneutrale Quartiersversorgung, unpublished master thesis (2022), University of Stuttgart.
+
+Three different energy or exergy loss mechanisms are taken into account as shown in the figure above:
+
+- Energy losses to the environment through the outer walls (bottom, walls and lid) of each storage layer (\(\dot{Q}_{STES,loss}\)), characterized by the heat transfer coefficient of the outer surfaces \(U_{STES,bottom/wall/lid}\)
+- Exergy losses due to diffusion processes between the storage layers \(\dot{Q}_{STES,diffus.}\), specified by the diffusion coefficient \(\xi_{STES}\)
+- Exergy losses due to convection (buoyancy) between the storage layers \(\dot{Q}_{STES,buoy.}\).
+
+The temperature \(T_l\) in layer \(l\) with height \(\Delta z_l\) is given by the partial differential equation 
+$$
+\frac{\delta T_{STES,l} }{\delta t} = \underbrace{\xi_{STES} \frac{\delta^2 T_{STES,l}}{\delta z^2}}_{\text{diffusion}} + \underbrace{\frac{M_{STES,l} \ U_{STES,l}}{\rho_{STES} \ c_{p,STES} \ V_{STES,l}} \left(T_{STES,amb,l} - T_{STES,l}\right)}_{\text{energy losses to ambient}}  + \  \cdot  \cdot  \cdot \\
+ \cdot  \cdot  \cdot \ \underbrace{\frac{\dot m_{STES} (T_{STES,l,in}-T_{STES,l})}{\rho_{STES} \ V_{STES,l}}}_{\text{direct (un-)loading}}
+$$
+The ambient temperature of each layer \(T_{amb,l}\) can be either the ambient air temperature \(T_{amb,air}\) in the specific time step or the ground temperature \(T_{ground}\) depending on the considered layer \(l\) and the number of layer burried under the ground surface.
+
+Using the explicite Euler method for integration, the previous equation leads to the temperature in every timestep \(t\) and layer \(l\) with respect to the temperatures in the timestep bevore and the layers around (without the index \(_{STES}\) for better overview)
+$$
+\begin{aligned} 
+	&T_{t+1,l}  = T_{t,l} + \left( \xi_{STES} \frac{T_{t,l+1} + T_{t,l-1} - 2 T_{t,l}}{\Delta z^2_{l,vol}} +  \sigma_l (T_{amb,l} - T_{t,l}) 	+ \phi_l \dot{m}_{t,l} \left(T_{t,l,in} - T_{t,l}   \right)  \right) \Delta t \\
+%    
+	& \text{with the volume-related layer height} \\
+    &\Delta z_{l,vol} = \Delta z_l \ \sqrt{\frac{n_l \ V_{STES,l}}{V_{STES}} }  \ \ \text{(because \(\Delta z_l = const.\), but \(V_{STES,l} \neq const.\)),}  \\[5pt]
+%    
+    & \text{the coefficient of heat losses to the environment} \\
+	&\sigma_l = \begin{cases}
+		\frac{A_{STES,lid} \ U_{STES,lid} + M_{STES,l} \ U_{STES,l}}{c_{p,STES} \ \rho_{STES} \ V_{LZSWP,l}} &\text{for l = lid layer} \\[5pt]
+		\frac{A_{STES,bottom} \ U_{STES,bottom} + M_{STES,l} \ U_{STES,l}}{c_{p,STES} \ \rho_{STES} \ V_{LZSWP,l}} &\text{for l = bottom layer} \\[5pt]
+		\frac{M_{STES,l} \ U_{STES,l}}{c_{p,STES} \ \rho_{STES} \ V_{LZSWP,l}} &\text{for l = sandwich layers}		
+	\end{cases} \\
+%    
+    &\text{and the coefficient for direct loading and unloading} \\ 
+	&\phi_l =  \frac{1 }{\rho_{STES} \ V_{STES,l}} \ 
+%	
+\end{aligned}
+$$
+
+As the coefficients mentioned above are constant within the simulation time, they can be precomputed for cumputational efficiency.
+
+To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as examplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the inegrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in Quasi II?)
+
+![Layer Model of STES](fig/221103_STES_layer_temp.svg)
+
+To account for buoyancy effects, a check is made in each time step to determine whether the temperature gradient in the reservoir corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each time step for all layers, beginning with \(l=2\):
+$$
+T_l = T_l + \theta_l \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1 \text{ and }\\
+T_{l-1} = T_{l-1} - (1-\theta_l) \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1
+$$
+using the volume-ratio of each layer \(\theta_l\) with respect to the surrounding layers, inspired by [Lago2019][^Lago2019]:
+$$  \theta_{l}  = \frac{V_{STES,l-1}}{V_{STES,l} + V_{STES,l-1}} \in [0,1] \text{ for } l > 1. $$
+
+This method was extensively tested in [Steinacker2022][^Steinacker2022] and compared to calculations performed with TRNSYS Type 142 with high agreement. Is was shown that an optimal number of layers for this model is 25, considering computational efficiency and quality of the results. 
 
 **Inputs and Outputs of the STES:**
 
@@ -487,6 +583,7 @@ Symbol | Description | Unit
 \(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
 \(\rho_{STES}\)  | densitiy of the heat carrier medium in the STES | [kg/m\(^3\)]
 \(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
+\(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m\(^2\)/s]
 \(U_{STES,lid}\)  | heat transfer coefficient of the STES' lid | [W/m\(^2\) K]
 \(U_{STES,wall}\)  | heat transfer coefficient of the STES' wall | [W/m\(^2\) K]
 \(U_{STES,bottom}\)  | heat transfer coefficient of the STES' bottom | [W/m\(^2\) K]
