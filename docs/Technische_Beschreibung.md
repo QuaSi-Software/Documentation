@@ -5,13 +5,13 @@ As heat pumps, electrically driven variable-speed compressor heat pumps can be i
 
 Fig. 1: General system chart of a heat pump
 
-![Image title](fig/221018_WP_Anlagenschema.png)
+![General System chart of a heat pump](fig/221018_WP_Anlagenschema.svg)
 
 The energy balance at the heat pump is built up from the incoming electricity, the incoming heat at a low temperature level and the outgoing heat flow at a higher temperature level. The efficiency of the heat pump is defined by the coefficient of performance (COP) as a function of the condenser outlet temperature and the evaporator inlet temperature (see Figure 2).
 
 Fig. 2: Energy balance of the heat pump model
 
-![Image title](fig/221006_Wärmepumpe_Energiefluss.png)
+![Energy flow of heat pump](fig/221006_Wärmepumpe_Energiefluss.svg)
  
 The coefficient of performance (COP) determines the electrical power required \(P_{el,HP}\) to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
@@ -26,7 +26,7 @@ The coefficient of performance is always smaller than the maximum possible Carno
 
 Fig. 3: COP chart of a high-temperature heat pump, given as a series of curves
 
-![Image title](fig/COP_Kennfeld_Beispiel.png)
+![COP chart of heat pump](fig/COP_Kennfeld_Beispiel.png)
 
 
 The energy balance (or power balance) of the heat pump can be determined according to Figure 2, as well as a relationship between supplied and dissipated heat output as a function of the coefficient of performance: 
@@ -48,11 +48,11 @@ Elektrische Leistung konstant über verschiedene Quelltemperaturen, aber veränd
 
 Fig. 4: Linear behaviour of thermal output power in part load operation
 
-![Image title](fig/221018_WP_Teillast_Heizleistung.png)
+![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
 
 The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the part load operation. The relation of the COP and the partial load is assumed to be non-linear. The COP can be corrected using a non-linear part load factor. It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump is therefore not linear too. The coefficient of performance in partial load operation is approximated using the following correction function. Example --> Generalize?! TODO:
 
-![Image title](fig/COP_Teillast.png)
+![COP in part load](fig/COP_Teillast.png)
 
 Image from [^2]
 
@@ -60,7 +60,7 @@ Image from [^2]
 
 Exemplary correction curve for the COP at partial load and a 4\(^{th}\) grade fitting polynome:
 
-![Image title](fig/221020_COP_curve_PL_2.png)
+![Exemplary COP curve in part load](fig/221020_COP_curve_PL_2.png)
 
 Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, are also relevant, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
 
@@ -101,6 +101,35 @@ Symbol | Description | Unit
 **TODO**: Teillastverhalten? getaktet oder Drehzahlgeregelt (Inverter)?
 Anpassung des COPs über lineare oder quadratische Funktion? Oder konstander Wirkungsgrad in Teillast?
 
+Nach WP-Leistungsdatentool von Stiebel-Eltron: 
+
+--> Heizleistung ist Abhängig von Quellentemperatur aber unabhängig von Vorlauftemperatur (je geringer die Quellentemperatur desto kleiner ist die Heizleistung) 
+
+--> Elektrische Leistung ist Abhängig von Vorlauftemperatur (el. Leistungsaufnahme höher bei höheren Vorlauftemperaturen) aber unabhängig von Quellentemperatur
+
+Berechnungsschritte Wärmepumpe wärmegeführt: 
+
+- Thermische Leistung:
+    1. Berechnung der thermischen Leistung bei aktueller Quellentemperatur: Anpassung der thermischen Nennleistung bei definierter Quellentemperatur und Volllast anhand Gradient in Abhängigkeit von der aktuellen Quellentemperatur und Quellentyp (Luft, Wasser) (linearer Zusammenhang)
+    2. Berechnung des Teilllast-Betriebspunktes anhand des thermischen Leistungsbedarfs und aktueller thermischen Maximalleistung
+    3. Minderung der quellentemperaturangepassten thermischen Leistung linear in Abhängigkeit der Teilllast
+- Elektrische Leistung und COP:
+    1. Bestimmung des COPs aus Kennfeld oder Carnot mit Gütegrad aus Quellen- und Senkentemperatur
+    2. Anpassung des COPs in Abhängigkeit der aktuellen Teillast über Faktorenkurve
+    3. Berechnung der elektrischen Leistung aus aktueller thermischen Leistung und COP
+	
+Berechnungsschritte Wärmepumpe stromgeführt: 
+
+- Elektrische Leistung:
+    1. Berechnung der elektrischen Leistung bei aktueller Senkentemperatur: Minderung der elektrischen Nennleistung bei definierter Senkentemperatur und Volllast anhand Gradient in Abhängigkeit der aktuellen Senkentemperatur 
+    2. Berechnung des Teilllast-Betriebspunktes anhand der Verfügbarkeit der elektrischen Leistung und aktuell möglicher elektrischen Maximalleistung
+    3. Minderung der senkentemperaturangepassten elektrischen Leistung linear in Abhängigkeit der Teilllast
+- Thermische Leistung und COP:
+    1. COP aus Kennfeld oder Carnot mit Gütegrad aus Quellen- und Senkentemperatur
+    2. Anpassung des COPs in Abhängigkeit der aktuellen Teillast über Faktorekkurve
+    3. Berechnung der thermischen Leistung aus aktueller elektrischen Leistung und COP
+
+
 Beispiel für quadratische Teillastverhalten des COPs: 
 
 ![Image title](fig/Beispiel_fuer_Teillast.png)
@@ -124,7 +153,7 @@ The general energy and mass flow in the electrolyser as well as the losses consi
 
 Fig. 5: Energy and mass flows in the electrolyser
 
-![Image title](fig/221013_Elektrolyseur.png)
+![Energy flow of electrolyser](fig/221013_Elektrolyseur.svg)
 
 The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{Ely,H_2}\)) or mass flow (\(\dot{m}_{Ely,H_2}\))) and the consumption of electrical energy (\( P_{el,Ely} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
 $$
@@ -218,7 +247,7 @@ Symbol | Description | Unit
 
 ## Reduction of usable heat during start-up
 
-![Image title](fig/221028_Start-up-Reduction_general.svg)
+![Heat reduction during start-up](fig/221028_Start-up-Reduction_general.svg)
 
 Linear warm-up during start-up:
 $$
@@ -231,7 +260,7 @@ $$
 
 
 ## Combined heat and power plant (CHP)
-![Image title](fig/221021_CHP.png)
+![Energy flow of CHP](fig/221021_CHP.svg)
 
 Definiton of power-to-heat ratio of CHP:
 $$ r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  $$
@@ -283,7 +312,7 @@ Symbol | Description | Unit
 \(x_{CHP}\)  | current operating state of the CHP (on, off, part load)   | [%]
 
 ## Gas boiler (GB)
-![Image title](fig/221021_Gaskessel.png)
+![Energy flow of gas boiler](fig/221021_Gaskessel.svg)
 
 Energy balance of gas boilder:
 $$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB} \ \dot{E}_{GB,gas,in}   $$
@@ -317,13 +346,13 @@ Symbol | Description | Unit
 
 
 ## Oil heating (OH)
-![Image title](fig/221028_Oelkessel.png)
+![Energy flow of oil heating](fig/221028_Oelkessel.svg)
 
 ## Elecric heating rod (ER)
-![Image title](fig/221028_ElectricRod.png)
+![Energy flow of electric rod](fig/221028_ElectricRod.svg)
 
 ## Biomass boiler (BB)
-![Image title](fig/221028_BiomassBoiler.png)
+![Energy flow of biomass boiler](fig/221028_BiomassBoiler.svg)
 
 
 ## Heat sources 
@@ -361,9 +390,9 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 or just one general model?
 
 ## Short-term thermal energy storage (STTES)
-![Image title](fig/221028_STTES.png)
+![Energy flow of STTES](fig/221028_STTES.svg)
 
-![Image title](fig/221021_STTES_scetch.png)
+![Scetch of STTES](fig/221021_STTES_scetch.svg)
 
 The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally layered storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.
 
@@ -422,13 +451,58 @@ Symbol | Description | Unit
 Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.
 
 ### Tank (TTES) and Pit (PTES) thermal energy storage 
-![Image title](fig/221028_STES.png)
+![<Energy flow of STES](fig/221028_STES.svg)
 
-![Image title](fig/221025_LZWSP_Geometrie.png)
+![Layer model of STES](fig/221021_STES_layers.png)
 
-![Image title](fig/221021_STES_layers.png)
+![Geometry of STES](fig/221028_STES_Geometry.png)
 
-Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken
+Vernachlässigt werden: Thermische Kapazität des umgebenden Erdreichs, Kies-Wasser-Becken, Wärmediffussion? (hat kaum Einfluss ggü. Konvektion)
+
+**Inputs and Outputs of the STES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{STES,load}\) | thermal power input in the STES | [MW]
+\(\dot{Q}_{STES,unload}\) | thermal power output of the STES | [MW]
+\(\dot{m}_{STES,load}\)  | current mass flow rate into the STES | [kg/h]
+\(\dot{m}_{STES,unload}\)  | current mass flow rate out of the STES | [kg/h]
+\(T_{STES,load,hot}\)  |  temperature of input mass flow while loading the STES | [°C]
+\(T_{STES,load,cold}\)  | temperature of output mass flow while loading the STES | [°C]
+\(T_{STES,unload,hot}\)  |  temperature of input mass flow while unloading the STES | [°C]
+\(T_{STES,unload,cold}\)  | temperature of output mass flow while unloading the STES | [°C]
+
+**Parameter of the STES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{STES,rated}\)  | rated thermal energy capacity of the STES | [MWh]
+\(x_{STES,start}\)  | thermal energy contend of the STES at the beginning of the simulation in relation to \(Q_{STES,rated}\)  | [%]
+\(T_{STES,hot}\)  | rated upper temperature of the STES | [°C]
+\(T_{STES,cold}\)  | rated lower temperature of the STES | [°C]
+\(c_{STES,max,load}\) | maximum charging rate (C-rate) of STES | [1/h]
+\(c_{STES,max,unload}\) | maximum discharging rate (C-rate) of STES | [1/h]
+\(V_{STES}\)  | volume of the STES | [m\(^3\)]
+\(\alpha_{STES,slope}\)  | slope angle of the wall of the STES with respect to the horizon | [°]
+\(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
+\(\rho_{STES}\)  | densitiy of the heat carrier medium in the STES | [kg/m\(^3\)]
+\(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
+\(U_{STES,lid}\)  | heat transfer coefficient of the STES' lid | [W/m\(^2\) K]
+\(U_{STES,wall}\)  | heat transfer coefficient of the STES' wall | [W/m\(^2\) K]
+\(U_{STES,bottom}\)  | heat transfer coefficient of the STES' bottom | [W/m\(^2\) K]
+\(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
+\(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
+\(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]
+\(\boldsymbol{T}_{STES,amb}\)  | timeseries of ambient temperature | [°C]
+
+
+**State variables of the STES:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\({Q}_{STES}\)  | current amount of thermal energy stored in the STES | [MWh]
+\(x_{STES}\)  | current charging state of the STES   | [%]
+\(\boldsymbol{T}_{STES}\)  | vector of current temperatures in every layer of the STES   | [°C]
 
 ### Borehole thermal energy storage (BTES)
 
@@ -443,19 +517,23 @@ Aquifer thermal energy storages are not implemented yet.
 
 
 ## Hydrogen fuel cell (FC)
-
+![Energy flow of hydrogen fuel cell](fig/221031_H2_Fuel_Cell.svg)
 
 ## Photovoltaik (PV)
+![Energy flow of photovoltaik](fig/221028_PV.svg)
+
 pvlib
 
 ## Wind power (WP)
+![Energy flow of wind power](fig/221028_Wind.svg)
+
 windpowerlib 
 
 Achtung: Winddaten von EPW nicht geeignet!
 
 ## Battery (BA)
 
-![Image title](fig/221025_battery.png)
+![Energy flow of battery](fig/221025_battery.svg)
 
 Energy balance of battery in every timestep:
 $$  E_{GB,t+1} = E_{GB,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) $$
@@ -514,9 +592,16 @@ Symbol | Description | Unit
 
 
 ## Hydrogen compressor (HC)
+![Energy flow of hydrogen compressor](fig/221028_HydroCompress.svg)
 
-
-
+## ToDo
+- In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
+- Quellenangabe LZWSP-Grafiken auf Masterarbeit
+- Definition einführen: 
+  - Skalare: kursiv (normal math: \(T \ t\))
+  - Vektor/Zeitreihe: Fett und kursiv (boldsymbol: \(\boldsymbol{T \ t}\))
+  - Matrix: Fett und nichtkursiv (textbf: \(\textbf{T t}\))
+- Nummerierung und Titel von Bilder hinzufügen oder ganz weg
 
 ## References
 ///Footnotes Go Here///
