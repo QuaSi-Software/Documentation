@@ -21,5 +21,21 @@ theme: readthedocs
 markdown_extensions:
   - mdx_math
   - footnotes 
-  
+
 extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']
+
+# navigation
+nav:
+  - Home:
+    - 'QuaSi - Overview': 'index.md'
+  - 'Technical description':
+    - 'Overview': 'Technische_Beschreibung.md'
+  - 'Simulation engine Bran':
+    - 'Installation and usage': 'bran_installation.md'
+    - 'Input file format': 'bran_input_file_format.md'
+    - 'Simulation model': 'bran_simulation_model.md'
+  - 'Contributions':
+    - 'How to help': 'contributions.md'
+    - 'Working on the documentation': 'changing_documentation.md'
+  - About:
+    - 'License': 'license.md'
