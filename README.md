@@ -17,6 +17,7 @@ It is advised to use a virtual environment to seperate the requirements of proje
 2. Construct the environment with `virtualenv venv`. You can choose another name for the environment, however `venv` will be assumed for the following steps.
 3. Activate the environment with `.\venv\Scripts\activate` on Windows or `source ./venv/bin/activate` on Linux. This step has to be done every time you want to use the project. The environment stays active in your terminal session as indicated by the prefix `(venv)` at the start of the command line prompt. You can deactivate the environment at any time by closing the session or use the `deactivate` command, which is only available while an environment is active.
 4. Install the python package `mkdocs` with `pip install mkdocs`.
+5. Install the documentation package with `pip install -e .`.
 
 ### 3. Run the documentation generation
 You can now generate and view the documentation. By running `mkdocs serve`, a webserver is started that hosts the documentation on [http://localhost:8000](http://localhost:8000). This process runs continously and should detect when changes are made to the documentation source files and restart automatically. You can also quit the process with `ctrl+c` and start it again in order to generate it again.
