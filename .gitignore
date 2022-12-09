@@ -1,2 +1,9 @@
 # local html files
 site/
+
+# virtual environment
+venv/
+
+# python cache file
+*.egg-info
+*__pycache__*
