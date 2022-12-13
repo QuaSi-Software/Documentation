@@ -35,7 +35,7 @@ nav:
     - 'Input file format': 'bran_input_file_format.md'
     - 'Simulation model':
       - 'Fundamentals': 'bran_fundamentals.md'
-      - 'System topology': 'bran_system_topology.md'
+      - 'Energy network topology': 'bran_ennet_topology.md'
       - 'Types of energy systems': 'bran_types_energy_systems.md'
       - 'Operation and control': 'bran_operation_control.md'
   - 'Contributions':

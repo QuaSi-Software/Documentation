@@ -12,7 +12,7 @@ The `JSON` format does not define comments. If there is a need to provide additi
 
 ### User address code
 
-The units / energy systems in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use a system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of system for easier debugging.
+The units / energy systems in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
 
 An example for a UAC system could be a hierarchical structure based on location and affiliation of the units within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
 

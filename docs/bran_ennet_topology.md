@@ -1,6 +1,6 @@
-# System topology
+# Energy network topology
 
-![Example of a system topology connecting various energy system units](fig/example_system_topology.png)
+![Example of an energy net topology connecting various energy system units](fig/example_ennet_topology.png)
 
 ## Energy media
 
