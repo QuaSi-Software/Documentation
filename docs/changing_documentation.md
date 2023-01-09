@@ -24,4 +24,4 @@ It is advised to use a virtual environment to seperate the requirements of proje
 5. Install the documentation package with `pip install -e .`.
 
 ### 3. Run the documentation generation
-You can now generate and view the documentation. By running `mkdocs serve`, a webserver is started that hosts the documentation on [http://localhost:8000](http://localhost:8000). This process runs continously and should detect when changes are made to the documentation source files and restart automatically. You can also quit the process with `ctrl+c` and start it again in order to generate it again.
+You can now generate and view the documentation. By running `mkdocs serve`, a webserver is started that hosts the documentation on [http://localhost:8000](http://localhost:8000). This process runs continously and should detect when changes are made to the documentation source files and restart automatically. If not, you can add the command `mkdocs serve -watch /path/to/markdown/file` with the absolute path to the file(s) that should be checked for changes continuously. You can also quit the process with `ctrl+c` and start it again in order to generate the HTML-files again.

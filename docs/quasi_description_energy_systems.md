@@ -1,8 +1,16 @@
 # Technical description of main components
 
+## Convention
+
+- scalars: italic letter (normal math: \(T \ t\))
+- vectors/time series: bold and italic (boldsymbol: \(\boldsymbol{T \ t}\))
+- matrices: bold and non-italic (textbf: \(\textbf{T t}\))
+
+Energy flows into an energy system are positive, energy flows out of an energy system are negative.
+
 ## Heat pump (HP)
 ### General description of HP
-As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of Quasi. Their general system chart with the denotation of the in- and outputs is shown in the figure below.
+As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of Quasi. Their general system chart with the denotation of the in- and outputs is shown in the figure below. Using the electrical power \(P_{el,HP, supply}\), reduced by the losses of the power electronics \(P_{el,HP, loss}\), an energy flow \(\dot{Q}_{HP,in}\) with temperature \(T_{HP,source,in}\) is transformed to the energy flow \(\dot{Q}_{HP,out}\) with temperature \(T_{HP,sink,out}\).
 
 ![General System chart of a heat pump](fig/221018_WP_Anlagenschema.svg)
 
@@ -48,14 +56,14 @@ For the simulation of energy systems in an early design phase, for which Quasi i
 
 There are several aspects to be considered when simulating a heat pump based on equation-fitting, which will be briefly described in the following:
 
-The COP of a heat pump, representing the efficiency in a current time step, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink. 
+The COP of a heat pump, representing the efficiency in a current time step, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink. ToDo: Figure
 
 Additionaly, the maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given for a specific heat pump is only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
 
 [^DINEN14511]: DIN EN 14511:2018 (2018): Air conditioner, liquid chiling packages and heat pumps for space heating and cooling and process chillers, with electrically driven compressors. DIN e.V., Beuth-Verlag, Berlin.
 
 Furthermore, the efficiency and therefor the COP is changing in part load operation. In the past, mostly on-off heat pump where used, regulating the total power output in a given time span by alternating the current state beween on and off. This causes efficency losses mostly due to thermal capacity effects and initial compression power needed at each start. (ToDo: Socal2021) 
-In the last years, modulating heat pumps are more common, using a frequency inverter to adjust the speed of the compression motor and therefor affecting the power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the nominal power output. In the literature, many research groups have investigated this effect, compare for excample to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
+In the last years, modulating heat pumps are more common, using a frequency inverter at the electrical power input to adjust the speed of the compression motor and therefor affecting the thermal power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the nominal power output. In the literature, many research groups have investigated this effect, compare for excample to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
 
 [^Bettanini2003]: Bettanini, E.; Gastaldello, A.; Schibuola, L. (2003): Simplified Models to Simulate Part Load Performance of Air Conditioning Equipments. *Eighth International IBPSA Conference, Eindhoven*, Netherlands, S. 107–114.
 
@@ -83,7 +91,6 @@ The temperature-dependend COP can be calculated from different methods:
 As example for a lookup-table COP (second bulletpoint above), the following figure from Steinacker2022[^Steinacker2022] shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm.
 
 ![COP chart of heat pump](fig/COP_Kennfeld_Beispiel.png)
-ToDO: translate to english
 
 **Maximum thermal and electrical power**
 
@@ -94,6 +101,7 @@ The more complex but also more accurate approache is the use of polynomial fits 
 In order to adress the early planning stage, general, market-averaged polynomes need to be created, representing an average heat pump. Aditionally, one specific heat pump model can be used if the the required data is available. 
 
 **ToDo**: Add method of calculating market-averaged polynomes!
+**ToDO:** Add description of icing-losses or air-water heat pumps!
 
 Biquadratic polynomes according to TRNSYS Type 401
 $$ \dot{Q}_{HP,max} = c_{q1} + c_{q2} \ \bar{T}_{HP,source,in} + c_{q3} \ \bar{T}_{HP,sink,out}  + c_{q4} \ \bar{T}_{HP,source,in} \ \bar{T}_{HP,sink,out} + \cdot  \cdot  \cdot \\
@@ -246,8 +254,6 @@ If the electrical energy is provided by renewable energies, the resulting hydrog
 
 The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
 
-Fig. 5: Energy and mass flows in the electrolyser
-
 ![Energy flow of electrolyser](fig/221013_Elektrolyseur.svg)
 
 The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{Ely,H_2}\)) or mass flow (\(\dot{m}_{Ely,H_2}\))) and the consumption of electrical energy (\( P_{el,Ely} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
@@ -339,19 +345,6 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(x_{Ely}\)  | current 	operating state (on, off, part load)   | [%]
-
-## Reduction of usable heat during start-up
-
-![Heat reduction during start-up](fig/221028_Start-up-Reduction_general.svg)
-
-Linear warm-up during start-up:
-$$
- \dot{Q}_{out,reduced} = 
-\begin{cases}
-\dot{Q}_{out} \ \frac{\text{actual operating time}}{\text{minimum operating time}} & \text{actual operating time} \ < \text{minimum operating time} \\
-\dot{Q}_{out} & \text{actual operating time} \ \geq  \text{minimum operating time}
-\end{cases} 
-$$
 
 
 ## Combined heat and power plant (CHP)
@@ -796,10 +789,7 @@ Symbol | Description | Unit
 
 ## ToDo
 - In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
-- Definition einführen: 
-    - Skalare: kursiv (normal math: \(T \ t\))
-    - Vektor/Zeitreihe: Fett und kursiv (boldsymbol: \(\boldsymbol{T \ t}\))
-    - Matrix: Fett und nichtkursiv (textbf: \(\textbf{T t}\))
+- Beschreibungen für Grafiken einfügen
 
 ## References
 ///Footnotes Go Here///

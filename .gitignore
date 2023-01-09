@@ -7,3 +7,6 @@ venv/
 # python cache file
 *.egg-info
 *__pycache__*
+
+# windows thumbnails
+docs/fig/Thumbs.db

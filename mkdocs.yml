@@ -28,8 +28,9 @@ extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX
 nav:
   - Home:
     - 'QuaSi - Overview': 'index.md'
-  - 'Technical description':
-    - 'Overview': 'Technische_Beschreibung.md'
+  - 'Technical description': 
+    - 'quasi_description_energy_systems.md'
+    - 'quasi_transient_effects.md'
   - 'Simulation engine Bran':
     - 'Installation and usage': 'bran_installation.md'
     - 'Input file format': 'bran_input_file_format.md'
