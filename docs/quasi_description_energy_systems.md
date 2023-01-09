@@ -2,11 +2,16 @@
 
 ## Convention
 
-- scalars: italic letter (normal math: \(T \ t\))
-- vectors/time series: bold and italic (boldsymbol: \(\boldsymbol{T \ t}\))
-- matrices: bold and non-italic (textbf: \(\textbf{T t}\))
+Symbols:
 
-Energy flows into an energy system are positive, energy flows out of an energy system are negative.
+- Scalars are shown in italic letters (normal math: \(T \ t\))
+- Vectors or time series in bold and italic letters (boldsymbol: \(\boldsymbol{T \ t}\))
+- Matrices are bold and non-italic (textbf: \(\textbf{T t}\)) 
+ 
+Energy systems:
+
+- Energy flows into an energy system are positive, energy flows out of an energy system are negative
+- Energy systems are single units like a heat pump, a buffer tank, a battery or a photovoltaik-plant while energy networks are interconnected energy systems
 
 ## Heat pump (HP)
 ### General description of HP

@@ -12,3 +12,9 @@ $$
 \dot{Q}_{out} & \text{actual operating time} \ \geq  \text{start-up time}
 \end{cases} 
 $$
+
+ToDo: May add also 
+
+- exponential start-up
+- shut down curve (linear, exonential)
+- re-start from shut down curve, starting from current state and not from zero, see e.g. TRNSYS Type 401
