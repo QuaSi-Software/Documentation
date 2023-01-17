@@ -148,7 +148,7 @@ The coefficient of performance in partial load operation is approximated using a
 
 The part-load behaviour depends also on the type of the heat pump (on-off or inverter heat pump), as shown for example in Bettanini2003[^Bettanini2003] or in Socal2021[^Socal2021]. For illustration, the following figure is taken from the latter reference to demonstrate the different part load factors of the COP (y-axis) at different part load ratios for different heat pump technologies:
 
-![Image title](fig/Socal2021_PLFfromPLR_angepasst.jpg)
+![Heat pump part load factor (PLF)](fig/Socal2021_PLFfromPLR_angepasst.jpg)
 
 Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP of 1.1. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1. These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. 
 
@@ -164,7 +164,7 @@ To account for icing losses of heat pumps with air as source medium, the approac
 
 For the calculation of icing losses, five coefficients are needed: \(c_{HP,ice,A}\), \(c_{HP,ice,B}\), \(c_{HP,ice,C}\), \(c_{HP,ice,D}\) and \(c_{HP,ice,E}\). According to the Type 401, icing losses are calculated using a superpositon of a gaussian curve with its maximum between 0 °C and 5 °C representing the maximum liklyhood of frost within the heat pump (high absolute humidity) and a linear curve, representing the higher sensible energy effort to heat-up the components of the heat pump for defrosting. Examplary curves are shown in the following figure (linear, gauss and superposition):
 
-![Image title](fig/230108_Icing_Losses.png)
+![Heat pump icing losses of COP](fig/230108_Icing_Losses.png)
 
 The examplary coeffients for the curves in the figure above are \(c_{HP,ice,A} = 3\), \(c_{HP,ice,B} = -0.42\), \(c_{HP,ice,C}=15\), \(c_{HP,ice,D}=2\), \(c_{HP,ice,E}=30\).
 
@@ -182,11 +182,15 @@ $$ COP_{ice,corrected} =  COP \ (1-\Delta COP_{ice,loss}) $$
 
 
 ### Steps to perform in the simulation model of the heat pump
-The calculation is based on TRNSYS Type 401[^Wetter1996] that is similar to Type 204[^Alfjei1996]. The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effecs during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
+The calculation is based on TRNSYS Type 401[^Wetter1996] that is similar to Type 204[^Alfjei1996] (Type 204 proviedes an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effecs during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
 
-Steps to calculate the electrical and thermal energy in- and outputs of HP:
+There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below.
 
-- using polynomial fits to calculate stationary thermal and electrical full-load power at given temperatures of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) for given nominal thermal power
+![Heat pump calculation steps](fig/230110_Waermepumpe_Berechnungsschritte.svg)
+
+Steps to calculate the electrical and thermal energy in- and outputs of HP using a polynomial fit of the thermal and electrical power (compare to left side of figure above):
+
+- using polynomial fits to calculate stationary thermal in- and output and electrical full-load power at given temperatures of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) for given nominal thermal power
     - differing source and sink medium: 
         - air-water
         - water-water
@@ -218,7 +222,7 @@ The polynomes describing the temperature-depended thermal and electrical power o
 
 [^Alfjei1996]: Afjei T., Wetter M., Glass A. (1997): TRNSYS Type 204 - Dual-stage compressor heat pump including frost and cycl losses. Model description and implementation in TRNSYS, Versin 2. Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf](https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf)
 
-If universal data table or the Carnot-COP reduced by an efficiency factor should be used instead of the more accurate model described above, a different calculation approach is needed:
+If universal data table or the Carnot-COP reduced by an efficiency factor should be used instead of the more accurate model described above, a different calculation approach is needed (compare right side in the figure above):
 
 - Get power at current temperatures
     - using nominal power without a temperature-dependency or
@@ -475,13 +479,16 @@ Symbol | Description | Unit
 ### Soil
 - geothermal probes
 - geothermal collector 
-- ...
+- geothermal basket collector
+- geothermal trensh collector
+- geothermal spiral collector
+- (sheet pile wall)
 
 Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmequellen
 
 ### Water
 - groundwater well
-- surface waters
+- surface waters: Temperature regression from measurement data: Harvey2011
 - waste heat from industrial processes
 - wastewater
 - solar thermal collector
@@ -510,7 +517,7 @@ or just one general model?
 
 ![Scetch of STTES](fig/221021_STTES_scetch.svg)
 
-The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally layered storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.
+The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally stratified storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.
 
 The rated thermal energy content \(Q_{STTES,rated}\) of the STTES can be calculated using the volume \(V_{STTES}\), the density \(\rho_{STTES}\), the specific thermal capacity of the medium in the storage \(cp_{STTES}\) and the temperature span within the STTES:
 $$ Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) $$
@@ -564,7 +571,7 @@ Symbol | Description | Unit
 
 
 ## Seasonal thermal energy storage (STES)
-Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account.
+Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account. Therefore, a stratified thermal storage model is implemented that is described below.
 
 ### Tank (TTES) and Pit (PTES) thermal energy storage 
 
@@ -610,7 +617,7 @@ $$
 Q_{STES,t} = Q_{STES,t-1} + (\dot{Q}_{STES,load} - \dot{Q}_{STES,unload} - \dot{Q}_{STES,loss,amb}) \ \Delta t
 $$
 
-![Layer model of STES](fig/221021_STES_layers.png)
+![Stratified model of STES](fig/221021_STES_layers.png)
 Figure adapted from [Steinacker2022][^Steinacker2022].
 
 Stratisfied storage model based on [Lago2019][^Lago2019] and modified to account for cones according to [Steinacker2022][^Steinacker2022] and for half-burried storages.
@@ -660,7 +667,7 @@ As the coefficients mentioned above are constant within the simulation time, the
 
 To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as examplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the inegrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in Quasi II?)
 
-![Layer Model of STES](fig/221103_STES_layer_temp.svg)
+![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
 
 To account for buoyancy effects, a check is made in each time step to determine whether the temperature gradient in the reservoir corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each time step for all layers, beginning with \(l=2\):
 $$
@@ -818,6 +825,6 @@ Symbol | Description | Unit
 ## ToDo
 - In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
 - Beschreibungen für Grafiken einfügen
-
+  
 ## References
 ///Footnotes Go Here///
