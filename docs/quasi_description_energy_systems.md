@@ -118,29 +118,27 @@ $$ \dot{P}_{el,HP,max} = c_{p1} + c_{p2} \ \bar{T}_{HP,source,in} + c_{p3} \ \ba
 where all temeratures have to be normed according to
 $$ \bar{T} = \frac{T \ [°C]}{273.15} + 1 $$
 
+If both the thermal output and electrical input power are given as a temperature-dependent polynome, the temperature-dependend COP (see previous section) can be direclty calculated from these polynomes.
+
 The second method to adjust the electrical and thermal energy would be a linear gradient that adjust the rated power in dependency of one temperature. Checking the available data of many different heat pumps from Stiebel-Eltron[^Stiebel-EltronTool], a simplified correlation can be observed:
 
 - the thermal power is dependend on the source temperature, but independent on the sink temperature (the lower the source temperature the lower is the heating power)
 - the electrical power is dependend on the sink temperature, but independent on the source temperature (the higher the sink temperature the higher is the electrical power consumption)
 
 This gives the possibility to linearly adjust the available thermal power with the change of the source temperature and the electrical power demand with the change of the temperature of the sink. Which power needs to be adjusted depends on the choice of the control strategy - thermally or electrically controlled.
-The gradient of the power de- or increase with changing temperature needs to be specified.
+The gradient of the power de- or increase with changing temperature needs to be specified. With this method, the actual temperature-dependend relation of thermal and electrical power need to be determined using the temperature-dependend COP described earlier.
 
 [^Stiebel-EltronTool]: Stiebel-Eltron Heat Pump Toolbox: [https://www.stiebel-eltron.com/toolbox/waermepumpe/](https://www.stiebel-eltron.com/toolbox/waermepumpe/)
 
 **Part load efficiency**
 
-The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The relation of the COP and the PLR is assumed to be non-linear. The COP can be corrected using a non-linear part load factor (PLF) in dependence of the PLR. 
+The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependend of the PLR. The definition of the PLR and the PLF is given below:
 
-Part load ratio (PLR) = power (el. or th.) demand or availability in current time step in relation to maximum power (el. or th.) with current temperatures: \(PLR = \frac{current \ power}{max. \ power} \)
+PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current time step}}{\text{maximum power (el. or th.) of heat pumpt at current temperatures}} \)
 
-Part load facor (PLF) = adjustment factor for COP at different PLR:  \(COP_{part-load} = COP_{full-load} * PLF \)
- 
-It follows from the definition of the COP that the correlation between the electrical power consumption and the heat output of the heat pump in part load operation is therefore not linear too. For simplification, the heat output of the heat pump itself is assumed to linear in part load operation between \(\dot{Q}_{HP,min}\) at \(PL_{HP,min}\) and \(\dot{Q}_{HP,max}\) at 100% compressor speed as shown in the figure below. 
+PLF (part load facor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
 
-![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
-
-The coefficient of performance in partial load operation is approximated using a correction function. The literature provides different examples for the quadratic part-load behaviour of the COP (see section "Overview" for literature examples). As an example, the part-load-dependend COP of an ENRGI-Heatpump is shown in the following figure (Source: Enrgi[^2])
+The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependend COP of an ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]). It is also important to note, that the curve shown in the figure below, that is typically for an inverter-driven heat pump, is not invertible.
 
 ![COP in part load](fig/COP_Teillast.png)
 
@@ -153,6 +151,11 @@ The part-load behaviour depends also on the type of the heat pump (on-off or inv
 Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP of 1.1. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1. These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. 
 
 The figure above shows also the difference of the part load factor comparing on-off and inverter heat pumps as well as the defined on-off losses in DIN EN 14825 for the calculation of the seasonal coefficient of performance (SCOP).
+
+The figures above also show the non-linear relation of the COP to the part load ratio. For simplification and to avoid iterative processes during the simulation, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,max}\) at PLF = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio.
+
+![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
+
  
 **ToDo**: Description of method of PLF-Factor curcve in Quasi II: Using Blervaque2015? 
 
@@ -180,9 +183,13 @@ $$
 
 $$ COP_{ice,corrected} =  COP \ (1-\Delta COP_{ice,loss}) $$
 
+Accoring to the results found in Wei2021[^Wei2021], it is assumed that the decrease of the COP due to icing losses will only increase the power input of the heat pump. It will not affect the thermal power output.
+
+[^Wei2021]: Wei, Wenzhe et al. (2021): Investigation on the regulating methods of air source heat pump system used for district heating: Considering the energy loss caused by frosting and on–off. In: *Energy and Buildings 235*, S. 110731. doi: [10.1016/j.enbuild.2021.110731]((https://doi.org/10.1016/j.enbuild.2021.110731).
+
 
 ### Steps to perform in the simulation model of the heat pump
-The calculation is based on TRNSYS Type 401[^Wetter1996] that is similar to Type 204[^Alfjei1996] (Type 204 proviedes an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effecs during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
+The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar to Type 204[^Alfjei1996] (Type 204 provides an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effecs during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
 
 There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below.
 
@@ -251,17 +258,17 @@ Symbol | Description | Unit
 \(\dot{Q}_{HP,out}\) | heat flow leaving the HP (heat sink) | [MW]
 \(P_{el,HP}\) | electric power demand of the HP | [MW]
 \(P_{el,HP,supply}\) | electric power demand of the HP incl. losses of the power electronics | [MW]
-\(T_{HP,sink,in}\) | condenser inlet temperature | [°C]
+\(T_{HP,sink,in}\) | condenser inlet temperature - not used | [°C]
 \(T_{HP,sink,out}\) | condenser outlet temperature | [°C]
 \(T_{HP,source,in}\) | evaporator inlet temperature | [°C]
-\(T_{HP,source,out}\) | evaporator outlet temperature | [°C]
+\(T_{HP,source,out}\) | evaporator outlet temperature - not used | [°C]
 
 **Parameter of the Heat Pump:** ToDO
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{HP,max}\) | maximum thermal power of the heat pump | [MW]
-\(\dot{Q}_{HP,min}\) | minimum thermal power of the heat pump at \(PL_{HP,min}\) | [MW]
+\(P_{el,HP,max}\) | maximum electical power of the heat pump - given as polynome with respect to \(T_{HP,source,in}\) | [MW]
+\(\dot{Q}_{HP,out,max}\) | maximum thermal power of the heat pump - given as polynome with respect to \(T_{HP,source,in}\) | [MW]
 \(PL_{HP,min}\) | minimum possible part load of the heat pump [%]
 \(COP_{HP}(T_{HP,sink,out}, T_{HP,source,in}, x_{HP})\) | coefficient of performance (COP) of the heat pump incl. thermal losses depending on \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) and on current state \(x_{HP}\) | [-]
 \(\eta_{HP,PE}\) | efficiency of power electronics of heat pump | [-]
