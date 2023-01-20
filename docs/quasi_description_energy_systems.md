@@ -87,7 +87,7 @@ When heat pumps with air as source medium are used, the losses due to icing effe
 For a most realistic representation, all four discussed effects need to be considered - temperature-dependent COP, temperature-dependent power, part-load-dependent COP and icing losses. The calulation of these dependencies will be described below.
 
 ### Modelling approaches for HP: Detail
-**Temperature-dependent COP**
+#### Temperature-dependent COP
 
 The temperature-dependend COP can be calculated from different methods:
 
@@ -99,7 +99,7 @@ As example for a lookup-table COP (second bulletpoint above), the following figu
 
 ![COP chart of heat pump](fig/COP_Kennfeld_Beispiel.png)
 
-**Maximum thermal and electrical power**
+#### Maximum thermal and electrical power
 
 In order to adress a change in maximum power output or input of the heat pump at different operating temperatures, two different approaches can be used.
 
@@ -130,7 +130,7 @@ The gradient of the power de- or increase with changing temperature needs to be 
 
 [^Stiebel-EltronTool]: Stiebel-Eltron Heat Pump Toolbox: [https://www.stiebel-eltron.com/toolbox/waermepumpe/](https://www.stiebel-eltron.com/toolbox/waermepumpe/)
 
-**Part load efficiency**
+#### Part load efficiency
 
 The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependend of the PLR. The definition of the PLR and the PLF is given below:
 
@@ -138,7 +138,7 @@ PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availabili
 
 PLF (part load facor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
 
-The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependend COP of an ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]). It is also important to note, that the curve shown in the figure below, that is typically for an inverter-driven heat pump, is not invertible.
+The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependend COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
 
 ![COP in part load](fig/COP_Teillast.png)
 
@@ -148,20 +148,49 @@ The part-load behaviour depends also on the type of the heat pump (on-off or inv
 
 ![Heat pump part load factor (PLF)](fig/Socal2021_PLFfromPLR_angepasst.jpg)
 
-Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP of 1.1. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1. These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. 
+Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increas of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. 
 
 The figure above shows also the difference of the part load factor comparing on-off and inverter heat pumps as well as the defined on-off losses in DIN EN 14825 for the calculation of the seasonal coefficient of performance (SCOP).
 
-The figures above also show the non-linear relation of the COP to the part load ratio. For simplification and to avoid iterative processes during the simulation, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,max}\) at PLF = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio.
+As described in the section "General description of HP", the COP is defined as the ratio of the heat output \(\dot{Q}_{HP,out}\) and the electrical input power \(P_{el,HP}\). The shown curves for the part load factor affecs only the ratio of heat output to electrical input power and there is no information available on the acutal change of the two dimensions. Therefore, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,out,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,out,max}\) at PLF = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio that was found more relalistic as for inverter heat pumps, the observed efficiency change is mostly due to an efficiency change of the frequency converter and motor of the compressor. (QUELLE ToDo)
 
 ![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
 
+It is also important to note, that the typical PLF-curve for inverter-driven heat pumps is not invertible and can therefore not be used directly to calculate the PLR from PLF. Although, is needed for a operation strategy that uses limited availability or demand of the electrical or thermal power. To handle this problem, the PLF-curve is not used directly:
+
+During preprocessing, the given curve of the PLF in dependece of the PLR (see orange curve in figure below as excample) is discretised. Then, the electrical input power (yellow curve) is calculated at each discretization using the assumption of a linear thermal power output (grey curve) in part load operation. As the relation of the power input to the thermal power output is defined by the COP that is changing in every timestept, any COP can be chosen for this initial calculation during the preprocessing. For this example, a COP of 4 is chosen. This process results in two value tables for the electrical input power and the thermal output power. The latter one is, according to the assumption made above, a straight line as shown in the figure.
  
-**ToDo**: Description of method of PLF-Factor curcve in Quasi II: Using Blervaque2015? 
+![non-linear part load power curve of heat pump](fig/230119_PartLoadPowerCurve.JPG)
+
+ Both value tables are then normalized to their maximum value as shown in the next figure. The thermal power input although can not be precalculated as it depends on the absolute difference of thermal output and electrical input power.  
+
+![normalized non-linear part load power curve of heat pump](fig/230119_PartLoadPowerCurve_normalized.JPG)
+
+In every timestep, the two precomputed and normalized value tables of the thermal output and electrical input power are scaled up to the current maximum power, limited by the heat pump current full-load operation state. There, the actual COP at the current time step is represented in the ration of both values. The two scaled value tables can then be used to determine the actual PLF that is nececarry to cover the current demand or to limit the operation state due to the limited available eletrical power (interpolation on value table with known power). For the thermal output power, this is trivial as the ratio of the maximum thermal power output to the thermal power demand is equal to the PLF. To calculate the PLF for the thermal input power, if this is a limited source according to the operational strategy, the two scaled value tables need to be substracted from each other to get a third table: 
+
+$$
+\dot{Q}_{HP,in}(PLF) = \dot{Q}_{HP,out}(PLF) - P_{el,HP,in}(PLF)
+$$
+
+This third value table, generated in each timestep, can then be used to determine the maximum possible PLF according to the available thermal input power from a limited thermal power source. 
+
+All three PLF (from thermal input and ouput as well as electrical input power) are then compared and the smallest one is chosen as operating state in the current timestep. If this value is smaller than the minimal allowed PLF of the heat pump \(PLF_{HP,min}\), the heat pump will not be in operation in the current timestep. 
+
+This method avoids the need to invert polynomial functions at each timestep and is computationally more efficient.
+
+The definition of the part load factor curve is user-defined and differentiated into inverter and on-off heat pumps.
+The part load factor curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the part load factor calculation in DIN EN 14825 for water-based on-off heatpumps. The section above the point of the maximum efficiency is approximated as straight curve. The definition of these curve can be done by the cc-coefficient and the two points highlighed in the figure below. Here, cc is chosen as 0.95 and a is used to stretch the curve to meet the intersection point with the straight line.
+
+![Input curve for part load efficiency of inverter heat pump](fig/230119_PartLoadPowerCurve_input.JPG)
+
+$$
+PLF(PLR) = a \ \frac{PLR}{cc \ PLR + (1 - cc)} 
+$$
+
 
 [^Socal2021]: Socal, Laurent (2021): Heat pumps: lost in standards, *REHVA Journal August 2021*.
 
-**Icing-losses of heat pumps with air as source medium**
+#### Icing-losses of heat pumps with air as source medium
 
 To account for icing losses of heat pumps with air as source medium, the approach presented in TRNSYS Type 401 is used[^Wetter1996]. When considering icing-losses, make sure that icing losses are not already included in the polynomes for thermal and electrical power!
 
@@ -194,6 +223,7 @@ The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar 
 There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below.
 
 ![Heat pump calculation steps](fig/230110_Waermepumpe_Berechnungsschritte.svg)
+ToDO: Add step to check if minimal part load is in range of COP<1, if yes, set new min part load to the part load at COP=1
 
 Steps to calculate the electrical and thermal energy in- and outputs of HP using a polynomial fit of the thermal and electrical power (compare to left side of figure above):
 
