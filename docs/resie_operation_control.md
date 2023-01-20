@@ -1,6 +1,6 @@
 # Operation and control
 
-An important part of what makes Bran's simulation model different from similar tools is how the control of energy systems is handled. Actualized energy networks, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
+An important part of what makes Resie's simulation model different from similar tools is how the control of energy systems is handled. Actualized energy networks, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
 
 ## Control behaviour
 
@@ -18,7 +18,7 @@ State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state
 
 The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions. When the state machine is checked to advance its state[^2] and the expression of a transition evaluates as true, it is followed to the new state.
 
-One addition to the common concept of a state machine is that the implementation in Bran keeps track of how many steps a state machine was in the current state.
+One addition to the common concept of a state machine is that the implementation in Resie keeps track of how many steps a state machine was in the current state.
 
 [^2]: Usually this happens once a simulation step for each state machine, but in the general definition of a state machine this is not time-dependant and works on "turns".
 

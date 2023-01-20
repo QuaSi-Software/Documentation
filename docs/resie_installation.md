@@ -3,9 +3,9 @@
 
 * Julia v1.7.2 or later: [https://julialang.org/downloads/](https://julialang.org/downloads/)
 
-**Installation of bran:**
+**Installation of resie:**
 
-1. Get a copy: `git clone git@bran.example.com`
+1. Get a copy: `git clone git@resie.example.com`
 2. Switch into project directory: `cd /path/to/repo`
 
 Install additional Julia-modules in working directory:
@@ -16,6 +16,6 @@ Install additional Julia-modules in working directory:
 4. install required external packages: `add JSON`
 5. to exit packacket manager, hit `backspace`
 
-Usage of bran:
+Usage of resie:
 
-1. Run the simulation with `julia src/Bran.jl example_two_sector.json`
+1. Run the simulation with `julia src/Resie.jl example_two_sector.json`

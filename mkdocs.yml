@@ -31,14 +31,14 @@ nav:
   - 'Technical description': 
     - 'quasi_description_energy_systems.md'
     - 'quasi_transient_effects.md'
-  - 'Simulation engine Bran':
-    - 'Installation and usage': 'bran_installation.md'
-    - 'Input file format': 'bran_input_file_format.md'
+  - 'Simulation engine Resie':
+    - 'Installation and usage': 'resie_installation.md'
+    - 'Input file format': 'resie_input_file_format.md'
     - 'Simulation model':
-      - 'Fundamentals': 'bran_fundamentals.md'
-      - 'Energy network topology': 'bran_ennet_topology.md'
-      - 'Types of energy systems': 'bran_types_energy_systems.md'
-      - 'Operation and control': 'bran_operation_control.md'
+      - 'Fundamentals': 'resie_fundamentals.md'
+      - 'Energy network topology': 'resie_ennet_topology.md'
+      - 'Types of energy systems': 'resie_types_energy_systems.md'
+      - 'Operation and control': 'resie_operation_control.md'
   - 'Contributions':
     - 'How to help': 'contributions.md'
     - 'Working on the documentation': 'changing_documentation.md'
