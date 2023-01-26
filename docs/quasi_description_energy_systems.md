@@ -144,7 +144,7 @@ With this method, the actual temperature-dependend relation of thermal and elect
 
 The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependend of the PLR. The definition of the PLR and the PLF is given below:
 
-PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current time step}}{\text{maximum power (el. or th.) of heat pumpt at current temperatures}} \)
+PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current time step}}{\text{maximum power (el. or th.) of heat pump at current temperatures}} \)
 
 PLF (part load facor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
 
@@ -176,7 +176,7 @@ During preprocessing, the given curve of the PLF in dependece of the PLR (see or
 
 ![normalized non-linear part load power curve of heat pump](fig/230119_PartLoadPowerCurve_normalized.JPG)
 
-In every timestep, the two precomputed and normalized value tables of the thermal output and electrical input power are scaled up to the current maximum power, limited by the heat pump current full-load operation state. There, the actual COP at the current time step is represented in the ration of both values. The two scaled value tables can then be used to determine the actual PLF that is nececarry to cover the current demand or to limit the operation state due to the limited available eletrical power (interpolation on value table with known power). For the thermal output power, this is trivial as the ratio of the maximum thermal power output to the thermal power demand is equal to the PLF. To calculate the PLF for the thermal input power, if this is a limited source according to the operational strategy, the two scaled value tables need to be substracted from each other to get a third table: 
+In every timestep, the two precomputed and normalized value tables of the thermal output and electrical input power are scaled up to the current maximum power, limited by the heat pump current full-load operation state. There, the actual COP at the current time step is represented in the ration of both values. The two scaled value tables can then be used to determine the actual PLF that is nececarry to cover the current demand or to limit the operation state due to the limited available eletrical power (interpolation on value table with known power, or interpolation in preprocessing). For the thermal output power, this is trivial as the ratio of the maximum thermal power output to the thermal power demand is equal to the PLF. To calculate the PLF for the thermal input power, if this is a limited source according to the operational strategy, the two scaled value tables need to be substracted from each other to get a third table: 
 
 $$
 \dot{Q}_{HP,in}(PLF) = \dot{Q}_{HP,out}(PLF) - P_{el,HP,in}(PLF)
@@ -415,6 +415,7 @@ Symbol | Description | Unit
 \(PL_{Ely,min}\) | minimum allowed partial load of the electrolyzer | [-]
 \(MOT_{Ely}\) | minimum operating time of the electrolyser | [min]
 \(SUT_{Ely}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
+\(CDT_{Ely}\) | cool-down time of the electrolyser from full heat supply to ambient (linear curve) | [min]
 \(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value)
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
 \(\eta_{H_2 \ purification} \) | percentage of purification losses in hydrogen purification | [%]
@@ -434,9 +435,10 @@ Symbol | Description | Unit
 ## Combined heat and power plant (CHP)
 ![Energy flow of CHP](fig/221021_CHP.svg)
 
+<!---
 Definiton of power-to-heat ratio of CHP:
 $$ r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  $$
-
+-->
 Energy balance on CHP:
 $$  \dot{E}_{CHP,gas,in} = P_{el,CHP,out} + \dot{Q}_{CHP,out} + \dot{Q}_{CHP,loss} $$ 
 
@@ -452,7 +454,7 @@ $$ \dot{Q}_{CHP,loss} = (1-\eta_{CHP,thermal}+\eta_{CHP,el}) \ \dot{E}_{CHP,gas,
 Relation of electric and thermal power output:
 $$ P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out} =  r_{CHP,PTH}  \ \dot{Q}_{CHP,out}  $$
 
-**TODO:** Part load efficiency reduction?
+The part-load dependend efficiency as described in the chapter "general transient effects" can be considered as well.
 
 **Inputs and Outputs of the CHP:**
 
@@ -470,12 +472,13 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,CHP,rated}\) | rated electric power output of the CHP under full load (operating state 100 %) | [W]
 \(\dot{Q}_{CHP,rated}\) | rated thermal power output of the CHP under full load (operating state 100 %) | [W]
-\(\eta_{CHP,thermal}\) | thermal efficiency of CHP (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
-\(\eta_{CHP,el}\) | electrical efficiency of CHP, including selfe-use of electrical energy (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
-\(r_{CHP,PTH}\) | power-to-heat ratio of CHP | [-]
+\(\eta_{CHP,thermal}(PLR)\) | thermal efficiency of CHP, function of PLR (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
+\(\eta_{CHP,el}(PLR)\) | electrical efficiency of CHP, including self-use of electrical energy, function of PLR (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
 \(PL_{CHP,min}\) | minimum allowed partial load of the CHP | [-]
 \(MOT_{CHP}\) | minimum operating time of the CHP | [min]
 \(SUT_{CHP}\) | start-up time of the CHP until full heat supply (linear curve) | [min]
+\(CDT_{CHP}\) | cool-down time of the CHP from full heat supply to ambient (linear curve) | [min]
+
 
 **State variables of the CHP:**
 
@@ -486,7 +489,7 @@ Symbol | Description | Unit
 ## Gas boiler (GB)
 ![Energy flow of gas boiler](fig/221021_Gaskessel.svg)
 
-Energy balance of gas boilder:
+Energy balance of gas boiler:
 $$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB} \ \dot{E}_{GB,gas,in}   $$
 
 **TODO:** Part load efficiency reduction?
@@ -509,6 +512,8 @@ Symbol | Description | Unit
 \(PL_{GB,min}\) | minimum allowed partial load of the GB | [-]
 \(MOT_{GB}\) | minimum operating time of the GB | [min]
 \(SUT_{GB}\) | start-up time of the GB until full heat supply (linear curve) | [min]
+\(CDT_{GB}}\) | cool-down time of the GB from full heat supply to ambient (linear curve) | [min]
+
 
 **State variables of the GB:**
 
@@ -876,6 +881,7 @@ Symbol | Description | Unit
 
 ## ToDo
 - In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
+- check for consistency: energy system, part-load, timestep, start-up, shut-down
   
 ## References
 ///Footnotes Go Here///
