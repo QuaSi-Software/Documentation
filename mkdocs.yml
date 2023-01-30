@@ -42,5 +42,6 @@ nav:
   - 'Contributions':
     - 'How to help': 'contributions.md'
     - 'Working on the documentation': 'changing_documentation.md'
+    - 'Workflow for code contributions': 'workflow_code_contributions.md'
   - About:
     - 'License': 'license.md'
