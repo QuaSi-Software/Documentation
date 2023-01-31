@@ -45,6 +45,12 @@ Since the temperatures of the heat flows entering and leaving the heat pump, whi
 
 $$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
 
+As a chiller follows the same prinicple as a heat pump, the same energy system can be used to simulate both energy systems. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
+ 
+$$ EER = \frac{\dot{Q}_{HP,in}}{P_{el,HP}} = \frac{\dot{Q}_{HP,out} - P_{el,HP}}{P_{el,HP}} = COP - 1   $$
+
+As shown, the COP can be transferred to the EER. In the following, the description is made for heat pumps. The only adaption that has to be done for chillers is the change of the useful energy. Also, the efficiency function needs to be changed to EER(\(T_{HP,source,in}\), \(T_{HP,sink,out}\)) (if used) and for nonlinear part load efficiency the useful energy \(\dot{Q}_{HP,in}\) is assumed to be the linear reference energy instead of \(\dot{Q}_{HP,out}\) as for heating mode.
+
 ### Modelling approaches for HP: Overview
 According to [Blervaque2015][^Blervaque2015], four different categories are described in the literature when it comes to the simulation of heat pumps:
 
@@ -565,9 +571,14 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 
 ## Chiller (CH)
 ### Simple model for electrolyser
+with constant EER, no part-load-dependend efficiency, no temperature-dependend power, no icing losses
 
 ### General model for cooling purposes
-or just one general model?
+Compressor chiller:
+--> see chapter "Heat Pump"
+
+Absorption/Adsortpion chiller: **ToDo tba**
+
 
 ## Short-term thermal energy storage (STTES)
 ![Energy flow of STTES](fig/221028_STTES.svg)

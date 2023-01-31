@@ -1,7 +1,7 @@
-# General transient effects
+# General effects
 
 ## Reduction of usable heat during start-up of each component
-The reduction of the usable heat output during start-up of a system can be described using either linear oder exponential start-up and cool-down ramps. Both are described in the following.
+To account for transient effects, the reduction of the usable heat output during start-up of a system can be described using either linear oder exponential start-up and cool-down ramps. Both are described in the following.
 
 ### Linear start-up
 The following figure illustrate a linear start-up and cool-down behaviour characerized by the start-up time (SUT) and cool-down time (CDT) the system needs to reach full thermal energy output or to cool down completely.
@@ -45,7 +45,7 @@ This time-averaged integral results in the following yellow curve that represent
 Note that \(t_{shift}\) has to be set to zero at the first timestep of the simulation and \(t_{on,lower}\) and \(t_{on,upper}\) have to start couting again at every change of operation (on/off, not part-load).
 
 ### Exponential start-up
-While the method above describes a linear thermal power output during the heat-up of an energy system that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continious exponential functions. This is described for excample in the TRNSYSType 401[^Wetter1996]. The time span for each energy system to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. An energy system is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the system has cooled down completely.
+While the method above describes a linear thermal power output during the heat-up of an energy system that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continious exponential functions. This is described for excample in the TRNSYS Type 401[^Wetter1996]. The time span for each energy system to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. An energy system is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the system has cooled down completely.
 
 ![transient shut-down and tun-on effects exponential](fig/220223_transient_on_off.JPG)
 
@@ -56,20 +56,72 @@ $$
 
 If the system has not been cooled town completely since the last shut-down, the heat-up losses can be calculated using the following equation with \(t_{shift}\) representing the time shift for the exponential function (compare to figure above).
 $$
-\dot{Q}_{out,current}(t_{on}) = \dot{Q}_{stationary} \left (1 - e^{-\frac{t_{shift} + t_{on}}{\tau_{on}}} \right )
-\ \ \text{  with  } \ \ t_{shift} = - \tau_{on} \ ln \left ( 1-\frac{\dot{Q}_{out,current}(t_{off})}{\dot{Q}_{stationary}} \right )
+\dot{Q}_{out,current}(t_{on}) = \dot{Q}_{stationary} \left (1 - e^{-\frac{t_{shift,on} + t_{on}}{\tau_{on}}} \right ) 
+$$
+$$
+\text{  with  } \ \ t_{shift,on} = - \tau_{on} \ ln \left ( 1-\frac{\dot{Q}_{out,current}(t_{off})}{\dot{Q}_{stationary}} \right )
 $$
 
 The cool-down curve is calculated analogously in order to get the current state of the system in the case of restart in the next time step.
 $$
-\dot{Q}_{out,current}(t_{off}) = \dot{Q}_{stationary} \left (e^{-\frac{t_{shift}+t_{off}}{\tau_{off}}} \right ) \ \ \text{  with  } \ \ t_{shift} = - \tau_{off} \ ln \left ( 1-\frac{\dot{Q}_{out,current}(t_{on})}{\dot{Q}_{stationary}} \right )
+\dot{Q}_{out,current}(t_{off}) = \dot{Q}_{stationary} \left (e^{-\frac{t_{shift,off}+t_{off}}{\tau_{off}}} \right ) 
+$$
+$$
+ \text{  with  } \ \ t_{shift,off} = - \tau_{off} \ ln \left ( 1-\frac{\dot{Q}_{out,current}(t_{on})}{\dot{Q}_{stationary}} \right )
 $$
 
 To get the average thermal energy output within the current timestep between \(t_{on,lower}\) and \(t_{on,upper}\), an integration of the exponential function is needed. According to the TRNSYS Type 401[^Wetter1996], this leads to
 
 $$
-\dot{Q}_{out} = \dot{Q}_{stationary} \left ( 1 + \frac{\tau_{on}}{t_{on,upper}-t_{on,lower}} \ e^{-\frac{t_{shift}}{\tau_{on}}} \ \left ( e^{-\frac{t_{on,upper}}{\tau_{on}}} - e^{-\frac{t_{on,lower}}{\tau_{on}}} \right )   \right )
+\dot{Q}_{out} = \dot{Q}_{stationary} \left ( 1 + \frac{\tau_{on}}{t_{on,upper}-t_{on,lower}} \ e^{-\frac{t_{shift,on}}{\tau_{on}}} \ \left ( e^{-\frac{t_{on,upper}}{\tau_{on}}} - e^{-\frac{t_{on,lower}}{\tau_{on}}} \right )   \right ) 
 $$
+
+For the zeroth timestep of the simulation, \(\dot{Q}_{out,current}(0)\) is set to zero. \(\dot{Q}_{out,current}(t_{off})\) does not have to be calculated in every time step, but only when the state of the energy system changes from "off" to "on". For this purpose, the energy output of the last time step with the state "on" must be documented, since this is required for the further calculation.
+
+Below, an exemplary logic is given of a function handling the transient heat-up effects.
+```
+def heat_up_losses( Q_out(last_ontime),
+    	            last_state, 
+                    this_state, 
+                    t_simulation, 
+                    t_on, 
+                    t_off, 
+                    tau_on, 
+                    tau_off, 
+                    t_on_upper, 
+                    t_on_lower, 
+                    t_shift_on)
+
+    if t_simulation == 0:
+        Q_out_last = 0
+    else:
+        Q_out_last = Q_out(last_ontime)
+    end
+
+    if last_state == on and this_state == off:
+        t_off = 0
+    end
+
+    if last_state == off and this_state == on:
+        t_on = 0
+    end
+
+    if this_state == on and t_on == 0:
+        t_shif_off = f(Q_out_last)
+        Q_off = f(t_shift_off, t_off)
+        t_shift_on = f(Q_off)
+        Q_out_new = f(t_shift_on)
+        t_on += 1
+    elif this_state == on:
+        Q_out_new = f(t_shift_on)
+        t_on += 1
+    elif this_state == off:
+        t_off += 1
+    end
+
+return Q_out_new, t_shift_on, t_on, t_off
+
+```
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
@@ -96,28 +148,34 @@ In the figure below, a part-load curve (orange curve) based on an exponential fu
 
 The basis for the consideration of non-linear part-load efficiencies is the efficiency curve of an energy system
 
-\(\eta(PLR)=f(PLR)\)
+\(\eta(PLR)= f(PLR) = \frac{E_{useful}(PLR)}{E_{expended}(PLR)}  \)
 
-as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a linear, an exponential or a partially defined function. It can also be a non-monotonic function as long as the function of the electrical input power (yellow curve)
+as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a linear, an exponential or a partially defined function. If several outputs for an energy system exists, several efficiency curves are needed. The efficiency curves can also be non-monotonic functions as long as the function of the reffered useful energy (yellow curve for electrical input in the figure above)
 
-\(P(PLR)=\eta(PLR) \ \ PLR \ \ P_{rated}\) 
+\(E_{expended}(PLR)=\eta(PLR) \ \ PLR \ \ E_{expended,rated}\) 
 
-is monotonic in the range of \(PLR=0:1\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on \(P(PLR)\). During preprocessing, the function \(P(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(P)\). The part-load function of the heat output, that is assumed to be linear,
+are monotonic in the range of \(PLR=0:1\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). The part-load function of the useful energy, that is assumed to be linear,
 
-\(Q(PLR) = PLR \ \ Q_{rated}\)
+\(E_{useful}(PLR) = PLR \ \ E_{useful,rated}\)
 
-needs to be inverted as well. As \(Q(PLR)\) is linear, the inverse is trivial and meets the original definition of the PLR:
+needs to be inverted as well. As \(E_{useful}(PLR)\) is linear, the inverse is trivial and meets the original definition of the PLR:
 
-\(PLR(Q_{demand}) = \frac{Q_{demand}}{Q_{rated}}\).
+\(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
 
 During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exeeding the maximum abailable power.
 
 If several outputs on an energy system exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, but the part-load factor should then be based on the same definition to provide a consistent base.
 
 
-- Bezugsgröße für Berechnung der PLR
-- Aufteilung der Wirkungsgradänderung auf Input/Output
+- Bezugsgröße für Berechnung der PLR definieren je Energiesystem? Oder pauschal auf thermischen Ausgang? Oder wählbar?
+- Aufteilung der Wirkungsgradänderung auf Input/Output (aktuell: eines linear, das andere alles; aber aber 50/50 denkbar)
 
-In order to be able to consider the part load dependency of the thermal and electrical efficiency (\(\eta_{thermal}\) and \(\eta_{el}\)) during the simulation in a computaninally efficient way, they can be given as independent curves with respect to the part load ratio (PLR) as \(\eta_{CHP}(PLR)=f(PLR)\). During the preprocessing, both efficiency curves are used to calculate the part-load dependend power curves for the electical and thermal power as \(P(PLR)=\eta_{CHP}(PLR) \ \ PLR \ \ P_{rated}\). This works also for non-monotonic efficiency functions as long as \(P(PLR)\) is monotonic in the range of \(PLR=0:1\). During preprocessing, each function \(P(PLR)\) is inverted to get \(PLR(P)\). During each timestep, this function is evaluated according to the operational strategy to determine the part load ratio.
 
 [^Eppinger2021]: Eppinger, B. et al.(2021): Simulation of the Part Load Behavior of Combined Heat Pump-Organic Rankine Cycle Systems. In: *Energies 14 (13)*, S. 3870. doi: [10.3390/en14133870](https://doi.org/10.3390/en14133870).
+
+
+## Minimum operation time
+
+To force the simulation engine to turn on a power system for a defined minimum operation time, the partial load ratio is limited to allow the power system to run for the defined turn-on time. The limit is determined by the maximum potential of the energy sink (e.g. free storage capacity) divided by the minimum operating time with a consideration of the maximum deliverable power of the energy system. This method does not take into account an unexpected decrease of the available energy input into the energy system, since no prediction is possible in this model. Therefore, the minimum operating time cannot be guaranteed.
+
+**ToDo: elaborate further**
