@@ -46,7 +46,7 @@ The overall structure of the project file is split into three general sections, 
 * `dump_info_file` (`String`): File path to where the additional information will be written.
 * `output_keys` (`Map{String, List{String}}`): Output specification. See section on output for what this does and how it works.
 
-### Output specification
+### Output specification (csv-file)
 ```json
 "output_keys": {
     "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT"],
@@ -57,6 +57,29 @@ The overall structure of the project file is split into three general sections, 
 The keys of this map must correspond exactly to the UAC of the units defined in the energy system unit specification. By the definition of a map, each unit can only appear once in this map. If multiple outputs for a single unit should be tracked, multiple entries should be put in the list mapped to that unit's UAC. Each entry describes one input, output or other variable of that unit. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that unit should be tracked.
 
 The second part of the entry describes which of the available variables of the unit the desired output is. For most energy systems either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage systems often have the variable `Load` available, which corresponds to the amount of energy stored in the system. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
+
+### Output specification (interactive .html plot)
+```json
+"output_plot": {
+            "1": {
+                "key": {"TST_HP_01": ["m_h_w_lt1 IN"]},
+                "axis": "left",
+                "unit": "kW",
+                "scale_factor": 0.001
+            },
+            "2": {
+                "key": {"TST_HP_01": ["m_h_w_ht1 OUT"]},
+                "axis": "left",
+                "unit": "kW",
+                "scale_factor": 0.001
+            }
+            ...
+}
+```
+The output specification for an interactive plot can be specified in ```"output_plot"```. The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAV-name of the energy system and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plottet, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+
+The results will be saved in ```\output\output_plot.html"```. The plot can be opend with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
+
 
 ## Simulation parameters
 ```json
