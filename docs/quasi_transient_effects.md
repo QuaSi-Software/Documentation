@@ -45,7 +45,7 @@ This time-averaged integral results in the following yellow curve that represent
 Note that \(t_{shift}\) has to be set to zero at the first timestep of the simulation and \(t_{on,lower}\) and \(t_{on,upper}\) have to start couting again at every change of operation (on/off, not part-load).
 
 ### Exponential start-up
-While the method above describes a linear thermal power output during the heat-up of an energy system that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continious exponential functions. This is described for excample in the TRNSYS Type 401[^Wetter1996]. The time span for each energy system to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. An energy system is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the system has cooled down completely.
+While the method above describes a linear thermal power output during the heat-up of an energy system that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continious exponential functions. Therefore, the general time-related function of a PT1 element can be used to model the delay of the thermal energy output. This is used for excample in the TRNSYS Type 401[^Wetter1996] for modulating heat pumps. The time span for each energy system to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. An energy system is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the system has cooled down completely.
 
 ![transient shut-down and tun-on effects exponential](fig/220223_transient_on_off.JPG)
 
@@ -139,33 +139,34 @@ The change of the efficiency with respect to the PLR can be given as curve, for 
 
 Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which a power system has so be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
 
-Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the PLR that will be considered to have a linear behaviour in part-load operation. The other in- or output energies will be adjusted to represent the non-linearities in the change of the efficiency. 
+Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the efficiency that will be considered to have a linear behaviour in part-load operation. The other in- or output energy will be adjusted to represent the non-linearities in the change of the efficiency at different PLR. 
 
-A third difficulty is the inconsistent definition of the part-load ratio in the literature when considering non-linearities in part-load operation. In theory, every input and output has its own part-load ratio at a certain operation point. Each of the PLR do not necessarily represent the same operational state of the energy system, so this would lead to an inconsistent base if several operational restrictions are given. Using the assumption above helps to handle this issue - the reference part-load ratio is user-defined for each energy system and this is assumed to have a linear relation to the part-load.
+A third difficulty is the inconsistent definition of the part-load ratio in the literature when considering non-linearities in part-load operation. In theory, every input and output has its own part-load ratio at a certain operation point of an energy system with multiple in- or outputs. Each of the PLR do not necessarily represent the same operational state of the energy system, so this would lead to an inconsistent base if several operational restrictions are given. This can be solved by defining a reference part-load ratio, e.g. with respect to the main output or by defining the efficiency curves relative to each other with the same base.
 
-In the figure below, a part-load curve (orange curve) based on an exponential function of a fictitious energy system that has electricity as input (yellow curve) and heat as output (grey curve) is shown. The heat output is assumed to be linear (straight line) with a rated power of 1 kW, resulting in a non-linear demand of electricity. 
+In the figure below, a part-load curve (orange curve) based on an exponential function of a fictitious energy system that has electricity as input (yellow curve) and heat as output (grey curve) is shown. The heat output (= useful energy) is assumed to be linear (straight line) with a rated power of 1 kW, resulting in a non-linear demand of electricity (= expended energy). 
 ![general non-linear part-load of energy systems](fig/230125_non-linear_PLR_general.JPG)
 
-The basis for the consideration of non-linear part-load efficiencies is the efficiency curve of an energy system
+The basis for the consideration of non-linear part-load efficiencies is the user-defined efficiency curve of an energy system
 
-\(\eta(PLR)= f(PLR) = \frac{E_{useful}(PLR)}{E_{expended}(PLR)}  \)
+\(\eta(PLR)= f(PLR) \left (= \frac{E_{useful}(PLR)}{E_{expended}(PLR)} \right ) \)
 
-as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a linear, an exponential or a partially defined function. If several outputs for an energy system exists, several efficiency curves are needed. The efficiency curves can also be non-monotonic functions as long as the function of the reffered useful energy (yellow curve for electrical input in the figure above)
+as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a linear, an exponential or a partially defined function. The efficiency curve can also be a non-monotonic function as long as the function of the expended energy (yellow curve for electrical input in the figure above)
 
-\(E_{expended}(PLR)=\eta(PLR) \ \ PLR \ \ E_{expended,rated}\) 
+\(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \) 
 
-are monotonic in the range of \(PLR=0:1\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). The part-load function of the useful energy, that is assumed to be linear,
+is monotonic in the range of \(PLR \in [0:1]\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). The part-load function of the useful energy, that is assumed to be linear,
 
 \(E_{useful}(PLR) = PLR \ \ E_{useful,rated}\)
 
-needs to be inverted as well. As \(E_{useful}(PLR)\) is linear, the inverse is trivial and meets the original definition of the PLR:
+needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, the inverse is trivial and meets the original definition of the PLR:
 
 \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
 
 During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exeeding the maximum abailable power.
 
-If several outputs on an energy system exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, but the part-load factor should then be based on the same definition to provide a consistent base.
+If several outputs on an energy system exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
 
+**ToTo**
 
 - Bezugsgröße für Berechnung der PLR definieren je Energiesystem? Oder pauschal auf thermischen Ausgang? Oder wählbar?
 - Aufteilung der Wirkungsgradänderung auf Input/Output (aktuell: eines linear, das andere alles; aber aber 50/50 denkbar)

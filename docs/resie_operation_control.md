@@ -12,7 +12,7 @@ To facilitate this, all energy system implementations have access to a controlle
 
 ## State machines
 
-State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control of actualized building. In the simulation model they are used with some modifications as described in the following.
+State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
 
 ![Example of a state machine with two states](fig/example_state_machine.png)
 
@@ -24,7 +24,7 @@ One addition to the common concept of a state machine is that the implementation
 
 ### Conditions
 
-The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which energy systems it needs access. As the concrete systems are not defined before the project is loaded, these requirements act on the type and possibly medium of systems, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizeable parameters with default values.
+The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which energy systems it needs access. As the specific systems are not defined before the project is loaded, these requirements affect the type and possibly the medium of the systems, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizeable parameters with default values.
 
 The example above uses four different conditions:
 
@@ -72,4 +72,4 @@ This leads to the required user input in the project file:
 
 A CHPP is operated by this `storage-driven` strategy, which requires two parameters `high_threshold` and `low_threshold` as well as a linked buffer tank, which is added in the `control_refs` of the CHPP. The user does not need to know about the implementation of this strategy, only about the meaning of its parameters.
 
-Another use of operational strategies is controlling the production code without the use of a state machine. For example a demand-driven strategy requires only that any energy system is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked system before the controlled system. Otherwise the controlled energy system might try to meet a demand that has not yet been calculated.
+Another use of operational strategies is controlling the production code without the use of a state machine. For example a demand-driven strategy requires only that any energy system is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked system before the controlled system. Otherwise the controlled energy system might try to meet a demand that has not been calculated yet.

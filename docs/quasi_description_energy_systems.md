@@ -462,6 +462,8 @@ $$ P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out}
 
 The part-load dependend efficiency as described in the chapter "general transient effects" can be considered as well.
 
+**ToDo:** part-load dependend efficiency definition with heat and electricity --> two efficiency curves? One efficiency curve and the second one related to the first one?
+
 **Inputs and Outputs of the CHP:**
 
 Symbol | Description | Unit
@@ -496,9 +498,8 @@ Symbol | Description | Unit
 ![Energy flow of gas boiler](fig/221021_Gaskessel.svg)
 
 Energy balance of gas boiler:
-$$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB} \ \dot{E}_{GB,gas,in}   $$
+$$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB}(PLR) \ \dot{E}_{GB,gas,in}   $$
 
-**TODO:** Part load efficiency reduction?
 
 **Inputs and Outputs of the GB:**
 
@@ -514,11 +515,11 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(Q_{GB,rated}\) | rated thermal power output of the GB under full load (operating state 100 %) | [W]
-\( \eta_{GB}\) | thermal efficiency of gas boiler (regading NCV or GCV, needs to correspond to \(\dot{E}_{GB,gas,in}\)) | [-]
+\( \eta_{GB}(PLR)\) | thermal efficiency of gas boiler (regading NCV or GCV) with respect to the PLR | [-]
 \(PL_{GB,min}\) | minimum allowed partial load of the GB | [-]
 \(MOT_{GB}\) | minimum operating time of the GB | [min]
 \(SUT_{GB}\) | start-up time of the GB until full heat supply (linear curve) | [min]
-\(CDT_{GB}}\) | cool-down time of the GB from full heat supply to ambient (linear curve) | [min]
+\(CDT_{GB}\) | cool-down time of the GB from full heat supply to ambient (linear curve) | [min]
 
 
 **State variables of the GB:**
@@ -531,12 +532,103 @@ Symbol | Description | Unit
 ## Oil heating (OH)
 ![Energy flow of oil heating](fig/221028_Oelkessel.svg)
 
+Energy balance of oil heater:
+$$  \dot{Q}_{OH,out} = \dot{E}_{OH,oil,in} - \dot{Q}_{OH,loss} = \eta_{OH}(PLR) \ \dot{E}_{OH,oil,in}   $$
+
+
+**Inputs and Outputs of the OH:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{OH,out}\) | thermal power output of the OH | [W]
+\(\dot{E}_{OH,oil,in}\) | energy demand of the OH, fuel oil (NCV or GCV)  | [W]
+\(\dot{Q}_{OH,loss}\) | thermal losses of the OH | [W]
+
+
+**Parameter of the OH:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{OH,rated}\) | rated thermal power output of the OH under full load (operating state 100 %) | [W]
+\( \eta_{OH}(PLR)\) | thermal efficiency of oil heater (regading NCV or GCV) with respect to the PLR | [-]
+\(PL_{OH,min}\) | minimum allowed partial load of the OH | [-]
+\(MOT_{OH}\) | minimum operating time of the OH | [min]
+\(SUT_{OH}\) | start-up time of the OH until full heat supply (linear curve) | [min]
+\(CDT_{OH}\) | cool-down time of the OH from full heat supply to ambient (linear curve) | [min]
+
+
+**State variables of the OH:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{OH}\)  | current operating state of the OH (on, off, part load)   | [%]
+
+
 ## Elecric heating rod (ER)
 ![Energy flow of electric rod](fig/221028_ElectricRod.svg)
+
+Energy balance of electric heating rod:
+$$  \dot{Q}_{ER,out} = \dot{P}_{ER,el,in} - \dot{Q}_{ER,loss} = \eta_{ER}(PLR) \ \dot{P}_{ER,el,in}   $$
+
+
+**Inputs and Outputs of the ER:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{ER,out}\) | thermal power output of the ER | [W]
+\(\dot{P}_{ER,el,in}\) | electrical energy demand of the ER  | [W]
+\(\dot{Q}_{ER,loss}\) | thermal losses of the ER | [W]
+
+
+**Parameter of the ER:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{ER,rated}\) | rated thermal power output of the ER under full load (operating state 100 %) | [W]
+\( \eta_{ER}(PLR)\) | thermal efficiency of electric heating rod with respect to the PLR | [-]
+\(PL_{ER,min}\) | minimum allowed partial load of the ER | [-]
+\(MOT_{ER}\) | minimum operating time of the ER | [min]
+\(SUT_{ER}\) | start-up time of the ER until full heat supply (linear curve) | [min]
+\(CDT_{ER}\) | cool-down time of the ER from full heat supply to ambient (linear curve) | [min]
+
+
+**State variables of the ER:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{ER}\)  | current operating state of the ER (on, off, part load)   | [%]
+
 
 ## Biomass boiler (BB)
 ![Energy flow of biomass boiler](fig/221028_BiomassBoiler.svg)
 
+Energy balance of biomass boiler:
+$$  \dot{Q}_{BB,out} = \dot{E}_{BB,biomass,in} - \dot{Q}_{BB,loss} = \eta_{BB}(PLR) \ \dot{E}_{BB,biomass,in}   $$
+
+**Inputs and Outputs of the BB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{BB,out}\) | thermal power output of the BB | [W]
+\(\dot{E}_{BB,biomass,in}\) | energy demand of the BB, biomass (NCV or GCV)  | [W]
+\(\dot{Q}_{BB,loss}\) | thermal losses of the BB | [W]
+
+**Parameter of the BB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{BB,rated}\) | rated thermal power output of the BB under full load (operating state 100 %) | [W]
+\( \eta_{BB}(PLR)\) | thermal efficiency of biomass boiler (regading NCV or GCV, specific fuel and  moisture content) with respect to the PLR | [-]
+\(PL_{BB,min}\) | minimum allowed partial load of the BB | [-]
+\(MOT_{BB}\) | minimum operating time of the BB | [min]
+\(SUT_{BB}\) | start-up time of the BB until full heat supply (linear curve) | [min]
+\(CDT_{BB}\) | cool-down time of the BB from full heat supply to ambient (linear curve) | [min]
+
+**State variables of the BB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{BB}\)  | current operating state of the BB (on, off, part load)   | [%]
 
 ## Heat sources 
 ### Soil
