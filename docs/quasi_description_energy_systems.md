@@ -371,6 +371,12 @@ $$ P_{el,Ely} =  \frac{\dot{m}_{Ely,H_2,out} \ e_{H_2}}{\eta_{Ely,H_2} \ (1 - \e
 The usable waste heat from the electrolysis process \(\dot{Q}_{Ely,waste heat}\) is determined, depending on the available information, as
 $$\dot{Q}_{Ely,waste heat} = \eta_{Ely,heat} \enspace (1-\eta_{Ely,H_2}) \enspace P_{el,Ely} = \frac{(1 - \eta_{Ely,H_2}) \ \eta_{Ely,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{Ely,H_2} } \ \dot{E}_{Ely,H_2,out} $$ 
 
+With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{Ely,H_2}\)) and the heat (\(\delta_{Ely,heat}\)) relted efficiency. These correction factors are given in percent per thousand full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyer. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
+
+$$ \eta_{Ely,H_2} = \eta_{Ely,H_2,start} \ {\delta_{Ely,H_2}} ^{\frac{FLH}{1.000}} $$
+$$ \eta_{Ely,heat} = \eta_{Ely,heat,start} \ {\delta_{Ely,heat}} ^{\frac{FLH}{1.000}} $$
+$$ \text{with } FLH = \frac{\text{total hydrogen produced since start [kg]}}{\text{nominal hydrogen production [kg]}} $$
+
 With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{Ely,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{Ely,cool,out}\) can be determined by rearranging the following equation:
 $$\dot{Q}_{Ely,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{Ely,hot,out} - T_{Ely,cool,in})$$
 
@@ -390,8 +396,6 @@ The required mass flow of water \(\dot{m}_{Ely,H_2O,in}\) can be determined from
 $$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
 
 **Assumption:** The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
-
-**TODO:** Efficiency decrease (el.) due to degradation?
 
 **Inputs and Outputs of the Electrolyser:**
 
@@ -415,8 +419,10 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,Ely,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
-\(\eta_{Ely,H_2}(x_{Ely},P_{el,Ely,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type) | [-]
-\(\eta_{Ely,heat}\) | efficiency of the usable heat extraction of the electrolyzer (related to \(1-\eta_{Ely,H_2}\))   | [-]
+\(\eta_{Ely,H_2,start}(x_{Ely},P_{el,Ely,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type at the beginning of live) | [-]
+\(\eta_{Ely,heat,start}\) | efficiency of the usable heat extraction of the electrolyzer (related to \(1-\eta_{Ely,H_2}\) at the beginning of live)   | [-]
+\(\delta_{Ely,H_2}\) | decrease of efficiency of hydrogen production due to degradation per 1.000 full load hours  | \(\left [ \frac{1}{\text{1.000 full load hours}}\right ]\) 
+\(\delta_{Ely,heat}\) | increase of efficiency of heat production due to degradation per 1.000 full load hours  | \(\left [ \frac{1}{\text{1.000 full load hours}}\right ]\)
 \(\eta_{Ely,LE}\) | efficiency of the power electronics of the electrolyser | [-]
 \(PL_{Ely,min}\) | minimum allowed partial load of the electrolyzer | [-]
 \(MOT_{Ely}\) | minimum operating time of the electrolyser | [min]
