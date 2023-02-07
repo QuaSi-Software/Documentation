@@ -661,15 +661,58 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 (Vergleich FutureHeatPump II Projekt)
 
 
-## Chiller (CH)
-### Simple model for electrolyser
-with constant EER, no part-load-dependend efficiency, no temperature-dependend power, no icing losses
+## Chiller
+### Simple model of compression  chiller (SCC)
+A simple model of an air cooled compression chiller is implementent to account for rather irrelevant cooling demands without significant changes in temperatures of the energy to be cooled. This model is a rough approximation, but offers a fast and easy calculation. It is based on a constant seasonal energy efficiency ratio (SEER) as yearly average of the energy efficiency ratio (EER) without part-load dependend or temperature dependend efficiency. The energy flow chart is given below. The displayed temperature are only for illustration and will not be considered in this simple model.
 
-### General model for cooling purposes
-Compressor chiller:
---> see chapter "Heat Pump"
+![Energy flow of simple compression chiller](fig/230207_Chiller_simple_Energiefluss.svg)
 
-Absorption/Adsortpion chiller: **ToDo tba**
+The SEER is defined as
+
+\( SEER =  \text{yearly average of} \ \frac{\text{cooling power} \ \dot{Q}_{SCC,in}}{\text{electricity demand} \ P_{el,SCC,supply}}  \)
+
+Comparing the definition of the EER to the COP given in the chaper of heat pumps, the following relation of the two efficiencies for heat pumps and compression chillers can be obtained
+
+\(EER = COP - 1 \)
+
+In this simple model, a constant SEER is given and set equivalent to the EER in every timestep to calculate the electrical power \(P_{el,SCC,supply}\) needed to cool down a given amount of thermal energy \(Q_{SCC,in}\) in every timestep:
+
+\(P_{el,SCC,supply} = \frac{\dot{Q}_{SCC,in}}{EER}  \)
+
+The thermal output power, calculated from the energy balance of the chiller
+
+\(\dot{Q}_{SCC,out} = P_{el,SCC,supply} + \dot{Q}_{SCC,in} = \dot{Q}_{SCC,loss}\),
+
+is transferred to the environment by an air cooler and labeled as losses.
+
+**Inputs and Outputs of the SCC:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{SCC,out}\) | thermal power output of the SCC to the ambient air (= \(\dot{Q}_{SCC,losses}\)) | [W]
+\(\dot{Q}_{SCC,in}\) | thermal power input into the SSC, equals the thermal cooling power | [W]
+\(P_{el,SCC,in}\) | electrical energy power input in the SCC | [W]
+
+**Parameter of the SCC:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(SEER_{SSC}\) | Seasonal energy efficiency ratio (SEER) of the compresson chiller (= constant for all temperatures and part-load)| [-]
+\(Q_{SCC,in,rated}\) | rated thermal power input of the SCC under full load | [W]
+\(PL_{SSC,min}\) | minimum allowed partial load of the SCC with respect to \(\dot{Q}_{SCC,in}\) | [-]
+
+**State variables of the SSC:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{SSC}\)  | current operating state of the SSC (on, off, part load)   | [%]
+
+### General model for compression chiller (CC)
+The general model of a compression chiller, including a part-load dependent and temperature dependent efficiency, is modeled in the same way as the heat pump described in the chapter "Heat pump". Instead of defining the thermal energy output as useful energy, the thermal energy input is defined as useful energy. Accordingly, the efficiency is described differently, as EER for the compression chiller instead of COP for heat pumps (see also the section above on the definition of EER).
+
+### General model for absorption/adsorption chiller (AAC)
+
+Absorption/adsorption chiller are not implemented yet (ToDo).
 
 
 ## Short-term thermal energy storage (STTES)
@@ -887,18 +930,21 @@ Symbol | Description | Unit
 
 ### Borehole thermal energy storage (BTES)
 
-Borehole thermal energy storages are not implemented yet.
+Borehole thermal energy storages are not implemented yet (ToDo).
 
 ### Aquifer thermal energy storage (ATES)
 
-Aquifer thermal energy storages are not implemented yet.
+Aquifer thermal energy storages are not implemented yet (ToDo).
 
 
 ## Ice storage (IS)
 
+Ice storages are not implemented yet.
 
 ## Hydrogen fuel cell (FC)
 ![Energy flow of hydrogen fuel cell](fig/221031_H2_Fuel_Cell.svg)
+
+Hydrogen fuel cells are not implemented yet (ToDo).
 
 ## Photovoltaik (PV)
 ![Energy flow of photovoltaik](fig/221028_PV.svg)
@@ -915,7 +961,7 @@ Inputs can include orientation, tilt, ambient albedo, type of installation (e.g.
 ## Wind power (WP)
 ![Energy flow of wind power](fig/221028_Wind.svg)
 
-windpowerlib 
+windpowerlib (ToDo)
 
 Achtung: Winddaten von EPW nicht geeignet!
 
