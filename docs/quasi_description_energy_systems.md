@@ -953,7 +953,7 @@ Aquifer thermal energy storages are not implemented yet (ToDo).
 
 ## Ice storage (IS)
 
-Ice storages are not implemented yet.
+Ice storages are not implemented yet (ToDo).
 
 ## Hydrogen fuel cell (FC)
 ![Energy flow of hydrogen fuel cell](fig/221031_H2_Fuel_Cell.svg)

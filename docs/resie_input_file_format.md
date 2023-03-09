@@ -114,7 +114,8 @@ The specification for the energy systems involved in the simulation is the most 
             "high_threshold": 0.9,
             "low_threshold": 0.2
         },
-        "power": 12500
+        "power": 12500,
+        "m_heat_out": "m_h_w_ht1"
     },
     "TST_01_HZG_01_BUS": {
         "type": "Bus",
@@ -137,11 +138,12 @@ The specification for the energy systems involved in the simulation is the most 
 The specification is a map mapping a unit's UAC to the parameters required for initialization of that unit. Parameters specific to the type of the unit can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
 
 * `type` (`String`): The exact name of the type of the unit.
-* `medium` (`String`): Some energy systems can be used for a number of different media, for example a bus. If that is the case, this entry must match exactly one of the medium codes (see chapter on the simulation model).
+* `medium` (`String`): Some energy systems can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy network topology (see also chapter on the simulation model).
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
 * `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to unit is given implicitly, as a unit cannot output to two different units of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the unit. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the unit entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
 * `input_priorities` (`List{String}`): Bus systems implement an input priority, meaning that the order in which energy is drawn from the other units connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected units.
+* `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of an energy system, the default medium type is overwritten. This may can be usuful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected energy system. As alternative, all media names can be set user-defined.
 
 ## Profile file format
 

@@ -69,6 +69,11 @@ Different high temperature regimes:
 * `m_h_w_ht4`
 * `m_h_w_ht5`
 
+### User definable media names
+The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all energy systems can be declared in the input file. Alternatevly, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected energy system.
+
+For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each energy system can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer.
+
 ## Interfaces
 
 When writing the implementation of energy systems a problem has emerged in the functionality handling the production[^1]. There must be a way to track the energy balances between systems which is the same for all types of energy systems, so that the production code does not need to know which types of energy systems it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and production calculations for systems that are supposed to feed into a demand and fill a storage at the same time.
