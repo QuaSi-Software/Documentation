@@ -41,7 +41,7 @@ For example, alternating current of a certain voltage can be converted to a diff
 
 The following lists which media are currently implemented and what they represent.
 
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy systems. However this has not yet been implemented in the model. For now different regimes of temperatures are used.
+**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy systems. However this has not yet been implemented in the model. For now different regimes of temperatures are used. (ToDo: Revise!)
 
 ### Electricity
 * `m_e_ac_230v`: Household electricity at 230V AC and 50/60Hz.
