@@ -73,3 +73,26 @@ This leads to the required user input in the project file:
 A CHPP is operated by this `storage-driven` strategy, which requires two parameters `high_threshold` and `low_threshold` as well as a linked buffer tank, which is added in the `control_refs` of the CHPP. The user does not need to know about the implementation of this strategy, only about the meaning of its parameters.
 
 Another use of operational strategies is controlling the production code without the use of a state machine. For example a demand-driven strategy requires only that any energy system is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked system before the controlled system. Otherwise the controlled energy system might try to meet a demand that has not been calculated yet.
+
+For the predefined `demand_driven`, `supply_driven` and `storage_driven` control strategies, optional parameter flags can be set in the input file. Their default value is always `true` if the parameter is not given in the input file.
+
+```json
+    "strategy": {
+        "name": "demand_driven",    // required
+        "load_storages" : true,     // optional     
+        "unload_storages" : true,   // optional    
+        "m_el_in" : true,           // optional    
+        "m_el_out" : true,          // optional    
+        "m_gas_in" : true,          // optional    
+        "m_h2_out" : true,          // optional    
+        "m_o2_out" : true,          // optional    
+        "m_heat_out" : true,        // optional    
+        "m_heat_in" : true          // optional    
+        },
+```
+
+Each entry starting with an `m` (for medium) defines an input or output of the defined energy system. Obviously, an energy system has only a selection of the full list of inputs and outputs given above. If an input or output is set to false within the control strategy, the limitation of energy demand or supply on this interface is ignored when the current operation state of the energy system is determined. Note that this can lead to unexpected balance errors within the simulation! However, if users want more control over the operational strategy, these flags can be used to define complex rules for the operation of each energy system.
+
+If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified energy system is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this paramater allows to deny or allow system-wide storage loading or unloading for each energy system. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
+
+Using the `storage_driven` control strategy, `load_storages` and `unload_storages` can also be set to `false`, although this is usually not very useful.
