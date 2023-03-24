@@ -80,7 +80,8 @@ For the predefined `demand_driven`, `supply_driven` and `storage_driven` control
     "strategy": {
         "name": "demand_driven",    // required
         "load_storages" : true,     // optional     
-        "unload_storages" : true,   // optional    
+        "unload_storages" : true,   // optional 
+        "operation_profile_path": "path/to/profile.prf",  // optional 
         "m_el_in" : true,           // optional    
         "m_el_out" : true,          // optional    
         "m_gas_in" : true,          // optional    
@@ -96,3 +97,5 @@ Each entry starting with an `m` (for medium) defines an input or output of the d
 If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified energy system is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this paramater allows to deny or allow system-wide storage loading or unloading for each energy system. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
 
 Using the `storage_driven` control strategy, `load_storages` and `unload_storages` can also be set to `false`, although this is usually not very useful.
+
+The `operation_profile_path` entry within the `strategy`-Struct can be used to specify a path as a string to a `*.prf` file containing a timestamp and values between 0 and 1 for each time step. They serve as an additional operation limitation for the transformer and can be used e.g. to operate a transformer only at times with a high share of renewable energy in the public power grid.
