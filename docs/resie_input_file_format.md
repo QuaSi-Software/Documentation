@@ -139,7 +139,23 @@ The specification for the energy systems involved in the simulation is the most 
             "TST_01_HZG_01_CHP",
             "TST_01_HZG_01_HTP",
             "TST_01_HZG_01_BFT"
-        ]
+        ],
+        "connection_matrix": {
+            "input_order": [
+                "TST_01_HZG_01_CHP",
+                "TST_01_HZG_01_HTP",
+                "TST_01_HZG_01_BFT"
+            ],
+            "output_order": [
+                "TST_01_HZG_01_DEM",
+                "TST_01_HZG_01_BFT"
+            ],
+            "storage_loading": [
+                [1, 0],
+                [1, 1],
+                [1, 0]
+            ]
+        }
     },
     ...
 }
@@ -152,7 +168,9 @@ The specification is a map mapping a unit's UAC to the parameters required for i
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
 * `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to unit is given implicitly, as a unit cannot output to two different units of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the unit. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the unit entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
-* `input_priorities` (`List{String}`): Bus systems implement an input priority, meaning that the order in which energy is drawn from the other units connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected units.
+* `input_priorities` (`List{String}`, Busses only): Bus systems implement an input priority, meaning that the order in which energy is drawn from the other units connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected units.
+* `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected energy systems. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, coloums are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other energy system, the matrix will be ignorred! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
+![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)
 * `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of an energy system, the default medium type is overwritten. This may can be usuful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected energy system. As alternative, all media names can be set user-defined.
 
 ## Profile file format
