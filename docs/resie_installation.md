@@ -13,7 +13,14 @@ Install additional Julia-modules in working directory:
 1. open julia REPL: `julia`
 2. switch to julia packet manager: `]`
 3. activate environment: `activate .`
-4. install required external packages: `add JSON`
+4. install required external packages: 
+      - `add ColorSchemes`
+      - `add Debugger`
+      - `add Infiltrator`
+      - `add JSON`
+      - `add PlotlyJS`
+      - `add ResumableFunctions`
+      - `add Test`
 5. to exit packacket manager, hit `backspace`
 
 Usage of resie:

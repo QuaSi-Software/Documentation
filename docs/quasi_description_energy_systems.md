@@ -1,5 +1,9 @@
 # Technical description of main components
 
+In this Chapter, the energy systems that are used in Resie for the simulation of system topologies are described. An energy system is defined as one componente (e.g. a heat pump), while the combination of multiple iterconnected energy systems are defined as system topology. For each energy system, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
+
+**Note: The described energy systems are not implemented in Resie yet but will be included in upcoming versions! Currently, only simplified energy systems are integrated. Also, the descriptions are not yet completed and may change later.**
+
 ## Convention
 
 Symbols:
@@ -11,7 +15,7 @@ Symbols:
 Energy systems:
 
 - Energy flows into an energy system are positive, energy flows out of an energy system are negative
-- Energy systems are single units like a heat pump, a buffer tank, a battery or a photovoltaik-plant while energy networks are interconnected energy systems
+- Energy systems are single units like a heat pump, a buffer tank, a battery or a photovoltaik-plant while system topologies are interconnected energy systems
 
 ## Heat pump (HP)
 ### General description of HP
