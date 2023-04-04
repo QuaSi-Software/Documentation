@@ -173,6 +173,29 @@ The specification is a map mapping a unit's UAC to the parameters required for i
 ![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)
 * `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of an energy system, the default medium type is overwritten. This may can be usuful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected energy system. As alternative, all media names can be set user-defined.
 
+## Order of operation
+
+The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all power systems. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `dump_info` flag and the `dump_info_file` path in the `io_settings` section described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
+It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of an energy system and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the energy systems defined in the section `energy_systems`. For a further description of the available operation steps, see section `Simulation sequence` in chapter `Fundamentals`. 
+
+```json
+"order_of_operation": [
+    "TST_DEM_01 s_reset",
+    "TST_HP_01 s_reset",
+    "TST_SRC_01 s_reset",
+    "TST_GRI_01 s_reset",
+    "TST_DEM_01 s_control",
+    "TST_HP_01 s_control",
+    "TST_SRC_01 s_control",
+    "TST_GRI_01 s_control",
+    "TST_DEM_01 s_produce",
+    "TST_HP_01 s_produce",
+    "TST_SRC_01 s_produce",
+    "TST_GRI_01 s_produce"
+    ]
+```
+
+
 ## Profile file format
 
 As discussed earlier, time series data is separated into its own file format so as to not clutter the project file and turn it unreadable. This profile file format resembles a `CSV` format with a few additions.

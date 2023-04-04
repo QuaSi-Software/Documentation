@@ -82,11 +82,14 @@ The simulation steps for each unit are:
 
 * `Reset`: Reset values for the next time step.
 * `Control`: Calculate control behaviour to check if a unit should run or not.
+* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-produce step. Here, no energy is consumed or supplied.
 * `Produce`: Produce / transform / consume energy depending on the type of the unit and if the control behaviour dictates the unit should run.
 * `Load`: For storage systems, load any excess of energy produced by connected units.
 * `Distribute`: For bus systems, distribute the energy balances on each connected interface and check the overall balance on the bus.
 
 ### Determining order of execution
+
+**ToDo: Update!**
 
 Determination of the order of execution of the simulation steps described above follows an algorithm consisting of several heuristics. Each heuristic imposes some order over some or all of the units and is overwritten by the heuristics following after that.
 
