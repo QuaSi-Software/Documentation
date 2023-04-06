@@ -2,9 +2,9 @@
 
 The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to Resie, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
-The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system units that each produce, transform, transport or consume energy. Given the typical task of finding a suitable selection of units to satisfy a demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for dispatchable[^1] sources of energy, ensuring the energy balances are held for each unit along the way.
+The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system units that each produce, transform, transport or consume energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each unit along the way.
 
-[^1]: Dispatchable here refers to being flexible in regards to how much energy a unit produces or consumes, as opposed to units that represent a demand of energy that must be met or units that produce energy regardless of demand.
+[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a unit produces or consumes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they produce or consume. Fixed sources and sinks represent a precise demand of energy that must be met or units that produce a certain amount energy regardless of demand.
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a unit in the form of a gas boiler, which in turn requires an input of natural gas from a public grid.
 
@@ -29,7 +29,7 @@ The domain of the simulation can therefore be considered as the technical equipm
 
 The first of these is the environment, which plays a role for systems that directly draw energy from the environment such as solar collectors or heat pumps fed by ambient heat from the atmosphere or the ground. The second are public grids, usually for electricity, heat and natural gas, however grids of any kind of energy-carrying medium can be modeled. An important difference to the environment is that energy can be both drawn from the grids and fed back into them if there is a surplus.
 
-The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, Resie is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy network. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy network and this differs from an environmental input in the sense that the demand must be used up (it is not dispatchable).
+The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, Resie is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy network. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy network and this differs from an environmental input in the sense that the energy must be used up completely.
 
 ## Energy systems
 
@@ -41,8 +41,8 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Energy systems can be classified into seven categories, which are:
 
-* `Dispatchable sink`: A unit consuming a dispatchable amount of energy. For example can consume waste heat produced by other units.
-* `Dispatchable source`: A unit producing a dispatchable amount of energy, drawing it from outside the network boundary. For example drawing in heat from the ambient environment.
+* `Bounded sink`: A unit consuming a flexible amount of energy. For example can consume waste heat produced by other units.
+* `Bounded source`: A unit producing a flexible amount of energy, drawing it from outside the network boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A unit consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A unit producing an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A unit transforming energy in at least one medium to energy in at least one medium. For example a heat pump using lower temperature heat and electricity to produce higher temperature heat.
@@ -102,8 +102,8 @@ Determination of the order of execution of the simulation steps described above 
     1. `Bus`: `Control`, `Produce`
     1. `Transformer`: `Control`, `Produce`
     1. `Storage`: `Control`, `Produce`, `Load`
-    1. `Dispatchable source`: `Control`, `Produce`
-    1. `Dispatchable sink`: `Control`, `Produce`
+    1. `DBounded source`: `Control`, `Produce`
+    1. `Bounded sink`: `Control`, `Produce`
     1. `Bus`: `Distribute`
 1. Reorder `Control` and `Produce` of each unit connected to a bus so that it matches the bus' input priorities.
 1. Reorder `Control` and `Produce` of a unit's control references so that these appear first. This is ignored if the referenced unit is a storage system.
@@ -113,7 +113,7 @@ If the simulation parameter `dump_info` is used, the generated order of steps is
 #### Outside-in approach
 
 The general approach for determining the order is best described as an outside-in order, where "outside" refers to the network boundaries and "inner" refers to energy systems whose operation depends on information from systems on the outside. The information travels from the outer
-to the inner systems, in each step providing depending systems with the required details for calculating dispatch. Lets us consider an energy net with five systems, as illustrated in the following simplified diagram:
+to the inner systems, in each step providing depending systems with the required details for calculating operation. Let us consider an energy net with five systems, as illustrated in the following simplified diagram:
 
 ![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png)
 
