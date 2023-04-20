@@ -9,4 +9,4 @@ QuaSi was developed as part of a research project in Germany. As the tool grew u
 ## Funding
 This project is funded in majority by a research initiative of the German government.
 
-![Funding disclaimer](img/funding_disclaimer.jpg)
+![Funding disclaimer](img/funding_disclaimer.png)
