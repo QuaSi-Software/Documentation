@@ -6,6 +6,5 @@
 ### Connections to the public grid
 ### Generalized sources and sinks
 
-## Producers
 ## Transformers
 ## Storage

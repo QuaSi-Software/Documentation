@@ -2,9 +2,9 @@
 
 The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to Resie, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
-The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system units that each produce, transform, transport or consume energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each unit along the way.
+The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system units that each process energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each unit along the way.
 
-[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a unit produces or consumes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they produce or consume. Fixed sources and sinks represent a precise demand of energy that must be met or units that produce a certain amount energy regardless of demand.
+[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a unit processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or units that process a certain amount energy regardless of demand.
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a unit in the form of a gas boiler, which in turn requires an input of natural gas from a public grid.
 
@@ -33,7 +33,7 @@ The third domain are demands, which encompass any kind of system or process that
 
 ## Energy systems
 
-As mentioned earlier, an energy system is any kind technical equipment that deals with producing, transforming, transporting or consuming energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some energy systems this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
+As mentioned earlier, an energy system is any kind technical equipment that deals with transforming, transporting or transfering energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some energy systems this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
 
 For other equipment this is not the case. For example an electrolyser requires several components before and after the electrolysis step, such as water purification and hydrogen postprocessing. However given that these components are not used for anything else, they are included in the energy system under the label of "electrolyser".
 
@@ -41,11 +41,11 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Energy systems can be classified into seven categories, which are:
 
-* `Bounded sink`: A unit consuming a flexible amount of energy. For example can consume waste heat produced by other units.
-* `Bounded source`: A unit producing a flexible amount of energy, drawing it from outside the network boundary. For example drawing in heat from the ambient environment.
+* `Bounded sink`: A unit taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other units.
+* `Bounded source`: A unit outputting a flexible amount of energy, drawing it from outside the network boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A unit consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
-* `Fixed source`: A unit producing an amount of energy fixed within a time step. For example a photovoltaic power plant.
-* `Transformer`: A unit transforming energy in at least one medium to energy in at least one medium. For example a heat pump using lower temperature heat and electricity to produce higher temperature heat.
+* `Fixed source`: A unit outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
+* `Transformer`: A unit transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature heat.
 * `Storage`: A unit storing energy in a given medium. For example a buffer tank storing hot water.
 * `Bus`: A special type of unit used to facilitate the transport of energy from and to other units. Has only one implementation.
 
@@ -74,7 +74,7 @@ for time = t_start to t_end {
 }
 ```
 
-Inside the loop over time, first the simulation steps are performed for each unit. Then each unit is checked to ensure the energy balances are preserved, meaning that all energy consumed has also been produced and vice versa. This is necessary in particular as a safeguard against bugs in the implementation and operational strategies that produce unexpected results.
+Inside the loop over time, first the simulation steps are performed for each unit. Then each unit is checked to ensure the energy balances are preserved, meaning that all energy outputs (including losses) have a matching input and vice versa. This is necessary in particular as a safeguard against bugs in the implementation and operational strategies that produce unexpected results.
 
 After the balance check, output is written according to the output specification in the project file. The simulation engine specifically does not write all output as this can produce excessive amounts of data. Finally, the simulation is advanced to the next time step.
 
@@ -82,9 +82,9 @@ The simulation steps for each unit are:
 
 * `Reset`: Reset values for the next time step.
 * `Control`: Calculate control behaviour to check if a unit should run or not.
-* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-produce step. Here, no energy is consumed or supplied.
-* `Produce`: Produce / transform / consume energy depending on the type of the unit and if the control behaviour dictates the unit should run.
-* `Load`: For storage systems, load any excess of energy produced by connected units.
+* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. Here, no energy is consumed or supplied.
+* `Process`: Process energy depending on the type of the unit and if the control behaviour dictates the unit should run.
+* `Load`: For storage systems, take in any excess of energy after the processing of connected units.
 * `Distribute`: For bus systems, distribute the energy balances on each connected interface and check the overall balance on the bus.
 
 ### Determining order of execution
@@ -97,16 +97,16 @@ Determination of the order of execution of the simulation steps described above 
 
 1. Set up a base order of steps determined by the system function of the units:
     1. `All`: `Reset`
-    1. `Fixed source`: `Control`, `Produce`
-    1. `Fixed sink`: `Control`, `Produce`
-    1. `Bus`: `Control`, `Produce`
-    1. `Transformer`: `Control`, `Produce`
-    1. `Storage`: `Control`, `Produce`, `Load`
-    1. `DBounded source`: `Control`, `Produce`
-    1. `Bounded sink`: `Control`, `Produce`
+    1. `Fixed source`: `Control`, `Process`
+    1. `Fixed sink`: `Control`, `Process`
+    1. `Bus`: `Control`, `Process`
+    1. `Transformer`: `Control`, `Process`
+    1. `Storage`: `Control`, `Process`, `Load`
+    1. `DBounded source`: `Control`, `Process`
+    1. `Bounded sink`: `Control`, `Process`
     1. `Bus`: `Distribute`
-1. Reorder `Control` and `Produce` of each unit connected to a bus so that it matches the bus' input priorities.
-1. Reorder `Control` and `Produce` of a unit's control references so that these appear first. This is ignored if the referenced unit is a storage system.
+1. Reorder `Control` and `Process` of each unit connected to a bus so that it matches the bus' input priorities.
+1. Reorder `Control` and `Process` of a unit's control references so that these appear first. This is ignored if the referenced unit is a storage system.
 
 If the simulation parameter `dump_info` is used, the generated order of steps is written to the info file. This can be very useful to check for errors produced by an incorrect order.
 

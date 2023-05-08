@@ -4,11 +4,11 @@ An important part of what makes Resie's simulation model different from similar 
 
 ## Control behaviour
 
-The calculations for control have been decoupled from those of energy production, so that production can be modified depending on the result of the control. In the simplest case, control turns energy system on and off, but the implementation of various energy systems might take many more cases into account. The latter already is arbitrarily complex[^1], so the former must be as well.
+The calculations for control have been decoupled from those of energy processing, so that processing can work as a function depending on the result of the control. In the simplest case, control turns energy system on and off, but the implementation of various energy systems might take many more cases into account. The latter already is arbitrarily complex[^1], so the former must be as well.
 
 [^1]: In the sense that each energy system can perform any number and kind of calculations using the current state of the simulation that the energy system has access to.
 
-To facilitate this, all energy system implementations have access to a controller, that has access to information defined by its operational strategy and provides state information to the production functionality.
+To facilitate this, all energy system implementations have access to a controller, that has access to information defined by its operational strategy and provides state information to the processing functionality.
 
 ## State machines
 
@@ -45,7 +45,7 @@ The example above shows the truth table used for the state "Fill tank", which ha
 
 ## Strategies
 
-Instead of requiring the user to manually specify a state machine, it is desired to provide a number of predefined operational strategies that can be selected. Apart from simplifying the user input, this also makes it easier to enable production behaviour that depends on the chosen strategy, but not necessarily the current state of the controller as it may not need a state machine for control calculations.
+Instead of requiring the user to manually specify a state machine, it is desired to provide a number of predefined operational strategies that can be selected. Apart from simplifying the user input, this also makes it easier to enable processing behaviour that depends on the chosen strategy, but not necessarily the current state of the controller as it may not need a state machine for control calculations.
 
 For the given example above this would be best described as a storage-driven strategy as an energy system with this strategy would try to fill the linked storage system when it gets too low. The required linked energy systems and parameter values are carried over from the state machine constructed by the strategy to the required user input as illustrated in the following:
 
@@ -72,7 +72,7 @@ This leads to the required user input in the project file:
 
 A CHPP is operated by this `storage-driven` strategy, which requires two parameters `high_threshold` and `low_threshold` as well as a linked buffer tank, which is added in the `control_refs` of the CHPP. The user does not need to know about the implementation of this strategy, only about the meaning of its parameters.
 
-Another use of operational strategies is controlling the production code without the use of a state machine. For example a demand-driven strategy requires only that any energy system is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked system before the controlled system. Otherwise the controlled energy system might try to meet a demand that has not been calculated yet.
+Another use of operational strategies is controlling the processing code without the use of a state machine. For example a demand-driven strategy requires only that any energy system is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked system before the controlled system. Otherwise the controlled energy system might try to meet a demand that has not been calculated yet.
 
 For the predefined `demand_driven`, `supply_driven` and `storage_driven` control strategies, optional parameter flags can be set in the input file. Their default value is always `true` if the parameter is not given in the input file.
 

@@ -31,7 +31,7 @@ Each output of an energy system must connect to exactly one input of another sys
 * It simplifies calculations as there is always exactly one other system to consider.
 * It improves readability of the topology as, while it requires additional busses, it reduces the overall connectedness of the graph.
 * It enables an important layer of control behaviour as input priorities can be handled by the intermediate bus.
-* Storage systems work better if they are connected to a bus because large demand fluctuations might overload the storage capacity leading to flickering values of the storage as it is filled or depleted within a single timestep. Being connected to a bus enables the energy producers on the same bus to side-step the storage and feed into the demand side directly.
+* Storage systems work better if they are connected to a bus because large demand fluctuations might overload the storage capacity leading to flickering values of the storage as it is filled or depleted within a single timestep. Being connected to a bus enables the energy sources on the same bus to side-step the storage and feed into the demand side directly.
 
 ## Energy media
 
@@ -76,14 +76,14 @@ For busses, grids, demands, storages (except seasonal thermal energy storage), t
 
 ## Interfaces
 
-When writing the implementation of energy systems a problem has emerged in the functionality handling the production[^1]. There must be a way to track the energy balances between systems which is the same for all types of energy systems, so that the production code does not need to know which types of energy systems it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and production calculations for systems that are supposed to feed into a demand and fill a storage at the same time.
+When writing the implementation of energy systems a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between systems which is the same for all types of energy systems, so that the processing code does not need to know which types of energy systems it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for systems that are supposed to feed into a demand and fill a storage at the same time.
 
-[^1]: Here "production" is a stand-in for the creation, transformation or destruction of energy. The term is used to differentiate the "action" from the control of an energy system.
+[^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of an energy system.
 
 ![Illustration how interfaces connect energy systems](fig/energy_system_interfaces.png)
 
 To solve this problem interfaces have been introduced, which act as an intermediary between energy systems. The output of a system connects to the "left" of an interface and the input of the receiving system on the "right". That way energy always flows from left to right.
 
-When an energy system produces energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected energy systems can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage systems.
+When an energy system outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected energy systems can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage systems.
 
 This mechanism has proven useful as otherwise the implementation of every energy system would have to check if it is connected to a bus or a single other system as well as if it is a storage system or not. The interfaces simplify this behaviour and decouple the implementations of energy systems, which is important to maintain the flexibility of the overall simulation software in regards to new energy systems.
