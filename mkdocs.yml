@@ -29,7 +29,7 @@ nav:
   - Home:
     - 'QuaSi - Overview': 'index.md'
   - 'Technical description': 
-    - 'quasi_description_energy_systems.md'
+    - 'quasi_description_components.md'
     - 'quasi_transient_effects.md'
   - 'Simulation engine Resie':
     - 'Installation and usage': 'resie_installation.md'
