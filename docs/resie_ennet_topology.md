@@ -1,10 +1,10 @@
 # Energy network topology
 
-In the simulation model energy systems are connected to each other to form a network of systems across which the use of energy is balanced. The specific way the systems are connected is called the energy network topology. This is inspired by, but not quite the same as the term topology in graph theory. In the following any change in how the energy systems are connected is considered to result in a similar but different topology.
+In the simulation model energy system components are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is called the energy network topology. This is inspired by, but not quite the same as the term topology in graph theory. In the following any change in how the components are connected is considered to result in a similar but different topology.
 
-![Example of an energy net topology connecting various energy system units](fig/example_ennet_topology.png)
+![Example of an energy net topology connecting various components](fig/example_ennet_topology.png)
 
-In the example above a topology is displayed. Arrows denote the flow of energy from one system to the next with the colors of arrows denoting which medium is involved. Yellow is electricity, purple is natural gas, dark red is low temperature water and light red is high temperature water. Two busses form the main way how energy is exchanged.
+In the example above a topology is displayed. Arrows denote the flow of energy from one component to the next with the colors of arrows denoting which medium is involved. Yellow is electricity, purple is natural gas, dark red is low temperature water and light red is high temperature water. Two busses form the main way how energy is exchanged.
 
 ## Characteristics of a topology
 
@@ -12,26 +12,26 @@ The example in the introduction above shows some of the important characteristic
 
 ### No unmatched inputs / outputs
 
-Each energy system has defined inputs and outputs. A necessary condition for the simulation to work is that every input and output connects to something. If an input or output is not relevant for the analysis / question that underlies the simulation, an undesired input or output can be connected to a grid connection that does not appear in the simulation output.
+Each component has defined inputs and outputs. A necessary condition for the simulation to work is that every input and output connects to something. If an input or output is not relevant for the analysis / question that underlies the simulation, an undesired input or output can be connected to a grid connection that does not appear in the simulation output.
 
 ### Bidirectional flow only for storage
 
-Energy flow is always in one direction, namely from the output of one energy system to the input of another. While it is possible to construct a cycle by connecting the output of a system to the input of another system and in turn the output of that back to the the input of the first system, this will lead to problems in calculating the correct order of execution.
+Energy flow is always in one direction, namely from the output of one component to the input of another. While it is possible to construct a cycle by connecting the output of a component to the input of another component and in turn the output of that back to the the input of the first component, this will lead to problems in calculating the correct order of execution.
 
-The exception to this rule are storage systems, which typically are connected to both the input and output of a bus system. In the example topology this is displayed as a bidirectional arrow between the bus and the storage.
+The exception to this rule are storage component, which typically are connected to both the input and output of a bus component. In the example topology this is displayed as a bidirectional arrow between the bus and the storage.
 
 ### No mixing of media
 
-Along with the number of inputs and outputs an energy system has, each also has a defined medium. This is used to ensure that the systems in a topology are connected in such a way that the output of a system works on the same medium as the input of the other system. It is not possible to connect mismatching inputs / outputs.
+Along with the number of inputs and outputs a component has, each also has a defined medium. This is used to ensure that the components in a topology are connected in such a way that the output of a component works on the same medium as the input of the other component. It is not possible to connect mismatching inputs / outputs.
 
 ### Exactly one energy system per input / output
 
-Each output of an energy system must connect to exactly one input of another system and vice versa. If there is a need to connect multiple systems to the same receiver, there must be a bus used as an intermediary. This was chosen for several reasons:
+Each output of a component must connect to exactly one input of another component and vice versa. If there is a need to connect multiple components to the same receiver, there must be a bus used as an intermediary. This was chosen for several reasons:
 
-* It simplifies calculations as there is always exactly one other system to consider.
+* It simplifies calculations as there is always exactly one other component to consider.
 * It improves readability of the topology as, while it requires additional busses, it reduces the overall connectedness of the graph.
 * It enables an important layer of control behaviour as input priorities can be handled by the intermediate bus.
-* Storage systems work better if they are connected to a bus because large demand fluctuations might overload the storage capacity leading to flickering values of the storage as it is filled or depleted within a single timestep. Being connected to a bus enables the energy sources on the same bus to side-step the storage and feed into the demand side directly.
+* Storage components work better if they are connected to a bus because large demand fluctuations might overload the storage capacity leading to flickering values of the storage as it is filled or depleted within a single timestep. Being connected to a bus enables the energy sources on the same bus to side-step the storage and feed into the demand side directly.
 
 ## Energy media
 
@@ -70,20 +70,20 @@ Different high temperature regimes:
 * `m_h_w_ht5`
 
 ### User definable media names
-The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all energy systems can be declared in the input file. Alternatevly, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected energy system.
+The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatevly, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
 
 For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each energy system can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer.
 
 ## Interfaces
 
-When writing the implementation of energy systems a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between systems which is the same for all types of energy systems, so that the processing code does not need to know which types of energy systems it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for systems that are supposed to feed into a demand and fill a storage at the same time.
+When writing the implementation of components a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
 
 [^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of an energy system.
 
-![Illustration how interfaces connect energy systems](fig/energy_system_interfaces.png)
+![Illustration how interfaces connect components](fig/energy_system_interfaces.png)
 
-To solve this problem interfaces have been introduced, which act as an intermediary between energy systems. The output of a system connects to the "left" of an interface and the input of the receiving system on the "right". That way energy always flows from left to right.
+To solve this problem interfaces have been introduced, which act as an intermediary between components. The output of a component connects to the "left" of an interface and the input of the receiving system on the "right". That way energy always flows from left to right.
 
-When an energy system outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected energy systems can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage systems.
+When a component outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected components can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage systems.
 
-This mechanism has proven useful as otherwise the implementation of every energy system would have to check if it is connected to a bus or a single other system as well as if it is a storage system or not. The interfaces simplify this behaviour and decouple the implementations of energy systems, which is important to maintain the flexibility of the overall simulation software in regards to new energy systems.
+This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage system or not. The interfaces simplify this behaviour and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.

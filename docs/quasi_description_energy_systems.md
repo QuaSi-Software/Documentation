@@ -1,8 +1,8 @@
 # Technical description of main components
 
-In this Chapter, the energy systems that are used in Resie for the simulation of system topologies are described. An energy system is defined as one componente (e.g. a heat pump), while the combination of multiple iterconnected energy systems are defined as system topology. For each energy system, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
+In this chapter, the components that are used in Resie for the simulation of energy systems are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
 
-**Note: The described energy systems are not implemented in Resie yet but will be included in upcoming versions! Currently, only simplified energy systems are integrated. Also, the descriptions are not yet completed and may change later.**
+**Note: The described components are not implemented in Resie yet but will be included in upcoming versions! Currently, only simplified components are integrated. Also, the descriptions are not yet completed and may change later.**
 
 ## Convention
 
@@ -12,10 +12,10 @@ Symbols:
 - Vectors or time series in bold and italic letters (boldsymbol: \(\boldsymbol{T \ t}\))
 - Matrices are bold and non-italic (textbf: \(\textbf{T t}\)) 
  
-Energy systems:
+Components:
 
-- Energy flows into an energy system are positive, energy flows out of an energy system are negative
-- Energy systems are single units like a heat pump, a buffer tank, a battery or a photovoltaik-plant while system topologies are interconnected energy systems
+- Energy flows into a component are positive, energy flows out of a component are negative
+- Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected energy systems
 
 ## Heat pump (HP)
 ### General description of HP
@@ -45,11 +45,11 @@ The power of the heat pump's electric supply, including the losses of the power 
 
 $$P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
 
-Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, may also be relevant for connected energy systems, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
+Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, may also be relevant for connected components, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
 
 $$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
 
-As a chiller follows the same prinicple as a heat pump, the same energy system can be used to simulate both energy systems. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
+As a chiller follows the same prinicple as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
  
 $$ EER = \frac{\dot{Q}_{HP,in}}{P_{el,HP}} = \frac{\dot{Q}_{HP,out} - P_{el,HP}}{P_{el,HP}} = COP - 1   $$
 
@@ -1048,7 +1048,7 @@ Symbol | Description | Unit
 
 ## ToDo
 - In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
-- check for consistency: energy system, part-load, timestep, start-up, shut-down
+- check for consistency: part-load, timestep, start-up, shut-down
   
 ## References
 ///Footnotes Go Here///
