@@ -1,11 +1,10 @@
-# Types of energy systems
+# Types of energy system components
 
-## Boundary and connection systems
+## Boundary and connection components
 ### Bus
 ### Demand
 ### Connections to the public grid
 ### Generalized sources and sinks
 
-## Producers
 ## Transformers
 ## Storage

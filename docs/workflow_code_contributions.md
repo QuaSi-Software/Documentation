@@ -6,9 +6,9 @@ called the "git feature-branch workflow". It is assumed the reader generally kno
 use git, for which there are many tutorials and guides available.
 
 To illustrate the workflow, let's imagine Resie is released on GitHub on version 1.2.3
-and Alice wants to add a new energy system to the simulation model. The workflow can also
-work if another repository host other than GitHub is used and can also be performed
-entirely with repositories in folders in a local network.
+and Alice wants to add a new energy system component to the simulation model. The workflow
+can also work if another repository host other than GitHub is used and can also be
+performed entirely with repositories in folders in a local network.
 
 #### Branch-basis
 The releases are simply specific commits in the commit-graph of the project and usually the

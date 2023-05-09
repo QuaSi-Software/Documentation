@@ -29,15 +29,15 @@ nav:
   - Home:
     - 'QuaSi - Overview': 'index.md'
   - 'Technical description': 
-    - 'quasi_description_energy_systems.md'
+    - 'quasi_description_components.md'
     - 'quasi_transient_effects.md'
   - 'Simulation engine Resie':
     - 'Installation and usage': 'resie_installation.md'
     - 'Input file format': 'resie_input_file_format.md'
     - 'Simulation model':
       - 'Fundamentals': 'resie_fundamentals.md'
-      - 'Energy network topology': 'resie_ennet_topology.md'
-      - 'Types of energy systems': 'resie_types_energy_systems.md'
+      - 'Energy systems': 'resie_energy_systems.md'
+      - 'Types of energy system components': 'resie_types_components.md'
       - 'Operation and control': 'resie_operation_control.md'
   - 'Contributions':
     - 'How to help': 'contributions.md'

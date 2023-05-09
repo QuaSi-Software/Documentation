@@ -12,7 +12,7 @@ The `JSON` format does not define comments. If there is a need to provide additi
 
 ### User address code
 
-The units / energy systems in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
+The units / energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
 
 An example for a UAC system could be a hierarchical structure based on location and affiliation of the units within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
 
@@ -64,9 +64,9 @@ The overall structure of the project file is split into three general sections, 
     ...
 }
 ```
-The keys of this map must correspond exactly to the UAC of the units defined in the energy system unit specification. By the definition of a map, each unit can only appear once in this map. If multiple outputs for a single unit should be tracked, multiple entries should be put in the list mapped to that unit's UAC. Each entry describes one input, output or other variable of that unit. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that unit should be tracked.
+The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
-The second part of the entry describes which of the available variables of the unit the desired output is. For most energy systems either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage systems often have the variable `Load` available, which corresponds to the amount of energy stored in the system. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
+The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
 
 ### Output specification (interactive .html plot)
 ```json
@@ -86,7 +86,7 @@ The second part of the entry describes which of the available variables of the u
             ...
 }
 ```
-The output specification for an interactive line plot can be specified in ```"output_plot"```. The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the energy system and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plottet, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+The output specification for an interactive line plot can be specified in ```"output_plot"```. The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plottet, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
 The results will be saved in ```\output\output_plot.html"```. The plot can be opend with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
 
@@ -106,9 +106,9 @@ The results will be saved in ```\output\output_plot.html"```. The plot can be op
 
 **A note on time:** The simulation engine works entirely with timestamps relative to an arbitrary reference point. It is up to the user to choose these so that the simulation works well with the given inputs. The reference point can be the same as with the unix timestamp (1970-01-01 00:00:00) or it can be any number whatsoever as long as it is used consistently. The most important point is that the profiles used in the simulation match the reference point being used in the simulation parameters.
 
-## Energy systems
+## Components
 
-The specification for the energy systems involved in the simulation is the most complicated part of the input file. Some of the parameters and values being used relate to the simulation model underlying the simulation engine. If you need to write this part of the input file from scratch, it is advised to read the chapter on the simulation model first, as this chapter only discusses the structure but not the meaning of the specification.
+The specification for the components involved in the simulation is the most complicated part of the input file. Some of the parameters and values being used relate to the simulation model underlying the simulation engine. If you need to write this part of the input file from scratch, it is advised to read the chapter on the simulation model first, as this chapter only discusses the structure but not the meaning of the specification.
 
 ```json
 "energy_systems": {
@@ -161,22 +161,22 @@ The specification for the energy systems involved in the simulation is the most 
 }
 ```
 
-The specification is a map mapping a unit's UAC to the parameters required for initialization of that unit. Parameters specific to the type of the unit can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
+The specification is a map mapping a unit's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
 
-* `type` (`String`): The exact name of the type of the unit.
-* `medium` (`String`): Some energy systems can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy network topology (see also chapter on the simulation model).
+* `type` (`String`): The exact name of the type of the component.
+* `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
-* `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to unit is given implicitly, as a unit cannot output to two different units of the same medium.
-* `strategy` (`String`): Parameters for the operation strategy of the unit. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the unit entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
-* `input_priorities` (`List{String}`, Busses only): Bus systems implement an input priority, meaning that the order in which energy is drawn from the other units connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected units.
-* `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected energy systems. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, coloums are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other energy system, the matrix will be ignorred! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
+* `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
+* `input_priorities` (`List{String}`, Busses only): Bus components implement an input priority, meaning that the order in which energy is drawn from the other components connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected components.
+* `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected components. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, coloums are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other component, the matrix will be ignorred! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
 ![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)
-* `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of an energy system, the default medium type is overwritten. This may can be usuful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected energy system. As alternative, all media names can be set user-defined.
+* `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of a component, the default medium type is overwritten. This may can be usuful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected component. As alternative, all media names can be set user-defined.
 
 ## Order of operation
 
-The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all power systems. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `dump_info` flag and the `dump_info_file` path in the `io_settings` section described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
-It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of an energy system and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the energy systems defined in the section `energy_systems`. For a further description of the available operation steps, see section `Simulation sequence` in chapter `Fundamentals`. 
+The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `dump_info` flag and the `dump_info_file` path in the `io_settings` section described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
+It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `energy_systems`. For a further description of the available operation steps, see section `Simulation sequence` in chapter `Fundamentals`. 
 
 ```json
 "order_of_operation": [
@@ -188,10 +188,10 @@ It may be convenient to first export the `dump_info` without a specification in 
     "TST_HP_01 s_control",
     "TST_SRC_01 s_control",
     "TST_GRI_01 s_control",
-    "TST_DEM_01 s_produce",
-    "TST_HP_01 s_produce",
-    "TST_SRC_01 s_produce",
-    "TST_GRI_01 s_produce"
+    "TST_DEM_01 s_process",
+    "TST_HP_01 s_process",
+    "TST_SRC_01 s_process",
+    "TST_GRI_01 s_process"
     ]
 ```
 

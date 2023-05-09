@@ -1,9 +1,3 @@
-This documentation and related files used for generating and rendering it are released under the MIT license (see below). Software packages of the QuaSi project, which are also described in this documentation, are released under their own licenses. Please see the corresponding repositories for details.
-
-For a detailed list of authorship please see the version history of the repository of source documents of this documentation. Names listed in the license text are considered authors of the documentation.
-
-________________________________________________________________________________
-
 MIT License
 
 Copyright (c) 2023 Authors: Etienne Ott, Heiner Steinacker

@@ -1,7 +1,7 @@
 # QuaSi - Overview
 ![Logo and visual for the project](img/quasi_combined_w3099.jpg)
 
-The QuaSi simulation software focuses on the energy supply and demand of buildings on the scale of city districts. The project is split into several components: The simulation engine Resie, user interfaces for both standalone use and integration into BIM tools, as well as additional tools surrounding the use of the simulation engine. The documents presented here describe the technical background, usage instructions and developer guidelines for these components.
+The QuaSi simulation software focuses on the energy supply and demand of buildings on the scale of city districts. The project is split into several software components: The simulation engine Resie, user interfaces for both standalone use and integration into BIM tools, as well as additional tools surrounding the use of the simulation engine. The documents presented here describe the technical background, usage instructions and developer guidelines for these components.
 
 **DISCLAIMER:** The current version of the documentation is a work in progress as we move towards the first full release of our various tools and software components. Please be aware that some parts of the documentation do not reflect the current state of what they are documenting.
 
