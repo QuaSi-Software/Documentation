@@ -12,24 +12,24 @@ To illustrate, let's look at a simple example. A heating demand, in the medium o
 
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
-This can be done by first calculating the hot water demand `E_hot_water` to be met, which is trivial from the perspective of the simulation as it is an input to the simulation. Then the gas boiler can meet this demand by burning gas, which in turn imposes a demand of natural gas `E_gas` on the grid connection. Finally the grid connection can fulfill this gas demand by drawing from outside the network boundary.
+This can be done by first calculating the hot water demand `E_hot_water` to be met, which is trivial from the perspective of the simulation as it is an input to the simulation. Then the gas boiler can meet this demand by burning gas, which in turn imposes a demand of natural gas `E_gas` on the grid connection. Finally the grid connection can fulfill this gas demand by drawing from outside the system boundary.
 
 #### Losses
 While the conservation of energy is upheld, this does not mean that losses cannot be modeled. Energy losses invariably end up as ambient heat, which can contribute to the energy balance of a building, however the technical equipment of a building rarely can be found in a thermal zone that should be kept to comfort levels. Equipment with large power draw might even impose a cooling demand on the thermal zone in which they reside.
 
-Due to the difficulty of generalizing the impact of these losses, they are not generally included in the energy flow model. Instead, the implementation of components that typically incur significant losses take this into account with imperfect conversion of energy. These losses are considered outside the network boundary and ignored. It is possible to track these for further analysis outside the simulation, e.g. as internal heating load for a thermal simulation of technical equipment and the surrounding room.
+Due to the difficulty of generalizing the impact of these losses, they are not generally included in the energy flow model. Instead, the implementation of components that typically incur significant losses take this into account with imperfect conversion of energy. These losses are considered outside the system boundary and ignored. It is possible to track these for further analysis outside the simulation, e.g. as internal heating load for a thermal simulation of technical equipment and the surrounding room.
 
 ## Domain and boundaries
 
-Due to the generalized nature of the energy network used by Resie, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in Resie is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.
+Due to the generalized nature of the energy system used by Resie, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in Resie is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.
 
-The domain of the simulation can therefore be considered as the technical equipment providing energy to a number of connected buildings up to a scale where transport losses cannot be ignored anymore. Outside the domain are three major other domains to and from which the energy network connect:
+The domain of the simulation can therefore be considered as the technical equipment providing energy to a number of connected buildings up to a scale where transport losses cannot be ignored anymore. Outside the domain are three major other domains to and from which the energy system connect:
 
 ![Illustration of the model domain and boundaries](fig/domain_boundaries.png)
 
 The first of these is the environment, which plays a role for components that directly draw energy from the environment such as solar collectors or heat pumps fed by ambient heat from the atmosphere or the ground. The second are public grids, usually for electricity, heat and natural gas, however grids of any kind of energy-carrying medium can be modeled. An important difference to the environment is that energy can be both drawn from the grids and fed back into them if there is a surplus.
 
-The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, Resie is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy network. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy network and this differs from an environmental input in the sense that the energy must be used up completely.
+The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, Resie is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy system. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy system and this differs from an environmental input in the sense that the energy must be used up completely.
 
 ## Energy system components
 
@@ -42,7 +42,7 @@ For other equipment this is not the case. For example an electrolyser requires s
 Components can be classified into seven categories, which are:
 
 * `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other units.
-* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the network boundary. For example drawing in heat from the ambient environment.
+* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature heat.
@@ -93,7 +93,7 @@ The simulation steps for each component are:
 
 Determination of the order of execution of the simulation steps described above follows an algorithm consisting of several heuristics. Each heuristic imposes some order over some or all of the components and is overwritten by the heuristics following after that.
 
-**Note: As of now, it is an open question if this algorithm produces correct results for all relevant system topologies.**
+**Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
 1. Set up a base order of steps determined by the system function of the components:
     1. `All`: `Reset`
@@ -112,7 +112,7 @@ If the simulation parameter `dump_info` is used, the generated order of steps is
 
 #### Outside-in approach
 
-The general approach for determining the order is best described as an outside-in order, where "outside" refers to the network boundaries and "inner" refers to components whose operation depends on information from systems on the outside. The information travels from the outer to the inner components, in each step providing depending components with the required details for calculating operation. Let us consider an energy net with five components, as illustrated in the following simplified diagram:
+The general approach for determining the order is best described as an outside-in order, where "outside" refers to the system boundaries and "inner" refers to components whose operation depends on information from systems on the outside. The information travels from the outer to the inner components, in each step providing depending components with the required details for calculating operation. Let us consider an energy net with five components, as illustrated in the following simplified diagram:
 
 ![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png)
 
@@ -125,8 +125,8 @@ From this initial state of all unknowns, the algorithm can work outside-in step 
 1. Components with no dependencies can be calculated directly.
 2. One component now has all of its dependencies fulfilled and can also be calculated. Another component is still missing one of its dependencies.
 3. The component that was incomplete in the previous step can now be completed.
-4. The last incomplete component is calculated and completes the entire network.
+4. The last incomplete component is calculated and completes the entire system.
 
 #### Cycles and feedback loops
 
-Cycles in the both the energy net and the information flow graph lead to issues with finding solutions to the order of execution. However these cycles are not a problem in actualized energy nets, as not all parts of a cycle are active at the same time. For example an electrolyser might feed into a hydrogen storage, which feeds into an fuel cell, which feeds back into the electrical net. It would make little sense however to have both systems run at the same time, as this would ultimately waste electricity. So while this topology causes cycles in the network, in operation these cycles do not cause issues.
+Cycles in the both the energy system and the information flow graph lead to issues with finding solutions to the order of execution. However these cycles are not a problem in actualized energy systems, as not all parts of a cycle are active at the same time. For example an electrolyser might feed into a hydrogen storage, which feeds into an fuel cell, which feeds back into the electrical net. It would make little sense however to have both components run at the same time, as this would ultimately waste electricity. So while these connections causes cycles in the graph, in operation these cycles do not cause issues.

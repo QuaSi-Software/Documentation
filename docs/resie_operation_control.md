@@ -1,6 +1,6 @@
 # Operation and control
 
-An important part of what makes Resie's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy networks, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
+An important part of what makes Resie's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
 
 ## Control behaviour
 
@@ -31,7 +31,7 @@ The example above uses four different conditions:
 * `BT >= X%`: Checks if a linked buffer tank is above X% capacity.
 * `BT < X%`: Checks if a linked buffer tank is below X% capacity.
 * `Min. run time`: Checks if the component the state machine controls has been in the current state for longer or equal than its minimum run time.
-* `Overfill`: Checks if the remaining empty capacity of a linked buffer tank is less than the minimum partial load of the system the state machine controls.[^3]
+* `Overfill`: Checks if the remaining empty capacity of a linked buffer tank is less than the minimum partial load of the component the state machine controls.[^3]
 
 [^3]: Rather, this is its intended use. As of now there remains an issue with its implementation.
 

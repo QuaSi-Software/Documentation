@@ -164,7 +164,7 @@ The specification for the components involved in the simulation is the most comp
 The specification is a map mapping a unit's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
 
 * `type` (`String`): The exact name of the type of the component.
-* `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy network topology (see also chapter on the simulation model).
+* `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
 * `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.

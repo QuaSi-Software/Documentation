@@ -15,7 +15,7 @@ Symbols:
 Components:
 
 - Energy flows into a component are positive, energy flows out of a component are negative
-- Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected energy systems
+- Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected components
 
 ## Heat pump (HP)
 ### General description of HP
