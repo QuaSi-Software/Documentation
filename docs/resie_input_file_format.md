@@ -24,7 +24,7 @@ The overall structure of the project file is split into three general sections, 
 {
     "io_settings": {...},
     "simulation_parameters": {...},
-    "energy_systems": {...}
+    "components": {...}
 }
 ```
 
@@ -111,11 +111,11 @@ The results will be saved in ```\output\output_plot.html"```. The plot can be op
 The specification for the components involved in the simulation is the most complicated part of the input file. Some of the parameters and values being used relate to the simulation model underlying the simulation engine. If you need to write this part of the input file from scratch, it is advised to read the chapter on the simulation model first, as this chapter only discusses the structure but not the meaning of the specification.
 
 ```json
-"energy_systems": {
+"components": {
     "TST_01_HZG_01_CHP": {
         "type": "CHPP",
         "control_refs": ["TST_01_HZG_01_BFT"],
-        "production_refs": [
+        "output_refs": [
             "TST_01_HZG_01_BUS",
             "TST_01_ELT_01_BUS"
         ],
@@ -131,7 +131,7 @@ The specification for the components involved in the simulation is the most comp
         "type": "Bus",
         "medium": "m_h_w_ht1",
         "control_refs": [],
-        "production_refs": [
+        "output_refs": [
             "TST_01_HZG_01_DEM",
             "TST_01_HZG_01_BFT"
         ],
@@ -166,7 +166,7 @@ The specification is a map mapping a unit's UAC to the parameters required for i
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
-* `production_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `output_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
 * `input_priorities` (`List{String}`, Busses only): Bus components implement an input priority, meaning that the order in which energy is drawn from the other components connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected components.
 * `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected components. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, coloums are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other component, the matrix will be ignorred! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
@@ -176,7 +176,7 @@ The specification is a map mapping a unit's UAC to the parameters required for i
 ## Order of operation
 
 The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `dump_info` flag and the `dump_info_file` path in the `io_settings` section described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
-It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `energy_systems`. For a further description of the available operation steps, see section `Simulation sequence` in chapter `Fundamentals`. 
+It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `components`. For a further description of the available operation steps, see section `Simulation sequence` in chapter `Fundamentals`. 
 
 ```json
 "order_of_operation": [

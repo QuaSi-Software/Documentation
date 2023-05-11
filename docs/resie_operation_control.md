@@ -57,7 +57,7 @@ This leads to the required user input in the project file:
 "TST_01_HZG_01_CHP": {
     "type": "CHPP",
     "control_refs": ["TST_01_HZG_01_BFT"],
-    "production_refs": [
+    "output_refs": [
         "TST_01_HZG_01_BUS",
         "TST_01_ELT_01_BUS"
     ],
