@@ -6,13 +6,23 @@ The geometry of buildings also does not play a role in the simulation and the fu
 
 [^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or units that process a certain amount energy regardless of demand.
 
-To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a component in the form of a gas boiler, which in turn requires an input of natural gas from a public grid.
+To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
 ![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
 
+Example of the energy flow of a gas boiler providing heat, adapted from [Resie2023][^Resie2023].
+
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
-This can be done by first calculating the hot water demand `E_hot_water` to be met, which is trivial from the perspective of the simulation as it is an input to the simulation. Then the gas boiler can meet this demand by burning gas, which in turn imposes a demand of natural gas `E_gas` on the grid connection. Finally the grid connection can fulfill this gas demand by drawing from outside the system boundary.
+This can be done by first calculating the hot water demand \(E_{in,C}\) to be met, which is trivial from the perspective of the simulation as it is an input to the simulation. Then the gas boiler can meet this demand by burning gas to provide \(E_{out,B}\), which in turn imposes a demand of natural gas \(E_{in,B}\) and removes \(E_{loss}\) from the system as losses. Finally the grid connection can fulfill this gas demand \(E_{out,A}\) by drawing from outside the system boundary. Overall this behaviour can be summarized as:
+
+$$
+\begin{equation}
+|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}|
+\end{equation}
+$$
+
+[^Resie2023]: Ott E, Steinacker H, Stickel M, Kley C, Fisch M N (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 #### Losses
 While the conservation of energy is upheld, this does not mean that losses cannot be modeled. Energy losses invariably end up as ambient heat, which can contribute to the energy balance of a building, however the technical equipment of a building rarely can be found in a thermal zone that should be kept to comfort levels. Equipment with large power draw might even impose a cooling demand on the thermal zone in which they reside.

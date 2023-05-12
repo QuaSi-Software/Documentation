@@ -85,7 +85,9 @@ When writing the implementation of components a problem has emerged in the funct
 
 [^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
-![Illustration how interfaces connect components](fig/energy_system_interfaces.png)
+![Illustration how interfaces connect components](fig/example_system_interfaces.png)
+
+An energy system component connecting via interfaces to other components, adapted from [Resie2023][^Resie2023].
 
 To solve this problem interfaces have been introduced, which act as an intermediary between components. The output of a component connects to the "left" of an interface and the input of the receiving component on the "right". That way energy always flows from left to right.
 
