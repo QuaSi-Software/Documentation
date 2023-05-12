@@ -13,15 +13,15 @@ Now, QuaSi is understood to be a collection of the following simulation tools:
 
 - **ReSiE** (acronym for "computational engine for the simulation of energy systems", in German "Rechenkern für die Simulation von Energiesystemen"), a simulation tool for the simulation and optimization of different energy supply systems for city districts or single buildings with a focus on operational strategies that can be used in early planning stages ([GitHub Repository](https://github.com/QuaSi-Software/resie))
   
-    <img src="img/230505_Resie.jpg" alt="ReSiE Logo" style="height: 100px">
+    ![ReSiE Logo](img/230505_Resie.jpg){: style="height:100px"}
 
 - **GenSim** (acronym for "generic building simulation", in German "Generische Gebäudesimulation") that can perform a thermal building simulation based on EnergyPlus\(^{TM}\) to get energy demands for a variety of buildings and usage
   
-    <img src="img/230505_GenSim.jpg" alt="GenSim Logo" style="height: 100px">
+    ![GenSim Logo](img/230505_GenSim.jpg){: style="height:100px"}
 
 - **SoDeLe** (acronym for "Solar simulation as easy as can be", in German "Solarsimulation denkbar leicht"), an easy-to-use tool to calculate energy profiles from photovoltaic systems with different orientations and different PV modules, based on python-pvlib
   
-    <img src="img/230505_SoDeLe.jpg" alt="SoDeLe Logo" style="height: 100px">
+    ![SoDeLe Logo](img/230505_SoDeLe.jpg){: style="height:100px"}
 
 
 ## Funding

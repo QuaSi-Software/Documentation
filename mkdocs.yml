@@ -21,6 +21,7 @@ theme: readthedocs
 markdown_extensions:
   - mdx_math
   - footnotes 
+  - attr_list
 
 extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']
 
