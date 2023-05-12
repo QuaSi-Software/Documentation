@@ -43,7 +43,7 @@ $$\dot{Q}_{HP,out} = \frac{COP_{HP}}{COP_{HP} -1} \ \dot{Q}_{HP,in} \mathrm{\qua
 
 The power of the heat pump's electric supply, including the losses of the power electronics, is given as: 
 
-$$P_{el,HP,Bezug} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
+$$P_{el,HP,supply} = \frac{P_{el,HP}}{\eta_{HP,LE}}$$
 
 Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, may also be relevant for connected components, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
 
@@ -73,7 +73,7 @@ There are several aspects to be considered when simulating a heat pump based on 
 
 The COP of a heat pump, representing the efficiency in a current timestep, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
 
-Additionaly, the maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given for a specific heat pump is only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
+Additionally, the maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given for a specific heat pump is only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
 
 [^DINEN14511]: DIN EN 14511:2018 (2018): Air conditioner, liquid chilling packages and heat pumps for space heating and cooling and process chillers, with electrically driven compressors. DIN e.V., Beuth-Verlag, Berlin.
 
@@ -99,7 +99,7 @@ For a most realistic representation, all four discussed effects need to be consi
 ### Modelling approaches for HP: Detail
 #### Temperature-dependent COP
 
-The temperature-dependend COP can be calculated from different methods:
+The temperature-dependent COP can be calculated from different methods:
 
 - using the \(COP_{Carnot}\) with the carnot efficiency factor \(\eta_{Carnot}\) as explained above (easy, simple and fast, but unreal high efficiency with small temperature differences of source and sink)
 - looking up the COP in a look-up table in dependence of the condenser outlet and the evaporator inlet temperature (for computational efficiency, lookup-tables are fitted to polynomials in pre-processing)
@@ -156,7 +156,7 @@ The COP of the modeled heat pump depends not only on the temperatures of the sin
 
 PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current timestep}}{\text{maximum power (el. or th.) of heat pump at current temperatures}} \)
 
-PLF (part load facor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
+PLF (part load factor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
 
 The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependent COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
 
@@ -293,7 +293,7 @@ The polynomials describing the temperature-depended thermal and electrical power
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
-[^Alfjei1996]: Afjei T., Wetter M., Glass A. (1997): TRNSYS Type 204 - Dual-stage compressor heat pump including frost and cycl losses. Model description and implementation in TRNSYS, Versin 2. Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf](https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf)
+[^Alfjei1996]: Afjei T., Wetter M., Glass A. (1997): TRNSYS Type 204 - Dual-stage compressor heat pump including frost and cycle losses. Model description and implementation in TRNSYS, Versin 2. Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf](https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf)
 
 
 **Inputs und Outputs of the Heat Pump:**
