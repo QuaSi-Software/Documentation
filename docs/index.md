@@ -13,7 +13,9 @@ Now, QuaSi is understood to be a collection of the following simulation tools:
 
 - **ReSiE** (acronym for "computational engine for the simulation of energy systems", in German "Rechenkern für die Simulation von Energiesystemen"), a simulation tool for the simulation and optimization of different energy supply systems for city districts or single buildings with a focus on operational strategies that can be used in early planning stages ([GitHub Repository](https://github.com/QuaSi-Software/resie))
   
-    ![ReSiE Logo](img/230505_Resie.jpg){: style="height:100px"}
+    <figure markdown>
+        ![ReSiE Logo](img/230505_Resie.jpg){ width="260" }
+    </figure>
 
 - **GenSim** (acronym for "generic building simulation", in German "Generische Gebäudesimulation") that can perform a thermal building simulation based on EnergyPlus\(^{TM}\) to get energy demands for a variety of buildings and usage
   
