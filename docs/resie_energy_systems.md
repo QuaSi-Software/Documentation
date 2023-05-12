@@ -1,6 +1,6 @@
 # Energy systems
 
-In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is the energy systen. In the following any change in how the components are connected is considered to result in a similar but different energy system.
+In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is the energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system.
 
 ![Example of an energy system connecting various components](fig/example_energy_system.png)
 
@@ -30,14 +30,14 @@ Each output of a component must connect to exactly one input of another componen
 
 * It simplifies calculations as there is always exactly one other component to consider.
 * It improves readability of the energy system as, while it requires additional busses, it reduces the overall connectedness of the graph.
-* It enables an important layer of control behaviour as input priorities can be handled by the intermediate bus.
+* It enables an important layer of control behavior as input priorities can be handled by the intermediate bus.
 * Storage components work better if they are connected to a bus because large demand fluctuations might overload the storage capacity leading to flickering values of the storage as it is filled or depleted within a single timestep. Being connected to a bus enables the energy sources on the same bus to side-step the storage and feed into the demand side directly.
 
 ## Energy media
 
-All energy handled by the simulation model exists in the form of some medium that carries that energy. This includes but is not limited to the two major forms of energy used in buildings, namely electricity and heat. For a complete physical simulation each medium would carry its own set of restrictions and modeling challenges, however for Resie this was simplified. Different media are reduced to categories that differ only in name.
+All energy handled by the simulation model exists in the form of some medium that carries that energy. This includes but is not limited to the two major forms of energy used in buildings, namely electricity and heat. For a complete physical simulation each medium would carry its own set of restrictions and modeling challenges, however for ReSiE this was simplified. Different media are reduced to categories that differ only in name.
 
-For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplifaction has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
+For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
 The following lists which media are currently implemented and what they represent.
 
@@ -70,7 +70,7 @@ Different high temperature regimes:
 * `m_h_w_ht5`
 
 ### User definable media names
-The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatevly, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
+The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatively, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
 
 For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each component can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer.
 
@@ -86,4 +86,4 @@ To solve this problem interfaces have been introduced, which act as an intermedi
 
 When a component outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected components can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage components.
 
-This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage component or not. The interfaces simplify this behaviour and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.
+This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage component or not. The interfaces simplify this behavior and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.

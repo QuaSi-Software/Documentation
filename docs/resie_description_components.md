@@ -1,8 +1,8 @@
 # Technical description of main components
 
-In this chapter, the components that are used in Resie for the simulation of energy systems are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
+In this chapter, the components that are used in ReSiE for the simulation of energy systems are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
 
-**Note: The described components are not implemented in Resie yet but will be included in upcoming versions! Currently, only simplified components are integrated. Also, the descriptions are not yet completed and may change later.**
+**Note: The described components are not implemented in ReSiE yet but will be included in upcoming versions! Currently, only simplified components are integrated. Also, the descriptions are not yet completed and may change later.**
 
 ## Convention
 
@@ -19,7 +19,7 @@ Components:
 
 ## Heat pump (HP)
 ### General description of HP
-As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of Quasi. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor uwing electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
+As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of Quasi. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
 
 ![General System chart of a heat pump](fig/221018_WP_Anlagenschema.svg)
 
@@ -35,7 +35,7 @@ $$ COP_{HP} = \frac{\dot{Q}_{HP,out}}{P_{el,HP}} \quad  \leq \quad COP_{Carnot} 
 
 $$ COP_{HP} = \eta_{Carnot} \  COP_{Carnot} \quad \text{with} \quad 0 \leq \eta_{Carnot} \leq 1 $$
 
-The COP is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. The maximum possible COP calculated by Carnot is reduced by the carnot effiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^Arpagaus2018] around 45 % for high temperature heat pumps and around 40 % for conventional heat pumps.
+The COP is always smaller than the maximum possible Carnot coefficient of performance (\(COP_{Carnot}\)), which is calculated from the condenser outlet and evaporator inlet temperature. The maximum possible COP calculated by Carnot is reduced by the carnot efficiency factor \(\eta_{Carnot}\), which is according to [Arpagaus2018][^Arpagaus2018] around 45 % for high temperature heat pumps and around 40 % for conventional heat pumps.
 
 The energy balance (or power balance) of the heat pump can be drawn up on the basis of the latter figure and on the ratio between supplied and dissipated heat power, expressed as the COP:
 
@@ -49,7 +49,7 @@ Since the temperatures of the heat flows entering and leaving the heat pump, whi
 
 $$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
 
-As a chiller follows the same prinicple as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
+As a chiller follows the same principle as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
  
 $$ EER = \frac{\dot{Q}_{HP,in}}{P_{el,HP}} = \frac{\dot{Q}_{HP,out} - P_{el,HP}}{P_{el,HP}} = COP - 1   $$
 
@@ -58,8 +58,8 @@ As shown, the COP can be transferred to the EER. In the following, the descripti
 ### Modelling approaches for HP: Overview
 According to [Blervaque2015][^Blervaque2015], four different categories are described in the literature when it comes to the simulation of heat pumps:
 
-- **quasi-static empirical models**: equation-fit models based on discretised manufacturer or certification data fitted to polynomes, used for example in EnergyPlus or TRNSYS
-- **dynamic empirical models**: equasion-fit models extended by continious transient effects 
+- **quasi-static empirical models**: equation-fit models based on discretized manufacturer or certification data fitted to polynomials, used for example in EnergyPlus or TRNSYS
+- **dynamic empirical models**: equation-fit models extended by continuous transient effects 
 - **detailed physical models**: thermodynamic approach based on dynamic and refrigerant flow modelling, many parameters required
 - **simplified physical models** or parameter-estimation models: based on physical model, but with less input parameter needed due to internal assumptions
 
@@ -71,14 +71,14 @@ For the simulation of energy systems in an early design phase, for which Quasi i
 
 There are several aspects to be considered when simulating a heat pump based on equation-fitting, which will be briefly described in the following:
 
-The COP of a heat pump, representing the efficiency in a current time step, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
+The COP of a heat pump, representing the efficiency in a current timestep, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
 
 Additionaly, the maximum thermal power of the heat pump is not constant for different operation temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given for a specific heat pump is only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
 
-[^DINEN14511]: DIN EN 14511:2018 (2018): Air conditioner, liquid chiling packages and heat pumps for space heating and cooling and process chillers, with electrically driven compressors. DIN e.V., Beuth-Verlag, Berlin.
+[^DINEN14511]: DIN EN 14511:2018 (2018): Air conditioner, liquid chilling packages and heat pumps for space heating and cooling and process chillers, with electrically driven compressors. DIN e.V., Beuth-Verlag, Berlin.
 
-Furthermore, the efficiency and therefor the COP is changing in part load operation. In the past, mostly on-off heat pump where used, regulating the total power output in a given time span by alternating the current state beween on and off. This causes efficency losses mostly due to thermal capacity effects and initial compression power needed at each start, or rather the compression losses at each shutdown. [Socal2021][^Socal2021]
-In the last years, modulating heat pumps are more common, using a frequency inverter at the electrical power input to adjust the speed of the compression motor and therefor affecting the thermal power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the nominal power output. In the literature, many research groups have investigated this effect, compare for excample to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
+Furthermore, the efficiency and therefor the COP is changing in part load operation. In the past, mostly on-off heat pump where used, regulating the total power output in a given time span by alternating the current state between on and off. This causes efficiency losses mostly due to thermal capacity effects and initial compression power needed at each start, or rather the compression losses at each shutdown. [Socal2021][^Socal2021]
+In the last years, modulating heat pumps are more common, using a frequency inverter at the electrical power input to adjust the speed of the compression motor and therefor affecting the thermal power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the nominal power output. In the literature, many research groups have investigated this effect, compare for example to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
 
 When heat pumps with air as source medium are used, the losses due to icing effects need to be considered as well.
 
@@ -94,16 +94,16 @@ When heat pumps with air as source medium are used, the losses due to icing effe
 
 [^Fahlen2012]: Fahlén, Per (2012): Capacity control of heat pumps. *REHVA Journal Oktober 2012*, S. 28–31.
 
-For a most realistic representation, all four discussed effects need to be considered - temperature-dependent COP, temperature-dependent power, part-load-dependent COP and icing losses. The calulation of these dependencies will be described below.
+For a most realistic representation, all four discussed effects need to be considered - temperature-dependent COP, temperature-dependent power, part-load-dependent COP and icing losses. The calculation of these dependencies will be described below.
 
 ### Modelling approaches for HP: Detail
 #### Temperature-dependent COP
 
 The temperature-dependend COP can be calculated from different methods:
 
-- using the \(COP_{Carnot}\) with the carnot effiency factor \(\eta_{Carnot}\) as explained above (easy, simple and fast, but unreal high efficiency with small temperature differences of source and sink)
-- looking up the COP in a look-up table in dependence of the condenser outlet and the evaporator inlet temperature (for computational efficienc, lookup-tables are fitted to polynomes in pre-processing)
-- COP calculated as fraction of temperature-dependend electrical and thermal power, gained from generally developed polynomes. Here, the temperature-depended variation of the maximal power output of the heat pump can be directly taken into account.
+- using the \(COP_{Carnot}\) with the carnot efficiency factor \(\eta_{Carnot}\) as explained above (easy, simple and fast, but unreal high efficiency with small temperature differences of source and sink)
+- looking up the COP in a look-up table in dependence of the condenser outlet and the evaporator inlet temperature (for computational efficiency, lookup-tables are fitted to polynomials in pre-processing)
+- COP calculated as fraction of temperature-dependent electrical and thermal power, gained from generally developed polynomials. Here, the temperature-depended variation of the maximal power output of the heat pump can be directly taken into account.
 
 As example for a lookup-table COP (second bulletpoint above), the following figure from Steinacker2022[^Steinacker2022] shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm.
 
@@ -111,29 +111,29 @@ As example for a lookup-table COP (second bulletpoint above), the following figu
 
 #### Maximum thermal and electrical power
 
-In order to adress a change in maximum power output or input of the heat pump at different operating temperatures, two different approaches can be used.
+In order to address a change in maximum power output or input of the heat pump at different operating temperatures, two different approaches can be used.
 
-The more complex but also more accurate approache is the use of polynomial fits of temperature-dependend thermal and electrical power. These polynomes depend on the condenser outlet and the evaporator inlet temperature and they need to be calculated from manufacturer data or from measurements. 
+The more complex but also more accurate approach is the use of polynomial fits of temperature-dependent thermal and electrical power. These polynomials depend on the condenser outlet and the evaporator inlet temperature and they need to be calculated from manufacturer data or from measurements. 
 
-In order to adress the early planning stage, general, market-averaged polynomes need to be created, representing an average heat pump. Aditionally, one specific heat pump model can be used if the the required data is available. 
+In order to address the early planning stage, general, market-averaged polynomials need to be created, representing an average heat pump. Additionally, one specific heat pump model can be used if the the required data is available. 
 
-**ToDo**: Add method of calculating market-averaged polynomes!
+**ToDo**: Add method of calculating market-averaged polynomials!
 
-Biquadratic polynomes according to TRNSYS Type 401
+Biquadratic polynomials according to TRNSYS Type 401
 $$ \dot{Q}_{HP,max} = c_{q1} + c_{q2} \ \bar{T}_{HP,source,in} + c_{q3} \ \bar{T}_{HP,sink,out}  + c_{q4} \ \bar{T}_{HP,source,in} \ \bar{T}_{HP,sink,out} + \cdot  \cdot  \cdot \\
   \ c_{q5} \ \bar{T}_{HP,source,in}^2  + c_{q6} \ \bar{T}_{HP,sink,out}^2  $$
 
 $$ P_{el,HP,max} = c_{p1} + c_{p2} \ \bar{T}_{HP,source,in} + c_{p3} \ \bar{T}_{HP,sink,out}  + c_{p4} \ \bar{T}_{HP,source,in} \ \bar{T}_{HP,sink,out} + \cdot  \cdot  \cdot \\
   \ c_{p5} \ \bar{T}_{HP,source,in}^2  + c_{p6} \ \bar{T}_{HP,sink,out}^2  $$
-where all temeratures have to be normed according to
+where all temperatures have to be normed according to
 $$ \bar{T} = \frac{T \ [°C]}{273.15} + 1 $$
 
-If both the thermal output and electrical input power are given as a temperature-dependent polynome, the temperature-dependend COP (see previous section) can be direclty calculated from these polynomes.
+If both the thermal output and electrical input power are given as a temperature-dependent polynomial, the temperature-dependent COP (see previous section) can be directly calculated from these polynomials.
 
 The second method to adjust the electrical and thermal energy would be a linear gradient that adjust the rated power in dependency of one temperature. Checking the available data of many different heat pumps from Stiebel-Eltron[^Stiebel-EltronTool], a simplified correlation can be observed:
 
-- the thermal power is dependend on the source temperature, but independent on the sink temperature (the lower the source temperature the lower is the heating power)
-- the electrical power is dependend on the sink temperature, but independent on the source temperature (the higher the sink temperature the higher is the electrical power consumption)
+- the thermal power is dependent on the source temperature, but independent on the sink temperature (the lower the source temperature the lower is the heating power)
+- the electrical power is dependent on the sink temperature, but independent on the source temperature (the higher the sink temperature the higher is the electrical power consumption)
 
 This gives the possibility to linearly adjust the available thermal power with the change of the source temperature and the electrical power demand with the change of the temperature of the sink. Which power needs to be adjusted depends on the choice of the control strategy - thermally or electrically controlled.
 The gradients of the power de- or increase with a change of the temperature, \(f_{HP,\dot{Q} reduction}\) and \(f_{HP,P_{el} reduction}\), needs to be specified. Both factors can have a value of, for example, 0.02, which means a change of 2 % of the rated power per Kelvin of temperature shift with respect to the rated temperatures. The two factors are defined as follows:
@@ -145,41 +145,41 @@ $$
 P_{el,HP,temp. \ dependent}  = P_{el,HP,rated} (1 + f_{HP,P_{el} reduction} \ (T_{HP,sink,out,current} - T_{HP,sink,out,rated}))
 $$
 
-With this method, the actual temperature-dependend relation of thermal and electrical power need to be determined using the temperature-dependend COP described earlier.
+With this method, the actual temperature-dependent relation of thermal and electrical power need to be determined using the temperature-dependent COP described earlier.
 
 
 [^Stiebel-EltronTool]: Stiebel-Eltron Heat Pump Toolbox: [https://www.stiebel-eltron.com/toolbox/waermepumpe/](https://www.stiebel-eltron.com/toolbox/waermepumpe/)
 
 #### Part load efficiency
 
-The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependend of the PLR. The definition of the PLR and the PLF is given below:
+The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependent of the PLR. The definition of the PLR and the PLF is given below:
 
-PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current time step}}{\text{maximum power (el. or th.) of heat pump at current temperatures}} \)
+PLR (part load ratio) \(= \frac{\text{power (el. or th.) of demand or availability in current timestep}}{\text{maximum power (el. or th.) of heat pump at current temperatures}} \)
 
 PLF (part load facor = adjustment factor for COP):  \(COP_{part-load} = COP_{full-load} * PLF(PLR) \)
 
-The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependend COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
+The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependent COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
 
 ![COP in part load](fig/COP_Teillast.png)
 
 [^2]: [https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf](https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf)
 
-The part-load behaviour depends also on the type of the heat pump (on-off or inverter heat pump), as shown for example in Bettanini2003[^Bettanini2003] or in Socal2021[^Socal2021]. For illustration, the following figure is taken from the latter reference to demonstrate the different part load factors of the COP (y-axis) at different part load ratios for different heat pump technologies:
+The part-load behavior depends also on the type of the heat pump (on-off or inverter heat pump), as shown for example in Bettanini2003[^Bettanini2003] or in Socal2021[^Socal2021]. For illustration, the following figure is taken from the latter reference to demonstrate the different part load factors of the COP (y-axis) at different part load ratios for different heat pump technologies:
 
 ![Heat pump part load factor (PLF)](fig/Socal2021_PLFfromPLR_angepasst.jpg)
 
-Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increas of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. In Lachance2011[Lachance2021^], several part load curces are compared.
+Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. In Lachance2011[Lachance2021^], several part load curves are compared.
 
 
 The figure above shows also the difference of the part load factor comparing on-off and inverter heat pumps as well as the defined on-off losses in DIN EN 14825 for the calculation of the seasonal coefficient of performance (SCOP).
 
-As described in the section "General description of HP", the COP is defined as the ratio of the heat output \(\dot{Q}_{HP,out}\) and the electrical input power \(P_{el,HP}\). The shown curves for the part load factor affecs only the ratio of heat output to electrical input power and there is no information available on the acutal change of the two dimensions. Therefore, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,out,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,out,max}\) at PLR = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio that was found more relalistic as for inverter heat pumps, the observed efficiency change is mostly due to an efficiency change of the frequency converter and motor of the compressor. (QUELLE ToDo)
+As described in the section "General description of HP", the COP is defined as the ratio of the heat output \(\dot{Q}_{HP,out}\) and the electrical input power \(P_{el,HP}\). The shown curves for the part load factor affects only the ratio of heat output to electrical input power and there is no information available on the actual change of the two dimensions. Therefore, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,out,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,out,max}\) at PLR = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio that was found more realistic as for inverter heat pumps, the observed efficiency change is mostly due to an efficiency change of the frequency converter and motor of the compressor. (QUELLE ToDo)
 
 ![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
 
 It is also important to note, that the typical PLF-curve for inverter-driven heat pumps is not invertible and can therefore not be used directly to calculate the PLR from PLF. Although, this needed for an operation strategy that uses limited availability or demand of the electrical or thermal power. To handle this problem, the PLF-curve is not used directly:
 
-During preprocessing, the given curve of the PLF in dependece of the PLR (see orange curve in figure below as excample) is discretised. Then, the electrical input power (yellow curve) is calculated at each discretization using the assumption of a linear thermal power output (grey curve) in part load operation. As the relation of the power input to the thermal power output is defined by the COP that is changing in every timestept, any COP can be chosen for this initial calculation during the preprocessing. For this example, a COP of 4 is chosen. This process results in two value tables for the electrical input power and the thermal output power. The latter one is, according to the assumption made above, a straight line as shown in the figure.
+During preprocessing, the given curve of the PLF in dependence of the PLR (see orange curve in figure below as example) is discretized. Then, the electrical input power (yellow curve) is calculated at each discretization using the assumption of a linear thermal power output (grey curve) in part load operation. As the relation of the power input to the thermal power output is defined by the COP that is changing in every timestep, any COP can be chosen for this initial calculation during the preprocessing. For this example, a COP of 4 is chosen. This process results in two value tables for the electrical input power and the thermal output power. The latter one is, according to the assumption made above, a straight line as shown in the figure.
  
 ![non-linear part load power curve of heat pump](fig/230119_PartLoadPowerCurve.JPG)
 
@@ -187,7 +187,7 @@ During preprocessing, the given curve of the PLF in dependece of the PLR (see or
 
 ![normalized non-linear part load power curve of heat pump](fig/230119_PartLoadPowerCurve_normalized.JPG)
 
-In every timestep, the two precomputed and normalized value tables of the thermal output and electrical input power are scaled up to the current maximum power, limited by the heat pump current full-load operation state. There, the actual COP at the current time step is represented in the ration of both values. The two scaled value tables can then be used to determine the actual PLF that is nececarry to cover the current demand or to limit the operation state due to the limited available eletrical power (interpolation on value table with known power, or interpolation in preprocessing). For the thermal output power, this is trivial as the ratio of the maximum thermal power output to the thermal power demand is equal to the PLF. To calculate the PLF for the thermal input power, if this is a limited source according to the operational strategy, the two scaled value tables need to be substracted from each other to get a third table: 
+In every timestep, the two precomputed and normalized value tables of the thermal output and electrical input power are scaled up to the current maximum power, limited by the heat pump current full-load operation state. There, the actual COP at the current timestep is represented in the ration of both values. The two scaled value tables can then be used to determine the actual PLF that is necessary to cover the current demand or to limit the operation state due to the limited available electrical power (interpolation on value table with known power, or interpolation in preprocessing). For the thermal output power, this is trivial as the ratio of the maximum thermal power output to the thermal power demand is equal to the PLF. To calculate the PLF for the thermal input power, if this is a limited source according to the operational strategy, the two scaled value tables need to be subtracted from each other to get a third table: 
 
 $$
 \dot{Q}_{HP,in}(PLF) = \dot{Q}_{HP,out}(PLF) - P_{el,HP,in}(PLF)
@@ -195,12 +195,12 @@ $$
 
 This third value table, generated in each timestep, can then be used to determine the maximum possible PLF according to the available thermal input power from a limited thermal power source. 
 
-All three PLF (from thermal input and ouput as well as electrical input power) are then compared and the smallest one is chosen as operating state in the current timestep. If this value is smaller than the minimal allowed PLF of the heat pump \(PLF_{HP,min}\), the heat pump will not be in operation in the current timestep. 
+All three PLF (from thermal input and output as well as electrical input power) are then compared and the smallest one is chosen as operating state in the current timestep. If this value is smaller than the minimal allowed PLF of the heat pump \(PLF_{HP,min}\), the heat pump will not be in operation in the current timestep. 
 
 This method avoids the need to invert polynomial functions at each timestep and is computationally more efficient.
 
 The definition of the part load factor curve is user-defined and differentiated into inverter and on-off heat pumps.
-The part load factor curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the part load factor calculation in DIN EN 14825 for water-based on-off heatpumps, differing from the cited paper but according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as straight curve. The definition of these curve can be done entering the cc-coefficient and the coordinates of the two points highlighed in the figure below. Here, cc is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
+The part load factor curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the part load factor calculation in DIN EN 14825 for water-based on-off heatpumps, differing from the cited paper but according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as straight curve. The definition of these curve can be done entering the cc-coefficient and the coordinates of the two points highlighted in the figure below. Here, cc is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
 
 ![Input curve for part load efficiency of inverter heat pump](fig/230119_PartLoadPowerCurve_input.JPG)
 
@@ -223,13 +223,13 @@ For on-off heat pumps, \(a\) is set to 1 and the domain of the first equation ab
 
 #### Icing-losses of heat pumps with air as source medium
 
-To account for icing losses of heat pumps with air as source medium, the approach presented in TRNSYS Type 401 is used[^Wetter1996]. When considering icing-losses, make sure that icing losses are not already included in the polynomes for thermal and electrical power!
+To account for icing losses of heat pumps with air as source medium, the approach presented in TRNSYS Type 401 is used[^Wetter1996]. When considering icing-losses, make sure that icing losses are not already included in the polynomials for thermal and electrical power!
 
-For the calculation of icing losses, five coefficients are needed: \(c_{HP,ice,A}\), \(c_{HP,ice,B}\), \(c_{HP,ice,C}\), \(c_{HP,ice,D}\) and \(c_{HP,ice,E}\). According to the Type 401, icing losses are calculated using a superpositon of a gaussian curve with its maximum between 0 °C and 5 °C representing the maximum liklyhood of frost within the heat pump (high absolute humidity) and a linear curve, representing the higher sensible energy effort to heat-up the components of the heat pump for defrosting. Examplary curves are shown in the following figure (linear, gauss and superposition):
+For the calculation of icing losses, five coefficients are needed: \(c_{HP,ice,A}\), \(c_{HP,ice,B}\), \(c_{HP,ice,C}\), \(c_{HP,ice,D}\) and \(c_{HP,ice,E}\). According to the Type 401, icing losses are calculated using a superposition of a gaussian curve with its maximum between 0 °C and 5 °C representing the maximum likelihood of frost within the heat pump (high absolute humidity) and a linear curve, representing the higher sensible energy effort to heat-up the components of the heat pump for defrosting. Exemplary curves are shown in the following figure (linear, gauss and superposition):
 
 ![Heat pump icing losses of COP](fig/230108_Icing_Losses.png)
 
-The examplary coeffients for the curves in the figure above are \(c_{HP,ice,A} = 3\), \(c_{HP,ice,B} = -0.42\), \(c_{HP,ice,C}=15\), \(c_{HP,ice,D}=2\), \(c_{HP,ice,E}=30\).
+The exemplary coefficients for the curves in the figure above are \(c_{HP,ice,A} = 3\), \(c_{HP,ice,B} = -0.42\), \(c_{HP,ice,C}=15\), \(c_{HP,ice,D}=2\), \(c_{HP,ice,E}=30\).
 
 The resulting superposition, which represents the percentage loss of the COP due to icing as a function of ambient temperature, is expressed by the following formula, where the coefficients are reduced to the last letter for better readability:
 $$
@@ -243,13 +243,13 @@ $$
 
 $$ COP_{ice,corrected} =  COP \ (1-\Delta COP_{ice,loss}) $$
 
-Accoring to the results found in Wei2021[^Wei2021], it is assumed that the decrease of the COP due to icing losses will only increase the power input of the heat pump. It will not affect the thermal power output.
+According to the results found in Wei2021[^Wei2021], it is assumed that the decrease of the COP due to icing losses will only increase the power input of the heat pump. It will not affect the thermal power output.
 
 [^Wei2021]: Wei, Wenzhe et al. (2021): Investigation on the regulating methods of air source heat pump system used for district heating: Considering the energy loss caused by frosting and on–off. In: *Energy and Buildings 235*, S. 110731. doi: [10.1016/j.enbuild.2021.110731]((https://doi.org/10.1016/j.enbuild.2021.110731).
 
 
 ### Steps to perform in the simulation model of the heat pump
-The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar to Type 204[^Alfjei1996] (Type 204 provides an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effecs during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
+The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar to Type 204[^Alfjei1996] (Type 204 provides an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effects during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
 
 There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below. Each of the main steps is described in more detail in the previous chapter.
 
@@ -263,13 +263,13 @@ Steps to calculate the electrical and thermal energy in- and outputs of HP using
         - water-water
         - sole-water
     - differing temperature range: 
-        - normale heat pump
+        - normal heat pump
         - high-temperature heat pump
-    - polynomial fits have to be normalized to rated power at specified temperatures! Rated power has to be related always to the same temperature lift according to DIN EN 14511 --> different fits for normal (B10/W35, W10/W35, A10/W35) and high temperture (B35/W85, W35/W85) heat pumps  
-- reduce thermal power output due to transient capacity effects during start-up as average over current time step and calculate COP\(_{transient}\) at full load with calculated thermal and electrical power
+    - polynomial fits have to be normalized to rated power at specified temperatures! Rated power has to be related always to the same temperature lift according to DIN EN 14511 --> different fits for normal (B10/W35, W10/W35, A10/W35) and high temperature (B35/W85, W35/W85) heat pumps  
+- reduce thermal power output due to transient capacity effects during start-up as average over current timestep and calculate COP\(_{transient}\) at full load with calculated thermal and electrical power
 - may adjust COP\(_{transient}\) by icing losses for air-water and air-air heat pumps; calculate COP\(_{transient,ice}\), recalculate electrical input power
 - get demand/availability of thermal or electrical energy (mind \(\eta_{HP,PE}\)!), differing if thermal and/or electric energy related operation strategy is chosen
-- calculate smallest non-linear part-load ratio (PLR) with current demand and temperature-dependend, transient full-load power and precalculated value tables from PLF-curve, in dependency of heat pump type (inverter, on-off)
+- calculate smallest non-linear part-load ratio (PLR) with current demand and temperature-dependent, transient full-load power and precalculated value tables from PLF-curve, in dependency of heat pump type (inverter, on-off)
 - calculate part-load thermal and electrical energy, recalculate COP\(_{transient,ice,partload}\)
 
 If universal data table or the Carnot-COP reduced by an efficiency factor should be used instead of the more accurate model described above, a different calculation approach is needed (compare right side in the figure above):
@@ -278,18 +278,18 @@ If universal data table or the Carnot-COP reduced by an efficiency factor should
     - using nominal power without a temperature-dependency or
     - using polynomial fits to calculate stationary thermal **or** electrical full-load power at given temperatures of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\), depending on control strategy (see above)
 - get stationary full-load COP at given temperatures of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) either from
-    - COP data table (fitted to polynome in pre-calculation) or
+    - COP data table (fitted to polynomials in pre-calculation) or
     - Carnot-COP reduced by an efficiency factor
-- determine the unknown, non-controlled full load power (electrial or thermal) with known, controlled power and COP
+- determine the unknown, non-controlled full load power (electrical or thermal) with known, controlled power and COP
 - continue with transient capacity effects as described above
 
-Contraty to the TRNSYS Type 401, the mass flow here is variable and not constant within two timesteps, therefore the \(T_{HP,sink,out}\) and \(\dot{Q}_{HP,sink,out}\) can be calculated directly without the need of iteration as implemented in Type 401. Here, the \(T_{HP,sink,out}\) is a fixed, user-specified value in the presented simplified model. 
+Contrary to the TRNSYS Type 401, the mass flow here is variable and not constant within two time steps, therefore the \(T_{HP,sink,out}\) and \(\dot{Q}_{HP,sink,out}\) can be calculated directly without the need of iteration as implemented in Type 401. Here, the \(T_{HP,sink,out}\) is a fixed, user-specified value in the presented simplified model. 
 
-The polynomes describing the temperature-depended thermal and electrical power of the heat pump need to be normalized to the power consumption at the rated operation point in order to be able to auto-scale the size in parameter variation studies. Therefore, the following steps are necessary:
+The polynomials describing the temperature-depended thermal and electrical power of the heat pump need to be normalized to the power consumption at the rated operation point in order to be able to auto-scale the size in parameter variation studies. Therefore, the following steps are necessary:
 
-- fit data to polynome for thermal and electrical energy
-- calculate power at specified nominal temperatures with generated fitted polynome
-- normalize polynome to calculated rated power at specific temperature using a fraction_factor
+- fit data to polynomial for thermal and electrical energy
+- calculate power at specified nominal temperatures with generated fitted polynomial
+- normalize polynomial to calculated rated power at specific temperature using a fraction_factor
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
@@ -314,11 +314,11 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(\dot{Q}_{HP,rated}\) | rated thermal energy output of heat pump at specified conditions |  [W]
-\(\dot{Q}_{HP,max}(T_{HP,sink,out}, T_{HP,source,in})\) | (normalized) polynome of maximum full load thermal heat output at given temperatures | [W]
-\(P_{el,HP,max}(T_{HP,sink,out}, T_{HP,source,in})\) | (normalized) polynome of maximum full load electrical power output at given temperatures | [W]
+\(\dot{Q}_{HP,max}(T_{HP,sink,out}, T_{HP,source,in})\) | (normalized) polynomial of maximum full load thermal heat output at given temperatures | [W]
+\(P_{el,HP,max}(T_{HP,sink,out}, T_{HP,source,in})\) | (normalized) polynomial of maximum full load electrical power output at given temperatures | [W]
 or ||
 \(f_{HP,\dot{Q} reduction}\) | linear reduction factor for nominal full load thermal output power with respect to \(T_{HP,source,in}\) | [%/°C]
-\(f_{HP,P_{el} reduction}\) | linear reduction factor for nominal full load electical input power with respect to \(T_{HP,sink,out}\) | [%/°C]
+\(f_{HP,P_{el} reduction}\) | linear reduction factor for nominal full load electrical input power with respect to \(T_{HP,sink,out}\) | [%/°C]
 \(COP_{HP}(T_{HP,sink,out}, T_{HP,source,in})\) | coefficient of performance (COP) of the heat pump depending on \(T_{HP,sink,out}\) and \(T_{HP,source,in}\) | [-]
 \(\eta_{Carnot}\) | efficiency factor of heat pump, reduces the Carnot-COP | [-]
 and | |
@@ -343,11 +343,11 @@ Symbol | Description | Unit
 
 
 ## Electrolyser
-The electrolyzer uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
+The electrolyser uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
 
 $$ 2 \ H_2O \rightarrow 2 \ H_2 + O_2 $$
 
-If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyzer. 
+If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyser. 
 
 The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
 
@@ -378,13 +378,13 @@ $$ P_{el,Ely} =  \frac{\dot{m}_{Ely,H_2,out} \ e_{H_2}}{\eta_{Ely,H_2} \ (1 - \e
 The usable waste heat from the electrolysis process \(\dot{Q}_{Ely,waste heat}\) is determined, depending on the available information, as
 $$\dot{Q}_{Ely,waste heat} = \eta_{Ely,heat} \enspace (1-\eta_{Ely,H_2}) \enspace P_{el,Ely} = \frac{(1 - \eta_{Ely,H_2}) \ \eta_{Ely,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{Ely,H_2} } \ \dot{E}_{Ely,H_2,out} $$ 
 
-With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{Ely,H_2} < 0\)) and the heat (\(\delta_{Ely,heat}\) > 0) related efficiency. These correction factors are given in the change of percentage points per tenthousand full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyer. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
+With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{Ely,H_2} < 0\)) and the heat (\(\delta_{Ely,heat}\) > 0) related efficiency. These correction factors are given in the change of percentage points per tenthousand full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyser. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
 
 $$ \eta_{Ely,H_2} = \eta_{Ely,H_2,start} + \left ( \frac{\delta_{Ely,H_2}}{100} \ {\frac{FLH}{10.000}} \right )$$
 $$ \eta_{Ely,heat} = \eta_{Ely,heat,start} + \left ( \frac{\delta_{Ely,heat}}{100} \ {\frac{FLH}{1.000}} \right ) $$
 $$ \text{with } FLH = \frac{\text{total hydrogen produced since start [kg]}}{\text{nominal hydrogen production [kg]}} $$
 
-Keep in mind: Test if sum of efficiencies will reach values > 1 or if one efficiency falls below zero for the given maximum changing intervall of the stacks (ToDo)
+Keep in mind: Test if sum of efficiencies will reach values > 1 or if one efficiency falls below zero for the given maximum changing intervale of the stacks (ToDo)
 
 With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{Ely,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{Ely,cool,out}\) can be determined by rearranging the following equation:
 $$\dot{Q}_{Ely,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{Ely,hot,out} - T_{Ely,cool,in})$$
@@ -393,7 +393,7 @@ The heat loss \(\dot{Q}_{Ely,loss}\), which cannot be used and is dissipated to 
 
 $$  \dot{Q}_{Ely,loss} = P_{el,Ely} - \dot{Q}_{Ely,waste heat} - \dot{E}_{Ely,H_2} \\ =  P_{el,Ely} \ (1 - \eta_{Ely,heat} + \eta_{Ely,heat} \ \eta_{Ely,H_2} - \eta_{Ely,H_2}) $$
 
-The actual needed power supply of the electrolyzer \(P_{el,Ely,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,Ely}\) and the losses in the power electronics \(\eta_{Ely,PE}\) to
+The actual needed power supply of the electrolyser \(P_{el,Ely,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,Ely}\) and the losses in the power electronics \(\eta_{Ely,PE}\) to
 $$ P_{el,Ely,supply} = \frac{P_{el,Ely}}{\eta_{Ely,PE}} $$
 
 Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{Ely,O_2,out}\) is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:
@@ -404,7 +404,7 @@ $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{atomic \ mass \ 2 
 The required mass flow of water \(\dot{m}_{Ely,H_2O,in}\) can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses \(\eta_{H_2O \ treatment}\).
 $$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
 
-**Assumption:** The electrolyzer is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
+**Assumption:** The electrolyser is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
 
 **Inputs and Outputs of the Electrolyser:**
 
@@ -421,7 +421,7 @@ Symbol | Description | Unit
 \(T_{Ely,cooling,in}\)   | cooling fluid inlet temperature of electrolyser   | [°C]
 \(T_{Ely,cooling,out}\)   | cooling fluid outlet temperature of electrolyser   | [°C]
 \(\dot{Q}_{Ely,waste heat}\)  | waste heat provided by the electrolyser  | [W]
-\(\dot{Q}_{Ely,loss}\)  | thermal losses in elektrolyser (unused waste heat))  | [W]
+\(\dot{Q}_{Ely,loss}\)  | thermal losses in electrolyser (unused waste heat))  | [W]
 
 **Parameter of the Electrolyser:**
 
@@ -429,11 +429,11 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,Ely,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
 \(\eta_{Ely,H_2,start}(x_{Ely},P_{el,Ely,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type at the beginning of live) | [-]
-\(\eta_{Ely,heat,start}\) | efficiency of the usable heat extraction of the electrolyzer (related to \(1-\eta_{Ely,H_2}\) at the beginning of live)   | [-]
+\(\eta_{Ely,heat,start}\) | efficiency of the usable heat extraction of the electrolyser (related to \(1-\eta_{Ely,H_2}\) at the beginning of live)   | [-]
 \(\delta_{Ely,H_2}\) | linear decrease of efficiency of hydrogen production due to degradation per 10.000 full load hours, typically < 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\) 
 \(\delta_{Ely,heat}\) | linear increase of efficiency of heat production due to degradation per 10.000 full load hours, typically > 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\)
 \(\eta_{Ely,LE}\) | efficiency of the power electronics of the electrolyser | [-]
-\(PL_{Ely,min}\) | minimum allowed partial load of the electrolyzer | [-]
+\(PL_{Ely,min}\) | minimum allowed partial load of the electrolyser | [-]
 \(MOT_{Ely}\) | minimum operating time of the electrolyser | [min]
 \(SUT_{Ely}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
 \(CDT_{Ely}\) | cool-down time of the electrolyser from full heat supply to ambient (linear curve) | [min]
@@ -457,7 +457,7 @@ Symbol | Description | Unit
 ![Energy flow of CHP](fig/221021_CHP.svg)
 
 <!---
-Definiton of power-to-heat ratio of CHP:
+Definition of power-to-heat ratio of CHP:
 $$ r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  $$
 -->
 Energy balance on CHP:
@@ -475,9 +475,9 @@ $$ \dot{Q}_{CHP,loss} = (1-\eta_{CHP,thermal}+\eta_{CHP,el}) \ \dot{E}_{CHP,gas,
 Relation of electric and thermal power output:
 $$ P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out} =  r_{CHP,PTH}  \ \dot{Q}_{CHP,out}  $$
 
-The part-load dependend efficiency as described in the chapter "general transient effects" can be considered as well.
+The part-load dependent efficiency as described in the chapter "general transient effects" can be considered as well.
 
-**ToDo:** part-load dependend efficiency definition with heat and electricity --> two efficiency curves? One efficiency curve and the second one related to the first one?
+**ToDo:** part-load dependent efficiency definition with heat and electricity --> two efficiency curves? One efficiency curve and the second one related to the first one?
 Part load curve e.g in Urbanucci2019[^Urbanucci2019]
 
 [^Urbanucci2019]: Urbanucci, Luca; Testi, Daniele; Bruno, Joan Carles (2019): Integration of Reversible Heat Pumps in Trigeneration Systems for Low-Temperature Renewable District Heating and Cooling Microgrids. *Applied Sciences 9 (15), S. 3194.*, doi: [10.3390/app9153194](https://doi.org/10.3390/app9153194).
@@ -498,8 +498,8 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,CHP,rated}\) | rated electric power output of the CHP under full load (operating state 100 %) | [W]
 \(\dot{Q}_{CHP,rated}\) | rated thermal power output of the CHP under full load (operating state 100 %) | [W]
-\(\eta_{CHP,thermal}(PLR)\) | thermal efficiency of CHP, function of PLR (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
-\(\eta_{CHP,el}(PLR)\) | electrical efficiency of CHP, including self-use of electrical energy, function of PLR (regading NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
+\(\eta_{CHP,thermal}(PLR)\) | thermal efficiency of CHP, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
+\(\eta_{CHP,el}(PLR)\) | electrical efficiency of CHP, including self-use of electrical energy, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
 \(PL_{CHP,min}\) | minimum allowed partial load of the CHP | [-]
 \(MOT_{CHP}\) | minimum operating time of the CHP | [min]
 \(SUT_{CHP}\) | start-up time of the CHP until full heat supply (linear curve) | [min]
@@ -533,7 +533,7 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(Q_{GB,rated}\) | rated thermal power output of the GB under full load (operating state 100 %) | [W]
-\( \eta_{GB}(PLR)\) | thermal efficiency of gas boiler (regading NCV or GCV) with respect to the PLR | [-]
+\( \eta_{GB}(PLR)\) | thermal efficiency of gas boiler (regarding NCV or GCV) with respect to the PLR | [-]
 \(PL_{GB,min}\) | minimum allowed partial load of the GB | [-]
 \(MOT_{GB}\) | minimum operating time of the GB | [min]
 \(SUT_{GB}\) | start-up time of the GB until full heat supply (linear curve) | [min]
@@ -568,7 +568,7 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(Q_{OH,rated}\) | rated thermal power output of the OH under full load (operating state 100 %) | [W]
-\( \eta_{OH}(PLR)\) | thermal efficiency of oil heater (regading NCV or GCV) with respect to the PLR | [-]
+\( \eta_{OH}(PLR)\) | thermal efficiency of oil heater (regarding NCV or GCV) with respect to the PLR | [-]
 \(PL_{OH,min}\) | minimum allowed partial load of the OH | [-]
 \(MOT_{OH}\) | minimum operating time of the OH | [min]
 \(SUT_{OH}\) | start-up time of the OH until full heat supply (linear curve) | [min]
@@ -636,7 +636,7 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(Q_{BB,rated}\) | rated thermal power output of the BB under full load (operating state 100 %) | [W]
-\( \eta_{BB}(PLR)\) | thermal efficiency of biomass boiler (regading NCV or GCV, specific fuel and  moisture content) with respect to the PLR | [-]
+\( \eta_{BB}(PLR)\) | thermal efficiency of biomass boiler (regarding NCV or GCV, specific fuel and  moisture content) with respect to the PLR | [-]
 \(PL_{BB,min}\) | minimum allowed partial load of the BB | [-]
 \(MOT_{BB}\) | minimum operating time of the BB | [min]
 \(SUT_{BB}\) | start-up time of the BB until full heat supply (linear curve) | [min]
@@ -681,7 +681,7 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 
 ## Chiller
 ### Simple model of compression  chiller (SCC)
-A simple model of an air cooled compression chiller is implementent to account for rather irrelevant cooling demands without significant changes in temperatures of the energy to be cooled. This model is a rough approximation, but offers a fast and easy calculation. It is based on a constant seasonal energy efficiency ratio (SEER) as yearly average of the energy efficiency ratio (EER) without part-load dependend or temperature dependend efficiency. The energy flow chart is given below. The displayed temperature are only for illustration and will not be considered in this simple model.
+A simple model of an air cooled compression chiller is implemented to account for rather irrelevant cooling demands without significant changes in temperatures of the energy to be cooled. This model is a rough approximation, but offers a fast and easy calculation. It is based on a constant seasonal energy efficiency ratio (SEER) as yearly average of the energy efficiency ratio (EER) without part-load dependent or temperature dependent efficiency. The energy flow chart is given below. The displayed temperature are only for illustration and will not be considered in this simple model.
 
 ![Energy flow of simple compression chiller](fig/230207_Chiller_simple_Energiefluss.svg)
 
@@ -689,7 +689,7 @@ The SEER is defined as
 
 \( SEER =  \text{yearly average of} \ \frac{\text{cooling power} \ \dot{Q}_{SCC,in}}{\text{electricity demand} \ P_{el,SCC,supply}}  \)
 
-Comparing the definition of the EER to the COP given in the chaper of heat pumps, the following relation of the two efficiencies for heat pumps and compression chillers can be obtained
+Comparing the definition of the EER to the COP given in the chapter of heat pumps, the following relation of the two efficiencies for heat pumps and compression chillers can be obtained
 
 \(EER = COP - 1 \)
 
@@ -715,7 +715,7 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(SEER_{SSC}\) | Seasonal energy efficiency ratio (SEER) of the compresson chiller (= constant for all temperatures and part-load)| [-]
+\(SEER_{SSC}\) | Seasonal energy efficiency ratio (SEER) of the compressor chiller (= constant for all temperatures and part-load)| [-]
 \(Q_{SCC,in,rated}\) | rated thermal power input of the SCC under full load | [W]
 \(PL_{SSC,min}\) | minimum allowed partial load of the SCC with respect to \(\dot{Q}_{SCC,in}\) | [-]
 
@@ -778,8 +778,8 @@ Symbol | Description | Unit
 \(Q_{STTES,rated}\)  | rated thermal energy capacity of the STTES | [MWh]
 \(x_{STTES,start}\)  | thermal energy contend of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
 \(V_{STTES}\)  | volume of the STTES | [m\(^3\)]
-\(\rho_{STTES}\)  | densitiy of the heat carrier medium in the STTES | [kg/m\(^3\)]
-\(cp_{STTES}\)  | specifiy heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
+\(\rho_{STTES}\)  | density of the heat carrier medium in the STTES | [kg/m\(^3\)]
+\(cp_{STTES}\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
 \(T_{STTES,hot}\)  | rated upper temperature of the STTES | [°C]
 \(T_{STTES,cold}\)  | rated lower temperature of the STTES | [°C]
 
@@ -814,22 +814,22 @@ $$ r_{STES} = R_{STES}  \ \beta $$
 
 Slope angle has to be in the range of
 $$    180° - \arctan{\left(\frac{hr_{STES}}{2} \right)}	\geq \alpha_{STES} \geq \arctan{\left(\frac{hr_{STES}}{2} \right)} $$
-to ensure the shape of a zylinder, a cone or a truncated cone. Analogously, the ratio beween the height and the mean radius of the STES \(hr_{LZWSP}\) has to be smaller as
+to ensure the shape of a cylinder, a cone or a truncated cone. Analogously, the ratio between the height and the mean radius of the STES \(hr_{LZWSP}\) has to be smaller as
 $$	hr_{LZWSP} \leq 2 \ \tan(\alpha_{LZWSP}) \mathrm{\quad with \quad}   0 ° < \alpha_{LZWSP} < 90 ° $$
 
-The heigt of the STES can be calculated as
+The height of the STES can be calculated as
 $$ h_{STES} = hr_{STES} \ \frac{R_{STES}+r_{STES}}{2}   $$
 resulting with the number of layers \(n_l\) into the thickness of each layer
 $$ \Delta z_{l} = \frac{h_{STES}}{n_l} = \text{constant for all layers} $$
 
-Lateral surface of each layer with heigt \(h_l\), upper radius \(R_l\) and lower radius \(r_l\) of each layer:
+Lateral surface of each layer with height \(h_l\), upper radius \(R_l\) and lower radius \(r_l\) of each layer:
 $$ M_{STES,l} = (R_l + r_l) \ \pi \ \sqrt{(R_l - r_l)^2 + h_l^2}  $$
 
 Volume of each layer:
 $$ V_{STES,l} = \frac{h_l}{3} \pi \ (R_l^2 + R_l \ r_l \ + r_l^2)  $$
 
 
-#### Thermal model for stratisfied storage
+#### Thermal model for stratified storage
 
 ![Energy flow of STES](fig/221028_STES.svg)
 
@@ -841,7 +841,7 @@ $$
 ![Stratified model of STES](fig/221021_STES_layers.png)
 Figure adapted from [Steinacker2022][^Steinacker2022].
 
-Stratisfied storage model based on [Lago2019][^Lago2019] and modified to account for cones according to [Steinacker2022][^Steinacker2022] and for half-burried storages.
+Stratified storage model based on [Lago2019][^Lago2019] and modified to account for cones according to [Steinacker2022][^Steinacker2022] and for half-buried storages.
 
 [^Lago2019]: Lago, J. et al. (2019): A 1-dimensional continuous and smooth model for thermally stratified storage tanks including mixing and buoyancy, *Applied Energy* 248, S. 640–
 655: doi: [10.1016/j.apenergy.2019.04.139](https://doi.org/10.1016/j.apenergy.2019.04.139).
@@ -861,9 +861,9 @@ $$
 \ \underbrace{\frac{\dot m_{STES} (T_{STES,l,in}-T_{STES,l})}{\rho_{STES} \ V_{STES,l}}}_{\text{direct (un-)loading}}
 $$
 
-The ambient temperature of each layer \(T_{amb,l}\) can be either the ambient air temperature \(T_{amb,air}\) in the specific time step or the ground temperature \(T_{ground}\) depending on the considered layer \(l\) and the number of layer burried under the ground surface.
+The ambient temperature of each layer \(T_{amb,l}\) can be either the ambient air temperature \(T_{amb,air}\) in the specific timestep or the ground temperature \(T_{ground}\) depending on the considered layer \(l\) and the number of layer buried under the ground surface.
 
-Using the explicite Euler method for integration, the previous equation leads to the temperature in every timestep \(t\) and layer \(l\) with respect to the temperatures in the timestep bevore and the layers around (without the index \(_{STES}\) for better overview)
+Using the explicit Euler method for integration, the previous equation leads to the temperature in every timestep \(t\) and layer \(l\) with respect to the temperatures in the timestep before and the layers around (without the index \(_{STES}\) for better overview)
 $$
 \begin{aligned} 
 	&T_{t+1,l}  = T_{t,l} + \left( \xi_{STES} \frac{T_{t,l+1} + T_{t,l-1} - 2 T_{t,l}}{\Delta z^2_{l,vol}} +  \sigma_l (T_{amb,l} - T_{t,l}) 	+ \phi_l \dot{m}_{t,l} \left(T_{t,l,in} - T_{t,l}   \right)  \right) \Delta t \\
@@ -884,13 +884,13 @@ $$
 \end{aligned}
 $$
 
-As the coefficients mentioned above are constant within the simulation time, they can be precomputed for cumputational efficiency.
+As the coefficients mentioned above are constant within the simulation time, they can be precomputed for computational efficiency.
 
-To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as examplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the inegrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in Quasi II?)
+To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as exemplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the integrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in Quasi II?)
 
 ![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
 
-To account for buoyancy effects, a check is made in each time step to determine whether the temperature gradient in the reservoir corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each time step for all layers, beginning with \(l=2\):
+To account for buoyancy effects, a check is made in each timestep to determine whether the temperature gradient in the reservoir corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each timestep for all layers, beginning with \(l=2\):
 $$
 T_l = T_l + \theta_l \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1 \text{ and }\\
 T_{l-1} = T_{l-1} - (1-\theta_l) \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1
@@ -926,7 +926,7 @@ Symbol | Description | Unit
 \(V_{STES}\)  | volume of the STES | [m\(^3\)]
 \(\alpha_{STES,slope}\)  | slope angle of the wall of the STES with respect to the horizon | [°]
 \(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
-\(\rho_{STES}\)  | densitiy of the heat carrier medium in the STES | [kg/m\(^3\)]
+\(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m\(^3\)]
 \(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
 \(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m\(^2\)/s]
 \(U_{STES,lid}\)  | heat transfer coefficient of the STES' lid | [W/m\(^2\) K]
@@ -965,9 +965,9 @@ Ice storages are not implemented yet (ToDo).
 Hydrogen fuel cells are not implemented yet (ToDo).
 
 ## Photovoltaik (PV)
-![Energy flow of photovoltaik](fig/221028_PV.svg)
+![Energy flow of photovoltaic](fig/221028_PV.svg)
 
-For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into QuaSi. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC interverts are taken from the SAM model[^SAM-Model] and integrated into pvlib.
+For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into QuaSi. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC inverters are taken from the SAM model[^SAM-Model] and integrated into pvlib.
 
 Inputs can include orientation, tilt, ambient albedo, type of installation (e.g. roof-added, free-standing), as well as module interconnection and specific PV modules and inverters chosen from the library. Additional losses, such as ohmic losses in cables or losses due to soiling, can be taken into account. A weather input dataset is required that includes direct normal, global horizontal and diffuse horizontal irradiance as well as ambient (dry bulb) temperature, humidity and wind speed.   
 
@@ -1007,7 +1007,7 @@ Limits of electrical power in- and output (limit to current energy content and m
 $$ \frac{E_{GB,max,current} - E_{GB}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{GB,max,current}  $$
 $$ \eta_{BA,discharge} \ \frac{E_{GB}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{GB,max,current} $$
 
-Relation beween current charging state in percent and in energy content:
+Relation between current charging state in percent and in energy content:
 $$ E_{GB} = E_{GB,max,current} \ x_{GB} $$
 
 **Inputs and Outputs of the BA:**

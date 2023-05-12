@@ -28,10 +28,7 @@ extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX
 nav:
   - Home:
     - 'QuaSi - Overview': 'index.md'
-  - 'Technical description': 
-    - 'quasi_description_components.md'
-    - 'quasi_transient_effects.md'
-  - 'Simulation engine Resie':
+  - 'Simulation engine ReSiE':
     - 'Installation and usage': 'resie_installation.md'
     - 'Input file format': 'resie_input_file_format.md'
     - 'Simulation model':
@@ -39,6 +36,9 @@ nav:
       - 'Energy systems': 'resie_energy_systems.md'
       - 'Types of energy system components': 'resie_types_components.md'
       - 'Operation and control': 'resie_operation_control.md'
+    - 'Technical description': 
+      - 'resie_description_components.md'
+      - 'resie_transient_effects.md'
   - 'Contributions':
     - 'How to help': 'contributions.md'
     - 'Working on the documentation': 'changing_documentation.md'

@@ -1,6 +1,6 @@
 # Fundamentals
 
-The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to Resie, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
+The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to ReSiE, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
 The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
 
@@ -21,7 +21,7 @@ Due to the difficulty of generalizing the impact of these losses, they are not g
 
 ## Domain and boundaries
 
-Due to the generalized nature of the energy system used by Resie, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in Resie is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.
+Due to the generalized nature of the energy system used by ReSiE, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in ReSiE is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.
 
 The domain of the simulation can therefore be considered as the technical equipment providing energy to a number of connected buildings up to a scale where transport losses cannot be ignored anymore. Outside the domain are three major other domains to and from which the energy system connect:
 
@@ -29,11 +29,11 @@ The domain of the simulation can therefore be considered as the technical equipm
 
 The first of these is the environment, which plays a role for components that directly draw energy from the environment such as solar collectors or heat pumps fed by ambient heat from the atmosphere or the ground. The second are public grids, usually for electricity, heat and natural gas, however grids of any kind of energy-carrying medium can be modeled. An important difference to the environment is that energy can be both drawn from the grids and fed back into them if there is a surplus.
 
-The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, Resie is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy system. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy system and this differs from an environmental input in the sense that the energy must be used up completely.
+The third domain are demands, which encompass any kind of system or process that requires energy and that must be met exactly. While demand simulation is an important part of the overall building energy simulation process, ReSiE is not concerned with calculating the demands and requires the values as an input. Demands can also be abstracted to impose the use of energy upon an energy system. For example if there is a power plant nearby, which produces a large amount of waste heat, this can be implemented as a cooling demand. This allows the waste heat to be used for providing energy for other heating demands while moving any excess into the environment. In that case the cooling demand provides energy to the energy system and this differs from an environmental input in the sense that the energy must be used up completely.
 
 ## Energy system components
 
-As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transfering energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
+As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transferring energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
 
 For other equipment this is not the case. For example an electrolyser requires several components before and after the electrolysis step, such as water purification and hydrogen postprocessing. However given that these components are not used for anything else, they are included in the energy system component model under the label of "electrolyser".
 
@@ -81,9 +81,9 @@ After the balance check, output is written according to the output specification
 The simulation steps for each component are:
 
 * `Reset`: Reset values for the next time step.
-* `Control`: Calculate control behaviour to check if a component should run or not.
+* `Control`: Calculate control behavior to check if a component should run or not.
 * `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. Here, no energy is consumed or supplied.
-* `Process`: Process energy depending on the type of the component and if the control behaviour dictates the component should run.
+* `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
 * `Distribute`: For bus components, distribute the energy balances on each connected interface and check the overall balance on the bus.
 

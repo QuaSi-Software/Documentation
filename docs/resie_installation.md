@@ -21,7 +21,7 @@ Install additional Julia-modules in working directory:
       - `add PlotlyJS`
       - `add ResumableFunctions`
       - `add Test`
-5. to exit packacket manager, hit `backspace`
+5. to exit packet manager, hit `backspace`
 
 Usage of resie:
 

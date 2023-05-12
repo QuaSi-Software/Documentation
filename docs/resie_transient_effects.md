@@ -4,7 +4,7 @@
 To account for transient effects, the reduction of the usable heat output during start-up of a component can be described using either linear oder exponential start-up and cool-down ramps. Both are described in the following.
 
 ### Linear start-up
-The following figure illustrate a linear start-up and cool-down behaviour characerized by the start-up time (SUT) and cool-down time (CDT) the component needs to reach full thermal energy output or to cool down completely.
+The following figure illustrate a linear start-up and cool-down behavior characterized by the start-up time (SUT) and cool-down time (CDT) the component needs to reach full thermal energy output or to cool down completely.
 
 ![Heat reduction during start-up](fig/221028_Start-up-Reduction_general.svg)
 
@@ -42,10 +42,10 @@ This time-averaged integral results in the following yellow curve that represent
 
 ![transient shut-down and turn-on effects linear](fig/220223_transient_on_off_linear.JPG)
 
-Note that \(t_{shift}\) has to be set to zero at the first timestep of the simulation and \(t_{on,lower}\) and \(t_{on,upper}\) have to start couting again at every change of operation (on/off, not part-load).
+Note that \(t_{shift}\) has to be set to zero at the first timestep of the simulation and \(t_{on,lower}\) and \(t_{on,upper}\) have to start counting again at every change of operation (on/off, not part-load).
 
 ### Exponential start-up
-While the method above describes a linear thermal power output during the heat-up of a component that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continious exponential functions. Therefore, the general time-related function of a PT1 element can be used to model the delay of the thermal energy output. This is used for excample in the TRNSYS Type 401[^Wetter1996] for modulating heat pumps. The time span for each component to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. A component is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the component has cooled down completely.
+While the method above describes a linear thermal power output during the heat-up of a component that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continuous exponential functions. Therefore, the general time-related function of a PT1 element can be used to model the delay of the thermal energy output. This is used for example in the TRNSYS Type 401[^Wetter1996] for modulating heat pumps. The time span for each component to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. A component is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the component has cooled down completely.
 
 ![transient shut-down and tun-on effects exponential](fig/220223_transient_on_off.JPG)
 
@@ -127,7 +127,7 @@ return Q_out_new, t_shift_on, t_on, t_off
 
 ## Non-linear part-load efficiency
 
-Most components can be operated not only at full load, but also in part load operation. Due to several effects like the efficiency of electrical motors, inverters or thermal capacity effects, the efficiency of a component in part load usually differs from its efficiency at its full load operation point. How exactly the efficiency changes in part load depends on the specific component. Here, the general approach implemented in the simulation model is explained to consider part-load dependent efficencies. This method needs to be extended for heat pumps which is described in the corresponding section.
+Most components can be operated not only at full load, but also in part load operation. Due to several effects like the efficiency of electrical motors, inverters or thermal capacity effects, the efficiency of a component in part load usually differs from its efficiency at its full load operation point. How exactly the efficiency changes in part load depends on the specific component. Here, the general approach implemented in the simulation model is explained to consider part-load dependent efficiencies. This method needs to be extended for heat pumps which is described in the corresponding section.
 
 The part-load ratio (PLR) in general is defined as:
 
@@ -139,7 +139,7 @@ The change of the efficiency with respect to the PLR can be given as curve, for 
 
 Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has so be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
 
-Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the efficiency that will be considered to have a linear behaviour in part-load operation. The other in- or output energy will be adjusted to represent the non-linearities in the change of the efficiency at different PLR. 
+Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the efficiency that will be considered to have a linear behavior in part-load operation. The other in- or output energy will be adjusted to represent the non-linearities in the change of the efficiency at different PLR. 
 
 A third difficulty is the inconsistent definition of the part-load ratio in the literature when considering non-linearities in part-load operation. In theory, every input and output has its own part-load ratio at a certain operation point of a component with multiple in- or outputs. Each of the PLR do not necessarily represent the same operational state of the component, so this would lead to an inconsistent base if several operational restrictions are given. This can be solved by defining a reference part-load ratio, e.g. with respect to the main output or by defining the efficiency curves relative to each other with the same base.
 
@@ -162,7 +162,7 @@ needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, th
 
 \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
 
-During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exeeding the maximum abailable power.
+During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
 
 If several outputs on a component exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
 

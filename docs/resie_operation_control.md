@@ -1,8 +1,8 @@
 # Operation and control
 
-An important part of what makes Resie's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
+An important part of what makes ReSiE's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
 
-## Control behaviour
+## Control behavior
 
 The calculations for control have been decoupled from those of energy processing, so that processing can work as a function depending on the result of the control. In the simplest case, control turns components on and off, but the implementation of various components might take many more cases into account. The latter already is arbitrarily complex[^1], so the former must be as well.
 
@@ -18,13 +18,13 @@ State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state
 
 The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions. When the state machine is checked to advance its state[^2] and the expression of a transition evaluates as true, it is followed to the new state.
 
-One addition to the common concept of a state machine is that the implementation in Resie keeps track of how many steps a state machine was in the current state.
+One addition to the common concept of a state machine is that the implementation in ReSiE keeps track of how many steps a state machine was in the current state.
 
 [^2]: Usually this happens once a simulation step for each state machine, but in the general definition of a state machine this is not time-dependant and works on "turns".
 
 ### Conditions
 
-The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which components it needs access. As the specific components are not defined before the project is loaded, these requirements affect the type and possibly the medium of the components, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizeable parameters with default values.
+The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which components it needs access. As the specific components are not defined before the project is loaded, these requirements affect the type and possibly the medium of the components, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizable parameters with default values.
 
 The example above uses four different conditions:
 
@@ -45,7 +45,7 @@ The example above shows the truth table used for the state "Fill tank", which ha
 
 ## Strategies
 
-Instead of requiring the user to manually specify a state machine, it is desired to provide a number of predefined operational strategies that can be selected. Apart from simplifying the user input, this also makes it easier to enable processing behaviour that depends on the chosen strategy, but not necessarily the current state of the controller as it may not need a state machine for control calculations.
+Instead of requiring the user to manually specify a state machine, it is desired to provide a number of predefined operational strategies that can be selected. Apart from simplifying the user input, this also makes it easier to enable processing behavior that depends on the chosen strategy, but not necessarily the current state of the controller as it may not need a state machine for control calculations.
 
 For the given example above this would be best described as a storage-driven strategy as a component with this strategy would try to fill the linked storage component when it gets too low. The required linked components and parameter values are carried over from the state machine constructed by the strategy to the required user input as illustrated in the following:
 
@@ -94,7 +94,7 @@ For the predefined `demand_driven`, `supply_driven` and `storage_driven` control
 
 Each entry starting with an `m` (for medium) defines an input or output of the defined component. Obviously, a component has only a selection of the full list of inputs and outputs given above. If an input or output is set to false within the control strategy, the limitation of energy demand or supply on this interface is ignored when the current operation state of the component is determined. Note that this can lead to unexpected balance errors within the simulation! However, if users want more control over the operational strategy, these flags can be used to define complex rules for the operation of each component.
 
-If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified component is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this paramater allows to deny or allow system-wide storage loading or unloading for each component. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
+If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified component is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this parameter allows to deny or allow system-wide storage loading or unloading for each component. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
 
 Using the `storage_driven` control strategy, `load_storages` and `unload_storages` can also be set to `false`, although this is usually not very useful.
 

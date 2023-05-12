@@ -1,11 +1,11 @@
 # Workflow for code contributions
 The followinging describes a workflow for how contributions to the code base can be done.
-This is particularly relevant for the simulation engine Resie, but the same applies for
+This is particularly relevant for the simulation engine ReSiE, but the same applies for
 other code-heavy parts of the QuaSi project. It is oriented by a popular approach often
 called the "git feature-branch workflow". It is assumed the reader generally knows how to
 use git, for which there are many tutorials and guides available.
 
-To illustrate the workflow, let's imagine Resie is released on GitHub on version 1.2.3
+To illustrate the workflow, let's imagine ReSiE is released on GitHub on version 1.2.3
 and Alice wants to add a new energy system component to the simulation model. The workflow
 can also work if another repository host other than GitHub is used and can also be
 performed entirely with repositories in folders in a local network.
@@ -30,8 +30,8 @@ easier as it becomes faster to reason about the impact of the code changes. Ther
 approaches to how commits can be used and personal preference plays a large role.
 
 #### Open a merge request
-Once Alice is confident all required changes are comitted, she can open a merge request
-(also called a pull request) in the Resie repository from the feature branch to the `main`
+Once Alice is confident all required changes are committed, she can open a merge request
+(also called a pull request) in the ReSiE repository from the feature branch to the `main`
 branch. If the feature branch lives on another repository this requires selection of that
 repository, but otherwise works the same. The request ideally contains a description of
 what the changes entail and how they impact the code base (specifically, if they change any
@@ -54,14 +54,14 @@ All changes to the code base should be reflected in the changelog and cause an i
 the version number. Therefore Alice has to make sure her changes appear in the changelog.
 
 First the `main` branch is merged into the feature branch if other commits have
-been done inbetween the base commit of the feature branch and the current `HEAD` of `main`.
+been done in between the base commit of the feature branch and the current `HEAD` of `main`.
 Perhaps someone made a bugfix and got it merged while Alice was still working on her
-changes. Therefore the released version of Resie is now `1.2.4`. With the merge these
+changes. Therefore the released version of ReSiE is now `1.2.4`. With the merge these
 changes and the entry in the changelog now appears in the feature branch too. Optionally
 the feature branch can be rebased so that no merge commit is necessary, but this is not
 required.
 
-Then Alice increases the version number in file `Project.toml` (this is specific to Resie)
+Then Alice increases the version number in file `Project.toml` (this is specific to ReSiE)
 to `1.3.0` and adds an entry in the changelog. Given that the changes are backwards
 compatible and add new functionality, an increase in the minor version number is
 appropriate. The commit for the version bump should contain the same message as the entry
