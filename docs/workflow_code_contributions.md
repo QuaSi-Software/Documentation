@@ -1,5 +1,5 @@
 # Workflow for code contributions
-The followinging describes a workflow for how contributions to the code base can be done.
+The following describes a workflow for how contributions to the code base can be done.
 This is particularly relevant for the simulation engine ReSiE, but the same applies for
 other code-heavy parts of the QuaSi project. It is oriented by a popular approach often
 called the "git feature-branch workflow". It is assumed the reader generally knows how to
