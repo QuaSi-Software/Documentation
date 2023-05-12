@@ -2,9 +2,14 @@
 
 In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is the energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system.
 
-![Example of an energy system connecting various components](fig/example_energy_system.png)
+![A multi-sector example energy system](fig/example_energy_system.png)
+A multi-sector example energy system, adapted from [Resie2023][^Resie2023].
 
-In the example above an example energy system is displayed. Arrows denote the flow of energy from one component to the next with the colors of arrows denoting which medium is involved. Yellow is electricity, purple is natural gas, dark red is low temperature water and light red is high temperature water. Two busses form the main way how energy is exchanged.
+In the figure above an example energy system for a district of two buildings is displayed. Arrows denote the flow of energy between components with the colors of arrows denoting which medium is involved. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
+
+Such an energy system requires several operational strategies and control mechanisms to operate as expected. How these can be modeled for this example is described in more detail in the chapter on operation and control. For the following we focus on the graph structure that is formed from the components and the connections between them.
+
+[^Resie2023]: Ott E, Steinacker H, Stickel M, Kley C, Fisch M N (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 ## Characteristics of an energy system
 
