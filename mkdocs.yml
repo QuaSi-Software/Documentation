@@ -39,8 +39,8 @@ nav:
       - 'Types of energy system components': 'resie_types_components.md'
       - 'Operation and control': 'resie_operation_control.md'
   - 'ReSiE: Technical description': 
-      - 'resie_description_components.md'
-      - 'resie_transient_effects.md'
+      - Main components: 'resie_description_components.md'
+      - General effects: 'resie_transient_effects.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
