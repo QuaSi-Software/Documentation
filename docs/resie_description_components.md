@@ -342,8 +342,8 @@ Symbol | Description | Unit
 
 
 
-## Electrolyser
-The electrolyser uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
+## Hydrogen Electrolyser (HEL)
+The hydrogen electrolyser uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
 
 $$ 2 \ H_2O \rightarrow 2 \ H_2 + O_2 $$
 
@@ -353,56 +353,56 @@ The general energy and mass flow in the electrolyser as well as the losses consi
 
 ![Energy flow of electrolyser](fig/221013_Elektrolyseur.svg)
 
-The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{Ely,H_2}\)) or mass flow (\(\dot{m}_{Ely,H_2}\))) and the consumption of electrical energy (\( P_{el,Ely} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
+The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{HEL,H_2}\)) or mass flow (\(\dot{m}_{HEL,H_2}\))) and the consumption of electrical energy (\( P_{el,HEL} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
 $$
 \begin{align}
-\dot{E}_{Ely,H_2}=  P_{el,Ely} \enspace \eta_{Ely,H_2}
+\dot{E}_{HEL,H_2}=  P_{el,HEL} \enspace \eta_{HEL,H_2}
 \end{align}
 $$
 
 $$ 
 \begin{equation}
-\dot{m}_{Ely,H_2} =  \frac{\dot{E}_{Ely,H_2}}{e_{H_2}} 
+\dot{m}_{HEL,H_2} =  \frac{\dot{E}_{HEL,H_2}}{e_{H_2}} 
 \end{equation}
 $$
 
 Due to the purification losses of the hydrogen caused by the reduction of oxygen molecules contained in the hydrogen gas in the catalyst, depending on the electrolysis technology, the actually obtained hydrogen energy or mass flow is reduced by the proportion of the hydrogen losses \(\eta_{H_2 \ purification}\) to the energy or mass flows, supplemented with index \(out\):
-$$ \dot{E}_{Ely,H_2,out}=  (1-\eta_{H_2 \ purification}) \ \dot{E}_{Ely,H_2} $$
+$$ \dot{E}_{HEL,H_2,out}=  (1-\eta_{H_2 \ purification}) \ \dot{E}_{HEL,H_2} $$
 
-$$ \dot{m}_{Ely,H_2,out} = (1-\eta_{H_2 \ purification}) \ \dot{m}_{Ely,H_2} $$
+$$ \dot{m}_{HEL,H_2,out} = (1-\eta_{H_2 \ purification}) \ \dot{m}_{HEL,H_2} $$
 
 
 Conversely, by rearranging and substituting the previous equations from a required hydrogen mass flow, the electrical power consumption can be calculated as follows:
-$$ P_{el,Ely} =  \frac{\dot{m}_{Ely,H_2,out} \ e_{H_2}}{\eta_{Ely,H_2} \ (1 - \eta_{H_2 \ purification})}  $$
+$$ P_{el,HEL} =  \frac{\dot{m}_{HEL,H_2,out} \ e_{H_2}}{\eta_{HEL,H_2} \ (1 - \eta_{H_2 \ purification})}  $$
 
-The usable waste heat from the electrolysis process \(\dot{Q}_{Ely,waste heat}\) is determined, depending on the available information, as
-$$\dot{Q}_{Ely,waste heat} = \eta_{Ely,heat} \enspace (1-\eta_{Ely,H_2}) \enspace P_{el,Ely} = \frac{(1 - \eta_{Ely,H_2}) \ \eta_{Ely,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{Ely,H_2} } \ \dot{E}_{Ely,H_2,out} $$ 
+The usable waste heat from the electrolysis process \(\dot{Q}_{HEL,waste heat}\) is determined, depending on the available information, as
+$$\dot{Q}_{HEL,waste heat} = \eta_{HEL,heat} \enspace (1-\eta_{HEL,H_2}) \enspace P_{el,HEL} = \frac{(1 - \eta_{HEL,H_2}) \ \eta_{HEL,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{HEL,H_2} } \ \dot{E}_{HEL,H_2,out} $$ 
 
-With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{Ely,H_2} < 0\)) and the heat (\(\delta_{Ely,heat}\) > 0) related efficiency. These correction factors are given in the change of percentage points per tenthousand full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyser. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
+With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{HEL,H_2} < 0\)) and the heat (\(\delta_{HEL,heat}\) > 0) related efficiency. These correction factors are given in the change of percentage points per 10.000 full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyser. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
 
-$$ \eta_{Ely,H_2} = \eta_{Ely,H_2,start} + \left ( \frac{\delta_{Ely,H_2}}{100} \ {\frac{FLH}{10.000}} \right )$$
-$$ \eta_{Ely,heat} = \eta_{Ely,heat,start} + \left ( \frac{\delta_{Ely,heat}}{100} \ {\frac{FLH}{1.000}} \right ) $$
+$$ \eta_{HEL,H_2} = \eta_{HEL,H_2,start} + \left ( \frac{\delta_{HEL,H_2}}{100} \ {\frac{FLH}{10.000}} \right )$$
+$$ \eta_{HEL,heat} = \eta_{HEL,heat,start} + \left ( \frac{\delta_{HEL,heat}}{100} \ {\frac{FLH}{1.000}} \right ) $$
 $$ \text{with } FLH = \frac{\text{total hydrogen produced since start [kg]}}{\text{nominal hydrogen production [kg]}} $$
 
 Keep in mind: Test if sum of efficiencies will reach values > 1 or if one efficiency falls below zero for the given maximum changing intervale of the stacks (ToDo)
 
-With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{Ely,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{Ely,cool,out}\) can be determined by rearranging the following equation:
-$$\dot{Q}_{Ely,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{Ely,hot,out} - T_{Ely,cool,in})$$
+With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{HEL,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{HEL,cool,out}\) can be determined by rearranging the following equation:
+$$\dot{Q}_{HEL,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{HEL,hot,out} - T_{HEL,cool,in})$$
 
-The heat loss \(\dot{Q}_{Ely,loss}\), which cannot be used and is dissipated to the environment via heat transport mechanisms, is calculated as follows
+The heat loss \(\dot{Q}_{HEL,loss}\), which cannot be used and is dissipated to the environment via heat transport mechanisms, is calculated as follows
 
-$$  \dot{Q}_{Ely,loss} = P_{el,Ely} - \dot{Q}_{Ely,waste heat} - \dot{E}_{Ely,H_2} \\ =  P_{el,Ely} \ (1 - \eta_{Ely,heat} + \eta_{Ely,heat} \ \eta_{Ely,H_2} - \eta_{Ely,H_2}) $$
+$$  \dot{Q}_{HEL,loss} = P_{el,HEL} - \dot{Q}_{HEL,waste heat} - \dot{E}_{HEL,H_2} \\ =  P_{el,HEL} \ (1 - \eta_{HEL,heat} + \eta_{HEL,heat} \ \eta_{HEL,H_2} - \eta_{HEL,H_2}) $$
 
-The actual needed power supply of the electrolyser \(P_{el,Ely,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,Ely}\) and the losses in the power electronics \(\eta_{Ely,PE}\) to
-$$ P_{el,Ely,supply} = \frac{P_{el,Ely}}{\eta_{Ely,PE}} $$
+The actual needed power supply of the electrolyser \(P_{el,HEL,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,HEL}\) and the losses in the power electronics \(\eta_{HEL,PE}\) to
+$$ P_{el,HEL,supply} = \frac{P_{el,HEL}}{\eta_{HEL,PE}} $$
 
-Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{Ely,O_2,out}\) is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:
+Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{HEL,O_2,out}\) is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:
 
-$$  \dot{m}_{Ely,O_2,out} =  v_{O_2,H_2} \enspace  \dot{m}_{Ely,H_2} $$
+$$  \dot{m}_{HEL,O_2,out} =  v_{O_2,H_2} \enspace  \dot{m}_{HEL,H_2} $$
 $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{atomic \ mass \ 2 \ H_2} = \frac{2 * 15,9990 \ u}{2*2*1,0008 \ u} = 7,9386 $$
 
-The required mass flow of water \(\dot{m}_{Ely,H_2O,in}\) can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses \(\eta_{H_2O \ treatment}\).
-$$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
+The required mass flow of water \(\dot{m}_{HEL,H_2O,in}\) can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses \(\eta_{H_2O \ treatment}\).
+$$ \dot{m}_{HEL,H_2O,in} = \frac{\dot{m}_{HEL,H_2}  + \dot{m}_{HEL,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
 
 **Assumption:** The electrolyser is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
 
@@ -410,47 +410,47 @@ $$ \dot{m}_{Ely,H_2O,in} = \frac{\dot{m}_{Ely,H_2}  + \dot{m}_{Ely,O_2,out}}{1- 
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,Ely}\)   | electrical power requirement of the electrolyser   | [W]
-\(P_{el,Ely,supply}\)   | electrical power requirement of the electrolyser incl. losses of power electronics   | [W]
-\(\dot{m}_{Ely,H_2O,in}\)  | water mass flow fed to the electrolyser  | [kg/h]
-\(\dot{m}_{Ely,O_2,out}\)  | oxygen mass flow delivered by the electrolyser  | [kg/h]
-\(\dot{m}_{Ely,H_2}\)  | hydrogen mass flow produced by the electrolyser (before \(H_2\)-cleaning losses)  | [kg/h]
-\(\dot{m}_{Ely,H_2,out}\)  | hydrogen mass flow provided by the electrolyser (after \(H_2\)-cleaning losses)  | [kg/h]
-\(\dot{E}_{Ely,H_2}\)  | hydrogen energy flow discharged from the electrolyser (before \(H_2\)-cleaning losses) | [W]
-\(\dot{E}_{Ely,H_2,out}\)  | hydrogen energy flow provided by the electrolyser \(after (H_2\)-cleaning losses) | [W]
-\(T_{Ely,cooling,in}\)   | cooling fluid inlet temperature of electrolyser   | [°C]
-\(T_{Ely,cooling,out}\)   | cooling fluid outlet temperature of electrolyser   | [°C]
-\(\dot{Q}_{Ely,waste heat}\)  | waste heat provided by the electrolyser  | [W]
-\(\dot{Q}_{Ely,loss}\)  | thermal losses in electrolyser (unused waste heat))  | [W]
+\(P_{el,HEL}\)   | electrical power requirement of the electrolyser   | [W]
+\(P_{el,HEL,supply}\)   | electrical power requirement of the electrolyser incl. losses of power electronics   | [W]
+\(\dot{m}_{HEL,H_2O,in}\)  | water mass flow fed to the electrolyser  | [kg/h]
+\(\dot{m}_{HEL,O_2,out}\)  | oxygen mass flow delivered by the electrolyser  | [kg/h]
+\(\dot{m}_{HEL,H_2}\)  | hydrogen mass flow produced by the electrolyser (before \(H_2\)-cleaning losses)  | [kg/h]
+\(\dot{m}_{HEL,H_2,out}\)  | hydrogen mass flow provided by the electrolyser (after \(H_2\)-cleaning losses)  | [kg/h]
+\(\dot{E}_{HEL,H_2}\)  | hydrogen energy flow discharged from the electrolyser (before \(H_2\)-cleaning losses) | [W]
+\(\dot{E}_{HEL,H_2,out}\)  | hydrogen energy flow provided by the electrolyser \(after (H_2\)-cleaning losses) | [W]
+\(T_{HEL,cooling,in}\)   | cooling fluid inlet temperature of electrolyser   | [°C]
+\(T_{HEL,cooling,out}\)   | cooling fluid outlet temperature of electrolyser   | [°C]
+\(\dot{Q}_{HEL,waste heat}\)  | waste heat provided by the electrolyser  | [W]
+\(\dot{Q}_{HEL,loss}\)  | thermal losses in electrolyser (unused waste heat))  | [W]
 
 **Parameter of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,Ely,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
-\(\eta_{Ely,H_2,start}(x_{Ely},P_{el,Ely,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{Ely,H_2,out}\) related to \(P_{el,Ely}\) as a function of operating state, plant size and plant type at the beginning of live) | [-]
-\(\eta_{Ely,heat,start}\) | efficiency of the usable heat extraction of the electrolyser (related to \(1-\eta_{Ely,H_2}\) at the beginning of live)   | [-]
-\(\delta_{Ely,H_2}\) | linear decrease of efficiency of hydrogen production due to degradation per 10.000 full load hours, typically < 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\) 
-\(\delta_{Ely,heat}\) | linear increase of efficiency of heat production due to degradation per 10.000 full load hours, typically > 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\)
-\(\eta_{Ely,LE}\) | efficiency of the power electronics of the electrolyser | [-]
-\(PL_{Ely,min}\) | minimum allowed partial load of the electrolyser | [-]
-\(MOT_{Ely}\) | minimum operating time of the electrolyser | [min]
-\(SUT_{Ely}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
-\(CDT_{Ely}\) | cool-down time of the electrolyser from full heat supply to ambient (linear curve) | [min]
+\(P_{el,HEL,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
+\(\eta_{HEL,H_2,start}(x_{HEL},P_{el,HEL,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{HEL,H_2,out}\) related to \(P_{el,HEL}\) as a function of operating state, plant size and plant type at the beginning of live) | [-]
+\(\eta_{HEL,heat,start}\) | efficiency of the usable heat extraction of the electrolyser (related to \(1-\eta_{HEL,H_2}\) at the beginning of live)   | [-]
+\(\delta_{HEL,H_2}\) | linear decrease of efficiency of hydrogen production due to degradation per 10.000 full load hours, typically < 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\) 
+\(\delta_{HEL,heat}\) | linear increase of efficiency of heat production due to degradation per 10.000 full load hours, typically > 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\)
+\(\eta_{HEL,LE}\) | efficiency of the power electronics of the electrolyser | [-]
+\(PL_{HEL,min}\) | minimum allowed partial load of the electrolyser | [-]
+\(MOT_{HEL}\) | minimum operating time of the electrolyser | [min]
+\(SUT_{HEL}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
+\(CDT_{HEL}\) | cool-down time of the electrolyser from full heat supply to ambient (linear curve) | [min]
 \(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value)
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
 \(\eta_{H_2 \ purification} \) | percentage of purification losses in hydrogen purification | [%]
 \(\eta_{H_2O \ treatment} \) | percentage of purification losses in water treatment | [%]
-\(p_{H_2,Ely} \) | pressure of hydrogen supply | [bar]
-\(p_{O_2,Ely} \) | pressure of oxygen supply | [bar]
-\(T_{Ely,cooling,in,max}\) | max. allowed temperature of cooling medium input | [°C]
+\(p_{H_2,HEL} \) | pressure of hydrogen supply | [bar]
+\(p_{O_2,HEL} \) | pressure of oxygen supply | [bar]
+\(T_{HEL,cooling,in,max}\) | max. allowed temperature of cooling medium input | [°C]
 
 
 **State variables of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(x_{Ely}\)  | current 	operating state (on, off, part load)   | [%]
+\(x_{HEL}\)  | current 	operating state (on, off, part load)   | [%]
 
 
 ## Combined heat and power plant (CHP)
