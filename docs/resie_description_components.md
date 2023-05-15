@@ -19,7 +19,7 @@ Components:
 
 ## Heat pump (HP)
 ### General description of HP
-As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of Quasi. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
+As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of ReSiE. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
 
 ![General System chart of a heat pump](fig/221018_WP_Anlagenschema.svg)
 
@@ -49,11 +49,11 @@ Since the temperatures of the heat flows entering and leaving the heat pump, whi
 
 $$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
 
-As a chiller follows the same principle as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ration (EER) for chillers as
+As a chiller follows the same principle as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{HP,out}\) but \(\dot{Q}_{HP,in}\). This leads to the definition of the energy efficiency ratio (EER) for chillers as
  
 $$ EER = \frac{\dot{Q}_{HP,in}}{P_{el,HP}} = \frac{\dot{Q}_{HP,out} - P_{el,HP}}{P_{el,HP}} = COP - 1   $$
 
-As shown, the COP can be transferred to the EER. In the following, the description is made for heat pumps. The only adaption that has to be done for chillers is the change of the useful energy. Also, the efficiency function needs to be changed to EER(\(T_{HP,source,in}\), \(T_{HP,sink,out}\)) (if used) and for nonlinear part load efficiency the useful energy \(\dot{Q}_{HP,in}\) is assumed to be the linear reference energy instead of \(\dot{Q}_{HP,out}\) as for heating mode.
+As shown, the COP can be transferred to the EER. In the following, the description is made for heat pumps. The only adaption that has to be done for chillers is the change of the useful energy. Also, the efficiency function needs to be changed to EER (\(T_{HP,source,in}\), \(T_{HP,sink,out}\)) (if used) and for nonlinear part load efficiency the useful energy \(\dot{Q}_{HP,in}\) is assumed to be the linear reference energy instead of \(\dot{Q}_{HP,out}\) as for heating mode.
 
 ### Modelling approaches for HP: Overview
 According to [Blervaque2015][^Blervaque2015], four different categories are described in the literature when it comes to the simulation of heat pumps:
@@ -67,7 +67,7 @@ According to [Blervaque2015][^Blervaque2015], four different categories are desc
 
 [^Arpagaus2018]: Arpagaus C. et al. (2018): High temperature heat pumps: Market overview, state of the art, research status, refrigerants, and application potentials, *Energy*, doi: [10.1016/j.energy.2018.03.166](https://doi.org/10.1016/j.energy.2018.03.166)
 
-For the simulation of energy systems in an early design phase, for which Quasi is intended, only quasi-static or dynamic empirical models can be considered due to the lack of detailed information about the technical components used and the computational effort required for physical models. Therefore, an empirical model based on manufacturer data or certification process data is implemented in Quasi.
+For the simulation of energy systems in an early design phase, for which QuaSi is intended, only quasi-static or dynamic empirical models can be considered due to the lack of detailed information about the technical components used and the computational effort required for physical models. Therefore, an empirical model based on manufacturer data or certification process data is implemented in ReSiE.
 
 There are several aspects to be considered when simulating a heat pump based on equation-fitting, which will be briefly described in the following:
 
@@ -453,27 +453,27 @@ Symbol | Description | Unit
 \(x_{HEL}\)  | current 	operating state (on, off, part load)   | [%]
 
 
-## Combined heat and power plant (CHP)
-![Energy flow of CHP](fig/221021_CHP.svg)
+## Combined heat and power plant (CHPP)
+![Energy flow of CHPP](fig/221021_CHP.svg)
 
 <!---
-Definition of power-to-heat ratio of CHP:
-$$ r_{CHP,PTH} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} = \frac{P_{el,CHP,rated}}{\dot{Q}_{CHP,rated}}  $$
+Definition of power-to-heat ratio of CHPP:
+$$ r_{CHPP,PTH} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} = \frac{P_{el,CHPP,rated}}{\dot{Q}_{CHPP,rated}}  $$
 -->
-Energy balance on CHP:
-$$  \dot{E}_{CHP,gas,in} = P_{el,CHP,out} + \dot{Q}_{CHP,out} + \dot{Q}_{CHP,loss} $$ 
+Energy balance on CHPP:
+$$  \dot{E}_{CHPP,gas,in} = P_{el,CHPP,out} + \dot{Q}_{CHPP,out} + \dot{Q}_{CHPP,loss} $$ 
 
 Calculation of electric power output:
-$$  P_{el,CHP,out} = \eta_{CHP,el} \ \dot{E}_{CHP,gas,in}   $$ 
+$$  P_{el,CHPP,out} = \eta_{CHPP,el} \ \dot{E}_{CHPP,gas,in}   $$ 
 
 Calculation of thermal power output:
-$$  \dot{Q}_{CHP,out} = \eta_{CHP,thermal} \ \dot{E}_{CHP,gas,in}   $$ 
+$$  \dot{Q}_{CHPP,out} = \eta_{CHPP,thermal} \ \dot{E}_{CHPP,gas,in}   $$ 
 
-Calculation of thermal losses in CHP:
-$$ \dot{Q}_{CHP,loss} = (1-\eta_{CHP,thermal}+\eta_{CHP,el}) \ \dot{E}_{CHP,gas,in} $$
+Calculation of thermal losses in CHPP:
+$$ \dot{Q}_{CHPP,loss} = (1-\eta_{CHPP,thermal}+\eta_{CHPP,el}) \ \dot{E}_{CHPP,gas,in} $$
 
 Relation of electric and thermal power output:
-$$ P_{el,CHP,out} = \frac{\eta_{CHP,el}}{\eta_{CHP,thermal}} \ \dot{Q}_{CHP,out} =  r_{CHP,PTH}  \ \dot{Q}_{CHP,out}  $$
+$$ P_{el,CHPP,out} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} \ \dot{Q}_{CHPP,out} =  r_{CHPP,PTH}  \ \dot{Q}_{CHPP,out}  $$
 
 The part-load dependent efficiency as described in the chapter "general transient effects" can be considered as well.
 
@@ -482,35 +482,35 @@ Part load curve e.g in Urbanucci2019[^Urbanucci2019]
 
 [^Urbanucci2019]: Urbanucci, Luca; Testi, Daniele; Bruno, Joan Carles (2019): Integration of Reversible Heat Pumps in Trigeneration Systems for Low-Temperature Renewable District Heating and Cooling Microgrids. *Applied Sciences 9 (15), S. 3194.*, doi: [10.3390/app9153194](https://doi.org/10.3390/app9153194).
 
-**Inputs and Outputs of the CHP:**
+**Inputs and Outputs of the CHPP:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,CHP,out}\) | electric power output of the CHP | [W]
-\(P_{el,CHP}\) | electric power provided by the CHP | [W]
-\(\dot{Q}_{CHP,out}\) | thermal power output of the CHP | [W]
-\(\dot{E}_{CHP,gas,in}\) | energy demand of the CHP, natural or green gas (NCV or GCV)  | [W]
-\(\dot{Q}_{CHP,loss}\) | thermal energy losses of the CHP | [W]
+\(P_{el,CHPP,out}\) | electric power output of the CHPP | [W]
+\(P_{el,CHPP}\) | electric power provided by the CHPP | [W]
+\(\dot{Q}_{CHPP,out}\) | thermal power output of the CHPP | [W]
+\(\dot{E}_{CHPP,gas,in}\) | energy demand of the CHPP, natural or green gas (NCV or GCV)  | [W]
+\(\dot{Q}_{CHPP,loss}\) | thermal energy losses of the CHPP | [W]
 
-**Parameter of the CHP:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(P_{el,CHP,rated}\) | rated electric power output of the CHP under full load (operating state 100 %) | [W]
-\(\dot{Q}_{CHP,rated}\) | rated thermal power output of the CHP under full load (operating state 100 %) | [W]
-\(\eta_{CHP,thermal}(PLR)\) | thermal efficiency of CHP, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
-\(\eta_{CHP,el}(PLR)\) | electrical efficiency of CHP, including self-use of electrical energy, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHP,gas,in}\)) | [-]
-\(PL_{CHP,min}\) | minimum allowed partial load of the CHP | [-]
-\(MOT_{CHP}\) | minimum operating time of the CHP | [min]
-\(SUT_{CHP}\) | start-up time of the CHP until full heat supply (linear curve) | [min]
-\(CDT_{CHP}\) | cool-down time of the CHP from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the CHP:**
+**Parameter of the CHPP:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(x_{CHP}\)  | current operating state of the CHP (on, off, part load)   | [%]
+\(P_{el,CHPP,rated}\) | rated electric power output of the CHPP under full load (operating state 100 %) | [W]
+\(\dot{Q}_{CHPP,rated}\) | rated thermal power output of the CHPP under full load (operating state 100 %) | [W]
+\(\eta_{CHPP,thermal}(PLR)\) | thermal efficiency of CHPP, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
+\(\eta_{CHPP,el}(PLR)\) | electrical efficiency of CHPP, including self-use of electrical energy, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
+\(PL_{CHPP,min}\) | minimum allowed partial load of the CHPP | [-]
+\(MOT_{CHPP}\) | minimum operating time of the CHPP | [min]
+\(SUT_{CHPP}\) | start-up time of the CHPP until full heat supply (linear curve) | [min]
+\(CDT_{CHPP}\) | cool-down time of the CHPP from full heat supply to ambient (linear curve) | [min]
+
+
+**State variables of the CHPP:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
 
 ## Gas boiler (GB)
 ![Energy flow of gas boiler](fig/221021_Gaskessel.svg)
@@ -886,7 +886,7 @@ $$
 
 As the coefficients mentioned above are constant within the simulation time, they can be precomputed for computational efficiency.
 
-To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as exemplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the integrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in Quasi II?)
+To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as exemplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the integrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in ReSiE?)
 
 ![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
 
@@ -967,7 +967,7 @@ Hydrogen fuel cells are not implemented yet (ToDo).
 ## Photovoltaik (PV)
 ![Energy flow of photovoltaic](fig/221028_PV.svg)
 
-For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into QuaSi. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC inverters are taken from the SAM model[^SAM-Model] and integrated into pvlib.
+For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into ReSiE. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC inverters are taken from the SAM model[^SAM-Model] and integrated into pvlib.
 
 Inputs can include orientation, tilt, ambient albedo, type of installation (e.g. roof-added, free-standing), as well as module interconnection and specific PV modules and inverters chosen from the library. Additional losses, such as ohmic losses in cables or losses due to soiling, can be taken into account. A weather input dataset is required that includes direct normal, global horizontal and diffuse horizontal irradiance as well as ambient (dry bulb) temperature, humidity and wind speed.   
 
@@ -988,10 +988,10 @@ Achtung: Winddaten von EPW nicht geeignet!
 ![Energy flow of battery](fig/221025_battery.svg)
 
 Energy balance of battery in every timestep:
-$$  E_{GB,t+1} = E_{GB,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) $$
+$$  E_{BA,t+1} = E_{BA,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) $$
 
 Self-Discharge losses of battery:
-$$ P_{el,BA,loss,self} = r_{BA,self \ discharge} \ \frac{1 \ h}{\Delta t} \ E_{GB,t} $$
+$$ P_{el,BA,loss,self} = r_{BA,self \ discharge} \ \frac{1 \ h}{\Delta t} \ E_{BA,t} $$
 
 Charging losses of battery:
 $$ P_{el,BA,loss,charge} = (1 - \eta_{BA,charge}) \ P_{el,BA,in} $$
@@ -1000,15 +1000,15 @@ Discharging losses of battery:
 $$ P_{el,BA,loss,discharge} = \frac{1 - \eta_{BA,discharge}}{\eta_{BA,discharge}} \ P_{el,BA,out} $$
 
 Current maximum capacity of the battery:
-$$ E_{GB,max,current} = E_{GB,rated} \ (1-r_{GB,CapReduction}) ^{ n_{cycles \ performed}} $$
-$$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{GB,rated}} $$
+$$ E_{BA,max,current} = E_{BA,rated} \ (1-r_{BA,CapReduction}) ^{ n_{cycles \ performed}} $$
+$$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{BA,rated}} $$
 
 Limits of electrical power in- and output (limit to current energy content and maximum c-rate of battery):
-$$ \frac{E_{GB,max,current} - E_{GB}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{GB,max,current}  $$
-$$ \eta_{BA,discharge} \ \frac{E_{GB}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{GB,max,current} $$
+$$ \frac{E_{BA,max,current} - E_{BA}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{BA,max,current}  $$
+$$ \eta_{BA,discharge} \ \frac{E_{BA}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{BA,max,current} $$
 
 Relation between current charging state in percent and in energy content:
-$$ E_{GB} = E_{GB,max,current} \ x_{GB} $$
+$$ E_{BA} = E_{BA,max,current} \ x_{BA} $$
 
 **Inputs and Outputs of the BA:**
 
@@ -1029,18 +1029,18 @@ Symbol | Description | Unit
 \(r_{BA,self \ discharge}\) | self-discharge rate of battery (% losses per hour regarding current energy content) | [1/h]
 \(c_{BA,max,charge}\) | maximum charging rate (C-rate) of battery | [1/h]
 \(c_{BA,max,discharge}\) | maximum discharging rate (C-rate) of battery | [1/h]
-\({E}_{GB,rated}\)  | rated electrical energy capacity of the battery | [MWh]
-\(r_{GB,CapReduction}\)  | percentage of the reduction of the current battery capacity due to one full charge cycle | [%/cycle]
-\({E}_{GB,start}\)  | electrical energy contend of the battery at the beginning of the simulation   | [MWh]
+\({E}_{BA,rated}\)  | rated electrical energy capacity of the battery | [MWh]
+\(r_{BA,CapReduction}\)  | percentage of the reduction of the current battery capacity due to one full charge cycle | [%/cycle]
+\({E}_{BA,start}\)  | electrical energy contend of the battery at the beginning of the simulation   | [MWh]
 
 
 **State variables of the BA:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\({E}_{GB}\)  | current amount of energy stored in the battery   | [MWh]
-\({E}_{GB,max,current}\)  | current maximum capacity of the battery depending on the number of charging cycles already performed  | [MWh]
-\(x_{GB}\)  | current charging state of the battery   | [%]
+\({E}_{BA}\)  | current amount of energy stored in the battery   | [MWh]
+\({E}_{BA,max,current}\)  | current maximum capacity of the battery depending on the number of charging cycles already performed  | [MWh]
+\(x_{BA}\)  | current charging state of the battery   | [%]
 
 
 ## Hydrogen compressor (HC)

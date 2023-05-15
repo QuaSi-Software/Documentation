@@ -34,5 +34,3 @@ Now, QuaSi is understood to be a collection of the following simulation tools:
 This project is funded in majority by a research initiative of the German government (German Federal Ministry for Economic Affairs and Climate Action, BMWK).
 
 <img src="img/funding_disclaimer.png" alt="Funding disclaimer" style="height: 200px">
-
-

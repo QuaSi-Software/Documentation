@@ -25,3 +25,10 @@ It is advised to use a virtual environment to separate the requirements of proje
 
 ### 3. Run the documentation generation
 You can now generate and view the documentation. By running `mkdocs serve`, a web server is started that hosts the documentation on [http://localhost:8000](http://localhost:8000). This process runs continuously and should detect when changes are made to the documentation source files and restart automatically. If not, you can add the command `mkdocs serve -watch /path/to/markdown/file` with the absolute path to the file(s) that should be checked for changes continuously. You can also quit the process with `ctrl+c` and start it again in order to generate the HTML-files again.
+
+
+## Adding Abbreviations
+Abbreviations can be added globally in `/includes/abbreviations.md` by using the syntax provided by MarkDown, e.g. `*[abbrev]: Abbreviation`. Using this global file, the MarkDown extension `pymdownx.snippets` replaces all appearances of the abbrev in all files. Note that this is function is case sensitive! 
+
+Unfortunately, a separate list of all abbreviations has to be generated manually and is located in `/docs/abbreviations_list.md`. This file is included in the main documentation. The table is sorted alphabetically, which can be done easily using the extension "Markdown Table Sort" of Visual Studio Code.
+
