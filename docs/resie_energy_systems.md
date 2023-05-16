@@ -44,7 +44,7 @@ The following lists which media are currently implemented as default and what th
 **Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
 
 ### Electricity
-* `m_e_ac_230v`: Household electricity at 230V AC and 50/60Hz.
+* `m_e_ac_230v`: Household electricity at 230 V AC and 50/60 Hz.
 
 ### Chemicals - Gasses
 * `m_c_g_natgas`: A natural gas mix available through the public gas grid.
@@ -87,3 +87,6 @@ To solve this problem interfaces have been introduced, which act as an intermedi
 When a component outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected components can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage components.
 
 This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage component or not. The interfaces simplify this behavior and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.
+
+## Units
+Currently, ReSiE is based on energie in watt-hour [Wh], power in watt [W] and temperatures in degree celsius [°C]. Values provided in the project input file or in profiles should have this units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
