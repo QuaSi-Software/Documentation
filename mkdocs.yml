@@ -47,6 +47,8 @@ nav:
   - 'ReSiE: Technical description': 
       - Main components: 'resie_description_components.md'
       - General effects: 'resie_transient_effects.md'
+  - 'ReSiE: Examples':
+      - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
