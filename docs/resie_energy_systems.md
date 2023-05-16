@@ -4,7 +4,7 @@ In the simulation model technical equipment units are connected to each other to
 
 ![A multi-sector example energy system](fig/example_energy_system.svg)
 
-There, arrows indicate the flow of energy between the components, with the colors of the arrows representing the respective medium. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
+There, arrows indicate the flow of energy between the components, with the colors of the arrows representing the respective medium. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHPP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
 
 Such an energy system requires several operational strategies and control mechanisms to operate as expected. How these can be modeled for this example is described in more detail in the chapter on operation and control. For the following we focus on the graph structure that is formed from the components and the connections between them.
 
@@ -93,4 +93,13 @@ When a component outputs energy, it writes a negative amount of energy to the ri
 This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage component or not. The interfaces simplify this behavior and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.
 
 ## Units
-Currently, ReSiE is based on energie in watt-hour [Wh], power in watt [W] and temperatures in degree celsius [°C]. Values provided in the project input file or in profiles should have this units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
+Currently, ReSiE is based on the following units:
+
+- time in seconds [s]
+- energy in watt-hour [Wh]
+- power in watt [W]
+- temperatures in degree celsius [°C]
+
+Values provided in the project input file or in profiles should have these units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). 
+
+Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
