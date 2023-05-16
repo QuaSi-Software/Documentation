@@ -10,7 +10,7 @@ To illustrate, let's look at a simple example. A heating demand, in the medium o
 
 ![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
 
-Example of the energy flow of a gas boiler providing heat, adapted from [Resie2023][^Resie2023].
+Example of the energy flow of a gas boiler providing heat, adapted from [Ott2023][^Ott2023].
 
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
@@ -18,11 +18,11 @@ This can be done by first calculating the hot water demand \(E_{in,C}\) to be me
 
 $$
 \begin{equation}
-|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}|
+|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}| % + |E_{loss}|
 \end{equation}
 $$
 
-[^Resie2023]: Ott E, Steinacker H, Stickel M, Kley C, Fisch M N (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
+[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 #### Losses
 While the conservation of energy is upheld, this does not mean that losses cannot be modeled. Energy losses invariably end up as ambient heat, which can contribute to the energy balance of a building, however the technical equipment of a building rarely can be found in a thermal zone that should be kept to comfort levels. Equipment with large power draw might even impose a cooling demand on the thermal zone in which they reside.
@@ -35,7 +35,7 @@ Due to the generalized nature of the energy system used by ReSiE, there is no ex
 
 The domain of the simulation can therefore be considered as the technical equipment providing energy to a number of connected buildings up to a scale where transport losses cannot be ignored anymore. Outside the domain are three major other domains to and from which the energy system connect:
 
-![Illustration of the model domain and boundaries](fig/domain_boundaries.png)
+<center>![Illustration of the model domain and boundaries](fig/domain_boundaries.png){: style="height:400px"}</center>
 
 The first of these is the environment, which plays a role for components that directly draw energy from the environment such as solar collectors or heat pumps fed by ambient heat from the atmosphere or the ground. The second are public grids, usually for electricity, heat and natural gas, however grids of any kind of energy-carrying medium can be modeled. An important difference to the environment is that energy can be both drawn from the grids and fed back into them if there is a surplus.
 
@@ -91,7 +91,7 @@ After the balance check, output is written according to the output specification
 The simulation steps for each component are:
 
 * `Reset`: Reset values for the next time step.
-* `Control`: Calculate control behavior to check if a component should run or not.
+* `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, is this is already known
 * `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. Here, no energy is consumed or supplied.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
@@ -99,32 +99,36 @@ The simulation steps for each component are:
 
 ### Determining order of execution
 
-**ToDo: Update!**
-
 Determination of the order of execution of the simulation steps described above follows an algorithm consisting of several heuristics. Each heuristic imposes some order over some or all of the components and is overwritten by the heuristics following after that.
 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
 1. Set up a base order of steps determined by the system function of the components:
-    1. `All`: `Reset`
-    1. `Fixed source`: `Control`, `Process`
-    1. `Fixed sink`: `Control`, `Process`
-    1. `Bus`: `Control`, `Process`
-    1. `Transformer`: `Control`, `Process`
-    1. `Storage`: `Control`, `Process`, `Load`
-    1. `DBounded source`: `Control`, `Process`
-    1. `Bounded sink`: `Control`, `Process`
-    1. `Bus`: `Distribute`
-1. Reorder `Control` and `Process` of each component connected to a bus so that it matches the bus' input priorities.
-1. Reorder `Control` and `Process` of a component's control references so that these appear first. This is ignored if the referenced component is a storage component.
+    1. `Reset`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    2. `Control`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    3. `Process`:  `Fixed source`, `Fixed sink`, `Bus`
+    4. `Potential`: `Transformer`
+    5. `Process`: `Transformer`, `Storage`
+    6. `Load`: `Storage`
+    7. `Process`:  `Bounded source`, `Bounded sink` 
+    8. `Distribute`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
 
-If the simulation parameter `dump_info` is used, the generated order of steps is written to the info file. This can be very useful to check for errors produced by an incorrect order.
+    The base order is also illustrated in the following figure, taken from [Ott2023][^Ott2023]:
+    ![Illustration of the base order of operation](fig/230515_base_OoO.svg)
+
+2. Reorder `Process` and `Potential` of each component connected to a bus so that it matches the bus' input priorities.
+3. Reorder `Distribute` of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
+4. Reorder `Process` and `Load` of storages such the loading (and unloading) of storages follows the priorities on busses.
+
+All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
+
+If the simulation parameter `dump_info` is used, the generated order of steps is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom sequence of steps that can be imported via the project input file.
 
 #### Outside-in approach
 
 The general approach for determining the order is best described as an outside-in order, where "outside" refers to the system boundaries and "inner" refers to components whose operation depends on information from systems on the outside. The information travels from the outer to the inner components, in each step providing depending components with the required details for calculating operation. Let us consider an energy net with five components, as illustrated in the following simplified diagram:
 
-![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png)
+<center>![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png){: style="height:200px"}</center>
 
 Here arrows do *not* denote the energy flow, but the information flow. How this information flow can be derived in the general case is not known, as it depends on the operational strategies involved. This is one of the reasons why this algorithm is useful in theory, but not implemented in the simulation engine.
 
