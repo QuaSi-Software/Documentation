@@ -39,9 +39,9 @@ All energy handled by the simulation model exists in the form of some medium tha
 
 For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
-The following lists which media are currently implemented and what they represent.
+The following lists which media are currently implemented as default and what they represent.
 
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. However this has not yet been implemented in the model. For now different regimes of temperatures are used. (ToDo: Revise!)
+**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
 
 ### Electricity
 * `m_e_ac_230v`: Household electricity at 230V AC and 50/60Hz.
