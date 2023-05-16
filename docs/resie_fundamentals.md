@@ -8,9 +8,9 @@ The geometry of buildings also does not play a role in the simulation and the fu
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
-![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
+<center>![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
 
-Example of the energy flow of a gas boiler providing heat, adapted from [Ott2023][^Ott2023].
+Example of the energy flow of a gas boiler providing heat for the heating demand C.</center>
 
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
@@ -18,11 +18,9 @@ This can be done by first calculating the hot water demand \(E_{in,C}\) to be me
 
 $$
 \begin{equation}
-|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}| % + |E_{loss}|
+|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}| + |E_{loss}|
 \end{equation}
 $$
-
-[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 #### Losses
 While the conservation of energy is upheld, this does not mean that losses cannot be modeled. Energy losses invariably end up as ambient heat, which can contribute to the energy balance of a building, however the technical equipment of a building rarely can be found in a thermal zone that should be kept to comfort levels. Equipment with large power draw might even impose a cooling demand on the thermal zone in which they reside.
@@ -104,21 +102,22 @@ Determination of the order of execution of the simulation steps described above 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
 1. Set up a base order of steps determined by the system function of the components:
-    1. `Reset`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
-    2. `Control`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
-    3. `Process`:  `Fixed source`, `Fixed sink`, `Bus`
+    1. `Reset`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
+    2. `Control`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
+    3. `Process`:  `fixed source`, `fixed sink`, `Bus`
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`:  `Bounded source`, `Bounded sink` 
-    8. `Distribute`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    7. `Process`:  `bounded source`, `bounded sink` 
+    8. `Distribute`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
 
-    The base order is also illustrated in the following figure, taken from [Ott2023][^Ott2023]:
-    ![Illustration of the base order of operation](fig/230515_base_OoO.svg)
+    <!-- The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:  -->
+    <!-- ![Illustration of the base order of operation](fig/230515_base_OoO.svg)  -->
+    <!-- [^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy    systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review** -->
 
-2. Reorder `Process` and `Potential` of each component connected to a bus so that it matches the bus' input priorities.
-3. Reorder `Distribute` of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
-4. Reorder `Process` and `Load` of storages such the loading (and unloading) of storages follows the priorities on busses.
+1. Reorder `Process` and `Potential` of each component connected to a bus so that it matches the bus' input priorities.
+2. Reorder `Distribute` of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
+3. Reorder `Process` and `Load` of storages such the loading (and unloading) of storages follows the priorities on busses.
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 
