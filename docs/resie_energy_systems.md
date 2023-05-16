@@ -1,10 +1,12 @@
 # Energy systems
 
-In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is the energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system.
+In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban strict of two buildings is shown in the figure below.
 
-![Example of an energy system connecting various components](fig/example_energy_system.png)
+![A multi-sector example energy system](fig/example_energy_system.svg)
 
-In the example above an example energy system is displayed. Arrows denote the flow of energy from one component to the next with the colors of arrows denoting which medium is involved. Yellow is electricity, purple is natural gas, dark red is low temperature water and light red is high temperature water. Two busses form the main way how energy is exchanged.
+There, arrows indicate the flow of energy between the components, with the colors of the arrows representing the respective medium. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
+
+Such an energy system requires several operational strategies and control mechanisms to operate as expected. How these can be modeled for this example is described in more detail in the chapter on operation and control. For the following we focus on the graph structure that is formed from the components and the connections between them.
 
 ## Characteristics of an energy system
 
@@ -80,7 +82,9 @@ When writing the implementation of components a problem has emerged in the funct
 
 [^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
-![Illustration how interfaces connect components](fig/energy_system_interfaces.png)
+<center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
+
+An energy system component A connected via an interfaces to an other component B.</center>
 
 To solve this problem interfaces have been introduced, which act as an intermediary between components. The output of a component connects to the "left" of an interface and the input of the receiving component on the "right". That way energy always flows from left to right.
 
