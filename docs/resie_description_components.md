@@ -21,13 +21,13 @@ Components:
 ### General description of HP
 As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of ReSiE. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
 
-![General System chart of a heat pump](fig/221018_WP_Anlagenschema.svg)
+![General System chart of a heat pump](fig/221018_HeatPump_system_chart.svg)
 
 The energy balance at the heat pump is built up from the incoming electricity \(P_{el,HP}\), the incoming heat at a low temperature level \(T_{HP,source,in}\) and the outgoing heat flow at a higher temperature level \(T_{HP,sink,out}\). 
 
 The energy balance of the heat pump model is shown in the following figure:
 
-![Energy flow of heat pump](fig/221006_Wärmepumpe_Energiefluss.svg)
+![Energy flow of heat pump](fig/221006_HeatPump_Energyflow.svg)
  
 Using the electrical power \(P_{el,HP, supply}\), reduced by the losses of the power electronics \(P_{el,HP, loss}\), an energy flow \(\dot{Q}_{HP,in}\) with temperature \(T_{HP,source,in}\) is transformed to the energy flow \(\dot{Q}_{HP,out}\) with temperature \(T_{HP,sink,out}\). The efficiency of the heat pump is defined by the coefficient of performance (COP). The COP determines the electrical power \(P_{el,HP}\) required to raise the temperature of a mass flow from the lower temperature level \(T_{HP,source,in}\) to \(T_{HP,sink,out}\): 
 
@@ -107,7 +107,7 @@ The temperature-dependent COP can be calculated from different methods:
 
 As example for a lookup-table COP (second bulletpoint above), the following figure from Steinacker2022[^Steinacker2022] shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be parameterized with a three-dimensional spline interpolation algorithm.
 
-![COP chart of heat pump](fig/COP_Kennfeld_Beispiel.png)
+![COP chart of heat pump](fig/COP_chart_example.png)
 
 #### Maximum thermal and electrical power
 
@@ -160,13 +160,13 @@ PLF (part load factor = adjustment factor for COP):  \(COP_{part-load} = COP_{fu
 
 The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependent COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
 
-![COP in part load](fig/COP_Teillast.png)
+![COP in part load](fig/COP_partload.png)
 
 [^2]: [https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf](https://enrgi.de/wp-content/uploads/2022/08/Datenblatt_ecoGEO_B-C_1-9kW.pdf)
 
 The part-load behavior depends also on the type of the heat pump (on-off or inverter heat pump), as shown for example in Bettanini2003[^Bettanini2003] or in Socal2021[^Socal2021]. For illustration, the following figure is taken from the latter reference to demonstrate the different part load factors of the COP (y-axis) at different part load ratios for different heat pump technologies:
 
-![Heat pump part load factor (PLF)](fig/Socal2021_PLFfromPLR_angepasst.jpg)
+![Heat pump part load factor (PLF)](fig/Socal2021_PLFfromPLR.jpg)
 
 Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. In Lachance2011[Lachance2021^], several part load curves are compared.
 
@@ -175,7 +175,7 @@ The figure above shows also the difference of the part load factor comparing on-
 
 As described in the section "General description of HP", the COP is defined as the ratio of the heat output \(\dot{Q}_{HP,out}\) and the electrical input power \(P_{el,HP}\). The shown curves for the part load factor affects only the ratio of heat output to electrical input power and there is no information available on the actual change of the two dimensions. Therefore, the heat output of the heat pump itself is assumed to be linear in part load operation between \(\dot{Q}_{HP,out,min}\) at \(PLF_{HP,min}\) and \(\dot{Q}_{HP,out,max}\) at PLR = 1.0 as shown in the figure below. This leads to a non-linear relation of the power input to the part load ratio that was found more realistic as for inverter heat pumps, the observed efficiency change is mostly due to an efficiency change of the frequency converter and motor of the compressor. (QUELLE ToDo)
 
-![Thermal power of heatpump in partload](fig/221018_WP_Teillast_Heizleistung.svg)
+![Thermal power of heatpump in partload](fig/221018_HeatPump_partload_thermal_power.svg)
 
 It is also important to note, that the typical PLF-curve for inverter-driven heat pumps is not invertible and can therefore not be used directly to calculate the PLR from PLF. Although, this needed for an operation strategy that uses limited availability or demand of the electrical or thermal power. To handle this problem, the PLF-curve is not used directly:
 
@@ -253,7 +253,7 @@ The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar 
 
 There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{HP,sink,out}\) and \(T_{HP,source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below. Each of the main steps is described in more detail in the previous chapter.
 
-![Heat pump calculation steps](fig/230110_Waermepumpe_Berechnungsschritte.svg)
+![Heat pump calculation steps](fig/230110_HeatPump_calculation_steps.svg)
 
 Steps to calculate the electrical and thermal energy in- and outputs of HP using a polynomial fit of the thermal and electrical power (compare to left side of figure above):
 
@@ -351,7 +351,7 @@ If the electrical energy is provided by renewable energies, the resulting hydrog
 
 The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
 
-![Energy flow of electrolyser](fig/221013_Elektrolyseur.svg)
+![Energy flow of electrolyser](fig/221013_Elektrolyser.svg)
 
 The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{HEL,H_2}\)) or mass flow (\(\dot{m}_{HEL,H_2}\))) and the consumption of electrical energy (\( P_{el,HEL} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
 $$
@@ -454,7 +454,7 @@ Symbol | Description | Unit
 
 
 ## Combined heat and power plant (CHPP)
-![Energy flow of CHPP](fig/221021_CHP.svg)
+![Energy flow of CHPP](fig/221021_CHPP.svg)
 
 <!---
 Definition of power-to-heat ratio of CHPP:
@@ -513,7 +513,7 @@ Symbol | Description | Unit
 \(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
 
 ## Gas boiler (GB)
-![Energy flow of gas boiler](fig/221021_Gaskessel.svg)
+![Energy flow of gas boiler](fig/221021_Gasboiler.svg)
 
 Energy balance of gas boiler:
 $$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB}(PLR) \ \dot{E}_{GB,gas,in}   $$
@@ -548,7 +548,7 @@ Symbol | Description | Unit
 
 
 ## Oil heating (OH)
-![Energy flow of oil heating](fig/221028_Oelkessel.svg)
+![Energy flow of oil heating](fig/221028_Oil_heating.svg)
 
 Energy balance of oil heater:
 $$  \dot{Q}_{OH,out} = \dot{E}_{OH,oil,in} - \dot{Q}_{OH,loss} = \eta_{OH}(PLR) \ \dot{E}_{OH,oil,in}   $$
@@ -683,7 +683,7 @@ Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmeq
 ### Simple model of compression  chiller (SCC)
 A simple model of an air cooled compression chiller is implemented to account for rather irrelevant cooling demands without significant changes in temperatures of the energy to be cooled. This model is a rough approximation, but offers a fast and easy calculation. It is based on a constant seasonal energy efficiency ratio (SEER) as yearly average of the energy efficiency ratio (EER) without part-load dependent or temperature dependent efficiency. The energy flow chart is given below. The displayed temperature are only for illustration and will not be considered in this simple model.
 
-![Energy flow of simple compression chiller](fig/230207_Chiller_simple_Energiefluss.svg)
+![Energy flow of simple compression chiller](fig/230207_Chiller_simple_energyflow.svg)
 
 The SEER is defined as
 
