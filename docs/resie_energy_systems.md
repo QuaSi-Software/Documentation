@@ -103,3 +103,7 @@ Currently, ReSiE is based on the following units:
 Values provided in the project input file or in profiles should have these units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). 
 
 Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
+
+**Output units:**
+
+Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW. 
