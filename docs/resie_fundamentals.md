@@ -129,23 +129,6 @@ All rearrangement steps are carried out one after the other, which means that th
 
 If the simulation parameter `dump_info` is used, the generated order of steps is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom sequence of steps that can be imported via the project input file.
 
-#### Outside-in approach
-
-The general approach for determining the order is best described as an outside-in order, where "outside" refers to the system boundaries and "inner" refers to components whose operation depends on information from systems on the outside. The information travels from the outer to the inner components, in each step providing depending components with the required details for calculating operation. Let us consider an energy net with five components, as illustrated in the following simplified diagram:
-
-<center>![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png){: style="height:200px"}</center>
-
-Here arrows do *not* denote the energy flow, but the information flow. How this information flow can be derived in the general case is not known, as it depends on the operational strategies involved. This is one of the reasons why this algorithm is useful in theory, but not implemented in the simulation engine.
-
-From this initial state of all unknowns, the algorithm can work outside-in step by step:
-
-![Illustration of outside-in algorithm, steps 1 to 4](fig/outside_in_algorithm_part_2.png)
-
-1. Components with no dependencies can be calculated directly.
-2. One component now has all of its dependencies fulfilled and can also be calculated. Another component is still missing one of its dependencies.
-3. The component that was incomplete in the previous step can now be completed.
-4. The last incomplete component is calculated and completes the entire system.
-
 #### Cycles and feedback loops
 
 Cycles in the both the energy system and the information flow graph lead to issues with finding solutions to the order of execution. However these cycles are not a problem in actualized energy systems, as not all parts of a cycle are active at the same time. For example an electrolyser might feed into a hydrogen storage, which feeds into an fuel cell, which feeds back into the electrical net. It would make little sense however to have both components run at the same time, as this would ultimately waste electricity. So while these connections causes cycles in the graph, in operation these cycles do not cause issues.
