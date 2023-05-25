@@ -18,7 +18,13 @@ This can be done by first calculating the hot water demand \(E_{in,C}\) to be me
 
 $$
 \begin{equation}
-|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}| + |E_{loss}|
+|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}|
+\end{equation}
+$$
+
+$$
+\begin{equation}
+|E_{in,B}| - |E_{loss}| = |E_{out,B}| = |E_{in,C}|
 \end{equation}
 $$
 
@@ -53,24 +59,24 @@ Components can be classified into seven categories, which are:
 * `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
-* `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature heat.
+* `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature.
 * `Storage`: A component storing energy in a given medium. For example a buffer tank storing hot water.
 * `Bus`: A special type of component used to facilitate the transport of energy from and to other components. Has only one implementation.
 
-This classification is used by the simulation engine to reason about the order in which calculations must happen. This is described in more detail in the section on the order of execution of simulation steps. The implementation of the various types of components is described in its own chapter.
+This classification is used by the simulation engine to reason about the order in which calculations must happen. This is described in more detail in the section on the order of operations below. The implementation of the various types of components is described in its own chapter.
 
 ## Simulation sequence
 The simulation follows a fairly basic structure:
 
 ```pseudocode
 units = load_components()
-order = step_order(units)
+order = order_of_operations(units)
 for time = t_start to t_end {
     ...
 }
 ```
 
-First the components are loaded and initialized from the input project file. Then an order of execution of steps for each component is determined. The units and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
+First the components are loaded and initialized from the input project file. Then the order of operations is determined. The units and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
 
 ### Main loop over time
 ```pseudocode
@@ -89,57 +95,42 @@ After the balance check, output is written according to the output specification
 The simulation steps for each component are:
 
 * `Reset`: Reset values for the next time step.
-* `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, is this is already known
-* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. Here, no energy is consumed or supplied.
+* `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, if these are already known at this point.
+* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. No energy is processed in this step.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
 * `Distribute`: For bus components, distribute the energy balances on each connected interface and check the overall balance on the bus.
 
-### Determining order of execution
+### Determining order of operations
 
-Determination of the order of execution of the simulation steps described above follows an algorithm consisting of several heuristics. Each heuristic imposes some order over some or all of the components and is overwritten by the heuristics following after that.
+For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
-1. Set up a base order of steps determined by the system function of the components:
-    1. `Reset`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
-    2. `Control`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
-    3. `Process`:  `fixed source`, `fixed sink`, `Bus`
+1. Set up a base order of operations determined by the system function of the components:
+    1. `Reset`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    2. `Control`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    3. `Process`:  `Fixed source`, `Fixed sink`, `Bus`
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`:  `bounded source`, `bounded sink` 
-    8. `Distribute`: `fixed source`, `fixed sink`, `Bus`, `Transformer`, `Storage`,  `bounded source`, `bounded sink` 
+    7. `Process`:  `Bounded source`, `Bounded sink` 
+    8. `Distribute`: `Bus`
 
     <!-- The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:  -->
     <!-- ![Illustration of the base order of operation](fig/230515_base_OoO.svg)  -->
     <!-- [^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy    systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review** -->
 
-1. Reorder `Process` and `Potential` of each component connected to a bus so that it matches the bus' input priorities.
-2. Reorder `Distribute` of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
-3. Reorder `Process` and `Load` of storages such the loading (and unloading) of storages follows the priorities on busses.
+1. Reorder the `Process` and `Potential` operations of each component connected to a bus so that it matches the bus' input priorities.
+2. Reorder the `Distribute` operation of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
+3. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 
-If the simulation parameter `dump_info` is used, the generated order of steps is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom sequence of steps that can be imported via the project input file.
-
-#### Outside-in approach
-
-The general approach for determining the order is best described as an outside-in order, where "outside" refers to the system boundaries and "inner" refers to components whose operation depends on information from systems on the outside. The information travels from the outer to the inner components, in each step providing depending components with the required details for calculating operation. Let us consider an energy net with five components, as illustrated in the following simplified diagram:
-
-<center>![Illustration of outside-in algorithm, initial state](fig/outside_in_algorithm_part_1.png){: style="height:200px"}</center>
-
-Here arrows do *not* denote the energy flow, but the information flow. How this information flow can be derived in the general case is not known, as it depends on the operational strategies involved. This is one of the reasons why this algorithm is useful in theory, but not implemented in the simulation engine.
-
-From this initial state of all unknowns, the algorithm can work outside-in step by step:
-
-![Illustration of outside-in algorithm, steps 1 to 4](fig/outside_in_algorithm_part_2.png)
-
-1. Components with no dependencies can be calculated directly.
-2. One component now has all of its dependencies fulfilled and can also be calculated. Another component is still missing one of its dependencies.
-3. The component that was incomplete in the previous step can now be completed.
-4. The last incomplete component is calculated and completes the entire system.
+If the simulation parameter `dump_info` is used, the generated order of operations is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom order of operations that can be imported via the project input file. See section on the [project file format](resie_input_file_format.md) for details.
 
 #### Cycles and feedback loops
 
-Cycles in the both the energy system and the information flow graph lead to issues with finding solutions to the order of execution. However these cycles are not a problem in actualized energy systems, as not all parts of a cycle are active at the same time. For example an electrolyser might feed into a hydrogen storage, which feeds into an fuel cell, which feeds back into the electrical net. It would make little sense however to have both components run at the same time, as this would ultimately waste electricity. So while these connections causes cycles in the graph, in operation these cycles do not cause issues.
+Cycles in the energy flow of the energy system can lead to issues with finding solutions to the order of operations. However these cycles are not a problem in actualized energy systems, as not all parts of a cycle are active at the same time. For example an electrolyser might feed into a hydrogen storage, which feeds into a fuel cell, which feeds back into an electrical bus. It would make little sense however to have both components run at the same time, as this would ultimately waste electricity. So while these connections causes cycles in the graph, in operation these cycles do not cause issues.
+
+Constructing an energy system with such a cycle requires the user to carefully choose input and output priorities and disable certain storage loading in order for the components to operate as expected. The listed rearrangement steps above should produce an order that takes the priorities into account and works on cycles. However mathematically this not guarranteed. It is recommended to check the resulting order of operations for any issues.

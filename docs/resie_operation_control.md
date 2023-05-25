@@ -14,7 +14,7 @@ To facilitate this, all component implementations have access to a controller, t
 
 State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
 
-![Example of a state machine with two states](fig/example_state_machine.png)
+<center>![Example of a state machine with two states](fig/example_state_machine.png)</center>
 
 The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions. When the state machine is checked to advance its state[^2] and the expression of a transition evaluates as true, it is followed to the new state.
 
@@ -39,7 +39,7 @@ The example above uses four different conditions:
 
 The transitions for each state are defined using a truth table over the conditions involved, resulting in a new state (which may result in the current state again). This has the advantage that is covers every possible case implicitly, but also has the disadvantage that this might result in large truth tables for state machines with many conditions.
 
-![Example of a truth table with three conditions](fig/example_truth_table.png)
+<center>![Example of a truth table with three conditions](fig/example_truth_table.png)</center>
 
 The example above shows the truth table used for the state "Fill tank", which has three conditions. Cases where the `Overfill` condition is true always lead to the `Off` state, regardless of the values of the other conditions.
 
@@ -49,7 +49,7 @@ Instead of requiring the user to manually specify a state machine, it is desired
 
 For the given example above this would be best described as a storage-driven strategy as a component with this strategy would try to fill the linked storage component when it gets too low. The required linked components and parameter values are carried over from the state machine constructed by the strategy to the required user input as illustrated in the following:
 
-![Example of the storage-driven operational strategy](fig/example_storage_driven_strategy.png)
+<center>![Example of the storage-driven operational strategy](fig/example_storage_driven_strategy.png)</center>
 
 This leads to the required user input in the project file:
 
