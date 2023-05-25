@@ -1,15 +1,12 @@
 # Energy systems
 
-In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is the energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system.
+In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban strict of two buildings is shown in the figure below.
 
-![A multi-sector example energy system](fig/example_energy_system.png)
-A multi-sector example energy system, adapted from [Resie2023][^Resie2023].
+![A multi-sector example energy system](fig/example_energy_system.svg)
 
-In the figure above an example energy system for a district of two buildings is displayed. Arrows denote the flow of energy between components with the colors of arrows denoting which medium is involved. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
+There, arrows indicate the flow of energy between the components, with the colors of the arrows representing the respective medium. A main heat bus supplies two secondary heat busses, which each connect with a buffer tank and the demand side of a building. The main heat bus draws heat from the waste heat of a hydrogen electrolyser (HEL), elevated to the required temperature by a heat pump, as well as a combined heat-and-power plant (CHPP). A gas boiler supplies one of the buildings for additional peak load capacity. In order to shift available energy between seasons, a seasonal thermal energy storage (STES) is connected to the main heat bus.
 
 Such an energy system requires several operational strategies and control mechanisms to operate as expected. How these can be modeled for this example is described in more detail in the chapter on operation and control. For the following we focus on the graph structure that is formed from the components and the connections between them.
-
-[^Resie2023]: Ott E, Steinacker H, Stickel M, Kley C, Fisch M N (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 ## Characteristics of an energy system
 
@@ -44,12 +41,12 @@ All energy handled by the simulation model exists in the form of some medium tha
 
 For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
-The following lists which media are currently implemented and what they represent.
+The following lists which media are currently implemented as default and what they represent.
 
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. However this has not yet been implemented in the model. For now different regimes of temperatures are used. (ToDo: Revise!)
+**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
 
 ### Electricity
-* `m_e_ac_230v`: Household electricity at 230V AC and 50/60Hz.
+* `m_e_ac_230v`: Household electricity at 230 V AC and 50/60 Hz.
 
 ### Chemicals - Gasses
 * `m_c_g_natgas`: A natural gas mix available through the public gas grid.
@@ -85,12 +82,28 @@ When writing the implementation of components a problem has emerged in the funct
 
 [^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
-![Illustration how interfaces connect components](fig/example_system_interfaces.png)
+<center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
 
-An energy system component connecting via interfaces to other components, adapted from [Resie2023][^Resie2023].
+An energy system component A connected via an interfaces to an other component B.</center>
 
 To solve this problem interfaces have been introduced, which act as an intermediary between components. The output of a component connects to the "left" of an interface and the input of the receiving component on the "right". That way energy always flows from left to right.
 
 When a component outputs energy, it writes a negative amount of energy to the right side of the interfaces of all its inputs and writes a positive amount of energy to the left side of all its outputs. The connected components can then maintain the energy balance by writing matching positive / negative energy values to their inputs / outputs. In addition, this mechanism is also used to differentiate between energy demands and the loading potential for storage components.
 
 This mechanism has proven useful as otherwise the implementation of every component would have to check if it is connected to a bus or a single other component as well as if it is a storage component or not. The interfaces simplify this behavior and decouple the implementations of components, which is important to maintain the flexibility of the overall simulation software in regards to new components.
+
+## Units
+Currently, ReSiE is based on the following units:
+
+- time in seconds [s]
+- energy in watt-hour [Wh]
+- power in watt [W]
+- temperatures in degree celsius [°C]
+
+Values provided in the project input file or in profiles should have these units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). 
+
+Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
+
+**Output units:**
+
+Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW. 
