@@ -6,7 +6,7 @@ To account for transient effects, the reduction of the usable heat output during
 ### Linear start-up
 The following figure illustrate a linear start-up and cool-down behavior characterized by the start-up time (SUT) and cool-down time (CDT) the component needs to reach full thermal energy output or to cool down completely.
 
-![Heat reduction during start-up](fig/221028_Start-up-Reduction_general.svg)
+<center>![Heat reduction during start-up](fig/221028_Start-up-Reduction_general.svg)</center>
 
 The current thermal power output can be expressed with the following sectionally defined function. The simulation engine tracks the time a component is running or not running. The on-time \(t_{on}\) represents the time since the last start-up of the component while \(t_{off}\) is the time since the last shut-down. To handle the case when the component has not cooled down completely since the last shut-down, the linear start-up curve can be shifted using \(t_{shift}\) to represent a warm start:
 
@@ -40,14 +40,14 @@ $$
 
 This time-averaged integral results in the following yellow curve that represents the normalized average thermal power output, calculated in each timestep with the lower time bound of \(t_{on,lower} = 0\):
 
-![transient shut-down and turn-on effects linear](fig/220223_transient_on_off_linear.JPG)
+<center>![transient shut-down and turn-on effects linear](fig/220223_transient_on_off_linear.JPG)</center>
 
 Note that \(t_{shift}\) has to be set to zero at the first timestep of the simulation and \(t_{on,lower}\) and \(t_{on,upper}\) have to start counting again at every change of operation (on/off, not part-load).
 
 ### Exponential start-up
 While the method above describes a linear thermal power output during the heat-up of a component that requires the integration of sectionally defined functions, the calculation of the time-step averaged thermal power can be also performed using continuous exponential functions. Therefore, the general time-related function of a PT1 element can be used to model the delay of the thermal energy output. This is used for example in the TRNSYS Type 401[^Wetter1996] for modulating heat pumps. The time span for each component to heat up is defined by the constant heat-up-time \(\tau_{on}\) and the cool-down time \(\tau_{off}\). This is not the same time span as defined above (SUT and CDT) for the linear warm-up! The following figure shows an exemplary operation curve, analogous to the one for linear transient effects above. A component is started from a cool basis, heated up to nominal thermal power output, then shut down and restarted before the component has cooled down completely.
 
-![transient shut-down and tun-on effects exponential](fig/220223_transient_on_off.JPG)
+<center>![transient shut-down and tun-on effects exponential](fig/220223_transient_on_off.JPG)</center>
 
 The calculation of the reduced heat output due to transient effects at current time \(t_{on}\) since the last start of the component and with the constant heat-up-time \(\tau_{on}\) of each component can be calculated with the following expression:
 $$
@@ -135,7 +135,7 @@ The part-load ratio (PLR) in general is defined as:
 
 The change of the efficiency with respect to the PLR can be given as curve, for example as shown in the following figure for the efficiency of a motor in part-load operation (Source: Eppinger2021[^Eppinger2021]):
 
-<img src="/fig/230124_motor_efficiency_Eppinger2021.JPG" alt="test" width="500"/>
+<center>![motor efficiency](fig/230124_motor_efficiency_Eppinger2021.JPG)</center>
 
 Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has so be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
 
@@ -144,7 +144,8 @@ Another problem is the fact, that efficiencies are always defined as ratios. Whe
 A third difficulty is the inconsistent definition of the part-load ratio in the literature when considering non-linearities in part-load operation. In theory, every input and output has its own part-load ratio at a certain operation point of a component with multiple in- or outputs. Each of the PLR do not necessarily represent the same operational state of the component, so this would lead to an inconsistent base if several operational restrictions are given. This can be solved by defining a reference part-load ratio, e.g. with respect to the main output or by defining the efficiency curves relative to each other with the same base.
 
 In the figure below, a part-load curve (orange curve) based on an exponential function of a fictitious component that has electricity as input (yellow curve) and heat as output (grey curve) is shown. The heat output (= useful energy) is assumed to be linear (straight line) with a rated power of 1 kW, resulting in a non-linear demand of electricity (= expended energy). 
-![general non-linear part-load of energy systems](fig/230125_non-linear_PLR_general.JPG)
+
+<center>![general non-linear part-load of energy systems](fig/230125_non-linear_PLR_general.JPG)</center>
 
 The basis for the consideration of non-linear part-load efficiencies is the user-defined efficiency curve of a component
 
