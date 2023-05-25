@@ -18,7 +18,13 @@ This can be done by first calculating the hot water demand \(E_{in,C}\) to be me
 
 $$
 \begin{equation}
-|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}| = |E_{in,C}|
+|E_{out,A}| = |E_{in,B}| = |E_{out,B}| + |E_{loss}|
+\end{equation}
+$$
+
+$$
+\begin{equation}
+|E_{in,B}| - |E_{loss}| = |E_{out,B}| = |E_{in,C}|
 \end{equation}
 $$
 
