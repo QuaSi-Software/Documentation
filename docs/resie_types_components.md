@@ -1,4 +1,19 @@
 # Types of energy system components
+This document provides details on the component models and their implementations.
+
+The description of each component type includes a block with a number of attributes that describe the type and how it connects to other components by its input and output interfaces. An example of such a block:
+| | |
+| --- | --- |
+| **Type name** | `BoundedSink`|
+| **File** | `energy_systems/general/bounded_sink.jl` |
+| **Available models** | `default` |
+| **System function** | `bounded_sink` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | |
+| | |
+
+Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
 ## Boundary and connection components
 
@@ -9,9 +24,9 @@
 | **File** | `energy_systems/general/bounded_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_sink` |
-| **Medium** | `custom` |
-| **Input media** | `custom` |
-| **Output media** | `None` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | |
 | | |
 
 Generalised implementation of a bounded sink.
@@ -31,9 +46,9 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 | **File** | `energy_systems/general/bounded_supply.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_source` |
-| **Medium** | `custom` |
-| **Input media** | `None` |
-| **Output media** | `custom` |
+| **Medium** | `medium`/`None` |
+| **Input media** | |
+| **Output media** | `None`/`auto` |
 | | |
 
 Generalised implementation of a bounded source.
@@ -53,16 +68,16 @@ Must be given a profile for the maximum power it can provide, which is scaled by
 | **File** | `energy_systems/connections/bus.jl` |
 | **Available models** | `default` |
 | **System function** | `bus` |
-| **Medium** | `custom` |
-| **Input media** | `any` |
-| **Output media** | `any` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
 | | |
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
 | Parameter | Type | Default(Y/N) | Example |
 | ----------- | ------- | --- | ------------------------|
-| `medium` | `String` | N | `m_e_ac_230v` |
+| `connection_matrix` | `Dict` | N | |
 
 ### General demand
 | | |
@@ -71,9 +86,9 @@ The only implementation of special component `Bus`, used to connect multiple com
 | **File** | `energy_systems/general/demand.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
-| **Medium** | `custom` |
-| **Input media** | `custom` |
-| **Output media** | `None` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | |
 | | |
 
 Generalised implementation of a demand.
@@ -95,9 +110,9 @@ Must be given a profile for the energy it requests, which is scaled by the given
 | **File** | `energy_systems/general/fixed_supply.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_source` |
-| **Medium** | `custom` |
-| **Input media** | `None` |
-| **Output media** | `custom` |
+| **Medium** | `medium`/`None` |
+| **Input media** |  |
+| **Output media** | `None`/`auto` |
 | | |
 
 Generalised implementation of a fixed source.
@@ -117,9 +132,9 @@ Must be given a profile for the energy it can provide, which is scaled by the gi
 | **File** | `energy_systems/connections/grid_connection.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_source`, `bounded_sink` |
-| **Medium** | `custom` |
-| **Input media** | `custom` (or none) |
-| **Output media** | `custom` (or none) |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
 | | |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
@@ -128,7 +143,6 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 
 | Parameter | Type | Default(Y/N) | Example |
 | ----------- | ------- | --- | ------------------------|
-| `medium` | `String` | N | `m_e_ac_230v` |
 | `is_source` | `Boolean` | N | `True` |
 
 ## Other sources and sinks
@@ -140,8 +154,8 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 | **File** | `energy_systems/electric_producers/pv_plant.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `fixed_source` |
-| **Medium** | `None` |
-| **Input media** | `None` |
+| **Medium** | |
+| **Input media** | |
 | **Output media** | `m_el_out`/`m_e_ac_230v` |
 | | |
 
@@ -163,7 +177,7 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **File** | `energy_systems/electric_producers/chpp.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
-| **Medium** | `None` |
+| **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
 | | |
@@ -185,7 +199,7 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **File** | `energy_systems/others/electrolyser.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
-| **Medium** | `None` |
+| **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
 | | |
@@ -206,7 +220,7 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | **File** | `energy_systems/heat_producers/gas_boiler.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
-| **Medium** | `None` |
+| **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | | |
@@ -227,7 +241,7 @@ A gas boiler that transforms combustible gas into heat.
 | **File** | `energy_systems/heat_producers/heat_pump.jl` |
 | **Available models** | default: `carnot` |
 | **System function** | `transformer` |
-| **Medium** | `None` |
+| **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | | |
@@ -252,16 +266,15 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **File** | `energy_systems/storage/battery.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
-| **Medium** | `custom` |
-| **Input media** | `custom` |
-| **Output media** | `custom` |
+| **Medium** | `medium`/`m_e_ac_230v` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
 | | |
 
 A storage for electricity.
 
 | Parameter | Type | Default(Y/N) | Example |
 | ----------- | ------- | --- | ------------------------|
-| `medium` | `String` | N | `m_e_ac_230v` |
 | `capacity` | `Float` | N | 10000 |
 | `load` | `Float` | N | 5000 |
 
@@ -272,16 +285,15 @@ A storage for electricity.
 | **File** | `energy_systems/storage/buffer_tank.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
-| **Medium** | `custom` |
-| **Input media** | `custom` |
-| **Output media** | `custom` |
+| **Medium** | `medium`/`m_h_w_ht1` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
 | | |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
 | Parameter | Type | Default(Y/N) | Example |
 | ----------- | ------- | --- | ------------------------|
-| `medium` | `String` | Y | `m_h_w_ht1` |
 | `capacity` | `Float` | N | 10000 |
 | `load` | `Float` | N | 5000 |
 | `use_adaptive_temperature` | `Float` | Y | `False` |
@@ -296,7 +308,7 @@ A short-term storage for heat of thermal carrier fluids, typically water.
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
-| **Medium** | `custom` |
+| **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | | |
