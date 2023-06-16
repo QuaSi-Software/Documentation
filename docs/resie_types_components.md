@@ -2,9 +2,10 @@
 
 ## Boundary and connection components
 
-### Type: `BoundedSink`
+### General bounded sink
 | | |
 | --- | --- |
+| **Type name** | `BoundedSink`|
 | **File** | `energy_systems/general/bounded_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_sink` |
@@ -23,9 +24,10 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 | `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
 | `static_temperature` | `Temperature` | Y | `Nothing` |
 
-### Type: `BoundedSupply`
+### General bounded supply
 | | |
 | --- | --- |
+| **Type name** | `BoundedSupply`|
 | **File** | `energy_systems/general/bounded_supply.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_source` |
@@ -44,9 +46,10 @@ Must be given a profile for the maximum power it can provide, which is scaled by
 | `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
 | `static_temperature` | `Temperature` | Y | `Nothing` |
 
-### Type: `Bus`
+### Bus
 | | |
 | --- | --- |
+| **Type name** | `Bus`|
 | **File** | `energy_systems/connections/bus.jl` |
 | **Available models** | `default` |
 | **System function** | `bus` |
@@ -61,9 +64,10 @@ The only implementation of special component `Bus`, used to connect multiple com
 | ----------- | ------- | --- | ------------------------|
 | `medium` | `String` | N | `m_e_ac_230v` |
 
-### Type: `Demand`
+### General demand
 | | |
 | --- | --- |
+| **Type name** | `Demand`|
 | **File** | `energy_systems/general/demand.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
@@ -84,9 +88,10 @@ Must be given a profile for the energy it requests, which is scaled by the given
 | `static_load` | `Float` | Y | `Nothing` |
 | `static_temperature` | `Temperature` | Y | `Nothing` |
 
-### Type: `FixedSupply`
+### General fixed supply
 | | |
 | --- | --- |
+| **Type name** | `FixedSupply`|
 | **File** | `energy_systems/general/fixed_supply.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_source` |
@@ -105,9 +110,10 @@ Must be given a profile for the energy it can provide, which is scaled by the gi
 | `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
 | `static_temperature` | `Temperature` | Y | `Nothing` |
 
-### Type: GridConnection
+### Grid connection
 | | |
 | --- | --- |
+| **Type name** | `GridConnection`|
 | **File** | `energy_systems/connections/grid_connection.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_source`, `bounded_sink` |
@@ -127,9 +133,10 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 
 ## Other sources and sinks
 
-### Type: PVPlant
+### Photovoltaic plant
 | | |
 | --- | --- |
+| **Type name** | `PVPlant`|
 | **File** | `energy_systems/electric_producers/pv_plant.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `fixed_source` |
@@ -149,9 +156,10 @@ The energy it produces in each time step must be given as a profile, but can be 
 
 ## Transformers
 
-### Type: CHPP
+### Combined Heat and Power plant
 | | |
 | --- | --- |
+| **Type name** | `CHPP`|
 | **File** | `energy_systems/electric_producers/chpp.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
@@ -170,9 +178,10 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | `min_run_time` | `UInt` | Y | 1800 |
 | `output_temperature` | `Temperature` | Y | `nothing` |
 
-### Type: Electrolyser
+### Electrolyser
 | | |
 | --- | --- |
+| **Type name** | `Electrolyser`|
 | **File** | `energy_systems/others/electrolyser.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
@@ -190,9 +199,10 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | `min_run_time` | `UInt` | Y | 1800 |
 | `output_temperature` | `Temperature` | Y | 55.0 |
 
-### Type: GasBoiler
+### Gas boiler
 | | |
 | --- | --- |
+| **Type name** | `GasBoiler`|
 | **File** | `energy_systems/heat_producers/gas_boiler.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
@@ -210,9 +220,10 @@ A gas boiler that transforms combustible gas into heat.
 | `min_run_time` | `UInt` | Y | 1800 |
 | `output_temperature` | `Temperature` | Y | `nothing` |
 
-### Type: HeatPump
+### Heat pump
 | | |
 | --- | --- |
+| **Type name** | `HeatPump`|
 | **File** | `energy_systems/heat_producers/heat_pump.jl` |
 | **Available models** | default: `carnot` |
 | **System function** | `transformer` |
@@ -234,9 +245,10 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 ## Storage
 
-### Type: Battery
+### Battery
 | | |
 | --- | --- |
+| **Type name** | `Battery`|
 | **File** | `energy_systems/storage/battery.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
@@ -253,9 +265,10 @@ A storage for electricity.
 | `capacity` | `Float` | N | 10000 |
 | `load` | `Float` | N | 5000 |
 
-### Type: BufferTank
+### Buffer Tank
 | | |
 | --- | --- |
+| **Type name** | `BufferTank`|
 | **File** | `energy_systems/storage/buffer_tank.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
@@ -276,9 +289,10 @@ A short-term storage for heat of thermal carrier fluids, typically water.
 | `high_temperature` | `Float` | Y | 75.0 |
 | `low_temperature` | `Float` | Y | 20.0 |
 
-### Type: SeasonalThermalStorage
+### Seasonal thermal storage
 | | |
 | --- | --- |
+| **Type name** | `SeasonalThermalStorage`|
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `storage` |
