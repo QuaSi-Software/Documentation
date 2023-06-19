@@ -25,7 +25,7 @@ The description further lists which arguments the implementation takes. Let's ta
 
 The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
 
-The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
+The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. In general, a temperature of `Nothing` implies that any temperature is accepted and only the amount of energy is revelant. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
 ## Boundary and connection components
 
@@ -46,9 +46,10 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` |  |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
-| `static_temperature` | `Temperature` | N/N | 65.0 |  |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
+| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
 
 ### General bounded supply
 | | |
@@ -67,9 +68,10 @@ Must be given a profile for the maximum power it can provide, which is scaled by
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` |  |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
-| `static_temperature` | `Temperature` | N/N | 65.0 |  |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
+| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
 ### Bus
 | | |
@@ -105,11 +107,11 @@ Must be given a profile for the energy it requests, which is scaled by the given
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/demand.prf` |  |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
-| `scale` | `Float` | Y/N | 4000.0 |  |
-| `static_load` | `Float` | N/N | 4000.0 |  |
-| `static_temperature` | `Temperature` | N/N | 65.0 |  |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/demand.prf` | Path to the input energy profile. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `static_load` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
+| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
 
 ### General fixed supply
 | | |
@@ -128,9 +130,10 @@ Must be given a profile for the energy it can provide, which is scaled by the gi
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/energy_source.prf` |  |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
-| `static_temperature` | `Temperature` | N/N | 65.0 |  |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
+| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
 ### Grid connection
 | | |
@@ -145,11 +148,11 @@ Must be given a profile for the energy it can provide, which is scaled by the gi
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
-If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection.
+If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulutative value.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `is_source` | `Boolean` | Y/Y | `True` |  |
+| `is_source` | `Boolean` | Y/Y | `True` | If true, the grid connection acts as a source. |
 
 ## Other sources and sinks
 
@@ -170,8 +173,8 @@ The energy it produces in each time step must be given as a profile, but can be 
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` |  |
-| `scale` | `Float` | Y/N | 4000.0 |  |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` | Path to the output energy profile. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the profile values are multiplied. |
 
 ## Transformers
 
@@ -190,11 +193,11 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 |  |
-| `electricity_fraction` | `Float` | Y/Y | 0.4 |  |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
-| `min_run_time` | `UInt` | Y/Y | 1800 |  |
-| `output_temperature` | `Temperature` | N/N | 90.0 |  |
+| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `electricity_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input chemical energy that is output as electricity. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 
 ### Electrolyser
 | | |
@@ -211,10 +214,11 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
-| `heat_fraction` | `Float` | Y/Y | 0.4 |  |
-| `min_run_time` | `UInt` | Y/Y | 1800 |  |
-| `output_temperature` | `Temperature` | N/Y | 55.0 |  |
+| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `heat_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input electric energy that is output as heat. |
+| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
 
 ### Gas boiler
 | | |
@@ -231,10 +235,10 @@ A gas boiler that transforms combustible gas into heat.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 |  |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
-| `min_run_time` | `UInt` | Y/Y | 1800 |  |
-| `output_temperature` | `Temperature` | N/N | 65.0 |  |
+| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 
 ### Heat pump
 | | |
@@ -251,12 +255,12 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 |  |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
-| `min_run_time` | `UInt` | Y/Y | 1800 |  |
-| `fixed_cop` | `Float` | N/N | 3.0 |  |
-| `input_temperature` | `Temperature` | N/N | 20.0 |  |
-| `output_temperature` | `Temperature` | N/N | 65.0 |  |
+| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a static one. |
+| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a static one. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a static one. |
 
 ## Storage
 
@@ -275,8 +279,8 @@ A storage for electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 |  |
-| `load` | `Float` | Y/N | 6000.0 |  |
+| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the battery. |
+| `load` | `Float` | Y/N | 6000.0 | The initial load state of the battery. |
 
 ### Buffer Tank
 | | |
@@ -291,14 +295,21 @@ A storage for electricity.
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
+**Model `simplified`:**
+
+If the adaptive temperature calculation is activated, the temperatures for the input/output of the BT depends on the load state. If it is sufficiently full (depends on the `switch_point`), the BT can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+
+If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+
+
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 |  |
-| `load` | `Float` | Y/N | 6000.0 |  |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` |  |
-| `switch_point` | `Float` | Y/Y | 0.15 |  |
-| `high_temperature` | `Temperature` | Y/Y | 75.0 |  |
-| `low_temperature` | `Temperature` | Y/Y | 20.0 |  |
+| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the BT. |
+| `load` | `Float` | Y/N | 6000.0 | The initial load state of the BT. |
+| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
+| `switch_point` | `Float` | Y/Y | 0.15 | Partial load at which the adaptive output temperature calculation switches. |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 | The high end of the adaptive in-/output temperature. |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 | The low end of the adaptive in-/output temperature. |
 
 ### Seasonal thermal storage
 | | |
@@ -313,11 +324,17 @@ A short-term storage for heat of thermal carrier fluids, typically water.
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 
+**Model `simplified`:**
+
+If the adaptive temperature calculation is activated, the temperatures for the input/output of the STES depends on the load state. If it is sufficiently full (depends on the `switch_point`), the STES can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+
+If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 |  |
-| `load` | `Float` | Y/N | 6000.0 |  |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` |  |
-| `switch_point` | `Float` | Y/Y | 0.15 |  |
-| `high_temperature` | `Temperature` | Y/Y | 75.0 |  |
-| `low_temperature` | `Temperature` | Y/Y | 20.0 |  |
+| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the STES. |
+| `load` | `Float` | Y/N | 6000.0 | The initial load state of the STES. |
+| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
+| `switch_point` | `Float` | Y/Y | 0.25 | Partial load at which the adaptive output temperature calculation switches. |
+| `high_temperature` | `Temperature` | Y/Y | 90.0 | The high end of the adaptive in-/output temperature. |
+| `low_temperature` | `Temperature` | Y/Y | 15.0 | The low end of the adaptive in-/output temperature. |
