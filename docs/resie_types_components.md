@@ -15,6 +15,16 @@ The description of each component type includes a block with a number of attribu
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
+The description further lists which arguments the implementation takes. Let's take a look at an example:
+
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
+| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a static value. |
+
+The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The type refers to the type it is expected to have after being parsed by the JSON library. Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
+
 ## Boundary and connection components
 
 ### General bounded sink
@@ -33,11 +43,11 @@ Generalised implementation of a bounded sink.
 
 Must be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `max_power_profile_file_path` | `String` | N | `profiles/district/max_power.prf` |
-| `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
-| `static_temperature` | `Temperature` | Y | `Nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` |  |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
+| `static_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ### General bounded supply
 | | |
@@ -55,11 +65,11 @@ Generalised implementation of a bounded source.
 
 Must be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `max_power_profile_file_path` | `String` | N | `profiles/district/max_power.prf` |
-| `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
-| `static_temperature` | `Temperature` | Y | `Nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` |  |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
+| `static_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ### Bus
 | | |
@@ -75,9 +85,9 @@ Must be given a profile for the maximum power it can provide, which is scaled by
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `connection_matrix` | `Dict` | N | |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `connection_matrix` | `Dict{String,Any}` | N/N |  |  |
 
 ### General demand
 | | |
@@ -95,13 +105,13 @@ Generalised implementation of a demand.
 
 Must be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `energy_profile_file_path` | `String` | N | `profiles/district/demand.prf` |
-| `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
-| `scale` | `Float` | N | 4000 |
-| `static_load` | `Float` | Y | `Nothing` |
-| `static_temperature` | `Temperature` | Y | `Nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/demand.prf` |  |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
+| `scale` | `Float` | Y/N | 4000.0 |  |
+| `static_load` | `Float` | N/N | 4000.0 |  |
+| `static_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ### General fixed supply
 | | |
@@ -119,11 +129,11 @@ Generalised implementation of a fixed source.
 
 Must be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `energy_profile_file_path` | `String` | N | `profiles/district/energy_source.prf` |
-| `temperature_profile_file_path` | `String` | N | `profiles/district/temperature.prf` |
-| `static_temperature` | `Temperature` | Y | `Nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/energy_source.prf` |  |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` |  |
+| `static_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ### Grid connection
 | | |
@@ -141,9 +151,9 @@ Used as a source or sink with no limit, which receives or gives off energy from/
 
 If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `is_source` | `Boolean` | N | `True` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `is_source` | `Boolean` | Y/Y | `True` |  |
 
 ## Other sources and sinks
 
@@ -163,10 +173,10 @@ A photovoltaic (PV) power plant producing electricity.
 
 The energy it produces in each time step must be given as a profile, but can be scaled by a fixed value.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `energy_profile_file_path` | `String` | N | `profiles/district/pv_output.prf` |
-| `scale` | `Float` | N | 4000 |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` |  |
+| `scale` | `Float` | Y/N | 4000.0 |  |
 
 ## Transformers
 
@@ -184,13 +194,13 @@ The energy it produces in each time step must be given as a profile, but can be 
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `power` | `Float` | N | 40000 |
-| `electricity_fraction` | `Float` | Y | 0.4 |
-| `min_power_fraction` | `Float` | Y | 0.2 |
-| `min_run_time` | `UInt` | Y | 1800 |
-| `output_temperature` | `Temperature` | Y | `nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `power` | `Float` | Y/N | 4000.0 |  |
+| `electricity_fraction` | `Float` | Y/Y | 0.4 |  |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
+| `min_run_time` | `UInt` | Y/Y | 1800 |  |
+| `output_temperature` | `Temperature` | N/N | 90.0 |  |
 
 ### Electrolyser
 | | |
@@ -206,12 +216,12 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `min_power_fraction` | `Float` | Y | 0.2 |
-| `heat_fraction` | `Float` | Y | 0.4 |
-| `min_run_time` | `UInt` | Y | 1800 |
-| `output_temperature` | `Temperature` | Y | 55.0 |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
+| `heat_fraction` | `Float` | Y/Y | 0.4 |  |
+| `min_run_time` | `UInt` | Y/Y | 1800 |  |
+| `output_temperature` | `Temperature` | N/Y | 55.0 |  |
 
 ### Gas boiler
 | | |
@@ -227,12 +237,12 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 
 A gas boiler that transforms combustible gas into heat.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `power` | `Float` | N | 40000 |
-| `min_power_fraction` | `Float` | Y | 0.2 |
-| `min_run_time` | `UInt` | Y | 1800 |
-| `output_temperature` | `Temperature` | Y | `nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `power` | `Float` | Y/N | 4000.0 |  |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
+| `min_run_time` | `UInt` | Y/Y | 1800 |  |
+| `output_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ### Heat pump
 | | |
@@ -248,14 +258,14 @@ A gas boiler that transforms combustible gas into heat.
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `power` | `Float` | N | 40000 |
-| `min_power_fraction` | `Float` | Y | 0.2 |
-| `min_run_time` | `UInt` | Y | 1800 |
-| `fixed_cop` | `Float` | N | 3.0 |
-| `input_temperature` | `Temperature` | Y | `nothing` |
-| `output_temperature` | `Temperature` | Y | `nothing` |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `power` | `Float` | Y/N | 4000.0 |  |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 |  |
+| `min_run_time` | `UInt` | Y/Y | 1800 |  |
+| `fixed_cop` | `Float` | N/N | 3.0 |  |
+| `input_temperature` | `Temperature` | N/N | 20.0 |  |
+| `output_temperature` | `Temperature` | N/N | 65.0 |  |
 
 ## Storage
 
@@ -273,10 +283,10 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 A storage for electricity.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `capacity` | `Float` | N | 10000 |
-| `load` | `Float` | N | 5000 |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 |  |
+| `load` | `Float` | Y/N | 6000.0 |  |
 
 ### Buffer Tank
 | | |
@@ -292,14 +302,14 @@ A storage for electricity.
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `capacity` | `Float` | N | 10000 |
-| `load` | `Float` | N | 5000 |
-| `use_adaptive_temperature` | `Float` | Y | `False` |
-| `switch_point` | `Float` | Y | 0.15 |
-| `high_temperature` | `Float` | Y | 75.0 |
-| `low_temperature` | `Float` | Y | 20.0 |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 |  |
+| `load` | `Float` | Y/N | 6000.0 |  |
+| `use_adaptive_temperature` | `Float` | Y/Y | `False` |  |
+| `switch_point` | `Float` | Y/Y | 0.15 |  |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 |  |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 |  |
 
 ### Seasonal thermal storage
 | | |
@@ -315,11 +325,11 @@ A short-term storage for heat of thermal carrier fluids, typically water.
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 
-| Parameter | Type | Default(Y/N) | Example |
-| ----------- | ------- | --- | ------------------------|
-| `capacity` | `Float` | N | 1000000 |
-| `load` | `Float` | N | 500000 |
-| `use_adaptive_temperature` | `Float` | Y | `False` |
-| `switch_point` | `Float` | Y | 0.15 |
-| `high_temperature` | `Float` | Y | 75.0 |
-| `low_temperature` | `Float` | Y | 20.0 |
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 |  |
+| `load` | `Float` | Y/N | 6000.0 |  |
+| `use_adaptive_temperature` | `Float` | Y/Y | `False` |  |
+| `switch_point` | `Float` | Y/Y | 0.15 |  |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 |  |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 |  |
