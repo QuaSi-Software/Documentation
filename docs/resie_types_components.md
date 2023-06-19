@@ -23,7 +23,9 @@ The description further lists which arguments the implementation takes. Let's ta
 | `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a static value. |
 
-The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The type refers to the type it is expected to have after being parsed by the JSON library. Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
+The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
+
+The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
 ## Boundary and connection components
 
