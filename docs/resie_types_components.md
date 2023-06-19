@@ -12,8 +12,13 @@ The description of each component type includes a block with a number of attribu
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
+| **Tracked values** | `IN`, `Max_Energy` |
+
+The available models listed are subtypes to the implementation of a component, which each work slightly differently and might use different parameters. An example is the difference between a condensing gas boiler and a traditional one. **Note: At the moment there is no argument for the model, as each component currently only has one implemented model. In the future this will be extended to include a default model (when no argument is provided) and additional optional models.**
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
+
+The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values.
 
 The description further lists which arguments the implementation takes. Let's take a look at an example:
 
@@ -39,6 +44,7 @@ The type refers to the type it is expected to have after being parsed by the JSO
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
+| **Tracked values** | `IN`, `Max_Energy` |
 
 Generalised implementation of a bounded sink.
 
@@ -61,6 +67,7 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 | **Medium** | `medium`/`None` |
 | **Input media** | |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `OUT`, `Max_Energy`, `Temperature` |
 
 Generalised implementation of a bounded source.
 
@@ -83,6 +90,7 @@ Must be given a profile for the maximum power it can provide, which is scaled by
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `Balance` |
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
@@ -100,6 +108,7 @@ The only implementation of special component `Bus`, used to connect multiple com
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
+| **Tracked values** | `IN`, `Load`, `Temperature` |
 
 Generalised implementation of a demand.
 
@@ -123,6 +132,7 @@ Must be given a profile for the energy it requests, which is scaled by the given
 | **Medium** | `medium`/`None` |
 | **Input media** |  |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `Out`, `Supply`, `Temperature` |
 
 Generalised implementation of a fixed source.
 
@@ -145,6 +155,7 @@ Must be given a profile for the energy it can provide, which is scaled by the gi
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `IN`, `Out`, `Draw sum`, `Load sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
@@ -166,6 +177,7 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 | **Medium** | |
 | **Input media** | |
 | **Output media** | `m_el_out`/`m_e_ac_230v` |
+| **Tracked values** | `OUT`, `Supply` |
 
 A photovoltaic (PV) power plant producing electricity.
 
@@ -188,6 +200,7 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
+| **Tracked values** | `IN`, `OUT` |
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
@@ -209,6 +222,7 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
+| **Tracked values** | `IN`, `OUT` |
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -230,6 +244,7 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
+| **Tracked values** | `IN`, `OUT` |
 
 A gas boiler that transforms combustible gas into heat.
 
@@ -250,6 +265,7 @@ A gas boiler that transforms combustible gas into heat.
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
+| **Tracked values** | `IN`, `OUT`, `COP` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
@@ -274,6 +290,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
 
 A storage for electricity.
 
@@ -292,6 +309,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -321,6 +339,7 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 
