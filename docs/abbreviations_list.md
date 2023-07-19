@@ -35,6 +35,7 @@
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | MOT          | Minimum Operation Time                                                      |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
+| oemof        | Open energy modelling framework                                             |
 | OH           | Oil Heating                                                                 |
 | PLF          | Part Load Factor                                                            |
 | PLR          | Part Load Ratio                                                             |

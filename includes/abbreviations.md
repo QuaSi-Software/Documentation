@@ -21,6 +21,7 @@
 *[LHV]:     Lower Heating Value, also known as Net Calorific Value (NCV)
 *[GCV]:     Gross Calorific Value, also known as Higher Heating Value (HHV)
 *[HHV]:     Higher Heating Value, also known as Gross Calorific Value (GCV)
+*[oemof]:   Open energy modelling framework
 *[OH]:      Oil Heating
 *[ER]:      Electric Heating Rod
 *[BB]:      Biomass Boiler
