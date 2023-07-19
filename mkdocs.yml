@@ -48,7 +48,8 @@ nav:
       - Main components: 'resie_description_components.md'
       - General effects: 'resie_transient_effects.md'
   - 'ReSiE: Examples':
-      - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
+      - 'Overview': 'resie_exemplary_energy_systems.md'
+      - 'Comparison with oemof': 'resie_examples/comparison_oemof/index.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
