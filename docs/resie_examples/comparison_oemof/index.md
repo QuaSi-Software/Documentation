@@ -5,12 +5,12 @@
 ## Description of energy system
 * Technologies (heat pump, hydrogen electrolyser, etc.)
 * Operational strategies used (priorities, hysteresis, HEL power limitations)
-* main heat bus to two smaller busses: reason as prioritiy to one, peak load only in other bus
+* Main heat bus to two smaller busses: reason as prioritiy to one, peak load only in other bus
 
 ## Differences between models
 * ReSiE modelled as described (because it is the base)
 * oemof does not implement operational strategies the same way
-* priorities as costs???
+* priorities as costs??? In comparision to ReSiE the simulation framework oemof uses another form of energy prioritization, naimly cost prioritization.
 * hysteresis not used at all???
 * HEL power limitation???
 * disabled connections (battery, HP of STES)
