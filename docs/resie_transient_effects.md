@@ -167,10 +167,13 @@ needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, th
 
 During each timestep, both functions, \(E_{expended}(PLR)\) and \(E_{useful}(PLR)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
 
-For supply driven strategy the calculations are performed as following, 
+For supply driven strategy the calculations are as following, 
 \(\dot{E}_\text{in} = E_\text{Expended} (PLR) \) which is given, can be used to calculate \( PLR \) via \(E^{-1}_{Expended} (\dot{E}_\text{in})\). The determined \(PLR\) times \( E_{useful, rated}\) returns \( E_{useful}(PLR)\).
 From this the thermal efficiency of the gas boiler can be calculated \(\eta(PLR) = \frac{E_{useful}(PLR)}{E_{Expended}(PLR)} \).  
 Evaluating the energy balance of gas boiler, \(\dot{Q}_\text{GB, out} = \eta_\text{GB} (PLR) \dot{E}_\text{GB, gas, in} \) with the obtained \( \eta (PLR)\), the thermal power output \(\dot{Q}_\text{GB, out}\) of the GB is determined.
+
+For demand driven strategy the calculations the thermal power output \(\dot{Q}_\text{GB, out}\) is given and the \( E_{useful,rated} \) is known, hence the part load ratio \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\) can be calculated. Since, the thermal efficiency of gas boiler with respect to the \(PLR\) is given, the expended energy can be determined via \(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \).  
+Now evaluating \(\eta(PLR)= \frac{E_{useful}(PLR)}{E_{expended}(PLR)} \) the updated thermal efficiency is obtained. Last but not least, the energy demand of the GB can be determiend via \( \dot{E}_\text{GB, gas, in} = \frac{\dot{Q}_\text{GB, out}}{\eta_\text{GB}(PLR)} \).
 
 If several outputs on a component exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
 
