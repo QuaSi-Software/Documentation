@@ -137,7 +137,7 @@ The change of the efficiency with respect to the PLR can be given as curve, for 
 
 <center>![motor efficiency](fig/230124_motor_efficiency_Eppinger2021.JPG)</center>
 
-Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has to be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
+Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has so be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
 
 Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the efficiency that will be considered to have a linear behavior in part-load operation. The other in- or output energy will be adjusted to represent the non-linearities in the change of the efficiency at different PLR. 
 
@@ -155,9 +155,7 @@ as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a li
 
 \(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \) 
 
-is monotonic in the range of \(PLR \in [0:1]\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). 
-
-The part-load function of the useful energy, that is assumed to be linear,
+is monotonic in the range of \(PLR \in [0:1]\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). The part-load function of the useful energy, that is assumed to be linear,
 
 \(E_{useful}(PLR) = PLR \ \ E_{useful,rated}\)
 
@@ -165,19 +163,11 @@ needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, th
 
 \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
 
-During each timestep, both functions, \(E_{expended}(PLR)\) and \(E_{useful}(PLR)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
-
-For supply driven strategy the calculations are as following, 
-\(\dot{E}_\text{in} = E_\text{Expended} (PLR) \) which is given, can be used to calculate \( PLR \) via \(E^{-1}_{Expended} (\dot{E}_\text{in})\). The determined \(PLR\) times \( E_{useful, rated}\) returns \( E_{useful}(PLR)\).
-From this the thermal efficiency of the gas boiler can be calculated \(\eta(PLR) = \frac{E_{useful}(PLR)}{E_{Expended}(PLR)} \).  
-Evaluating the energy balance of gas boiler, \(\dot{Q}_\text{GB, out} = \eta_\text{GB} (PLR) \dot{E}_\text{GB, gas, in} \) with the obtained \( \eta (PLR)\), the thermal power output \(\dot{Q}_\text{GB, out}\) of the GB is determined.
-
-For demand driven strategy the calculations the thermal power output \(\dot{Q}_\text{GB, out}\) is given and the \( E_{useful,rated} \) is known, hence the part load ratio \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\) can be calculated. Since, the thermal efficiency of gas boiler with respect to the \(PLR\) is given, the expended energy can be determined via \(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \).  
-Now evaluating \(\eta(PLR)= \frac{E_{useful}(PLR)}{E_{expended}(PLR)} \) the updated thermal efficiency is obtained. Last but not least, the energy demand of the GB can be determiend via \( \dot{E}_\text{GB, gas, in} = \frac{\dot{Q}_\text{GB, out}}{\eta_\text{GB}(PLR)} \).
+During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
 
 If several outputs on a component exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
 
-**ToDo**
+**ToTo**
 
 - Bezugsgröße für Berechnung der PLR definieren je Komponente? Oder pauschal auf thermischen Ausgang? Oder wählbar?
 - Aufteilung der Wirkungsgradänderung auf Input/Output (aktuell: eines linear, das andere alles; aber aber 50/50 denkbar)
