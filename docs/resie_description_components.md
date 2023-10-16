@@ -657,7 +657,47 @@ Symbol | Description | Unit
 - geothermal spiral collector
 - (sheet pile wall)
 
+#### Geothermal Probes
 Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmequellen
+
+##### Overview
+Geothermal probes are vertical geothermal heat exchangers with a typical drilling depth of 50 - 150 m. Into the borehole, which usually has a diameter of 150 - 160 mm, pipes are laid. In most cases, two pipes are inserted into the borehole in a U-shape and the borehole is subsequently filled with filling material. The purpose of the filling material is to improve the thermal properties of the heat transfer between the probe tubes and the ground and to give the borehole stability. Geothermal probes serve as heat reservoirs for heat pumps and can also be used conversely as cold reservoirs in summer regeneration mode. In larger systems, several borehole heat exchangers are connected hydraulically in parallel to form fields of geothermal probes. Over longer periods of time, the temperature fields around adjacent probes in a field influence each other.
+There are several approaches to model geothermal probes. In QuaSi II, the approach based on g-functions is chosen. Using the g-functions, temperature step responses to changes in thermal power can be calculated. This approach eliminates the need to numerically calculate the temperature field of the entire ground at each time step and is therefore considered computationally efficient. The g-function values are based on analytical mathematical computational equations, which will be discussed in more detail later. The soil is assumed to be homogeneous with uniform and constant physical properties over time. The properties can be determined, for example, by a thermal response test, or estimated by assumptions of the soil typology with standard values from VDI-4640-1. [TO DO: SOURCE]
+
+
+##### g-function approach
+The temperature response at the borehole wall \(T_B\) to a constant specific heat extraction or injection \(\tilde{q}_{in,out}\) can be determined using the following equation: 
+$$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \cdot g(t)\ $$
+
+Where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of soil and g(t) the pre-calculated g-function value at the current simulation time t. The total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, is thereby related to the probe depth \(h_{\text{probe}}\) and considered to be uniform over the entire depth. 
+
+$$ \tilde{q}_{in,out} = \frac{\dot{Q}_{in,out}}{h_{\text{probe}}}\ $$
+
+Since the heat extraction or injection rate varies with each time step, a superposition approach is chosen, which is based on Duhamel's theorem. The temperature at the borehole wall is calculated by superimposing the temperature responses to past heat pulses.
+
+$$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_s} \cdot g(t_n - t_{i-1}) \right]\ $$
+
+The undisturbed ground temperature \(T_{s,u}\) can be assumed as a constant value averaged over the probe depth. With the assumption of a thermal borehole resistance \(R_{B}\) between the borehole wall and the circulating fluid, an average fluid temperature \(T_{\text{fl,avg}}\) can be calculated from the borehole temperature. The calculation approach of the thermal borehole resistance will be discussed in more detail later. 
+
+$$ T_{\text{fl,avg}} = T_B + \tilde{q}_{in,out} $$
+
+Since a uniform borehole wall temperature over the entire probe depth is assumed, a depth-averaged fluid temperature is calculated.
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(T_B\)  | Temperature at the borehole wall   | [°C]
+\(\tilde{q}_{in,out}\)  | specific heat extraction or injection   | [\(\frac{W}{m}\)]
+\(T_{s,u}\) | Undisturbed ground temperature | [°C]
+\(\lambda_s\) | Heat conductivity of soil | [\(\frac{W}{mK}\)]
+g(t) | g-function  | [-]
+t | current simulation time | [s]
+\(h_{\text{probe}}\) | probe depth | [m]
+i | Index Variable | [-]
+n | total numbers of time steps so far | [-]
+\(R_B\) | Thermal Resistance | [\(\frac{mK}{W}\)]
+\(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
+
+
 
 ### Water
 - groundwater well
