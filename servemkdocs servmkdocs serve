@@ -1,0 +1,228 @@
+[33mcommit b562b3b316e5aa205f77e173552d2f0c0bf5a583[m[33m ([m[1;36mHEAD -> [m[1;32mGenSim_user_manual[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: 9e823ff 3472c93
+Author: Etienne Ott <44156782+eott-siz@users.noreply.github.com>
+Date:   Mon Jun 19 13:18:25 2023 +0200
+
+    Merge pull request #10 from QuaSi-Software/content-description-components
+    
+    Overview of component implementations
+
+[33mcommit 3472c935e1967cc55418e8fc80c9bca0668ad9c8[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 19 13:16:02 2023 +0200
+
+    Add attribute listing available values for tracking to components.
+
+[33mcommit c39b37b488e9571b55f6b38de89a0ebb1de53fd8[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 19 11:27:45 2023 +0200
+
+    Add descriptions of component arguments to the tables.
+
+[33mcommit 6732b547d7eadca90607414d4a562d896f2fc10a[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 19 10:09:11 2023 +0200
+
+    Expand paragraph on types of the component model arguments.
+
+[33mcommit 5a6835d443d0c2993d432385ec813c97adb14794[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 19 09:59:21 2023 +0200
+
+    Remove superfluous empty line at the end of the attribute table.
+
+[33mcommit 9e1c052c91704dc01b8ad8a094039ddbf97b192d[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 19 09:55:41 2023 +0200
+
+    Expand structure of argument table with description and required/default flags.
+
+[33mcommit efab36d262afccbc297262c0d98b5fef0504d726[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Fri Jun 16 14:12:40 2023 +0200
+
+    Add description of syntax of medium attributes and clear use of syntax.
+
+[33mcommit b1bcd41f0a4ae34552b88afac1d142870946f8b1[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Fri Jun 16 13:08:01 2023 +0200
+
+    Move type names into attribute list and change titles to short description.
+
+[33mcommit c87faebd50a9c41ca8fa57ec33ecbf8b03e6ab81[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Fri Jun 16 12:46:18 2023 +0200
+
+    Add general description of energy system components.
+
+[33mcommit 9e823ffef17f65ce83a11c1aac583774561401df[m
+Merge: 220f560 df017f6
+Author: Etienne Ott <44156782+eott-siz@users.noreply.github.com>
+Date:   Mon Jun 12 12:03:37 2023 +0200
+
+    Merge pull request #9 from QuaSi-Software/fix-installation-instructions
+    
+    Fix ReSiE installation instructions
+
+[33mcommit df017f6a4ef0894cce54dc04d685b201043f91c4[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Mon Jun 12 12:02:33 2023 +0200
+
+    Fix installation instructions not working due to documenting an older version.
+
+[33mcommit 220f56069140b6f9e1f5bfaf750c613c2749f2fd[m
+Merge: ad3f110 4be0726
+Author: Etienne Ott <44156782+eott-siz@users.noreply.github.com>
+Date:   Thu May 25 15:25:19 2023 +0200
+
+    Merge pull request #8 from QuaSi-Software/fix-minor-corrections
+    
+    Corrections of fundamentals chapter
+
+[33mcommit 4be072647e0197c448ae76a8d4ce80e23f7a46a0[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 15:20:30 2023 +0200
+
+    Improve section on the order of operations and how it is determined.
+
+[33mcommit a90a348bc42d3dcd40ffc53dbf6124ce601f0fbd[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 11:59:48 2023 +0200
+
+    Remove section on 'outside-in approach' from fundamentals section.
+    
+    It was a left-over from an earlier explanation on the base order of operations and has been superceded.
+
+[33mcommit c1e50818764757b187d574b440229661178b8719[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 11:56:35 2023 +0200
+
+    Add centering to images missing it.
+
+[33mcommit d7ec403ace492ef1588a465fd525f116bea0d50f[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 11:27:16 2023 +0200
+
+    Add source images for diagrams used in section on the simulation model.
+
+[33mcommit 202cde48757d05166b500bde78618f01354569b3[m
+Merge: f29530e ad3f110
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 11:25:17 2023 +0200
+
+    Merge remote-tracking branch 'origin/main' into update-figures-from-paper
+
+[33mcommit f29530ebbfae3e619a24791428c90a5bc89a0166[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Thu May 25 11:20:48 2023 +0200
+
+    Correct equation describing energy balances by splitting it in two.
+
+[33mcommit ad3f1104cd4fcd0a76f42dcac8d81b6a014f8a0d[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Mon May 22 14:01:29 2023 +0200
+
+    added description of output units
+
+[33mcommit 32aa274d1d36e4b2bda25db52bf6f8359de89ae5[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Mon May 22 11:33:02 2023 +0200
+
+    renamed figures; added source files of figures
+
+[33mcommit f9484fbabbe989805d12d6c46a140500750c937c[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 17:20:55 2023 +0200
+
+    updated figures, corrected abbrev. of CHPP, updated README
+
+[33mcommit 26714afabdb2a0ea992d01f6332e360d32fe9af5[m
+Merge: cb5ebc3 6cec5d9
+Author: Heiner Steinacker <115217940+hsteinacker-siz@users.noreply.github.com>
+Date:   Tue May 16 16:50:01 2023 +0200
+
+    Merge pull request #7 from QuaSi-Software/update-figures-from-paper
+    
+    Update figures and updated energy system and fundamentals
+
+[33mcommit 6cec5d982e0034efdad6b2b97801a3b6b629de1a[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 16:46:08 2023 +0200
+
+    removed outdated figure
+
+[33mcommit 54ce79ff5bef5f17ea6d4bf07ff11b158c6f23f1[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 16:42:50 2023 +0200
+
+    updated figures
+
+[33mcommit cb5ebc3a84e8046781006749806a813ad7e3df2d[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 13:34:26 2023 +0200
+
+    added information on units
+
+[33mcommit 5e32e2449c9957fef930a35433c84676d4e0986b[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 11:13:12 2023 +0200
+
+    clarified current handing of temperatures
+
+[33mcommit f629547b11141957e57750830aaf9f020738b287[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 10:56:21 2023 +0200
+
+    updated description of OoO
+
+[33mcommit cf418afc3488919683711f2834265abd554ef5ba[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Tue May 16 09:46:49 2023 +0200
+
+    added placeholder for examples
+
+[33mcommit 2ff6dc868c07bd3519995c23ae89d9aea2e1a81d[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Mon May 15 17:51:27 2023 +0200
+
+    update description of requirements.txt
+
+[33mcommit 14e0ac93c9020ead51b47b56e1f32b1b8d52c313[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Mon May 15 14:48:56 2023 +0200
+
+    added global abbreviations and
+    updated python requirements for ReadTheDocs and
+    changed name of CHP to CHPP
+
+[33mcommit 415704ec72dc7b0a45036486630c7fad95c981ff[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Mon May 15 09:49:05 2023 +0200
+
+    changed naming of electrolyser (Ely) to hydrogen electrolyser (HEL)
+
+[33mcommit 4ad4ce22491972b2baafc1cc815765fe06775f57[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Fri May 12 15:39:18 2023 +0200
+
+    Update section explaining energy flow and use better figure for explaining system interfaces.
+
+[33mcommit cc05e9ddeea4a4bd902b95e0a136b43121f62f42[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Fri May 12 15:32:50 2023 +0200
+
+    updated navigation
+
+[33mcommit 19b84701024ed0e1e20068a5f8b1ba76d3667511[m
+Author: heiner.steinacker <heiner.steinacker@siz-energieplus.de>
+Date:   Fri May 12 15:28:35 2023 +0200
+
+    updated navigation
+
+[33mcommit c8ca7398379edd9bb339ab57dc2453c3ab599ba4[m
+Author: Etienne Ott <etienne.ott@siz-energieplus.de>
+Date:   Fri May 12 14:49:34 2023 +0200
+
+    Update section on example energy system.
+
+[33mcommit 5eeb
