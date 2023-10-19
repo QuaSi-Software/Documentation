@@ -1,5 +1,3 @@
-site_name: QuaSi Software
-
 version: 2
 
 build:
@@ -9,53 +7,8 @@ build:
 
 # Explicitly set the version of Python and its requirements
 python:
-  version: 2 # for unicode
-  setup_py_install: true
   install:
     - requirements: docs/requirements.txt
 
-# set theme
-theme: readthedocs
-
-# activate markdown math for latex 
-markdown_extensions:
-  - mdx_math
-  - footnotes 
-  - attr_list
-  - abbr
-  - pymdownx.snippets:
-        auto_append:
-            - includes/abbreviations.md
-
-extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']
-
-# navigation
-# Mkdocs readthedocs theme supports only one sub layer in navigation
-# should now support more than one sub layer with updated version, but structure of 
-# navigation is not working properly --> changed back to former version
-nav:
-  - Home:
-      - 'QuaSi - Overview': 'index.md'
-  - 'ReSiE: Simulation engine':
-      - 'Installation and usage': 'resie_installation.md'
-      - 'Input file format': 'resie_input_file_format.md'
-  - 'ReSiE: Simulation model':
-      - 'Fundamentals': 'resie_fundamentals.md'
-      - 'Energy systems': 'resie_energy_systems.md'
-      - 'Types of energy system components': 'resie_types_components.md'
-      - 'Operation and control': 'resie_operation_control.md'
-  - 'ReSiE: Technical description': 
-      - Main components: 'resie_description_components.md'
-      - General effects: 'resie_transient_effects.md'
-  - 'ReSiE: Examples':
-      - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
-  - 'GenSim: Generic Building Simulation':
-      - 'General Information': 'gensim_user_manual.md'
-  - Contributions:
-      - 'How to help': 'contributions.md'
-      - 'Working on the documentation': 'changing_documentation.md'
-      - 'Workflow for code contributions': 'workflow_code_contributions.md'
-  - Abbreviations:
-      - 'abbreviations_list.md'
-  - About:
-      - 'License': 'license.md'
+mkdocs:
+  configuration: mkdocs.yml
