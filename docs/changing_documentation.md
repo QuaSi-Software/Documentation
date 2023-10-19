@@ -20,7 +20,7 @@ It is advised to use a virtual environment to separate the requirements of proje
 1. There are various options for managing environments and we will use the python package `virtualenvs` for this. If you have not already, install it via `pip install virtualenvs`.
 2. Construct the environment with `virtualenv venv`. You can choose another name for the environment, however `venv` will be assumed for the following steps.
 3. Activate the environment with `.\venv\Scripts\activate` on Windows or `source ./venv/bin/activate` on Linux. This step has to be done every time you want to use the project. The environment stays active in your terminal session as indicated by the prefix `(venv)` at the start of the command line prompt. You can deactivate the environment at any time by closing the session or use the `deactivate` command, which is only available while an environment is active.
-4. Install the python package `mkdocs` with `pip install mkdocs`.
+4. Install the python package `mkdocs`, `pymdown-extensions` and `python-markdown-math` with `pip install mkdocs pymdown-extensions python-markdown-math`.
 5. Install the documentation package with `pip install -e .`.
 
 ### 3. Run the documentation generation
