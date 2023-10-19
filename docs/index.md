@@ -17,7 +17,7 @@ Now, QuaSi is understood to be a collection of the following simulation tools:
         ![ReSiE Logo](img/230505_Resie.jpg){ width="300" }
     </figure>
 
-- **GenSim** (acronym for "generic building simulation", in German "Generische Gebäudesimulation") that can perform a thermal building simulation based on EnergyPlus\(^{TM}\) to get energy demands for a variety of buildings and usage
+- **GenSim** (acronym for "generic building simulation", in German "Generische Gebäudesimulation") that can perform a thermal building simulation based on EnergyPlus\(^{TM}\) to get energy demands for a variety of buildings and usage ([GitHub Repository](https://github.com/QuaSi-Software/GenSim))
   
     <figure markdown>
         ![GenSim Logo](img/230505_GenSim.jpg){ width="300" }
