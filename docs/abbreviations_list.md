@@ -8,6 +8,8 @@
 | BA           | Battery (electrical)                                                        |
 | BB           | Biomass Boiler                                                              |
 | BETS         | Borehole Thermal Energy Storage                                             |
+| BGF          | Gross floor area (GFA)                                                      |
+| BRF          | Gross Room Volume                                                           |
 | BIM          | Building Information Modeling                                               |
 | BMWK         | German Federal Ministry for Economic Affairs and Climate Action             |
 | C-rate       | Charging rate (of storage)                                                  |
@@ -25,6 +27,7 @@
 | GB           | Gas Boiler                                                                  |
 | GCV          | Gross Calorific Value, also known as Higher Heating Value (HHV)             |
 | GenSim       | Generic Building Simulation [simulation tool]                               |
+| GR          | Gross floor area (german BGF)                                                |
 | HC           | Hydrogen Compressor                                                         |
 | HEL          | Hydrogen Electrolyser                                                       |
 | HHV          | Higher Heating Value, also known as Gross Calorific Value (GCV)             |
@@ -44,7 +47,7 @@
 | QuaSi        | Quarter Simulation [project name]                                           |
 | REPL         | Read-Eval-Print Loop of Julia                                               |
 | ReSiE        | Computational Engine for the Simulation of Energy Systems [simulation tool] |
-| NRF          | Net useful Building Area (n.b.ar.)                                          |
+| NRF          | Net useful building Area (n.b.ar.)                                          |
 | SAM          | System Advisor Model                                                        |
 | SCC          | Simple Compression Chiller                                                  |
 | SCOP         | Seasonal Coefficient of Performance                                         |
