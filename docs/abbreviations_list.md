@@ -11,6 +11,7 @@
 | BGF          | Gross floor area (GFA)                                                      |
 | BRF          | Gross Room Volume                                                           |
 | BIM          | Building Information Modeling                                               |
+| BKI          | Building cost index                                                         |
 | BMWK         | German Federal Ministry for Economic Affairs and Climate Action             |
 | C-rate       | Charging rate (of storage)                                                  |
 | CC           | Compression Chiller                                                         |
@@ -27,7 +28,6 @@
 | GB           | Gas Boiler                                                                  |
 | GCV          | Gross Calorific Value, also known as Higher Heating Value (HHV)             |
 | GenSim       | Generic Building Simulation [simulation tool]                               |
-| GR          | Gross floor area (german BGF)                                                |
 | HC           | Hydrogen Compressor                                                         |
 | HEL          | Hydrogen Electrolyser                                                       |
 | HHV          | Higher Heating Value, also known as Gross Calorific Value (GCV)             |
