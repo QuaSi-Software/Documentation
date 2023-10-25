@@ -32,6 +32,7 @@
 | HEL          | Hydrogen Electrolyser                                                       |
 | HHV          | Higher Heating Value, also known as Gross Calorific Value (GCV)             |
 | HP           | Heat Pump                                                                   |
+| HR           | Heat recovery                                                               |
 | HVAC         | Heating, Ventilation and Air Conditioning                                   |
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
@@ -52,6 +53,7 @@
 | SCC          | Simple Compression Chiller                                                  |
 | SCOP         | Seasonal Coefficient of Performance                                         |
 | SEER         | Seasonal Energy Efficiency Ratio                                            |
+| SFP          | Specific fan power                                                          |
 | STES         | Seasonal Thermal Energy Storage                                             |
 | STTES        | Short-Therm Thermal Energy Storage                                          |
 | SUT          | Start-Up Time                                                               |

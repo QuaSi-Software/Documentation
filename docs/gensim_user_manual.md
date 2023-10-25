@@ -97,12 +97,14 @@ The orientation of the building can also be changed using a drop down menu (see 
 As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NRF}\) the user now needs to specify the ratio BGF/NRF. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key figures from the Building Cost Index (BKI) and VDI 3807-2 have been stored for a variety of building typologies. 
 
 
+
 **Window areas**
 
 Besides the actual geometry window areas also need to be defined. Therefore a corresponding "window band"[^8] is modelled by specifying a proportion of window area per facade (m² of window area / m² of facade area [%] - see following figure).
 [^8]: Ratio of transparent to opaque outer surface (window without frame) 
 
 ![window area](fig\231025_window_area.PNG)
+
 
 
 **Adiabatic external components**
@@ -138,6 +140,61 @@ The type days for electrical devices and lighting are available in the form of s
 
 **Person occupancy**
 
-Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person \(W/pers\). 
+Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person (\(W/pers\)). By multiplying these two profiles and the person occupancy in \(m²NRF/person\) the result is - like for electrical devices and lighting - a profile in \(W/m²_{NRF}\) (\(W/person\) * \(person/m²_{NRF}\)). 
 
 ![definition of the building usage](fig\231025_definition_building_usage.PNG)
+
+Complete profiles from various sources are already stored for all usage profiles: 
+
+**SLP BDEW:** Standard load profiles from the German Association for Energy and Water Management    
+**DOE Prototype Buildings:** Commercial Prototype Building Models US Department of Energy   
+**DIN V 18500-10:** Energy performance of buildings Part 10     
+**VDI 2078: 1996-07:** Assessment of cooling load of air-conditioned rooms  
+It is also possible to define all profiles yourself. Custom profiles can be created using the "Own User Profiles" menu item and then selected in the respective drop-down menu (see figure). 
+
+![menu item own user profiles](fig\231025_menu_own_user_profile.png)
+
+
+###3.4 Building standard
+####3.4.1 External components
+
+A number of pre-defined component structures are stored for the external components of the building. These can be selected from the drop-down menu see figure. Additionally it is also possible to define your own component structures. For this use the "Own Components" menu item (see figure) to define all the required physical values for the external wall, roof, floor plate, intermediate ceiling and window component groups. Note: The heat transmission coefficient of opaque components is calculated from the layer thicknesses and specific thermal conductivities of the materials and the heat transfer resistances. When creating new layers all physical quantities must be fully described. 
+
+![definition of he building standard](fig\231025_definition_building_standard.PNG)
+
+![menu item own components](fig\231025_menu_own_components.png)
+
+
+####3.4.2 Internal components
+
+Internal components are defined as false ceilings (see last subchapter) and internal walls which essentially influence the simulation as internal storage masses. The building standard of the internal walls can be selected by a drop-down list as "light", "medium" or "heavy". Therefore typical structures have been saved.  
+
+![definition internal components](fig\231025_definition_internal_components.PNG)
+
+
+###3.5 Air temperature setpoint
+
+The air temperature setpoint for heating and cooling are set in the same way as the usage profiles (see chapter 3.3) using two drop-down menus (see figure below) either from stored standard profiles or from user-defined profiles. 
+
+![definition air temperature setpoint](fig\231025_definition_air_setpoint.PNG)
+
+
+###3.6 Ventilation system
+
+To represent the ventilation system the system type and the heat recovery (HR) option must be selected from two drop-down menus (see figure below). If the HR ist activated a return heat or return humidity value must also be specified. The operating times of the ventilation system are defined in the same way as the usage profiles (see chapter 3.3) using a drop-down list either from stored profiles or by selecting a user-defined profile. The actual air flow rate of the ventilation system is determined by specifying the "air change rate" parameter and a conditioned room height. 
+
+![definition ventilation system](fig\231025_definition_ventilation_system.PNG)
+
+The power demand of the ventilation system and therefore the resulting heat input into the ventilation system considered in the simulation is based on the standard SFP (specific fan power) factors of DIN EN 16798-3. The specific fan power is set at 750 \(W/(m³/s)\) for supply and extract air corresponding to SFP 2. 
+
+
+###3.7 Further more
+
+![definition of other parameters](fig\231025_definition_further_parameters.PNG)
+
+There are a number of optional model features that can be activated and these are explained below.
+
+**Window ventialtion in case of overheating (cooling)**
+
+In order to simplify window ventilation (for cooling) of the building users in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). 
+
