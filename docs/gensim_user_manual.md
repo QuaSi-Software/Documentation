@@ -190,11 +190,27 @@ The power demand of the ventilation system and therefore the resulting heat inpu
 
 ###3.7 Further more
 
-![definition of other parameters](fig\231025_definition_further_parameters.PNG)
-
 There are a number of optional model features that can be activated and these are explained below.
 
 **Window ventialtion in case of overheating (cooling)**
 
-In order to simplify window ventilation (for cooling) of the building users in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). 
+In order to simplify window ventilation (for cooling) in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of an air exchange rate (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
 
+**Infiltration**
+
+By defining an air exchange rate (see following figure) a constant air exchange rate is applied to all conditioned zones of the building during the simulation to reproduce the building's leakage. Reference values can be found in the GenSim reference library. 
+
+![definition of other parameters](fig\231025_definition_further_parameters.PNG)
+
+**Daylight-dependent lighting control**
+
+Daylight-dependent lighting control can be activated to realistically simulate user behaviour in terms of artificial lighting operation depending on the daylight available in individual rooms. When a certain level of daylight is reached (see parameter "daylight threshold" in the figure above) the lighting in individual rooms is deactivated contrary to the active "lighting usage profile". This leads to the typical seasonal character of the lighting profile as shown in the following figure.
+
+*figure missing*
+
+
+**Photovoltaic**
+
+Besides simulating the actual building, a simplified photovoltaic simulation can also be done. This option must be activated by ticking a checkbox (see following figure). Depending on the parameters "elevation angle" and "azimuth" as well as "module efficiency" and "system efficiency" a building-independent photovoltaic simulation can be done. A ground-mounted photovoltaic system with a module area of 1 m² is simulated. A building integrated PV system cannot be simulated with GenSim.
+
+*figure missing*

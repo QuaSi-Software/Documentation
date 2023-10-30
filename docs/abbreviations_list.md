@@ -37,6 +37,7 @@
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
 | JSON         | JavaScript Object Notation [data format]                                    |
+| K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | MOT          | Minimum Operation Time                                                      |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
