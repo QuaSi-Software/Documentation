@@ -81,7 +81,7 @@ For the zeroth timestep of the simulation, \(\dot{Q}_{out,current}(0)\) is set t
 Below, an exemplary logic is given of a function handling the transient heat-up effects.
 ```
 def heat_up_losses( Q_out(last_ontime),
-    	            last_state, 
+                    last_state, 
                     this_state, 
                     t_simulation, 
                     t_on, 
@@ -137,7 +137,7 @@ The change of the efficiency with respect to the PLR can be given as curve, for 
 
 <center>![motor efficiency](fig/230124_motor_efficiency_Eppinger2021.JPG)</center>
 
-Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has so be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
+Considering non-linear part-load efficiencies leads to several problems. First, the part-load efficiency curve is not necessarily a monotonic function, as shown in the figure above exemplarily. This implies that the function is also non-invertible. However, the inversion is needed to determine the part-load state at which power a component has to be operated at the current time step when external limits are present, e.g. if only a limited energy supply and/or a limited energy demand is given. 
 
 Another problem is the fact, that efficiencies are always defined as ratios. When changing the efficiency due to part-load operation, it is not clear, how the two elements of the efficiency-ratio have to be adjusted as only their ratio is given. Here, in this simulation model, one input or one output has to be defined as basis for the efficiency that will be considered to have a linear behavior in part-load operation. The other in- or output energy will be adjusted to represent the non-linearities in the change of the efficiency at different PLR. 
 
@@ -155,7 +155,9 @@ as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a li
 
 \(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \) 
 
-is monotonic in the range of \(PLR \in [0:1]\). This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). The part-load function of the useful energy, that is assumed to be linear,
+is monotonic in the range of \(PLR \in [0:1]\) and \( E_{useful,rated}\) depicts the rated power of the component. This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). 
+
+The part-load function of the useful energy, that is assumed to be linear,
 
 \(E_{useful}(PLR) = PLR \ \ E_{useful,rated}\)
 
@@ -163,21 +165,33 @@ needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, th
 
 \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
 
-During each timestep, both functions are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
+During each timestep, both functions, \(E_{expended}(PLR)\) and \(E_{useful}(PLR)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
+
+### PLR calculation for Gas Boiler
+
+The following section provides a more detailed explanation of the calculations for maximal consumable gas and maximal produced heat for the GB under different operating strategies. At full load, no additional calculations are required, as the maximal consumable gas is equal to the maximal produced heat.
+Before diving deeper into the computation steps, it should be noted that for the thermal efficiency curve of the gas boiler a polynomial fit is used. The data points for the fit are obtained from the graph via the visual metric and fitted with the NumPy polyfit function. The fit closely resembles the orange curve, with the **only difference** being that the implemented curve is monotonically increasing across the entire partial-load ratio interval. LeeSeo2019[^LeeSeo2019] uses a similar curve for the thermal efficiency of a gas boiler but with slightly different parameter values. The reason for the disparity in values is that we were unable to replicate the values for the thermal efficiency with their coefficient values.
+
+For a supply-driven strategy, the intake amount of gas is provided at the current time step. To determine PLR, the following procedure is followed: First, the output energy curve is divided by the thermal efficiency curve. Second, a lookup table is created. The entries in this table consist of tuples comprising the PLR value and the corresponding expended energy value, obtained in the first step. Finally, when estimating the part-load ratio corresponding to a provided energy input value, the upper and lower values around the provided value are identified using the lookup table. Once this is accomplished, the PLR value is calculated through linear interpolation.  
+The computed PLR value is then used to compute the thermal efficiency (gray function). Last but not least, the energy balance equation is solved to determine the maximum producible heat based on the obtained thermal efficiency of the gas boiler. This is achieved by simply multiplying the thermal efficiency by the maximum consumable gas.
+
+When a gas boiler (GB) is operated using a demand-driven strategy, the maximal produced heat and maximal consumable gas are determined as follows. First, the maximal produced heat is set to be equal to the rated power, instead of the demanded power. This prevents the case where the demanded power is infinite, which, in turn, would lead to a non-physical state. Second, the demand heat is checked to see if it exceeds the maximum producible heat. If this is the case, then the demand heat is limited to the maximum producible heat [^min_use_frac]. Afterwards, the part load ratio is calculated as \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\). Thermal efficiency is calculated by evaluating the pre-implemented function (orange curve) with the obtained PLR as input. Lastly, the maximal consumable gas is computed by solving the energy balance equation. In this case, the maximal produced heat is divided by the computed thermal efficiency.
 
 If several outputs on a component exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
 
-**ToTo**
+**ToDo**
 
 - Bezugsgröße für Berechnung der PLR definieren je Komponente? Oder pauschal auf thermischen Ausgang? Oder wählbar?
 - Aufteilung der Wirkungsgradänderung auf Input/Output (aktuell: eines linear, das andere alles; aber aber 50/50 denkbar)
 
-
 [^Eppinger2021]: Eppinger, B. et al.(2021): Simulation of the Part Load Behavior of Combined Heat Pump-Organic Rankine Cycle Systems. In: *Energies 14 (13)*, S. 3870. doi: [10.3390/en14133870](https://doi.org/10.3390/en14133870).
-
+[^LeeSeo2019]: Lee, D.Y., Seo, B.M., Yoon, Y.B. et al. Heating energy performance and part load ratio characteristics of boiler staging in an office building. Front. Energy 13, 339–353 (2019). doi: [https://doi.org/10.1007/s11708-018-0596-5](https://doi.org/10.1007/s11708-018-0596-5).
+[^min_use_frac]: Assuming the demand heat would not be set to the maximal produced heat, then the usage fraction would be greater than 1. This theoretically would not produce any issues as the usage fraction is set to 1 if there is no smaller value.
 
 ## Minimum operation time
 
 To force the simulation engine to turn on a component for a defined minimum operation time, the partial load ratio is limited to allow the component to run for the defined turn-on time. The limit is determined by the maximum potential of the energy sink (e.g. free storage capacity) divided by the minimum operating time with a consideration of the maximum deliverable power of the component. This method does not take into account an unexpected decrease of the available energy input into the component, since no prediction is possible in this model. Therefore, the minimum operating time cannot be guaranteed.
 
 **ToDo: elaborate further**
+
+

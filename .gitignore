@@ -3,6 +3,7 @@ site/
 
 # virtual environment
 venv/
+venv_docu/
 
 # python cache file
 *.egg-info
