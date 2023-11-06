@@ -214,3 +214,17 @@ Daylight-dependent lighting control can be activated to realistically simulate u
 Besides simulating the actual building, a simplified photovoltaic simulation can also be done. This option must be activated by ticking a checkbox (see following figure). Depending on the parameters "elevation angle" and "azimuth" as well as "module efficiency" and "system efficiency" a building-independent photovoltaic simulation can be done. A ground-mounted photovoltaic system with a module area of 1 m² is simulated. A building integrated PV system cannot be simulated with GenSim.
 
 *figure missing*
+
+## **4 Simulation**
+
+Once all the parameters have been entered the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process the EnergyPlus® model is generated in the first step. This turns the generic model into a customised EnergyPlus® building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
+
+![start of the simulation](fig\231106_start_simulation.png)
+
+The user is continuously informed about the progress of the model generation and simulation, see following figure. At the end of the simulation process the results of the EnergyPlus® simulation are imported into the Excel® user interface.
+
+*figure missing*
+
+## **5 Results**
+
+The results of the simulation are output by the software as annual values and profiles. Annual values can be found on the "HOMEPAGE" and under the menu item "BUILDING BALANCE". The main profiles are displayed under "ENERGY DEMAND". More profiles can be found under "e+ Outputs". A graphical representation of the main profiles can be found under the menu item "PROFILES VIEW". The output of the results is intuitive so no further explanation is given in this manual. 
