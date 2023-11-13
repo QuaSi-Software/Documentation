@@ -703,7 +703,7 @@ n | total numbers of time steps so far | [-]
 \(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
 
 #### Calculation of the g-function values
-There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already online libraries, such as the open-source library of (Spitler & Cook 2021)[^Spitler,Cook], which save a time-consuming calculation for g-functions of various probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. [The following sentence is TO DO Work in progress:] In QuaSi II, a default configuration is chosen based on the heat pump's nominal power if the exact system data is not known in the early planning phases. The pre-calculated g-function values are basically only 27 grid points between which the QuaSi II implementation interpolates in order to be able to access the corresponding g-function values for each simulation time step. The first interpolation point of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by (Eskilson 1987)[^Eskilson].
+There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already online libraries, such as the open-source library of (Spitler & Cook 2021)[^Spitler,Cook], which save a time-consuming calculation for g-functions of various probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The pre-calculated g-function values are basically 27 grid points between which the QuaSi II implementation interpolates in order to be able to access the corresponding g-function values for each simulation time step. The first interpolation point of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by (Eskilson 1987)[^Eskilson].
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
 $$ t_S = \frac{h_{probe}^2}{9 \cdot a_{soil}} $$
@@ -714,14 +714,14 @@ Where \(J_0\),\(J_1\),\(Y_0\) and \(Y_1\) are Bessel-functions, s is an integral
 $$ R = \frac{r_{\text{eq}}}{r_b} = \frac{2r_0}{r_b}\ $$
 Where \(r_{\text{eq}}\) is the equivalent radius, \(r_0\) is the radius of a U-tube and \(r_b\) is the borehole radius. After calculating the g-function values for the single probe, an overlap with the g-function values from the library of [Spitler, Cook, 2021] takes place. If both g-function value series do not have a common intersection point, the library values are used from the first grid point from [Spitler, Cook, 2021], which take into account mutual probe influence over longer periods of time. Thus, the g-function is composed as shown in the grafics below:
 ![composed g-function in detail ](fig/231025_composite_g_function.png)
-![composed g-function](fig/231025_composite_g_function_2.png)
+![composed g-function](fig/231030_composite_g_function_2.png)
 
 [^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu:  G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(a_{soil}\)  | thermal diffusivity   | [\(m^{2})\/s]
+\(a_{soil}\)  | thermal diffusivity   | [\(m^2/s \)] 
 \(h_{probe}\)  | probe depth   | [m]
 \(J_0\),\(J_1\),\(Y_0\),\(Y_1\)  | Bessel-functions   | [-]
 \(r_{\text{eq}}\)  | Equivalent radius of cyldindric heat source or sink | [m]
