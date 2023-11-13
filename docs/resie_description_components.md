@@ -650,15 +650,13 @@ Symbol | Description | Unit
 
 ## Heat sources 
 ### Soil
-- geothermal probes
-- geothermal collector 
-- geothermal basket collector
-- geothermal trensh collector
-- geothermal spiral collector
-- (sheet pile wall)
+- geothermal probes --> see below
+- geothermal collector --> see below
+- geothermal basket collector --> not included for now
+- geothermal trensh collector --> not included for now
+- geothermal spiral collector --> not included for now
 
 ### Geothermal Probes
-Regernation von Wärmequellen --> Erdwärmesonden sind eher Speicher als Wärmequellen
 
 #### Overview
 Geothermal probes are vertical geothermal heat exchangers with a typical drilling depth of 50 - 150 m. Into the borehole, which usually has a diameter of 150 - 160 mm, pipes are laid. In most cases, two pipes are inserted into the borehole in a U-shape and the borehole is subsequently filled with filling material. The purpose of the filling material is to improve the thermal properties of the heat transfer between the probe tubes and the ground and to give the borehole stability. Geothermal probes serve as heat reservoirs for heat pumps and can also be used conversely as cold reservoirs in summer regeneration mode. In larger systems, several borehole heat exchangers are connected hydraulically in parallel to form fields of geothermal probes. Over longer periods of time, the temperature fields around adjacent probes in a field influence each other.
@@ -779,7 +777,6 @@ R  | Radius ratio  | [-]
 
 
 ### Geothermal Heat Collector
-
 
 
 #### Overview
@@ -920,8 +917,6 @@ Symbol | Description | Unit
 ### External source
 - district heating network
 
-
-(Vergleich FutureHeatPump II Projekt)
 
 
 ## Chiller
