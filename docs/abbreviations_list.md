@@ -8,7 +8,6 @@
 | BA           | Battery (electrical)                                                        |
 | BB           | Biomass Boiler                                                              |
 | BETS         | Borehole Thermal Energy Storage                                             |
-| BGF          | Gross floor area (GFA)                                                      |
 | BRF          | Gross Room Volume                                                           |
 | BIM          | Building Information Modeling                                               |
 | BKI          | Building cost index                                                         |
@@ -28,6 +27,7 @@
 | GB           | Gas Boiler                                                                  |
 | GCV          | Gross Calorific Value, also known as Higher Heating Value (HHV)             |
 | GenSim       | Generic Building Simulation [simulation tool]                               |
+| GFA          | Gross floor area (BGF)                                                      |
 | HC           | Hydrogen Compressor                                                         |
 | HEL          | Hydrogen Electrolyser                                                       |
 | HHV          | Higher Heating Value, also known as Gross Calorific Value (GCV)             |
@@ -41,6 +41,7 @@
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | MOT          | Minimum Operation Time                                                      |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
+| NFA          | Net building area (NRF)                                                     |
 | OH           | Oil Heating                                                                 |
 | PLF          | Part Load Factor                                                            |
 | PLR          | Part Load Ratio                                                             |

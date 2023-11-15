@@ -17,7 +17,7 @@ An exception is the possibility besides the generic geometry generation (cubic b
 
 The main output of GenSim is high-resolution profiles in units of  \(Wh/m²_{NRF}\). Within the building simulation no distribution or transfer losses are represented. Therefore all results must be evaluated as net energy. Distribution losses must be imprinted afterwards for example in the form of an offset. 
 
-In addition to the output profiles GenSim provides various annual values, an overview of the building balance and the ability to perform of sensitivity analyses (see  figure below). 
+In addition to the output profiles GenSim provides various annual values, an overview of the building energy balance and the ability to perform of sensitivity analyses (see  figure below). 
 
 ![overview of the output sizes](fig\231023_overview.PNG)
 
@@ -43,7 +43,7 @@ Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25
 
 **Store and simulate custom weather data sets**
 In general any *EnergyPlus®* weather data set can be stored by the user and selected for the simulation with GenSim. A complete weather data set always consists of an epw-file and a ddy-file which must be stored under the same file name in the subfolder "weather" in the GenSim file path. The refresh button can be used to update the selection in the drop down list.
-Ready-to-use weather datasets (epw + ddy) for worldwide locations can be downloaded free of charge from the following websites: 
+Ready-to-use weather data sets (epw + ddy) for worldwide locations can be downloaded free of charge from the following websites: 
 
 [https://energyplus.net/weather](https://energyplus.net/weather)    
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
@@ -51,7 +51,7 @@ Ready-to-use weather datasets (epw + ddy) for worldwide locations can be downloa
 
 Furthermore the TRY of the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the "EnergyPlus Weather Converter". For this purpose a separate and more detailed instruction can be found in the following folder path:
 
-*Verweis auf interne Dokumente*
+*link coming soon*
 
 
 ###3.2 Building geometry
@@ -60,11 +60,11 @@ The building geometry can be defined in two ways. Either a generic cubic geometr
 
 ![selection of the method for geometry generation in the Excel® GUI](fig\231023_selection_method.png)
 
-Basically the *EnergyPlus®* geometry model is illustrated with its external dimensions but no component thicknesses or volumes (e.g. wall or ceiling thicknesses) are represented. As a result the entire Gross Floor Area (BGF) or Gross Room Volume (BRF) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible in any case given the low level of model detail. The net room area (NRF) is used to convert the results into area-specific quantities. This means that the absolute results of the simulation are related to a typical NRF corresponding to the simulated BGF.
+Basically the *EnergyPlus®* geometry model is illustrated with its external dimensions but no component thicknesses or volumes (e.g. wall or ceiling thicknesses) are represented. As a result the entire Gross Floor Area (GFA) or Gross Room Volume (BRF) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible in any case given the low level of model detail. The net room area (NFA) is used to convert the results into area-specific quantities. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
 
 ####3.2.1 Generic building model
 
-The generic geometry model is a cubic building (see figure) defined by the parameters "length", "width", " height", "number of floors" and "window area proportions"[^5] (see figure). An idealised floor plan is used which divides each floor into 4 external zones and one internal zone (see figure). 
+The generic geometry model is a cubic building (see figure) defined by the parameters "length", "width", " floor height", "number of floors" and "window area percentage"[^5] (see figure). An idealised floor plan is used which divides each floor into 4 external zones and one internal zone (see figure). 
 
 After the simulation it is possible to view the generic geometry model in *SketchUp®* using the *OpenStudio®* SketchUp plug-ins. The model file is located in 
 "/Output/run" directory under the name "in.osm".
@@ -92,15 +92,15 @@ The orientation of the building can also be changed using a drop down menu (see 
 
 
 
-**NRF/BGF ratio**
+**Ratio NFA/GFA**
 
-As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NRF}\) the user now needs to specify the ratio BGF/NRF. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key figures from the Building Cost Index (BKI) and VDI 3807-2 have been stored for a variety of building typologies. 
+As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\) the user now needs to specify the ratio GFA/NFA. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key figures from the Building Cost Index (BKI) and VDI 3807-2 have been stored for a variety of building typologies. 
 
 
 
 **Window areas**
 
-Besides the actual geometry window areas also need to be defined. Therefore a corresponding "window band"[^8] is modelled by specifying a proportion of window area per facade (m² of window area / m² of facade area [%] - see following figure).
+Besides the actual geometry window areas also need to be defined. Therefore a corresponding "window band"[^8] is modelled by specifying a percentage of window area per facade (m² of window area / m² of facade area [%] - see following figure).
 [^8]: Ratio of transparent to opaque outer surface (window without frame) 
 
 ![window area](fig\231025_window_area.PNG)
@@ -117,8 +117,7 @@ Optionally individual facade components as well as the roof and floor plate of t
 
 As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or  significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in the following section 5. Currently the gross floor area (GFA) of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
 
-
-*figure missing*
+![import geometry model](fig\231115_import_geometry_model.png)
 
 
 ###3.3 Building usage
@@ -127,7 +126,7 @@ By using electrical devices the user directly influences the electricity demand.
 
 ![parameter first day of the year](fig\231025_parameter_first_day.png)
 
-*figure missing*
+![profile typology days](fig\231115_profile_typology_days.png)
 
 Up to 5 periods can be defined for public holidays/vacation days (see following figure). These can be holiday periods e.g. when simulating a school or university building.
 
@@ -140,7 +139,7 @@ The type days for electrical devices and lighting are available in the form of s
 
 **Person occupancy**
 
-Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person (\(W/pers\)). By multiplying these two profiles and the person occupancy in \(m²NRF/person\) the result is - like for electrical devices and lighting - a profile in \(W/m²_{NRF}\) (\(W/person\) * \(person/m²_{NRF}\)). 
+Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person (\(W/pers\)). By multiplying these two profiles and the person occupancy in \(m²NFA/person\) the result is - like for electrical devices and lighting - a profile in \(W/m²_{NFA}\) (\(W/person\) * \(person/m²_{NFA}\)). 
 
 ![definition of the building usage](fig\231025_definition_building_usage.PNG)
 
@@ -160,7 +159,7 @@ It is also possible to define all profiles yourself. Custom profiles can be crea
 
 A number of pre-defined component structures are stored for the external components of the building. These can be selected from the drop-down menu see figure. Additionally it is also possible to define your own component structures. For this use the "Own Components" menu item (see figure) to define all the required physical values for the external wall, roof, floor plate, intermediate ceiling and window component groups. Note: The heat transmission coefficient of opaque components is calculated from the layer thicknesses and specific thermal conductivities of the materials and the heat transfer resistances. When creating new layers all physical quantities must be fully described. 
 
-![definition of he building standard](fig\231025_definition_building_standard.PNG)
+![definition of the building standard](fig\231025_definition_building_standard.PNG)
 
 ![menu item own components](fig\231025_menu_own_components.png)
 
@@ -194,11 +193,11 @@ There are a number of optional model features that can be activated and these ar
 
 **Window ventialtion in case of overheating (cooling)**
 
-In order to simplify window ventilation (for cooling) in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of an air exchange rate (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
+In order to simplify window ventilation (for cooling) in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of  air changes per hour (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
 
 **Infiltration**
 
-By defining an air exchange rate (see following figure) a constant air exchange rate is applied to all conditioned zones of the building during the simulation to reproduce the building's leakage. Reference values can be found in the GenSim reference library. 
+By defining the air changes per hour (see following figure) a constant air exchange rate is applied to all conditioned zones of the building during the simulation to reproduce the building's leakage. Reference values can be found in the GenSim reference library. 
 
 ![definition of other parameters](fig\231025_definition_further_parameters.PNG)
 
@@ -206,14 +205,8 @@ By defining an air exchange rate (see following figure) a constant air exchange 
 
 Daylight-dependent lighting control can be activated to realistically simulate user behaviour in terms of artificial lighting operation depending on the daylight available in individual rooms. When a certain level of daylight is reached (see parameter "daylight threshold" in the figure above) the lighting in individual rooms is deactivated contrary to the active "lighting usage profile". This leads to the typical seasonal character of the lighting profile as shown in the following figure.
 
-*figure missing*
+![example lightning annual value](231115_lightning_annual_value.png)
 
-
-**Photovoltaic**
-
-Besides simulating the actual building, a simplified photovoltaic simulation can also be done. This option must be activated by ticking a checkbox (see following figure). Depending on the parameters "elevation angle" and "azimuth" as well as "module efficiency" and "system efficiency" a building-independent photovoltaic simulation can be done. A ground-mounted photovoltaic system with a module area of 1 m² is simulated. A building integrated PV system cannot be simulated with GenSim.
-
-*figure missing*
 
 ## **4 Simulation**
 
