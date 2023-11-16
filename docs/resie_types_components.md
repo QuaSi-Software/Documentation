@@ -234,26 +234,33 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
 
-### Gas boiler
+### Fuel boiler
 | | |
 | --- | --- |
-| **Type name** | `GasBoiler`|
-| **File** | `energy_systems/heat_producers/gas_boiler.jl` |
+| **Type name** | `FuelBoiler`|
+| **File** | `energy_systems/heat_producers/fuel_boiler.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
-| **Input media** | `m_gas_in`/`m_c_g_natgas` |
+| **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`, `OUT` |
 
-A gas boiler that transforms combustible gas into heat.
+A boiler that transforms chemical fuel into heat.
+
+This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
+
+The current implementation includes functionality to model a PLR-dependant thermal efficiency \(\eta(PLR)\), however the efficiency curve is not customizable without code changes until a system for functions-as-parameters is in place.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
 | `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
+| `max_thermal_efficiency` | `Float` | N/Y | 1.0 | The maximum thermal efficiency if no \(\eta(PLR)\) is used. |
+| `is_plr_dependant` | `Boolean` | N/Y | False | Toggle if \(\eta(PLR)\) is used or not. |
 
 ### Heat pump
 | | |
