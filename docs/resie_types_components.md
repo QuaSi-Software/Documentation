@@ -48,12 +48,13 @@ The type refers to the type it is expected to have after being parsed by the JSO
 
 Generalised implementation of a bounded sink.
 
-Must be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
 
@@ -71,12 +72,13 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 
 Generalised implementation of a bounded source.
 
-Must be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
@@ -98,11 +100,11 @@ The only implementation of special component `Bus`, used to connect multiple com
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `connection_matrix` | `Dict{String,Any}` | N/N |  |  |
 
-### General demand
+### General fixed sink
 | | |
 | --- | --- |
 | **Type name** | `Demand`|
-| **File** | `energy_systems/general/demand.jl` |
+| **File** | `energy_systems/general/fixed_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
 | **Medium** | `medium`/`None` |
@@ -110,17 +112,24 @@ The only implementation of special component `Bus`, used to connect multiple com
 | **Output media** | |
 | **Tracked values** | `IN`, `Load`, `Temperature` |
 
-Generalised implementation of a demand.
+Generalised implementation of a fixed sink.
 
-Must be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
 | `static_load` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+
+### General demand
+| | |
+| --- | --- |
+| **Type name** | `Demand`|
+| **File** | `energy_systems/general/fixed_sink.jl` |
+Alias to `FixedSink`.
 
 ### General fixed supply
 | | |
@@ -136,12 +145,13 @@ Must be given a profile for the energy it requests, which is scaled by the given
 
 Generalised implementation of a fixed source.
 
-Must be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
+| `static_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
