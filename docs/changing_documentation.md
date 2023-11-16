@@ -7,8 +7,7 @@ Here's how to work with the documentation and in particular how to change someth
 5. When the changes have been merged, you can pull the new state to your local repository
 
 ## Installation and usage instruction
-**Requirements: Python 3.9 or later**
-Install python, e.g. from [https://www.python.org/downloads/](https://www.python.org/downloads/).
+**Requirements: Python 3.9 or later,** e.g. from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 ### 1. Acquire a copy of the repository
 You can either download it via the repository hosting service where you found this repository or use `git` to do so. For example: `git clone git@repository.domain.tld` will fetch a copy of the repository. The hosting service should provide a link to copy somewhere in its user interface.
@@ -22,7 +21,7 @@ It is advised to use a virtual environment to separate the requirements of proje
 2. Construct the environment with `virtualenv venv`. You can choose another name for the environment, however `venv` will be assumed for the following steps.
 3. Activate the environment with `.\venv\Scripts\activate` on Windows or `source ./venv/bin/activate` on Linux. This step has to be done every time you want to use the project. The environment stays active in your terminal session as indicated by the prefix `(venv)` at the start of the command line prompt. You can deactivate the environment at any time by closing the session or use the `deactivate` command, which is only available while an environment is active.
    
-### 3. Install necessary python packages to run the documentation
+### 3. Install required python packages to run the documentation
 Install the python package `mkdocs`, `pymdown-extensions` and `python-markdown-math` with `pip install mkdocs pymdown-extensions python-markdown-math` in the python terminal.
 
 ### 4. Run the generation of the documentation
