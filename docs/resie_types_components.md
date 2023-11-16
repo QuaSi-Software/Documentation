@@ -297,6 +297,25 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 ## Storage
 
+### General storage
+| | |
+| --- | --- |
+| **Type name** | `Storage`|
+| **File** | `energy_systems/general/storage.jl` |
+| **Available models** | default: `simplified` |
+| **System function** | `storage` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+
+A generic implementation for energy storage technologies.
+
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the storage. |
+| `load` | `Float` | Y/N | 6000.0 | The initial load state of the storage. |
+
 ### Battery
 | | |
 | --- | --- |
