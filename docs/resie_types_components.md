@@ -326,7 +326,7 @@ A generic implementation for energy storage technologies.
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A storage for electricity.
 
@@ -345,7 +345,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -375,7 +375,7 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 
