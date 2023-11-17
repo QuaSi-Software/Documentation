@@ -82,9 +82,7 @@ Ready-to-use weather data sets (epw + ddy) for worldwide locations can be downlo
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore the TRY of the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the "EnergyPlus Weather Converter". For this purpose a separate and more detailed instruction can be found in the following folder path:
-
-*link coming soon*
+Furthermore the TRY of the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the "EnergyPlus Weather Converter". A tool facilitating this workflow is currently under development and will be released soon.
 
 
 ###3.2 Building geometry
@@ -127,8 +125,7 @@ The orientation of the building can also be changed using a drop down menu (see 
 
 **Ratio NFA/GFA**
 
-As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\) the user now needs to specify the ratio GFA/NFA. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key figures from the Building Cost Index (BKI) and VDI 3807-2 have been stored for a variety of building typologies. 
-
+As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\) the user now needs to specify the ratio GFA/NFA. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key values for a variety of building typologies are available.
 
 
 **Window areas**
@@ -148,7 +145,7 @@ Optionally individual facade components as well as the roof and floor plate of t
 
 ####3.2.2 Imported geometry model
 
-As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in the following section 5. Currently the GFA of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
+As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in chapter 6. Currently the GFA of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
 
 ![import geometry model](fig\231115_import_geometry_model.png)
 
@@ -166,23 +163,24 @@ Up to 5 periods can be defined for public holidays/vacation days (see following 
 ![definition of holidays/ vacation days](fig\231025_definition_holidays.PNG)
 
 
-**Electrical devices and lightning**
+**Electrical devices and lighting**
 
 The type days for electrical devices and lighting are available in the form of standardised profiles. The range of values is therefore between 0 ... 1. Multiplying the corresponding power density in \(W/m²_{NFA}\) and the type day profile results in a profile in \(W/m²_{NFA}\). See the following figure: "Electrical devices" and "Lighting" drop-down menus as well as the "Electrical device power density" and "Lighting power density" parameters. 
 
-**Person occupancy**
+**Person occupancy and activity**
 
 Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person (\(W/pers\)). By multiplying these two profiles and the person occupancy in \(m²NFA/person\) the result is - like for electrical devices and lighting - a profile in \(W/m²_{NFA}\) (\(W/person\) * \(person/m²_{NFA}\)). 
 
 ![definition of the building usage](fig\231025_definition_building_usage.PNG)
 
-Complete profiles from various sources are already stored for all usage profiles: 
+Default values for these four categories are available, which were created using the characteristic values described in various sources:
 
-**SLP BDEW:** Standard load profiles from the German Association for Energy and Water Management    
-**DOE Prototype Buildings:** Commercial Prototype Building Models US Department of Energy   
-**DIN V 18500-10:** Energy performance of buildings Part 10     
-**VDI 2078: 1996-07:** Assessment of cooling load of air-conditioned rooms  
-It is also possible to define all profiles yourself. Custom profiles can be created using the "Own User Profiles" menu item and then selected in the respective drop-down menu (see figure). 
+* **SLP BDEW:** Standard load profiles from the German Association for Energy and Water Management
+* **DOE Prototype Buildings:** Commercial Prototype Building Models from the US Department of Energy
+* **DIN V 18599-10:** DIN standard *Energy performance of buildings* part 10
+* **VDI 2078: 1996-07:** VDI standard *Assessment of cooling load of air-conditioned rooms*
+
+It is also possible to define all profiles yourself. Custom profiles can be entered in the tab "Own User Profiles" and then selected in the respective drop-down menu (see figure).
 
 ![menu item own user profiles](fig\231025_menu_own_user_profile.png)
 
