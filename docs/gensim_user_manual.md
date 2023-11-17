@@ -221,3 +221,45 @@ The user is continuously informed about the progress of the model generation and
 ## **5 Results**
 
 The results of the simulation are output by the software as annual values and profiles. Annual values can be found on the "HOMEPAGE" and under the menu item "BUILDING BALANCE". The main profiles are displayed under "ENERGY DEMAND". More profiles can be found under "e+ Outputs". A graphical representation of the main profiles can be found under the menu item "PROFILES VIEW". The output of the results is intuitive so no further explanation is given in this manual. 
+
+
+## **6 Short tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in**
+
+**Create a new empty model**    
+In order to correctly create the geometry model for further GenSim modelling no predefined usage must be selected when creating the model.
+
+![create new geometry model](fig\231117_create_new_model.PNG)
+
+**Draw a floor plan**
+
+![draw floor plan](fig\231117_draw_floor_plan.png)
+
+Dimensions must be used for correct scale modelling. This option may need to be activated in SketchUp itself as it is not always activated by default during installation in order for the dimensions to be displayed in the lower section. To do so, click on "View" in the menu bar and then on "Toolbars" in the pull-down menu. In the "Toolbars" tab the "Dimensions" option must be activated. The dimensions will then appear in the bottom left corner of the program and can be easily entered (without clicking on the field). The entry of a dimension is completed and confirmed by pressing the Enter key.     
+It is important to not only draw the outline of the building but also the individual rooms in the floor plan so that the effects of different heating and cooling loads in individual rooms (depending on the solar input, etc.) are adequately represented. It is recommended to import the floor plan (if available) into SketchUp as an image file to make it easier to trace the individual rooms. Therefore it is necessary to know a length in the image. Preferably the length of the entire exterior wall of the building so that you can scale the image in SketchUp. Scaling works as described above. 
+
+![draw floor plan](fig\231117_import_file.png)
+
+Set zero:
+
+![set zero](fig\231117_set_zero.png)
+
+Scale by entering the length of the image: 
+
+![scale by length](fig\231117_scale_length.png)
+
+Trace the building outline:
+
+![trace building outline](fig\231117_trace_building.png)
+
+Switch on X-Ray mode:
+
+![X-Ray mode on](fig\231117_xray_mode.PNG)
+
+Trace individual rooms: 
+
+![trace individual rooms](fig\231117_trace_rooms.png)
+
+After drawing the floor plan of the building it is recommended to first save the file temporarily as a SketchUp file (.skp file type) so that it can be accessed later and corrected if necessary.[9]
+[9]: This is because once a building model is created from the floor plan it disappears in SketchUp. 
+
+![save file](fig\231117_save_file.png)
