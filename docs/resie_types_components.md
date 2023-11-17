@@ -48,12 +48,13 @@ The type refers to the type it is expected to have after being parsed by the JSO
 
 Generalised implementation of a bounded sink.
 
-Must be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
 
@@ -71,12 +72,13 @@ Must be given a profile for the maximum power it can take in, which is scaled by
 
 Generalised implementation of a bounded source.
 
-Must be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
@@ -98,11 +100,11 @@ The only implementation of special component `Bus`, used to connect multiple com
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `connection_matrix` | `Dict{String,Any}` | N/N |  |  |
 
-### General demand
+### General fixed sink
 | | |
 | --- | --- |
 | **Type name** | `Demand`|
-| **File** | `energy_systems/general/demand.jl` |
+| **File** | `energy_systems/general/fixed_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
 | **Medium** | `medium`/`None` |
@@ -110,17 +112,24 @@ The only implementation of special component `Bus`, used to connect multiple com
 | **Output media** | |
 | **Tracked values** | `IN`, `Load`, `Temperature` |
 
-Generalised implementation of a demand.
+Generalised implementation of a fixed sink.
 
-Must be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
 | `static_load` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+
+### General demand
+| | |
+| --- | --- |
+| **Type name** | `Demand`|
+| **File** | `energy_systems/general/fixed_sink.jl` |
+Alias to `FixedSink`.
 
 ### General fixed supply
 | | |
@@ -136,12 +145,13 @@ Must be given a profile for the energy it requests, which is scaled by the given
 
 Generalised implementation of a fixed source.
 
-Must be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
+| `static_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a static value. |
+| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
 
@@ -234,26 +244,33 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
 
-### Gas boiler
+### Fuel boiler
 | | |
 | --- | --- |
-| **Type name** | `GasBoiler`|
-| **File** | `energy_systems/heat_producers/gas_boiler.jl` |
+| **Type name** | `FuelBoiler`|
+| **File** | `energy_systems/heat_producers/fuel_boiler.jl` |
 | **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
-| **Input media** | `m_gas_in`/`m_c_g_natgas` |
+| **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`, `OUT` |
 
-A gas boiler that transforms combustible gas into heat.
+A boiler that transforms chemical fuel into heat.
+
+This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
+
+The current implementation includes functionality to model a PLR-dependant thermal efficiency \(\eta(PLR)\), however the efficiency curve is not customizable without code changes until a system for functions-as-parameters is in place.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
 | `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
+| `max_thermal_efficiency` | `Float` | N/Y | 1.0 | The maximum thermal efficiency if no \(\eta(PLR)\) is used. |
+| `is_plr_dependant` | `Boolean` | N/Y | False | Toggle if \(\eta(PLR)\) is used or not. |
 
 ### Heat pump
 | | |
@@ -280,6 +297,25 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 ## Storage
 
+### General storage
+| | |
+| --- | --- |
+| **Type name** | `Storage`|
+| **File** | `energy_systems/general/storage.jl` |
+| **Available models** | default: `simplified` |
+| **System function** | `storage` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | `None`/`auto` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+
+A generic implementation for energy storage technologies.
+
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the storage. |
+| `load` | `Float` | Y/N | 6000.0 | The initial load state of the storage. |
+
 ### Battery
 | | |
 | --- | --- |
@@ -290,7 +326,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A storage for electricity.
 
@@ -309,7 +345,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -339,7 +375,7 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 

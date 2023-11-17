@@ -22,7 +22,11 @@ In addition to the output profiles GenSim provides various annual values, an ove
 
 ![overview of the output sizes](fig\231023_overview.PNG)
 
+### Recent Publication
 
+We recently published a scientific paper in the journal "Energies" with a detailed description of the software architecture and capabilities of GenSim. To validate GenSim, we also performed a comparison of simulation results from GenSim, DesignBuilder and measurement data of two years, which is documented in the article. The paper is published with open access at:
+
+**[Maile, T.; Steinacker, H.; Stickel, M.W.; Ott, E.; Kley, C.: Automated Generation of Energy Profiles for Urban Simulations. Energies 2023, 16, 6115](https://doi.org/10.3390/en16176115)**
 
 ## **2  Installation**
 

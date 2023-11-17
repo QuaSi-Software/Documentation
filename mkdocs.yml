@@ -49,7 +49,7 @@ nav:
       - General effects: 'resie_transient_effects.md'
   - 'ReSiE: Examples':
       - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
-  - 'GenSim: User manual':
+  - 'GenSim: Generic Building Simulation':
       - 'User manual': 'gensim_user_manual.md'
   - Contributions:
       - 'How to help': 'contributions.md'
