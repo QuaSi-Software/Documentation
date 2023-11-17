@@ -25,7 +25,35 @@ In addition to the output profiles GenSim provides various annual values, an ove
 
 ## **2  Installation**
 
-*Content coming soon*
+GenSim has several requirements in the form of other software used to provide functionality and run simulations. In the following we list what these are and how you can go about installing them. In particular you should note which versions are recommended as the development of GenSim lags behind the development of the other software tools. As such, newer versions might break compatability.
+
+### *Microsoft Excel®*
+The user interface is based on *Microsoft Excel®*, without which much of the functionality of GenSim is not available. If you wish to use GenSim without a graphical user interface, you can find more information on how to do so in the documentation delivered in the repository of GenSim.
+
+GenSim has been tested with the following versions of Excel:
+
+* Office 2016 (16.0.5422.1000)
+* Office 365 (as of Nov 1st 2023)
+
+Excel may require you to enable macros on the file `GenSim.xlsm` before you can use the software or disable other security checks that prevent macros to run, which you can in the Trust Center in the options of Excel.
+
+### SketchUp
+SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
+
+We recommend using SketchUp 2017, however this version is no longer publicly available. We have yet to test using newer versions for use with GenSim. Until such time it may not be possible to acquire a version that works with GenSim. Sorry!
+
+### OpenStudio
+As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently supported version is 2.7.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
+
+* The default installation folder should be `C:\openstudio-2.7.0`. You can use a different folder, in which case you should note down where it is. We recommend a folder on the same disk as GenSim.
+* On the installer page where you can select which components of OpenStudio to install, please select all components.
+
+### Configuring GenSim
+After the previous steps have been performed, open the GenSim user interface and navigate to the first tab `Installation`. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+
+![path to OpenStudio installation](fig\231117_openstudio_path.png)
+
+Make sure it matches the installation folder of OpenStudio and change it if not. The field `Application path` below that should point to the folder in which the file `GenSim.xlsm` resides and should be set automatically on opening the file.
 
 ## **3  Model functions and parameters**
 ###3.1 Location
