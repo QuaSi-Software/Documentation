@@ -1,10 +1,11 @@
 # GenSim user manual
 ## **1  What is GenSim?**
 
-GenSim - for "generic building simulation" - is a building simulation software using the *EnergyPlus®* simulation computing core to generate high-resolution heating and cooling demand profiles as well as electricity demand profiles and PV outputs. "Generic" in this context means "generally valid" building model. This means that the software can be used to model and simulate any type of building in a very flexible and simplified way. 
+GenSim - for "generic building simulation" - is a building simulation software using the *EnergyPlus®* simulation engine to generate high-resolution heating and cooling demand profiles as well as electricity demand profiles. "Generic" in this context means "generally valid" building model. This means that the software can be used to model and simulate any type of building in a very flexible and simplified way. 
+
 The software was developed for use in the context of project pre-planning where usually no large time budget is available for detailed simulations of buildings. A detailed input and simulation of buildings with common applications like *DesignBuilder®*, *IDA ICE®* or *TRNSYS®* is usually time consuming. GenSim was therefore developed with the aim of ensuring the fastest and simplest possible simulation of buildings. In early planning phases often only relatively rough data on the planned buildings are available. Therefore an optimal relationship between the level of detail of the model and the accuracy of the input parameters should be achieved. 
 
-The input and output of the software is based on *Microsoft Excel®*. The computing core, based on *OpenStudio®*[^1] and *EnergyPlus®* is connected to the Excel interface via Visual Basic for *Applications®* - see following figure. 
+The user interface for input and output is based on *Microsoft Excel®*. The simulation engine, based on *OpenStudio®*[^1] and *EnergyPlus®* is connected to the user interface via *Visual Basic for Applications®* code.
 
 [^1]: OpenStudio® provides a development environment for customised use of EnergyPlus® in software applications. 
 
@@ -244,7 +245,7 @@ Once all the parameters have been entered the simulation is started using the "M
 
 The user is continuously informed about the progress of the model generation and simulation, see following figure. At the end of the simulation process the results of the *EnergyPlus®* simulation are imported into the Excel® user interface.
 
-*figure missing*
+![simulation status information](fig\231117_sim_status.png)
 
 ## **5 Results**
 
