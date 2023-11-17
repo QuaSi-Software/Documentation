@@ -15,7 +15,7 @@ An exception is the possibility besides the generic geometry generation (cubic b
 
 ![basic functions of the standardized building model](fig\231023_basic_functions_building_model.PNG)
 
-The main output of GenSim is high-resolution profiles in units of  \(Wh/m²_{NRF}\). Within the building simulation no distribution or transfer losses are represented. Therefore all results must be evaluated as net energy. Distribution losses must be imprinted afterwards for example in the form of an offset. 
+The main output of GenSim is high-resolution profiles in units of  \(Wh/m²_{NFA}\). Within the building simulation no distribution or transfer losses are represented. Therefore all results must be evaluated as net energy. Distribution losses must be imprinted afterwards for example in the form of an offset. 
 
 In addition to the output profiles GenSim provides various annual values, an overview of the building energy balance and the ability to perform of sensitivity analyses (see  figure below). 
 
@@ -88,7 +88,7 @@ The building geometry can be defined in two ways. Either a generic cubic geometr
 
 ![selection of the method for geometry generation in the Excel® GUI](fig\231023_selection_method.png)
 
-Basically the *EnergyPlus®* geometry model is illustrated with its external dimensions but no component thicknesses or volumes (e.g. wall or ceiling thicknesses) are represented. As a result the entire Gross Floor Area (GFA) or Gross Room Volume (BRF) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible in any case given the low level of model detail. The net room area (NFA) is used to convert the results into area-specific quantities. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
+Basically the *EnergyPlus®* geometry model is illustrated with its external dimensions but no component thicknesses or volumes (e.g. wall or ceiling thicknesses) are represented. As a result the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible in any case given the low level of model detail. The net floor area (NFA) is used to convert the results into area-specific quantities. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
 
 ####3.2.1 Generic building model
 
@@ -105,7 +105,7 @@ After the simulation it is possible to view the generic geometry model in *Sketc
 
 **Measurements**
 
-The "length" and "width" of the building are indicated as external dimensions. It is the length of the north-south facing facade and the width of the east-west facing facade (see figure above). The “floor height" is specified as the gross floor height. The multiplication of "floor height" and "number of floors" results in the total height of the building. The parameter "depth outer zones" additionally defines the depth of the outer zones[^6] according to the figure above. 
+The "length" and "width" of the building are indicated as external dimensions. It is the length of the north-south facing facade and the width of the east-west facing facade (see figure above). The "floor height" is specified as the gross floor height. The multiplication of "floor height" and "number of floors" results in the total height of the building. The parameter "depth outer zones" additionally defines the depth of the outer zones[^6] according to the figure above. 
 [^6]: An outer zone with a depth of 0m results in a one-zone model
 
 ![definition geometry model](fig\231025_definition_geometry_model.PNG)
@@ -143,7 +143,7 @@ Optionally individual facade components as well as the roof and floor plate of t
 
 ####3.2.2 Imported geometry model
 
-As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or  significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in the following section 5. Currently the gross floor area (GFA) of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
+As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in the following section 5. Currently the GFA of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
 
 ![import geometry model](fig\231115_import_geometry_model.png)
 
@@ -163,7 +163,7 @@ Up to 5 periods can be defined for public holidays/vacation days (see following 
 
 **Electrical devices and lightning**
 
-The type days for electrical devices and lighting are available in the form of standardised profiles. The range of values is therefore between 0 ... 1. Multiplying the corresponding power density in \(W/m²_{NRF}\) and the type day profile results in a profile in \(W/m²_{NRF}\). See the following figure: "Electrical devices" and "Lighting" drop-down menus as well as the "Electrical device power density" and "Lighting power density" parameters. 
+The type days for electrical devices and lighting are available in the form of standardised profiles. The range of values is therefore between 0 ... 1. Multiplying the corresponding power density in \(W/m²_{NFA}\) and the type day profile results in a profile in \(W/m²_{NFA}\). See the following figure: "Electrical devices" and "Lighting" drop-down menus as well as the "Electrical device power density" and "Lighting power density" parameters. 
 
 **Person occupancy**
 
