@@ -205,16 +205,16 @@ By defining the air changes per hour (see following figure) a constant air excha
 
 Daylight-dependent lighting control can be activated to realistically simulate user behaviour in terms of artificial lighting operation depending on the daylight available in individual rooms. When a certain level of daylight is reached (see parameter "daylight threshold" in the figure above) the lighting in individual rooms is deactivated contrary to the active "lighting usage profile". This leads to the typical seasonal character of the lighting profile as shown in the following figure.
 
-![example lightning annual value](231115_lightning_annual_value.png)
+![example lightning annual value](fig\231115_lightning_annual_value.png)
 
 
 ## **4 Simulation**
 
-Once all the parameters have been entered the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process the EnergyPlus® model is generated in the first step. This turns the generic model into a customised EnergyPlus® building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
+Once all the parameters have been entered the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process the *EnergyPlus®* model is generated in the first step. This turns the generic model into a customised *EnergyPlus®* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
 
 ![start of the simulation](fig\231106_start_simulation.png)
 
-The user is continuously informed about the progress of the model generation and simulation, see following figure. At the end of the simulation process the results of the EnergyPlus® simulation are imported into the Excel® user interface.
+The user is continuously informed about the progress of the model generation and simulation, see following figure. At the end of the simulation process the results of the *EnergyPlus®* simulation are imported into the Excel® user interface.
 
 *figure missing*
 
