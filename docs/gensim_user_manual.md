@@ -1,24 +1,25 @@
 # GenSim user manual
 ## **1  What is GenSim?**
 
-GenSim - for "generic building simulation" - is a building simulation software using the *EnergyPlus®* simulation engine to generate high-resolution heating and cooling demand profiles as well as electricity demand profiles. "Generic" in this context means "generally valid" building model. This means that the software can be used to model and simulate any type of building in a very flexible and simplified way. 
+GenSim - for "generic building simulation" - is a building simulation software using the *EnergyPlus®* simulation engine to generate high-resolution heating and cooling demand profiles as well as electricity demand profiles for buildings with various types of use. "Generic" in this context refers to a "generally valid" building model. This means that the software is versatile enough to simulate any type of building in a very flexible and simplified way, enabling users to efficiently adapt the software for any building design.
 
-The software was developed for use in the context of project pre-planning where usually no large time budget is available for detailed simulations of buildings. A detailed input and simulation of buildings with common applications like *DesignBuilder®*, *IDA ICE®* or *TRNSYS®* is usually time consuming. GenSim was therefore developed with the aim of ensuring the fastest and simplest possible simulation of buildings. In early planning phases often only relatively rough data on the planned buildings are available. Therefore an optimal relationship between the level of detail of the model and the accuracy of the input parameters should be achieved. 
+GenSim was specifically devloped for the use during project pre-planning where detailed simulations of buildings are challenging due to typically constrained time budgets and limited availability of information. Traditional simulation tools like *DesignBuilder®*, *IDA ICE®* or *TRNSYS®* require extensive input data, making the process time-consuming. GenSim addresses this by providing a streamlined approach for quick, simple, yet accurate building simulations. This is particularly valuable in early planning stages when only rough data about the planned buildings is available. GenSim strikes an optimal balance between the model's detail level and the precision of input parameters, ensuring efficiency without compromising on accuracy. If more detailed information (wall structure, geometry, specific use, ...) is available about the building to be examined, this can be used for more precise results.
 
-The user interface for input and output is based on *Microsoft Excel®*. The simulation engine, based on *OpenStudio®*[^1] and *EnergyPlus®* is connected to the user interface via *Visual Basic for Applications®* code.
+The user interface for input and output data is realised in *Microsoft Excel®*. The simulation engine, based on *OpenStudio®*[^1] and *EnergyPlus®*, is connected to the user interface via *Visual Basic for Applications®* code. The overall workflow is shown in the figure below.
 
 [^1]: OpenStudio® provides a development environment for customised use of EnergyPlus® in software applications. 
 
 ![simplified software structure](fig\231023_simplified_software_structure.PNG)
 
-The basis is a standardised (generic) building model that has all the essential levels of freedom or basic functions in order to be able to represent any type of building. These basic functions (see figure below) can be adjusted by a few simple parameters. Details of the individual basic functions and their parameters are given in chapter 3. 
-An exception is the possibility besides the generic geometry generation (cubic building) to create a custom geometry model using the OpenStudio SketchUp plugin and then import it into GenSim. 
+The baseline model is a standardised (generic) building model that offers the essential levels of freedom and includes the basic functions in order to be able to represent any type of building. These basic functions (see figure below) can be adjusted by a few simple parameters. Details of the individual basic functions and their parameters are given in chapter 3. 
 
-![basic functions of the standardized building model](fig\231023_basic_functions_building_model.PNG)
+The baseline includes generic, cubic building geometries that can be roughly adjusted to meet the investigated building. If more complex geometries should be simulatated, they can be created as a user-defined geometry model using the *OpenStudio SketchUp Plugin* and imported into GenSim. 
 
-The main output of GenSim is high-resolution profiles in units of  \(Wh/m²_{NFA}\). Within the building simulation no distribution or transfer losses are represented. Therefore all results must be evaluated as net energy. Distribution losses must be imprinted afterwards for example in the form of an offset. 
+![basic functions of the standardised building model](fig\231023_basic_functions_building_model.PNG)
 
-In addition to the output profiles GenSim provides various annual values, an overview of the building energy balance and the ability to perform of sensitivity analyses (see  figure below). 
+The main output of GenSim are high-resolution profiles in units of  \(Wh/m²_{NFA}\), refered to the net floor area (NFA) of the building. Within the building simulation, no distribution or transfer losses of the energy flows are represented. Therefore, all results must be evaluated as net energies and possible distribution losses must be included afterwards, for example in the form of an offset. 
+
+In addition to the output profiles, GenSim provides various annual values, key performance indicators, an overview of the building energy balance and the ability to perform sensitivity analyses (see  figure below). 
 
 ![overview of the output sizes](fig\231023_overview.PNG)
 
@@ -30,75 +31,75 @@ We recently published a scientific paper in the journal "Energies" with a detail
 
 ## **2  Installation**
 
-GenSim has several requirements in the form of other software used to provide functionality and run simulations. In the following we list what these are and how you can go about installing them. In particular you should note which versions are recommended as the development of GenSim lags behind the development of the other software tools. As such, newer versions might break compatability.
+GenSim relies on several external software tools to deliver its functionality and conduct simulations. Below, we detail these software requirements and guide you through their installation process. It's important to pay special attention to the recommended versions of these tools. Since the development of GenSim often trails behind these other software applications, using newer versions than those recommended can lead to compatibility issues. Sticking to the suggested versions ensures smooth integration and optimal performance of GenSim in your simulations.
 
 ### *Microsoft Excel®*
-The user interface is based on *Microsoft Excel®*, without which much of the functionality of GenSim is not available. If you wish to use GenSim without a graphical user interface, you can find more information on how to do so in the documentation delivered in the repository of GenSim.
+The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy-access to the functionalities of GenSim. GenSim could also be used without a the provided GUI. This will not be described further here, but you can find more information on how to do so in the documentation delivered in the GitHub repository of GenSim.
 
-GenSim has been tested with the following versions of Excel:
+GenSim has been tested with the following versions of *Microsoft Excel®*:
 
 * Office 2016 (16.0.5422.1000)
 * Office 365 (as of Nov 1st 2023)
 
-Excel may require you to enable macros on the file `GenSim.xlsm` before you can use the software or disable other security checks that prevent macros to run, which you can in the Trust Center in the options of Excel.
+*Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menue of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
 
 ### SketchUp
-SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
+SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
 
-We recommend using SketchUp 2017, however this version is no longer publicly available. We have yet to test using newer versions for use with GenSim. Until such time it may not be possible to acquire a version that works with GenSim. Sorry!
+We recommend using SketchUp 2017, however this version is no longer publicly available. We still need to test the use of newer versions of SketchUp for the use with GenSim. Until then it may not be possible to acquire a version that works with GenSim. Sorry!
 
 ### OpenStudio
-As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently supported version is 2.7.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
+As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently supported version is 2.7.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases/tag/v2.7.0). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
 
-* The default installation folder should be `C:\openstudio-2.7.0`. You can use a different folder, in which case you should note down where it is. We recommend a folder on the same disk as GenSim.
+* The default installation folder should be `C:\openstudio-2.7.0`. You can use a different folder, in which case you should note the installation path to specify it later in the `GenSim.xlsm` GUI. We recommend a folder on the same disk as GenSim.
 * On the installer page where you can select which components of OpenStudio to install, please select all components.
 
 ### Configuring GenSim
-After the previous steps have been performed, open the GenSim user interface and navigate to the first tab `Installation`. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+After the previous steps have been performed, open the GenSim user interface and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
 
 ![path to OpenStudio installation](fig\231117_openstudio_path.png)
 
-Make sure it matches the installation folder of OpenStudio and change it if not. The field `Application path` below that should point to the folder in which the file `GenSim.xlsm` resides and should be set automatically on opening the file.
+Make sure it matches the installation folder of OpenStudio and change it if not. The `Application path` field is designed to automatically detect and display the directory where the `GenSim.xlsm` file is located. This path should be set automatically when you open the file. If for any reason the path isn't set automatically, you need to manually enter the folder path.
 
 ## **3  Model functions and parameters**
 ###3.1 Location
 
-The modelling process starts on the homepage of the GenSim Excel interface with the selection of the location.
-
+The modelling process starts on the *HOMEPAGE* of the GenSim Excel® GUI with the selection of the building location and the weather file.
 
 ![selection of the weather data in Excel](fig\231023_selection_weather_data.png)
 
-Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a drop down list. 
+Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
 
 [^2]: File format "epw" - EnergyPlus weather data
 [^3]: Reference period 1995 to 2012
 [^4]: Forecast period 2031 to 2060
 
-**Store and simulate custom weather data sets**
-In general any *EnergyPlus®* weather data set can be stored by the user and selected for the simulation with GenSim. A complete weather data set always consists of an epw-file and a ddy-file which must be stored under the same file name in the subfolder "weather" in the GenSim file path. The refresh button can be used to update the selection in the drop down list.
+**Custom weather data sets**
+
+In general, any *EnergyPlus®* weather data set can be used for the simulation in GenSim. A complete weather data set always consists of an EPW-file and a DDY-file which must be saved with the same file name in the subfolder "weather" in the GenSim file path. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
+
 Ready-to-use weather data sets (epw + ddy) for worldwide locations can be downloaded free of charge from the following websites: 
 
 [https://energyplus.net/weather](https://energyplus.net/weather)    
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore the TRY of the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the "EnergyPlus Weather Converter". A tool facilitating this workflow is currently under development and will be released soon.
+Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the [EnergyPlus Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html). A tool facilitating this workflow is currently under development and will be released soon.
 
 
 ###3.2 Building geometry
 
-The building geometry can be defined in two ways. Either a generic cubic geometry model can be parameterised or the geometry can be individually created and imported. The choice between these two options is made using a drop down menu (see the following figure). Both options are described below. 
+The building geometry can be defined in two ways. Either a generic cubic geometry model can be parameterised directly in the GUI of GenSim, or the geometry can be individually created using SketchUp and imported to GenSim. The choice between these two options is made using a drop down menu (see the following figure). Both options are described below. 
 
 ![selection of the method for geometry generation in the Excel® GUI](fig\231023_selection_method.png)
 
-Basically the *EnergyPlus®* geometry model is illustrated with its external dimensions but no component thicknesses or volumes (e.g. wall or ceiling thicknesses) are represented. As a result the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible in any case given the low level of model detail. The net floor area (NFA) is used to convert the results into area-specific quantities. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
+Basically, in *EnergyPlus®*, the geometrical model of a building is represented by its external dimensions without any component thicknesses or volumes (e.g. wall or ceiling thicknesses). As a result, the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible given the low level of model detail. The user-defined net floor area (NFA) (or rather the ratio GFA/NFA, see below) is later used to convert the simulation results to area-specific quantities related to the NFA. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
 
 ####3.2.1 Generic building model
 
-The generic geometry model is a cubic building (see figure) defined by the parameters "length", "width", " floor height", "number of floors" and "window area percentage"[^5] (see figure). An idealised floor plan is used which divides each floor into 4 external zones and one internal zone (see figure). 
+The generic geometry model is a cubic building (see figure) defined by the parameters "length", "width", " floor height", "number of floors" and "window area percentage"[^5] (see figure). An idealised floor plan is used which divides each floor into 4 external and one internal zone (see figure below). 
 
-After the simulation it is possible to view the generic geometry model in *SketchUp®* using the *OpenStudio®* SketchUp plug-ins. The model file is located in 
-"/Output/run" directory under the name "in.osm".
+After the simulation, it is possible to view the generic geometry model in *SketchUp®* using the *OpenStudio®* SketchUp plug-ins. The geometrical model file is located in the directory "/Output/run" under the name "in.osm".
 [^5]: Ratio of transparent to opaque outer surface 
 
 ![generic geometry model](fig\231023_generic_geometric_model.png)
@@ -108,7 +109,7 @@ After the simulation it is possible to view the generic geometry model in *Sketc
 
 **Measurements**
 
-The "length" and "width" of the building are indicated as external dimensions. It is the length of the north-south facing facade and the width of the east-west facing facade (see figure above). The "floor height" is specified as the gross floor height. The multiplication of "floor height" and "number of floors" results in the total height of the building. The parameter "depth outer zones" additionally defines the depth of the outer zones[^6] according to the figure above. 
+The "length" and "width" of the building are indicated as external dimensions. The length is defined as the the north-south facing facade and the width as the east-west facing facade (see figure above). The "floor height" is specified as the gross floor height. The multiplication of "floor height" and "number of floors" results in the total height of the building. The parameter "depth outer zones" additionally defines the depth of the outer zones[^6] according to the figure above. All input parameters for the generic geometry model are shown in the figure below and will be described in the following.
 [^6]: An outer zone with a depth of 0m results in a one-zone model
 
 ![definition geometry model](fig\231025_definition_geometry_model.PNG)
@@ -116,7 +117,7 @@ The "length" and "width" of the building are indicated as external dimensions. I
 
 **Orientation**
 
-The orientation of the building can also be changed using a drop down menu (see following figure) if the building should not lie exactly in the axes of the main cardinal points. A positive rotation of the building corresponds to a clockwise rotation[^7].
+The orientation of the building can also be changed using a drop down menu (see following figure) if the building is not orientated in the axes of the main cardinal points. A positive rotation of the building corresponds to a clockwise rotation[^7].
 [^7]: See EnergyPlus® parameter "north axis": [https://bigladdersoftware.com](https://bigladdersoftware.com/epx/docs/8-0/input-output-reference/page-006.html#field-north-axis)    
 
 ![definition orientation](fig\231025_definition_orientation.png)
@@ -125,12 +126,12 @@ The orientation of the building can also be changed using a drop down menu (see 
 
 **Ratio NFA/GFA**
 
-As already mentioned only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\) the user now needs to specify the ratio GFA/NFA. This can either be entered as an individual value or it can be determined from previously stored characteristic values. Key values for a variety of building typologies are available.
+As already mentioned, only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\), the user needs to specify the ratio of GFA/NFA. This can either be entered as an individual value (if known) or it can be determined from various predefined building typologies included as presets in the GUI.
 
 
 **Window areas**
 
-Besides the actual geometry window areas also need to be defined. Therefore a corresponding "window band"[^8] is modelled by specifying a percentage of window area per facade (m² of window area / m² of facade area [%] - see following figure).
+Besides the actual geometry, window areas of the building also need to be defined. Therefore, a corresponding "window band"[^8] is modelled by specifying a percentage of window area per facade (m² of window area / m² of facade area [%] - see following figure).
 [^8]: Ratio of transparent to opaque outer surface (window without frame) 
 
 ![window area](fig\231025_window_area.PNG)
@@ -139,37 +140,36 @@ Besides the actual geometry window areas also need to be defined. Therefore a co
 
 **Adiabatic external components**
 
-Optionally individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the component does not allow heat transfer. This makes it possible e.g. to simulate coupled terraced houses or any other sub-volume of a whole building by defining component boundaries to heated zones as adiabatic. The procedure for the imported geometry model is explained in more detail in Section 3.2.4 Adiabatic External Components below. 
-
+Optionally, individual facade components or the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the component does not allow heat transfer. This allows the simulation of e.g. coupled terraced houses or other sub-volumes of a whole building by defining component boundaries facing to heated zones as adiabatic. The procedure for the imported geometry model is explained in more detail in Section 3.2.4 Adiabatic External Components below. 
 
 
 ####3.2.2 Imported geometry model
 
-As already mentioned an individual geometry model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the Import button (see following figure). A short tutorial on how to create your own geometry model can be found in chapter 6. Currently the GFA of the imported OpenStudio® model is not read in automatically so the user must enter it manually. If required, the actual GFA of the model can be read from the file "eplustbl.htm" in the "/Output/run" file path after a test simulation run (Total Building Area). The (gross) floor height of the imported geometry model itself must also be entered. 
+As mentioned above, an individual geometrical model can optionally be created with the OpenStudio® SketchUp® plugin if the building geometry is known in more detail and/or significantly differs from a cubic shape. The osm-model file created this way can be imported into GenSim by the *Import* button (see following figure). A short tutorial on how to create your own geometry model can be found in chapter 6. Currently, the GFA of the imported OpenStudio® model is not read in automatically by GenSim, so the user must enter it manually. It can be determined by perfomring a test-run of GenSim. The actual GFA of the imported model ("Total Building Area") can then be found in the file "eplustbl.htm" in the "/Output/run" folder and entered into the GUI for the actual simulation. The (gross) floor height of the imported geometry model must also be entered.
 
 ![import geometry model](fig\231115_import_geometry_model.png)
 
 
 ###3.3 Building usage
 
-By using electrical devices the user directly influences the electricity demand. In addition the usage of the building also has a significant impact on the heating and cooling demand in the form of internal heat loads from electrical devices and lighting as well as heat emitted by the people present. The internal heat loads of these 3 groups are basically defined by two components. On the one hand by load profiles and on the other hand by defining power densities and occupancy densities. The load profiles are defined in the form of type days for working days, Saturdays and Sundays (see following figure). In addition it is possible to define individual time periods for public holidays/vacation days as well as an additional type day for public holidays/vacation days. Depending on the parameter "first day of the year" an annual profile is generated on the basis of the individual type day profiles. 
+By using electrical devices, users of a building directly influence the electricity demand of a building. In addition, the usage of the building also has a significant impact on the heating and cooling demand in the form of internal heat loads from electrical devices and lighting as well as heat emitted by the present people and their activity. The internal heat loads of these three groups (electrical devices, lighting, presence of people) are defined by normalised load profiles and by power and occupancy densities for the scaling of these profiles. The load profiles are specified as individual typical days for working days, Saturdays and Sundays (see following figure). In addition, it is possible to define individual time periods for public holidays/vacation and corresponding load profiles of typical days for these time periods. Depending on the parameter "first day of the year", annual load profiles are generated on the basis of the individual normalised typical day profiles, the scaling factors and the arrangement of working days, weekends and user-defined holidays within the year. In the GUI, presents for the typical days are specified and can be accessed by dropdowns (more details below).
 
 ![parameter first day of the year](fig\231025_parameter_first_day.png)
 
 ![profile typology days](fig\231115_profile_typology_days.png)
 
-Up to 5 periods can be defined for public holidays/vacation days (see following figure). These can be holiday periods e.g. when simulating a school or university building.
+Up to 5 periods can be defined for public holidays/vacation days (see following figure). These can be holiday periods e.g. for the simulation of a school or university building.
 
 ![definition of holidays/ vacation days](fig\231025_definition_holidays.PNG)
 
 
 **Electrical devices and lighting**
 
-The type days for electrical devices and lighting are available in the form of standardised profiles. The range of values is therefore between 0 ... 1. Multiplying the corresponding power density in \(W/m²_{NFA}\) and the type day profile results in a profile in \(W/m²_{NFA}\). See the following figure: "Electrical devices" and "Lighting" drop-down menus as well as the "Electrical device power density" and "Lighting power density" parameters. 
+The typical days for electrical devices and lighting are available in the form of normalised profiles. The range of values is therefore between 0 ... 1. Multiplying the corresponding power density in \(W/m²_{NFA}\) with the normalised dimensionless typical day profile results in a profile in \(W/m²_{NFA}\). See the following figure: "Electrical devices" and "Lighting" drop-down menus as well as the "Electrical device power density" and "Lighting power density" parameters.
 
 **Person occupancy and activity**
 
-Two separate type day profiles are defined for person occupancy. On the one hand a standardised profile describing the presence of persons (0...1) and on the other hand a profile describing the activity of the persons present in the unit power per person (\(W/pers\)). By multiplying these two profiles and the person occupancy in \(m²NFA/person\) the result is - like for electrical devices and lighting - a profile in \(W/m²_{NFA}\) (\(W/person\) * \(person/m²_{NFA}\)). 
+Two separate typical day profiles are defined to represent the occupancy of persons and their activity: A normalised profile describing the presence of persons (0...1) and additionally a profile describing the activity of the present persons with the unit *power per person* (\(W/pers\)). By multiplying these two profiles with the person occupancy (defined in \(m²NFA/person\)), the result is - like for electrical devices and lighting - a profile in \(W/m²_{NFA}\) (\(W/person\) * \(person/m²_{NFA}\)). 
 
 ![definition of the building usage](fig\231025_definition_building_usage.PNG)
 
@@ -180,7 +180,7 @@ Default values for these four categories are available, which were created using
 * **DIN V 18599-10:** DIN standard *Energy performance of buildings* part 10
 * **VDI 2078: 1996-07:** VDI standard *Assessment of cooling load of air-conditioned rooms*
 
-It is also possible to define all profiles yourself. Custom profiles can be entered in the tab "Own User Profiles" and then selected in the respective drop-down menu (see figure).
+It is also possible to define all profiles yourself. Custom profiles can be entered in the tab *OWN USER PROFILES* of the GUI and then selected in the respective drop-down menu:
 
 ![menu item own user profiles](fig\231025_menu_own_user_profile.png)
 
@@ -188,7 +188,7 @@ It is also possible to define all profiles yourself. Custom profiles can be ente
 ###3.4 Building standard
 ####3.4.1 External components
 
-A number of pre-defined component structures are stored for the external components of the building. These can be selected from the drop-down menu see figure. Additionally it is also possible to define your own component structures. For this use the "Own Components" menu item (see figure) to define all the required physical values for the external wall, roof, floor plate, intermediate ceiling and window component groups. Note: The heat transmission coefficient of opaque components is calculated from the layer thicknesses and specific thermal conductivities of the materials and the heat transfer resistances. When creating new layers all physical quantities must be fully described. 
+A number of pre-defined component structures for the external components of the building (walls, roof, base plate, ceiling, windows) are included in the GUI. These can be selected from the drop-down menu, as shown in the figure below. Additionally, it is also possible to define own component structures, using the menu *OWN COMPONENTS* shown below. Here, all the required physical values for the external walls, roof, floor plate, intermediate ceiling and window component groups can be entered for custom structures. Note: The heat transmission coefficient of opaque components is calculated from the layer thicknesses and specific thermal conductivities of the materials and the heat transfer resistances. When creating new layers, all physical properties must be fully described. 
 
 ![definition of the building standard](fig\231025_definition_building_standard.PNG)
 
@@ -197,34 +197,34 @@ A number of pre-defined component structures are stored for the external compone
 
 ####3.4.2 Internal components
 
-Internal components are defined as false ceilings (see last subchapter) and internal walls which essentially influence the simulation as internal storage masses. The building standard of the internal walls can be selected by a drop-down list as "light", "medium" or "heavy". Therefore typical structures have been saved.  
+Internal components, defined as false ceilings (see last subchapter) and internal walls, affects the simulation results significantly as they act as internal storage masses for thermal energy. The building standard of the internal walls can be selected by a drop-down list as "light", "medium" or "heavy". The GUI provides corresponding typical structures, shown when changing the value in the drop-down menu.
 
 ![definition internal components](fig\231025_definition_internal_components.PNG)
 
 
 ###3.5 Air temperature setpoint
 
-The air temperature setpoint for heating and cooling are set in the same way as the usage profiles (see chapter 3.3) using two drop-down menus (see figure below) either from stored standard profiles or from user-defined profiles. 
+The air temperature setpoint for heating and cooling are set in the same way as the usage profiles (see chapter 3.3) by two drop-down menus (see figure below). They can be taken either from predefined standard profiles or from user-defined custom ones. 
 
 ![definition air temperature setpoint](fig\231025_definition_air_setpoint.PNG)
 
 
 ###3.6 Ventilation system
 
-To represent the ventilation system the system type and the heat recovery (HR) option must be selected from two drop-down menus (see figure below). If the HR ist activated a return heat or return humidity value must also be specified. The operating times of the ventilation system are defined in the same way as the usage profiles (see chapter 3.3) using a drop-down list either from stored profiles or by selecting a user-defined profile. The actual air flow rate of the ventilation system is determined by specifying the "air change rate" parameter and a conditioned room height. 
+To represent the ventilation system, the system type and the heat recovery (HR) option must be selected in two drop-down menus (see figure below). If the HR is activated, a return heat or return humidity value must also be specified. The operating times of the ventilation system are defined in the same way as the usage profiles (see chapter 3.3) using a drop-down list either from predefined profiles or by selecting a user-defined profile. The actual air flow rate of the ventilation system is determined by specifying the "air change rate" parameter and a "conditioned room height". 
 
 ![definition ventilation system](fig\231025_definition_ventilation_system.PNG)
 
-The power demand of the ventilation system and therefore the resulting heat input into the ventilation system considered in the simulation is based on the standard SFP (specific fan power) factors of DIN EN 16798-3. The specific fan power is set at 750 \(W/(m³/s)\) for supply and extract air corresponding to SFP 2. 
+The electrical power demand of the ventilation system and therefore the resulting heat input into the ventilation system considered in the simulation is based on the standard SFP (specific fan power) factors of DIN EN 16798-3. The specific fan power is set to 750 \(W/(m³/s)\) for supply and extract air corresponding to SFP 2. 
 
 
 ###3.7 Further more
 
-There are a number of optional model features that can be activated and these are explained below.
+There are a number of optional model features that can be activated which are explained below.
 
 **Window ventialtion in case of overheating (cooling)**
 
-In order to simplify window ventilation (for cooling) in case of overheating of the rooms the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of  air changes per hour (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
+In order to simplify window ventilation (for cooling) in case of overheating of the rooms, the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of "air changes per hour" (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter, then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
 
 **Infiltration**
 
@@ -234,21 +234,21 @@ By defining the air changes per hour (see following figure) a constant air excha
 
 **Daylight-dependent lighting control**
 
-Daylight-dependent lighting control can be activated to realistically simulate user behaviour in terms of artificial lighting operation depending on the daylight available in individual rooms. When a certain level of daylight is reached (see parameter "daylight threshold" in the figure above) the lighting in individual rooms is deactivated contrary to the active "lighting usage profile". This leads to the typical seasonal character of the lighting profile as shown in the following figure.
+Daylight-dependent lighting control can be activated to realistically simulate user behaviour in terms of artificial lighting operation depending on the daylight available in individual rooms. When a certain level of daylight is reached (see parameter "daylight threshold" in the figure above) the lighting in individual rooms is deactivated, overwriting the state set by the "lighting usage profile". This leads to the typical seasonal character of the lighting profile as shown in the following figure:
 
 ![example lightning annual value](fig\231115_lightning_annual_value.png)
 
 
 ## **4 Simulation**
 
-Once all the parameters have been entered the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process the *EnergyPlus®* model is generated in the first step. This turns the generic model into a customised *EnergyPlus®* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
+Once all the parameters have been entered, the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process, the *EnergyPlus®* model is generated in the first step. This turns the generic model into a customised *EnergyPlus®* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
 
 ![start of the simulation](fig\231106_start_simulation.png)
 
-The user is continuously informed about the progress of the model generation and simulation, see following figure. At the end of the simulation process the results of the *EnergyPlus®* simulation are imported into the Excel® user interface.
+The user is continuously informed about the progress of the model generation and simulation, as exemplary shown in the figure below. At the end of the simulation process, the results of the *EnergyPlus®* simulation are imported into the *Excel®* user interface.
 
 ![simulation status information](fig\231117_sim_status.png)
 
 ## **5 Results**
 
-The results of the simulation are output by the software as annual values and profiles. Annual values can be found on the "HOMEPAGE" and under the menu item "BUILDING BALANCE". The main profiles are displayed under "ENERGY DEMAND". More profiles can be found under "e+ Outputs". A graphical representation of the main profiles can be found under the menu item "PROFILES VIEW". The output of the results is intuitive so no further explanation is given in this manual. 
+The results of the simulation are given as annual values and profiles. Annual values can be found on the *HOMEPAGE* and under the menu item *BUILDING BALANCE*. The main profiles are displayed under *ENERGY DEMAND*. More profiles can be found at *e+ Outputs*. A graphical representation of the main profiles can be found under the menu item *PROFILES VIEW*. The output of the results is assumed to be intuitive so no further explanation is provided here. 

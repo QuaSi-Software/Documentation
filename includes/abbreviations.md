@@ -53,3 +53,20 @@
 *[BIM]:     Building Information Modeling 
 *[CSV]:     Comma-Separated Values [data format] 
 *[JSON]:    JavaScript Object Notation [data format]
+*[NFA]:     Net Floor Area (NRF)
+*[GFA]:     Gross Floor Area (BGF)
+*[BRF]:     Gross Room Volume
+*[BKI]:     Buiding Cost Index
+*[DWD]:     German weather service (Deutscher Wetterdienst)
+*[HR]:      Heat Recovery
+*[K]:       Kelvin
+*[SFP]:     Specific Fan Power
+*[K]:       Kelvin
+*[GUI]:     Graphical User Interface
+*[TMY]:     Typical Meteorological Year
+*[TRY]:     Test Reference Year
+
+
+
+
+
