@@ -239,23 +239,23 @@ It is important to not only draw the outline of the building but also the indivi
 
 ![draw floor plan](fig\231117_import_file.png)
 
-Set zero:
+**Set zero:**
 
 ![set zero](fig\231117_set_zero.png)
 
-Scale by entering the length of the image: 
+**Scale by entering the length of the image:** 
 
 ![scale by length](fig\231117_scale_length.png)
 
-Trace the building outline:
+**Trace the building outline:**
 
 ![trace building outline](fig\231117_trace_building.png)
 
-Switch on X-Ray mode:
+**Switch on X-Ray mode:**
 
 ![X-Ray mode on](fig\231117_xray_mode.PNG)
 
-Trace individual rooms: 
+**Trace individual rooms:**   
 
 ![trace individual rooms](fig\231117_trace_rooms.png)
 
@@ -263,3 +263,39 @@ After drawing the floor plan of the building it is recommended to first save the
 [9]: This is because once a building model is created from the floor plan it disappears in SketchUp. 
 
 ![save file](fig\231117_save_file.png)
+
+**Select floor plan and create floors** 
+
+![select floor plan](fig\231120_select_floor_plan.PNG)
+
+**Surface Matching**    
+
+![surface matching](fig\231120_surface_matching.PNG)
+
+Once the final steps have been completed the file can be saved as an OpenStudio file (.osm). This file is then linked in GenSim (Excel interface) - see chapter 3.2.2.  
+
+![save model](fig\231120_save_model.png)
+
+**Create window bands**
+
+Select the model or rooms of interest. If not all rooms have a constant proportion of window area but should have different sizes according to different external facades, the individual facade elements can be selected by double-clicking. Once the rooms or facades have been marked the window bands are inserted as shown in the following figure. The 'window to wall ratio' is the ratio of window area to facade area. 
+
+![window to wall ratio](fig\231120_window_to_wall.png)
+
+![window to wall ratio](fig\231120_window_to_wall_2.png)
+
+**Save final model as an OpenStudion model (.osm)**
+
+![save final model](fig\231120_save_final_model.png)
+
+
+**Useful Links**
+
+Roof geometry: [https://www.youtube.com/watch?v=7YRnquHx1AE](https://www.youtube.com/watch?v=7YRnquHx1AE)
+
+**6.1 **
+
+
+
+
+
