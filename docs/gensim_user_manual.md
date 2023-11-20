@@ -41,7 +41,7 @@ GenSim has been tested with the following versions of *Microsoft Excel®*:
 * Office 2016 (16.0.5422.1000)
 * Office 365 (as of Nov 1st 2023)
 
-*Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menue of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
+*Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menu of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
 
 ### SketchUp
 SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
