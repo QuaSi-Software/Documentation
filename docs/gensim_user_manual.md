@@ -259,8 +259,8 @@ It is important to not only draw the outline of the building but also the indivi
 
 ![trace individual rooms](fig\231117_trace_rooms.png)
 
-After drawing the floor plan of the building it is recommended to first save the file temporarily as a SketchUp file (.skp file type) so that it can be accessed later and corrected if necessary.[9]
-[9]: This is because once a building model is created from the floor plan it disappears in SketchUp. 
+After drawing the floor plan of the building it is recommended to first save the file temporarily as a SketchUp file (.skp file type) so that it can be accessed later and corrected if necessary.[^9]
+[^9]: This is because once a building model is created from the floor plan it disappears in SketchUp. 
 
 ![save file](fig\231117_save_file.png)
 
@@ -291,9 +291,34 @@ Select the model or rooms of interest. If not all rooms have a constant proporti
 
 **Useful Links**
 
-Roof geometry: [https://www.youtube.com/watch?v=7YRnquHx1AE](https://www.youtube.com/watch?v=7YRnquHx1AE)
+Roof geometry: [https://www.youtube.com/watch?v=7YRnquHx1AE](https://www.youtube.com/watch?v=7YRnquHx1AE)   
 
-**6.1 **
+
+###6.1 Optional: Draw windows by hand
+
+![draw window by hand](fig\231121_window_by_hand.png)
+
+![draw window by hand](fig\231121_window_by_hand_2.png)
+
+![draw window by hand](fig\231121_window_by_hand_3.png)
+
+###6.2 Optional: Adiabatic external components
+
+Optionally individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic implies that the external component does not allow heat conduction. This can be used e.g. to simulate coupled row houses or any other partial volume of a whole building by defining component boundaries to heated zones (simplified) as adiabatic. 
+
+* Change the display to "Render By Boundary Conditions"     
+* If it is not displayed: Extension > Open Studio > Rendering > Render By Boundary  
+
+![adiabatic external elements](fig\231121_adiabatic_external_elements.png)
+
+* Open the "Inspector" and change the item "Outside Boundary Condition" to "Adiabatic"
+
+![adiabatic external elements](fig\231121_adiabatic_external_elements_2.png)
+
+* If the floor (e.g.) is to be set as adiabatic the floor must be selected by double clicking on it. If this does not work double click again.
+* The colour of the previously selected area should now change to pink. Tip: If the colour does not change, it usually helps to restart the program and open the osm file again. This is simply a display error in the plugin. The colours of the areas will change to the correct colours after the restart. 
+
+![adiabatic external elements pink colour](fig\231121_adiabatic_external_elements_colour.png)
 
 
 
