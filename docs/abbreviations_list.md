@@ -8,7 +8,9 @@
 | BA           | Battery (electrical)                                                        |
 | BB           | Biomass Boiler                                                              |
 | BETS         | Borehole Thermal Energy Storage                                             |
+| BRF          | Gross Room Volume                                                           |
 | BIM          | Building Information Modeling                                               |
+| BKI          | Building cost index                                                         |
 | BMWK         | German Federal Ministry for Economic Affairs and Climate Action             |
 | C-rate       | Charging rate (of storage)                                                  |
 | CC           | Compression Chiller                                                         |
@@ -17,6 +19,7 @@
 | COP          | Coefficient of Performance                                                  |
 | CSV          | Comma-Separated Values [data format]                                        |
 | DC           | Direct Current                                                              |
+| DWD          | German weather service (Deutscher Wetterdienst)                             |
 | EER          | Energy Efficiency Ratio                                                     |
 | EPW          | Energy Plus Weather                                                         |
 | ER           | Electric Heating Rod                                                        |
@@ -24,17 +27,22 @@
 | GB           | Gas Boiler                                                                  |
 | GCV          | Gross Calorific Value, also known as Higher Heating Value (HHV)             |
 | GenSim       | Generic Building Simulation [simulation tool]                               |
+| GFA          | Gross floor area (BGF) of a building                                        |
+| GUI          | Graphical User Interface                                                    |
 | HC           | Hydrogen Compressor                                                         |
 | HEL          | Hydrogen Electrolyser                                                       |
 | HHV          | Higher Heating Value, also known as Gross Calorific Value (GCV)             |
 | HP           | Heat Pump                                                                   |
+| HR           | Heat recovery                                                               |
 | HVAC         | Heating, Ventilation and Air Conditioning                                   |
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
 | JSON         | JavaScript Object Notation [data format]                                    |
+| K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | MOT          | Minimum Operation Time                                                      |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
+| NFA          | Net floor area (NRF) of a building                                          |
 | OH           | Oil Heating                                                                 |
 | PLF          | Part Load Factor                                                            |
 | PLR          | Part Load Ratio                                                             |
@@ -47,11 +55,14 @@
 | SCC          | Simple Compression Chiller                                                  |
 | SCOP         | Seasonal Coefficient of Performance                                         |
 | SEER         | Seasonal Energy Efficiency Ratio                                            |
+| SFP          | Specific fan power                                                          |
 | STES         | Seasonal Thermal Energy Storage                                             |
 | STTES        | Short-Therm Thermal Energy Storage                                          |
 | SUT          | Start-Up Time                                                               |
 | SoDeLe       | Solar Simulation as easy as can be [simulation tool]                        |
 | TRNSYS       | TRaNsient SYstems Simulation [simulation tool]                              |
+| TRY          | Test Reference Year                                                         |
+| TMY          | Typical Meteorological Year                                                 |
 | TTES         | Tank Thermal Energy Storage                                                 |
 | UAC          | User Address Codes                                                          |
 | WP           | Wind Power                                                                  |
