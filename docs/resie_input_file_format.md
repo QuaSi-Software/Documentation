@@ -53,10 +53,15 @@ The overall structure of the project file is split into three general sections, 
 * `output_file` (`String`): File path to a location where the output will be saved.
 * `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `dump_info_file` (`String`): File path to where the additional information will be written.
-* `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (csv-file) for what this does and how it works.
+* `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (CSV-file) for what this does and how it works.
 * `output_plot` (`Map{Int, Dict{String, Any}`): Specification for output line plot. See section on output specification (interactive .html plot) for what this does and how it works.
 
-### Output specification (csv-file)
+### Output specification (CSV-file)
+
+The output values of each component can be written to a CSV-file. `output_keys` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_keys": "all"```, all possible output channels of all components will be written to the CSV-file, while for ```"nothing"``` no file will be created. 
+
+To specify a custom selection of outputs, use the following syntax:
+
 ```json
 "output_keys": {
     "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT"],
@@ -69,6 +74,11 @@ The keys of this map must correspond exactly to the UAC of the components define
 The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
 
 ### Output specification (interactive .html plot)
+
+The output values of each component can be plotted in an interactive HTML-based line plot. `output_plot` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all"```, all possible output channels of all components will be plotted in the line plot, while for ```"nothing"``` no plot will be created. Note that for ```"output_plot": "all"```, the unit of each output is not specified as well as there is no `scale_factor` as for custon defined outputs. 
+
+To define a custom plot, use the following syntax:
+
 ```json
 "output_plot": {
             "1": {
@@ -86,9 +96,9 @@ The second part of the entry describes which of the available variables of the c
             ...
 }
 ```
-The output specification for an interactive line plot can be specified in ```"output_plot"```. The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
-The results will be saved in ```\output\output_plot.html"```. The plot can be opened with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
+The results will be saved in `\output\output_plot.html`. The plot can be opened with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
 
 
 ## Simulation parameters
