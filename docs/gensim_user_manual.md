@@ -33,17 +33,30 @@ We recently published a scientific paper in the journal "Energies" with a detail
 
 GenSim relies on several external software tools to deliver its functionality and conduct simulations. Below, we detail these software requirements and guide you through their installation process. It's important to pay special attention to the recommended versions of these tools. Since the development of GenSim often trails behind these other software applications, using newer versions than those recommended can lead to compatibility issues. Sticking to the suggested versions ensures smooth integration and optimal performance of GenSim in your simulations.
 
-### *Microsoft Excel®*
-The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy-access to the functionalities of GenSim. GenSim could also be used without a the provided GUI. This will not be described further here, but you can find more information on how to do so in the documentation delivered in the GitHub repository of GenSim.
+### Download GenSim & Quickstart
+
+The latest stable GenSim release can be downloaded from the GitHub repository [here](https://github.com/QuaSi-Software/GenSim/releases).
+
+Quickstart:
+
+- Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel-VBA!
+- unpack the zip-file
+- install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
+- start GenSim using the `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
+  
+See chapter 3 & 4 for detailed description on how to use GenSim. 
+
+### *Microsoft Excel®* (and possible alternatives)
+The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy-access to the functionalities of GenSim. GenSim could also be used without the provided GUI. This will not be described further here, but you can find more information on how to do so in the `CONTRIBUTING.md` in the GitHub repository of GenSim.
 
 GenSim has been tested with the following versions of *Microsoft Excel®*:
 
 * Office 2016 (16.0.5422.1000)
 * Office 365 (as of Nov 1st 2023)
 
-*Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menu of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
+**Note:** *Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menu of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
 
-### SketchUp
+### SketchUp (optional)
 SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
 
 We recommend using SketchUp 2017, however this version is no longer publicly available. We still need to test the use of newer versions of SketchUp for the use with GenSim. Until then it may not be possible to acquire a version that works with GenSim. Sorry!
