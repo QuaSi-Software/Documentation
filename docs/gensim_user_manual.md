@@ -278,7 +278,7 @@ Once the final steps have been completed the file can be saved as an OpenStudio 
 
 **Create window bands**
 
-Select the model or rooms of interest. If not all rooms have a constant proportion of window area but should have different sizes according to different external facades, the individual facade elements can be selected by double-clicking. Once the rooms or facades have been marked the window bands are inserted as shown in the following figure. The 'window to wall ratio' is the ratio of window area to facade area. 
+Select the model or rooms of interest. If not all rooms have a constant proportion of window area but should have different sizes according to different external facades, the individual facade elements can be selected by double-clicking. Once the rooms or facades have been marked the window bands are inserted as shown in the following figure. The "window to wall ratio" is the ratio of window area to facade area. 
 
 ![window to wall ratio](fig\231120_window_to_wall.png)
 
@@ -304,7 +304,7 @@ Roof geometry: [https://www.youtube.com/watch?v=7YRnquHx1AE](https://www.youtube
 
 ###6.2 Optional: Adiabatic external components
 
-Optionally individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic implies that the external component does not allow heat conduction. This can be used e.g. to simulate coupled row houses or any other partial volume of a whole building by defining component boundaries to heated zones (simplified) as adiabatic. 
+Optionally individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the external component does not allow heat conduction. This can be used e.g. to simulate coupled row houses or any other partial volume of a whole building by defining component boundaries to heated zones (simplified) as adiabatic. 
 
 * Change the display to "Render By Boundary Conditions"     
 * If it is not displayed: Extension > Open Studio > Rendering > Render By Boundary  
