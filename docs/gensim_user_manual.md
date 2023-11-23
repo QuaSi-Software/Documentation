@@ -3,7 +3,7 @@
 
 GenSim - for "generic building simulation" - is a building simulation software using the *EnergyPlus®* simulation engine to generate high-resolution heating and cooling demand profiles as well as electricity demand profiles for buildings with various types of use. "Generic" in this context refers to a "generally valid" building model. This means that the software is versatile enough to simulate any type of building in a very flexible and simplified way, enabling users to efficiently adapt the software for any building design.
 
-GenSim was specifically devloped for the use during project pre-planning where detailed simulations of buildings are challenging due to typically constrained time budgets and limited availability of information. Traditional simulation tools like *DesignBuilder®*, *IDA ICE®* or *TRNSYS®* require extensive input data, making the process time-consuming. GenSim addresses this by providing a streamlined approach for quick, simple, yet accurate building simulations. This is particularly valuable in early planning stages when only rough data about the planned buildings is available. GenSim strikes an optimal balance between the model's detail level and the precision of input parameters, ensuring efficiency without compromising on accuracy. If more detailed information (wall structure, geometry, specific use, ...) is available about the building to be examined, this can be used for more precise results.
+GenSim was specifically developed for the use during project pre-planning where detailed simulations of buildings are challenging due to typically constrained time budgets and limited availability of information. Traditional simulation tools like *DesignBuilder®*, *IDA ICE®* or *TRNSYS®* require extensive input data, making the process time-consuming. GenSim addresses this by providing a streamlined approach for quick, simple, yet accurate building simulations. This is particularly valuable in early planning stages when only rough data about the planned buildings is available. GenSim strikes an optimal balance between the model's detail level and the precision of input parameters, ensuring efficiency without compromising on accuracy. If more detailed information (wall structure, geometry, specific use, ...) is available about the building to be examined, this can be used for more precise results.
 
 The user interface for input and output data is realised in *Microsoft Excel®*. The simulation engine, based on *OpenStudio®*[^1] and *EnergyPlus®*, is connected to the user interface via *Visual Basic for Applications®* code. The overall workflow is shown in the figure below.
 
@@ -23,6 +23,12 @@ In addition to the output profiles, GenSim provides various annual values, key p
 
 ![overview of the output sizes](fig/231023_overview.PNG)
 
+### Important note on the purpose of GenSim
+
+We envision GenSim as a valuable tool to perform building energy simulations in the early planning stage of projects, when the lack of detailed information plays well into the strengths of GenSim as it does not require great detail to calculate reasonable approximations of the expected energy use. In this context some inaccuracies are expected and mostly caused by uncertainty in the values of important parameters.
+
+**Please keep this in mind and note that we do not endorse GenSim for any specific use, especially not to perform simulations according to standards, to certify a building project's energy system, to predict precise energy costs or to size any energy system component to match exact demands.**
+
 ### Recent Publication
 
 We recently published a scientific paper in the journal "Energies" with a detailed description of the software architecture and capabilities of GenSim. To validate GenSim, we also performed a comparison of simulation results from GenSim, DesignBuilder and measurement data of two years, which is documented in the article. The paper is published with open access at:
@@ -40,9 +46,11 @@ The latest stable GenSim release can be downloaded from the GitHub repository [h
 Quickstart:
 
 - Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel-VBA!
-- unpack the zip-file
-- install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
-- start GenSim using the `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
+- Unpack the zip-file
+- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
+- Allow file `GenSim.xlsm` to be accessed in the file property settings
+- Start GenSim by opening file `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
+- Enable macros and access to the VBA Object Model in the *Microsoft Excel®* Trust Center
   
 See chapter 3 & 4 for detailed description on how to use GenSim. 
 
@@ -54,7 +62,11 @@ GenSim has been tested with the following versions of *Microsoft Excel®*:
 * Office 2016 (16.0.5422.1000)
 * Office 365 (as of Nov 1st 2023)
 
-**Note:** *Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menu of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
+**Note:** *Microsoft Excel®* may require you to enable macros before you can use the software and to enable access to the VBA Object Model. This can be done in the *Trust Center* in the options of *Microsoft Excel®* as shown in the following figure. The shown settings allow access to the VBA Object Model and allow macros to be run after prompting the user.
+
+There is also the option to always allow macros to be run, **however please note that these settings may increase the risk of malware if left on "allow all" permanently.** If you regularly open *Microsoft Excel®* files from untrusted sources, allowing all macros to be run may lead to malware infecting your computer. To prevent this, please be mindful about when to enable and disable the use of macros.
+
+![Microsoft Excel® Trust Center settings](fig/231123_trust_center_settings.png)
 
 ### SketchUp (optional)
 SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
@@ -68,7 +80,11 @@ As GenSim is based on OpenStudio, it must be installed in order to run simulatio
 * On the installer page where you can select which components of OpenStudio to install, please select all components.
 
 ### Configuring GenSim
-After the previous steps have been performed, open the GenSim user interface and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+After the previous steps have been performed, you need to mark the file `GenSim.xlsm` to be allowed to be run and modified. Open the file property settings by right-clicking the file in a file explorer and select settings. In the settings there is an option to allow access to the file as shown in the following figure. The setting is only shown if the operating system recognises the file as an external file. If it is not there, you can skip this step.
+
+![option to enable access to the file GenSim.xlsm](fig/231123_enable_file_permissions.png)
+
+As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
 
 ![path to OpenStudio installation](fig/231117_openstudio_path.png)
 
