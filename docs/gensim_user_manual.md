@@ -46,9 +46,11 @@ The latest stable GenSim release can be downloaded from the GitHub repository [h
 Quickstart:
 
 - Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel-VBA!
-- unpack the zip-file
-- install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
-- start GenSim using the `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
+- Unpack the zip-file
+- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
+- Allow file `GenSim.xlsm` to be accessed in the file property settings
+- Start GenSim by opening file `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
+- Enable macros and access to the VBA Object Model in the *Microsoft Excel®* Trust Center
   
 See chapter 3 & 4 for detailed description on how to use GenSim. 
 
@@ -60,7 +62,11 @@ GenSim has been tested with the following versions of *Microsoft Excel®*:
 * Office 2016 (16.0.5422.1000)
 * Office 365 (as of Nov 1st 2023)
 
-**Note:** *Microsoft Excel®* may require you to enable macros on the file `GenSim.xlsm` before you can use the software, or to disable other security checks that prevent macros to run. This can be done in the *Trust Center* in the options of *Microsoft Excel®* or, depending on your windows security settings, also in the windows preference menu of the file (right click on `GenSim.xlsm` - preferences - general - allow access).
+**Note:** *Microsoft Excel®* may require you to enable macros before you can use the software and to enable access to the VBA Object Model. This can be done in the *Trust Center* in the options of *Microsoft Excel®* as shown in the following figure. The shown settings allow access to the VBA Object Model and allow macros to be run after prompting the user.
+
+There is also the option to always allow macros to be run, **however please note that these settings may increase the risk of malware if left on "allow all" permanently.** If you regularly open *Microsoft Excel®* files from untrusted sources, allowing all macros to be run may lead to malware infecting your computer. To prevent this, please be mindful about when to enable and disable the use of macros.
+
+![Microsoft Excel® Trust Center settings](fig/231123_trust_center_settings.png)
 
 ### SketchUp (optional)
 SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 3.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
@@ -74,7 +80,11 @@ As GenSim is based on OpenStudio, it must be installed in order to run simulatio
 * On the installer page where you can select which components of OpenStudio to install, please select all components.
 
 ### Configuring GenSim
-After the previous steps have been performed, open the GenSim user interface and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+After the previous steps have been performed, you need to mark the file `GenSim.xlsm` to be allowed to be run and modified. Open the file property settings by right-clicking the file in a file explorer and select settings. In the settings there is an option to allow access to the file as shown in the following figure. The setting is only shown if the operating system recognises the file as an external file. If it is not there, you can skip this step.
+
+![option to enable access to the file GenSim.xlsm](fig/231123_enable_file_permissions.png)
+
+As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
 
 ![path to OpenStudio installation](fig/231117_openstudio_path.png)
 
