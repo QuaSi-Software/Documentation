@@ -287,67 +287,67 @@ The results of the simulation are given as annual values and profiles. Annual va
 ## **6 Short tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in**
 
 **Create a new empty model**    
-In order to correctly create the geometry model for further GenSim modelling no predefined usage must be selected when creating the model.
+In order to correctly create a custom, non-generic geometry model for a thermal building simlation in GenSim, the model has to be created from scratch without any predefinitions, as shown in the following figure.
 
-![create new geometry model](fig\231117_create_new_model.PNG)
+![create new geometry model](fig/231117_create_new_model.PNG)
 
 **Draw a floor plan**
 
-![draw floor plan](fig\231117_draw_floor_plan.png)
+![draw floor plan](fig/231117_draw_floor_plan.png)
 
-Dimensions must be used for correct scale modelling. This option may need to be activated in SketchUp itself as it is not always activated by default during installation in order for the dimensions to be displayed in the lower section. To do so, click on "View" in the menu bar and then on "Toolbars" in the pull-down menu. In the "Toolbars" tab the "Dimensions" option must be activated. The dimensions will then appear in the bottom left corner of the program and can be easily entered (without clicking on the field). The entry of a dimension is completed and confirmed by pressing the Enter key.     
+Dimensions must be used for a correctly scaled model. This option may need to be activated in SketchUp itself as it is not always activated by default during installation in order for the dimensions to be displayed in the lower section. To do so, click on "View" in the menu bar and then on "Toolbars" in the pull-down menu. In the "Toolbars" tab the "Dimensions" option must be activated. The dimensions will then appear in the bottom left corner of the program and can be easily entered (without clicking on the field). The entry of a dimension is completed and confirmed by pressing the Enter key.     
 It is important to not only draw the outline of the building but also the individual rooms in the floor plan so that the effects of different heating and cooling loads in individual rooms (depending on the solar input, etc.) are adequately represented. It is recommended to import the floor plan (if available) into SketchUp as an image file to make it easier to trace the individual rooms. Therefore it is necessary to know a length in the image. Preferably the length of the entire exterior wall of the building so that you can scale the image in SketchUp. Scaling works as described above. 
 
-![draw floor plan](fig\231117_import_file.png)
+![draw floor plan](fig/231117_import_file.png)
 
 **Set zero:**
 
-![set zero](fig\231117_set_zero.png)
+![set zero](fig/231117_set_zero.png)
 
 **Scale by entering the length of the image:** 
 
-![scale by length](fig\231117_scale_length.png)
+![scale by length](fig/231117_scale_length.png)
 
 **Trace the building outline:**
 
-![trace building outline](fig\231117_trace_building.png)
+![trace building outline](fig/231117_trace_building.png)
 
 **Switch on X-Ray mode:**
 
-![X-Ray mode on](fig\231117_xray_mode.PNG)
+![X-Ray mode on](fig/231117_xray_mode.PNG)
 
 **Trace individual rooms:**   
 
-![trace individual rooms](fig\231117_trace_rooms.png)
+![trace individual rooms](fig/231117_trace_rooms.png)
 
-After drawing the floor plan of the building it is recommended to first save the file temporarily as a SketchUp file (.skp file type) so that it can be accessed later and corrected if necessary.[^9]
+After drawing the floor plan of the building, it is recommended to first save the file temporarily as a SketchUp file (.skp file type) so that it can be accessed later and corrected if necessary.[^9]
 [^9]: This is because once a building model is created from the floor plan it disappears in SketchUp. 
 
-![save file](fig\231117_save_file.png)
+![save file](fig/231117_save_file.png)
 
 **Select floor plan and create floors** 
 
-![select floor plan](fig\231120_select_floor_plan.PNG)
+![select floor plan](fig/231120_select_floor_plan.PNG)
 
 **Surface Matching**    
 
-![surface matching](fig\231120_surface_matching.PNG)
+![surface matching](fig/231120_surface_matching.PNG)
 
 Once the final steps have been completed the file can be saved as an OpenStudio file (.osm). This file is then linked in GenSim (Excel interface) - see chapter 3.2.2.  
 
-![save model](fig\231120_save_model.png)
+![save model](fig/231120_save_model.png)
 
 **Create window bands**
 
-Select the model or rooms of interest. If not all rooms have a constant proportion of window area but should have different sizes according to different external facades, the individual facade elements can be selected by double-clicking. Once the rooms or facades have been marked the window bands are inserted as shown in the following figure. The "window to wall ratio" is the ratio of window area to facade area. 
+Select the model or rooms of interest. If not all rooms have a constant proportion of window area but should have different sizes according to different external facades, the individual facade elements can be selected by double-clicking. Once the rooms or facades have been marked, the window bands are inserted as shown in the following figure. The "window to wall ratio" is the ratio of window area to facade area. 
 
-![window to wall ratio](fig\231120_window_to_wall.png)
+![window to wall ratio](fig/231120_window_to_wall.png)
 
-![window to wall ratio](fig\231120_window_to_wall_2.png)
+![window to wall ratio](fig/231120_window_to_wall_2.png)
 
 **Save final model as an OpenStudion model (.osm)**
 
-![save final model](fig\231120_save_final_model.png)
+![save final model](fig/231120_save_final_model.png)
 
 
 **Useful Links**
@@ -355,31 +355,31 @@ Select the model or rooms of interest. If not all rooms have a constant proporti
 Roof geometry: [https://www.youtube.com/watch?v=7YRnquHx1AE](https://www.youtube.com/watch?v=7YRnquHx1AE)   
 
 
-###6.1 Optional: Draw windows by hand
+**Optional: Draw windows by hand**
 
-![draw window by hand](fig\231121_window_by_hand.png)
+![draw window by hand](fig/231121_window_by_hand.png)
 
-![draw window by hand](fig\231121_window_by_hand_2.png)
+![draw window by hand](fig/231121_window_by_hand_2.png)
 
-![draw window by hand](fig\231121_window_by_hand_3.png)
+![draw window by hand](fig/231121_window_by_hand_3.png)
 
-###6.2 Optional: Adiabatic external components
+**Optional: Adiabatic external components**
 
-Optionally individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the external component does not allow heat conduction. This can be used e.g. to simulate coupled row houses or any other partial volume of a whole building by defining component boundaries to heated zones (simplified) as adiabatic. 
+Optionally, individual facade components as well as the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the external component does not allow heat conduction. This can be used e.g. to simulate coupled row houses or any other partial volume of a whole building by defining component boundaries to heated zones (simplified) as adiabatic. 
 
 * Change the display to "Render By Boundary Conditions"     
 * If it is not displayed: Extension > Open Studio > Rendering > Render By Boundary  
 
-![adiabatic external elements](fig\231121_adiabatic_external_elements.png)
+![adiabatic external elements](fig/231121_adiabatic_external_elements.png)
 
 * Open the "Inspector" and change the item "Outside Boundary Condition" to "Adiabatic"
 
-![adiabatic external elements](fig\231121_adiabatic_external_elements_2.png)
+![adiabatic external elements](fig/231121_adiabatic_external_elements_2.png)
 
-* If the floor (e.g.) is to be set as adiabatic the floor must be selected by double clicking on it. If this does not work double click again.
-* The colour of the previously selected area should now change to pink. Tip: If the colour does not change, it usually helps to restart the program and open the osm file again. This is simply a display error in the plugin. The colours of the areas will change to the correct colours after the restart. 
+* If the floor (e.g.) is to be set as adiabatic, the floor must be selected by double clicking on it. If this does not work, double click again.
+* The colour of the previously selected area should now change to pink. Tip: If the colour does not change, it usually helps to restart the program and open the .osm file again. This is simply a display error in the plugin. The colours of the areas will change to the correct colours after the restart. 
 
-![adiabatic external elements pink colour](fig\231121_adiabatic_external_elements_colour.png)
+![adiabatic external elements pink colour](fig/231121_adiabatic_external_elements_colour.png)
 
 
 
