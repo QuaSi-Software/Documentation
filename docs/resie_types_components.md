@@ -110,7 +110,7 @@ The only implementation of special component `Bus`, used to connect multiple com
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Load`, `Temperature` |
+| **Tracked values** | `IN`, `Demand`, `Temperature` |
 
 Generalised implementation of a fixed sink.
 
@@ -119,7 +119,7 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `static_load` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
+| `static_demand` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
@@ -141,7 +141,7 @@ Alias to `FixedSink`.
 | **Medium** | `medium`/`None` |
 | **Input media** |  |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `Out`, `Supply`, `Temperature` |
+| **Tracked values** | `OUT`, `Supply`, `Temperature` |
 
 Generalised implementation of a fixed source.
 
@@ -165,7 +165,7 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `Out`, `Draw sum`, `Load sum` |
+| **Tracked values** | `IN`, `OUT`, `Draw_sum`, `Demand_sum`, `Supply_sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
