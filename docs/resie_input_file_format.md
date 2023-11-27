@@ -134,7 +134,7 @@ The specification for the components involved in the simulation is the most comp
             "high_threshold": 0.9,
             "low_threshold": 0.2
         },
-        "power": 12500,
+        "power_gas": 12500,
         "m_heat_out": "m_h_w_ht1"
     },
     "TST_01_HZG_01_BUS": {

@@ -210,15 +210,15 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN`, `OUT` (el), `OUT` (heat) |
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `power_gas` | `Float` | Y/N | 4000.0 | The maximum design power input (input chemical energy). |
 | `electricity_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input chemical energy that is output as electricity. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_gas that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 
@@ -232,14 +232,14 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN` (el), `OUT` (H2), `OUT` (waste heat) |
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_el` | `Float` | Y/N | 4000.0 | The maximum electrical design power input. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_el that is required for the plant to run. |
 | `heat_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input electric energy that is output as heat. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
@@ -265,8 +265,8 @@ The current implementation includes functionality to model a PLR-dependant therm
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_th` | `Float` | Y/N | 4000.0 | The maximum thermal design power output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 | `max_thermal_efficiency` | `Float` | N/Y | 1.0 | The maximum thermal efficiency if no \(\eta(PLR)\) is used. |
@@ -282,14 +282,14 @@ The current implementation includes functionality to model a PLR-dependant therm
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP` |
+| **Tracked values** | `IN` (el), `IN` (cold), `OUT` (heat), `COP` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a static one. |
 | `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a static one. |
