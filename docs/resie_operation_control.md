@@ -78,24 +78,24 @@ For the predefined `demand_driven`, `supply_driven` and `storage_driven` control
 
 ```json
     "strategy": {
-        "name": "demand_driven",    // required
-        "load_storages" : true,     // optional     
-        "unload_storages" : true,   // optional 
+        "name": "demand_driven",        // required
+        "load_storages" : true,         // optional     
+        "unload_storages" : true,       // optional 
         "operation_profile_path": "path/to/profile.prf",  // optional 
-        "m_el_in" : true,           // optional    
-        "m_el_out" : true,          // optional    
-        "m_gas_in" : true,          // optional    
-        "m_h2_out" : true,          // optional    
-        "m_o2_out" : true,          // optional    
-        "m_heat_out" : true,        // optional    
-        "m_heat_in" : true          // optional    
+        "consider_m_el_in" : true,      // optional    
+        "consider_m_el_out" : true,     // optional    
+        "consider_m_gas_in" : true,     // optional    
+        "consider_m_h2_out" : true,     // optional    
+        "consider_m_o2_out" : true,     // optional    
+        "consider_m_heat_out" : true,   // optional    
+        "consider_m_heat_in" : true     // optional    
         },
 ```
 
-Each entry starting with an `m` (for medium) defines an input or output of the defined component. Obviously, a component has only a selection of the full list of inputs and outputs given above. If an input or output is set to false within the control strategy, the limitation of energy demand or supply on this interface is ignored when the current operation state of the component is determined. Note that this can lead to unexpected balance errors within the simulation! However, if users want more control over the operational strategy, these flags can be used to define complex rules for the operation of each component.
+Each entry of `consider_*medium*` defines an input or output of the related component. Obviously, a component has only a selection of the full list of inputs and outputs given above. If an input or output is set to false (`"consider_medium": false`) within the control strategy, the limitation of energy demand or supply on this interface is ignored when the current operation state of the component is determined. Note that this can lead to unexpected balance errors within the simulation! However, if users want more control over the operational strategy, these flags can be used to define complex rules for the operation of each component. As default state, all in- and outputs are considered when determining the state of a component in every time step (flags set to `true`).
 
 If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified component is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this parameter allows to deny or allow system-wide storage loading or unloading for each component. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
 
 Using the `storage_driven` control strategy, `load_storages` and `unload_storages` can also be set to `false`, although this is usually not very useful.
 
-The `operation_profile_path` entry within the `strategy`-Struct can be used to specify a path as a string to a `*.prf` file containing a timestamp and values between 0 and 1 for each time step. They serve as an additional operation limitation for the transformer and can be used e.g. to operate a transformer only at times with a high share of renewable energy in the public power grid.
+The `operation_profile_path` entry within the `strategy`-struct can be used to specify a path as a string to a `*.prf` file containing a timestamp and values between 0 and 1 for each time step. They serve as an additional operation limitation for the transformer and can be used e.g. to operate a transformer only at times with a high share of renewable energy in the public power grid.
