@@ -65,5 +65,6 @@
 | TMY          | Typical Meteorological Year                                                 |
 | TTES         | Tank Thermal Energy Storage                                                 |
 | UAC          | User Address Codes                                                          |
+| VS Code      | Visual Studio Code                                                          |
 | WP           | Wind Power                                                                  |
 | abbrev       | abbreviation                                                                |
