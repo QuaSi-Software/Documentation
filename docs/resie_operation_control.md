@@ -26,22 +26,26 @@ One addition to the common concept of a state machine is that the implementation
 
 The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which components it needs access. As the specific components are not defined before the project is loaded, these requirements affect the type and possibly the medium of the components, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizable parameters with default values.
 
-The example above uses four different conditions:
+The example above uses three different conditions:
 
 * `BT >= X%`: Checks if a linked buffer tank is above X% capacity.
 * `BT < X%`: Checks if a linked buffer tank is below X% capacity.
 * `Min. run time`: Checks if the component the state machine controls has been in the current state for longer or equal than its minimum run time.
-* `Overfill`: Checks if the remaining empty capacity of a linked buffer tank is less than the minimum partial load of the component the state machine controls.[^3]
 
-[^3]: Rather, this is its intended use. As of now there remains an issue with its implementation.
+To make sure that the buffer tank is not overfilled, the component linked to this buffer checks this condition itself during each timestep by comparing the free storage space and the possible energy that could be delivered to the buffer tank while considering the minimum partial load of the component. Therefore, this condition is not included in the state machine.  
 
 ### Truth table
 
 The transitions for each state are defined using a truth table over the conditions involved, resulting in a new state (which may result in the current state again). This has the advantage that is covers every possible case implicitly, but also has the disadvantage that this might result in large truth tables for state machines with many conditions.
 
-<center>![Example of a truth table with three conditions](fig/example_truth_table.png)</center>
+| **BT >= X%** | **Min. run time** | **New state** | 
+| --- | --- | --- |
+| true | true | Off |
+| false | true | Fill tank |
+| true | false | Fill tank |
+| false | false | Fill tank |
 
-The example above shows the truth table used for the state "Fill tank", which has three conditions. Cases where the `Overfill` condition is true always lead to the `Off` state, regardless of the values of the other conditions.
+The example above shows the truth table used for the state "Fill tank", which has two conditions. In this case, the buffer tank should be filled exept of the case where both the minimum run time has reached and the buffer tanks is filled above the defined upper load state. The condition to not overfill the buffer tank is handled by each component during each time step and not by the state machine.
 
 ## Strategies
 
