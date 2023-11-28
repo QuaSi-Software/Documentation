@@ -26,7 +26,7 @@ The description further lists which arguments the implementation takes. Let's ta
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
 | `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a constant value. |
 
 The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
 
@@ -48,15 +48,15 @@ The type refers to the type it is expected to have after being parsed by the JSO
 
 Generalised implementation of a bounded sink.
 
-Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a constant temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a static value. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
 
 ### General bounded supply
 | | |
@@ -72,15 +72,15 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 
 Generalised implementation of a bounded source.
 
-Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a constant temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a static value. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
 
 ### Bus
 | | |
@@ -114,15 +114,15 @@ The only implementation of special component `Bus`, used to connect multiple com
 
 Generalised implementation of a fixed sink.
 
-Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a constant load can be given. If the medium supports it, it can either be given a profile for the temperature or use a constant temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `static_demand` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
+| `constant_demand` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
 
 ### General demand
 | | |
@@ -145,15 +145,15 @@ Alias to `FixedSink`.
 
 Generalised implementation of a fixed source.
 
-Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a constant temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `static_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a static value. |
+| `constant_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
 
 ### Grid connection
 | | |
@@ -291,9 +291,9 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a static one. |
-| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a static one. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a static one. |
+| `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant one. |
+| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a constant one. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a constant one. |
 
 ## Storage
 
