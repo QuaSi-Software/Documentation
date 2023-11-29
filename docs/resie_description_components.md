@@ -761,8 +761,11 @@ $$Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
 Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
 For Re \(\leq\) 2300, which is laminar flow, an equation by Stephan[^Stephan]  is used:
-$$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{Rohr}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot \Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{Rohr}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
+$$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{pipe}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot \Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{pipe}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
 [^Stephan]: W. Heidemann: Berechnung von Wärmeübertragern. Unterlagen zur Vorlesung. Institut für Gebäudeenergetik, Thermotechnik und Energiespeicherung, Universität Stuttgart, 2022.
+
+where \(Pr\) is the Prandtl number of the heat carrier fluid,  \(L_{\text{pipe}}\) is the total length of one U-pipe, 
+\(D_i\) is the inner Diameter of one U-pipe and \(Pr_W\) is the Prandtl Number of water.
 
 For Re \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
 $$ Nu_{turbulent} = \frac{\frac{\zeta}{8 \cdot Re \cdot Pr}}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
@@ -771,7 +774,7 @@ $$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$
 
 [^Gielinski_1]: V. Gnielinski: Neue Gleichungen für den Wärme- und Stoffübergang in turbulent durchströmten Rohren und Kanälen.Forsch.Ing-wes 41(1):8–16, 1975.
 
-For 2300 \(\leq\) Re \(\leq\) 10^4m which is the transition flow, an equation by Gielinski[^Gielinski_2] is used: 
+For 2300 \(\leq\) Re \(\leq\) \(10^4\) which is the transition between laminar and turbulent flow, an equation by Gielinski[^Gielinski_2] is used: 
 $$ Nu = (1-\gamma) \cdot Nu_{\text{laminar,2300}} + \gamma \cdot Nu_{turbulent,10^4} $$
 Where \(\gamma\) is calculated as follows
 $$ \gamma = \frac{Re-2300}{10^4-2300} $$
@@ -799,14 +802,17 @@ Symbol | Description | Unit
 \(Nu\) |Nußelt number | [-]
 \(Re\) |Reynolds number | [-]
 \(\alpha_{i}\) |heat transfer coefficient inside the tube| [W/\((m^{2} \cdot K)\)]
-
-
+\(Pr\) |Prandtl number of the heat carrier Fluid| [-]
+\(Pr_W\) |Prandtl number of water| [-] 
+\(L_{\text{pipe}}\) |Total length of a U-pipe (up and down) | [m] 
+\(D_i\) |Inner diameter of a U-pipe| [m]
 
 ### Geothermal Heat Collector
 
 
 #### Overview
 There are several types of geothermal heat collectors. The Model in ReSiE covers classic horizontal geothermal heat exchangers with a typical depth of 1-2 m below the surface, e.g. by a number of pipes laid parallel to each other. In addition to the physical properties of the soil, local weather conditions have a noticeable influence on the soil temperature due to the low installation depth below the earth's surface, e.g. compared to geothermal probes systems. When designing geothermal collectors, the aim is to achieve partial icing of the ground around the collector pipes during the heating season in order to utilize latently stored energy. However, the iced volume around the collector pipes must not be too large in order to prevent precipitation from seeping into deeper layers of the earth. VDI 4640-2 specifies design values for the area-related heat extraction capacity depending on the soil type and the climate zone.
+
 
 #### Simulation domain and boundary conditions
 For modeling horizontal geothermal collectors, a numerical approach is chosen here, which discretizes the soil and calculates a two-dimensional temperature field at each time step. 
@@ -825,7 +831,6 @@ However, this is also associated with a significant increase in computing time. 
 The control volumes are calculated as follows:
 $$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \cdot \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \cdot \Delta z $$
 where \(V_{i,j}\) is the control volume around a node and \(\Delta x\), \(\Delta y\), and \(\Delta z\) are the variable location step widths in x, y, and z directions, respectively.
-
 
 
 #### Modelling of the soil
@@ -851,14 +856,11 @@ $$Q_{\text{in,out},i,j} = (\dot{Q}_1 + \dot{Q}_2 + \dot{Q}_3 + \dot{Q}_4) \cdot 
 
 If the value of τ is chosen too large, numerical instabilities and thus completely wrong calculation results may occur. According to the TRNSYS Type 710 Model (Hirsch, Hüsing & Rockendorf 2017)[^Type710], the maximum internal time step size depends significantly on the physical properties of the soil and the minimum location step size and can be determined as follows.
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf, “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
+
 $$\tau_{\text{max}} = \frac{\rho_{soil} \cdot c_{p,soil} \cdot \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})}{4 \cdot \lambda_{soil}}$$
 
-By rearranging the equation of the energy calance from above, the new value for the temperature of each control volume can be calculated for the current time step as
+By rearranging the equation of the energy balance from above, the new value for the temperature of each control volume can be calculated for the current time step as
 $$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \cdot c_{p,soil} \cdot \rho_{soil}} $$
-
-
-
-
 
 
 #### Boundary Conditions
@@ -888,8 +890,10 @@ In this model, the phase change of the water in the soil from liquid to solid an
 [^Muhidienne]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model, which is calculated using the following equation in accordance with (Ramming).
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model, which is calculated using the following equation in accordance with (Ramming)[^Ramming].
 $$R_p = \frac{1}{2\pi} \left( \frac{2}{\alpha_i \cdot D_i} + \frac{1}{\lambda_p} \cdot \ln\left(\frac{D_o}{D_i}\right) \right)$$
+
+[^Ramming]: K. Ramming, Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Technische Universität Dresden, 2007.
 
 where \(R_p \) is the length-specific thermal pipe resistance, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe.
 
@@ -951,7 +955,6 @@ Symbol | Description | Unit
 
 ### External source
 - district heating network
-
 
 
 ## Chiller
