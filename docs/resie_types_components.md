@@ -53,7 +53,7 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a constant value. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
@@ -77,7 +77,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a constant value. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the output to a constant value. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
@@ -119,7 +119,7 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `constant_demand` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a constant value. |
+| `constant_demand` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
@@ -150,7 +150,7 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `constant_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a constant value. |
+| `constant_supply` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
@@ -216,7 +216,7 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_gas` | `Float` | Y/N | 4000.0 | The maximum design power input (input chemical energy). |
+| `power_gas` | `Float` | Y/N | 4000.0 | The maximum design power input (chemical input power). |
 | `electricity_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input chemical energy that is output as electricity. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_gas that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
