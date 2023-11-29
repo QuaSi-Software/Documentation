@@ -12,7 +12,7 @@ The description of each component type includes a block with a number of attribu
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy` |
+| **Tracked values** | `IN`, `Max_Energy`, `Losses` |
 
 The available models listed are subtypes to the implementation of a component, which each work slightly differently and might use different parameters. An example is the difference between a condensing gas boiler and a traditional one. **Note: At the moment there is no argument for the model, as each component currently only has one implemented model. In the future this will be extended to include a default model (when no argument is provided) and additional optional models.**
 
@@ -210,7 +210,7 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT` (el), `OUT` (heat) |
+| **Tracked values** | `IN`, `OUT` (el), `OUT` (heat), `Losses` |
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
@@ -232,7 +232,7 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN` (el), `OUT` (H2), `OUT` (waste heat) |
+| **Tracked values** | `IN` (el), `OUT` (H2), `OUT` (waste heat), `Losses`, `Losses_heat`, `Losses_hydrogen` |
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -254,7 +254,7 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN`, `OUT`, `Losses` |
 
 A boiler that transforms chemical fuel into heat.
 
@@ -282,7 +282,7 @@ The current implementation includes functionality to model a PLR-dependant therm
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN` (el), `IN` (cold), `OUT` (heat), `COP` |
+| **Tracked values** | `IN` (el), `IN` (cold), `OUT` (heat), `COP`, `Losses` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
@@ -307,7 +307,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A generic implementation for energy storage technologies.
 
@@ -326,7 +326,7 @@ A generic implementation for energy storage technologies.
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A storage for electricity.
 
@@ -345,7 +345,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -375,7 +375,7 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 

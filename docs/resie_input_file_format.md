@@ -64,14 +64,14 @@ To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "output_keys": {
-    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT"],
+    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "Losses"],
     "TST_01_ELT_01_BAT": ["Load"],
     ...
 }
 ```
 The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
-The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
+The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `Losses`, which represents the total energy losses, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see section ["Types of energy system components"](https://quasi-software.readthedocs.io/en/latest/resie_types_components/). 
 
 ### Output specification (interactive .html plot)
 
