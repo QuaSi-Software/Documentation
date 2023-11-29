@@ -669,15 +669,18 @@ The soil is assumed to be homogeneous with uniform and constant physical propert
 [^VDI4640-1]: Verein Deutscher Ingenieure, VDI 4640 Blatt 1, Thermische Nutzung des Untergrunds - Grundlagen, Genehmigungen, Umweltaspekte: = Thermal use of the underground - fundamentals, approvals, environmental aspects. Berlin: Beuth Verlag GmbH, 2021.
 
 #### g-function approach
-The current temperature at the borehole wall \(T_B\) as response to a specific heat extraction or injection \(\tilde{q}_{in,out}\) within one timestep can be determined using the following equation: 
+The general g-function approach was introduced by Eskilson.[^Eskilson] The current temperature at the borehole wall \(T_B\) as response to a specific heat extraction or injection \(\tilde{q}_{in,out}\) within one timestep can be determined using the following equation: 
+[^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
+
 $$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \cdot g(t)\ $$
 
 where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time (\t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
 
 $$ \tilde{q}_{in,out} = \frac{\dot{Q}_{in,out}}{h_{\text{probe}}}\ $$
 
-Since the heat extraction or injection rate varies with each time step, a superposition approach is chosen, which is based on Duhamel's theorem. The temperature at the borehole wall is calculated by superimposing the temperature responses to past heat pulses:
+Since the heat extraction or injection rate varies with each time step, a superposition approach is chosen, which is based on Duhamels theorem.[^Özisik] The temperature at the borehole wall is calculated by superimposing the temperature responses to past heat pulses:
 
+[^Özisik]: Özisik, M.N. Heat conduction. New York: Wiley-Interscience, 1980. ISBN 047105481X
 $$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_s} \cdot g(t_n - t_{i-1}) \right]\ $$
 
 The undisturbed ground temperature \(T_{s,u}\) can be assumed as a constant value averaged over the probe depth. With the assumption of a thermal borehole resistance \(R_{B}\) between the borehole wall and the circulating fluid, an average fluid temperature \(T_{\text{fl,avg}}\) can be calculated from the borehole temperature. The calculation approach of the thermal borehole resistance will be discussed in more detail later. 
@@ -701,12 +704,16 @@ n | total numbers of time steps so far | [-]
 \(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
 
 #### Calculation of the g-function values
-There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler&Cook2021[^Spitler,Cook], which save a time-consuming calculation for g-functions of various probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The pre-calculated g-function values are basically 27 grid points between which the ReSiE implementation interpolates in order to be able to access the corresponding g-function values for each simulation time step. The first interpolation point of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson1987[^Eskilson]:
+There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler&Cook2021[^Spitler,Cook], which save a time-consuming calculation for g-functions of various probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. For each configuration, 27 pre-calculated g-function values are provided at different time points between which the ReSiE implementation interpolates in order to be able to access the corresponding g-function values for each simulation time step. The first interpolation point of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson 1987[^Eskilson]:
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
 $$ t_S = \frac{h_{probe}^2}{9 \cdot a_{soil}} $$
 
-where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is done under the assumption that the temperature fields of the probe fields do not influence each other during these short periods of time. Thus, a calculation equation for the g-function can be chosen that is only valid for a single probe. In ReSiE, the approach by Carslaw and Jaeger is implemented, which simplifies the probe as an infinite cylindrical source or sink. The short-term g-function values \(g(t)\) can be calculated using the following equation:
+where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is done under the assumption that the temperature fields of the probe fields do not influence each other during these short periods of time.[^Li] Thus, a calculation equation for the g-function can be chosen that is only valid for a single probe. In ReSiE, the approach by Carslaw and Jaeger is implemented [^Carslaw,Jaeger], which simplifies the probe as an infinite cylindrical source or sink. The short-term g-function values \(g(t)\) can be calculated using the following equation:
+
+[^Li]: M. Li, K. Zhu, Z. Fang: Analytical methods for thermal analysis of vertical ground heat exchangers. Advances in Ground-Source Heat Pump Systems, 2016. doi: [https://doi.org/10.1016/B978-0-08-100311-4.00006-6](https://doi.org/10.1016/B978-0-08-100311-4.00006-6).
+[^Carslaw,Jaeger]: H.S. Carslaw., J.C. Jaeger. Heat Flow in the Region bounded Internally by a Circular Cylinder. Proceedings of the Royal Society of Edinburgh, 1942. 
+
 $$ g(t) = \frac{2}{\pi} \int_{0}^{\infty} \frac{(exp(-s^2\cdot F_0) - 1)}{(J_1^2(s) + Y_1^2(s))} \cdot [J_0(Rs) \cdot Y_1(s) - J_1(s) \cdot Y_0(Rs)] \cdot \frac{ds}{s^2}\ $$
 Where \(J_0\),\(J_1\),\(Y_0\) and \(Y_1\) are Bessel-functions, \(s\) is an integral variable, \(F_0\) is the Fourier-Number and \(R\) is the radius ratio:
 $$ R = \frac{r_{\text{eq}}}{r_b} = \frac{2r_0}{r_b}\ $$
@@ -730,7 +737,8 @@ Symbol | Description | Unit
 
 
 #### Thermal borehole resistance
-The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström1991[^Hellström]: 
+All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström1991[^Hellström]: 
+[^Hellström]: G. Hellström, Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Theorie. University of Lund, 1991.
 
 $$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_F}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_F \beta}{1-2 \pi \lambda_F \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
 
@@ -751,10 +759,27 @@ where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) th
 $$Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
 
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
-Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated:
+Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
+For Re \(\leq\) 2300, which is laminar flow, an equation by Stephan[^Stephan]  is used:
+$$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{Rohr}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot \Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{Rohr}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
+[^Stephan]: W. Heidemann: Berechnung von Wärmeübertragern. Unterlagen zur Vorlesung. Institut für Gebäudeenergetik, Thermotechnik und Energiespeicherung, Universität Stuttgart, 2022.
+
+For Re \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
+$$ Nu_{turbulent} = \frac{\frac{\zeta}{8 \cdot Re \cdot Pr}}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
+Where \(\zeta\) is calculated as follows
+$$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$ 
+
+[^Gielinski_1]: V. Gnielinski: Neue Gleichungen für den Wärme- und Stoffübergang in turbulent durchströmten Rohren und Kanälen.Forsch.Ing-wes 41(1):8–16, 1975.
+
+For 2300 \(\leq\) Re \(\leq\) 10^4m which is the transition flow, an equation by Gielinski[^Gielinski_2] is used: 
+$$ Nu = (1-\gamma) \cdot Nu_{\text{laminar,2300}} + \gamma \cdot Nu_{turbulent,10^4} $$
+Where \(\gamma\) is calculated as follows
+$$ \gamma = \frac{Re-2300}{10^4-2300} $$
+
+Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated:
 $$ \alpha_i = \frac{\lambda_{\text{fl}} \cdot Nu}{D_i} $$
 
-[^Hellström]: G. Hellström, Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Theorie. University of Lund, 1991.
+[^Gielinski_2]:  V. Gnielinski: Ein neues Berechnungsverfahren für die Wärmeübertragung im Übergangsbereich zwischen laminarer und turbulenter Rohrströmung. Forsch im Ing Wes 61:240–248, 1995.
 
 Symbol | Description | Unit
 -------- | -------- | --------
