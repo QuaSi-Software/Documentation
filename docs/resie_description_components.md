@@ -716,7 +716,7 @@ where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{p
 
 [^Carslaw,Jaeger]: H.S. Carslaw., J.C. Jaeger. Heat Flow in the Region bounded Internally by a Circular Cylinder. Proceedings of the Royal Society of Edinburgh, 1942. 
 
-$$ g(t) = \frac{2}{\pi} \int_{0}^{\infty} \frac{(exp(-s^2\cdot F_0) - 1)}{(J_1^2(s) + Y_1^2(s))} \cdot [J_0(Rs) \cdot Y_1(s) - J_1(s) \cdot Y_0(Rs)] \cdot \frac{ds}{s^2}\ $$
+$$ g(t) = \frac{2}{\pi} \int_{0}^{\infty} \frac{(exp(-s^2\cdot F_0) - 1)}{(J_1^2(s) + Y_1^2(s))} \cdot [J_0(R \cdot s) \cdot Y_1(s) - J_1(s) \cdot Y_0(R \cdot s)] \cdot \frac{ds}{s^2}\ $$
 Where \(J_0\),\(J_1\),\(Y_0\) and \(Y_1\) are Bessel-functions, \(s\) is an integral variable, \(F_0\) is the Fourier-Number and \(R\) is the radius ratio:
 $$ R = \frac{r_{\text{eq}}}{r_b} = \frac{2r_0}{r_b}\ $$
 with \(r_{\text{eq}}\) as the equivalent radius, \(r_0\) as the radius of an U-tube and \(r_b\) as the borehole radius. After calculating the g-function values for the single probe, an overlap with the g-function values from the library of Spitler&Cook2021[^Spitler,Cook] takes place. If both g-function value series do not have a common intersection point, the library values are used from the first grid point from Spitler&Cook, which take into account mutual probe influence over longer periods of time. Thus, the g-function is composed as shown in the grafics below, where "online library" is meant to be the one by Spitler&Cook. The time horiont at the x-axis is given in years (a):
