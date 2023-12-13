@@ -34,6 +34,7 @@ The overall structure of the project file is split into three general sections, 
     "output_file": "./out.csv",
     "dump_info": true,
     "dump_info_file": "./info_dump.md",
+    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
     "output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
@@ -53,6 +54,7 @@ The overall structure of the project file is split into three general sections, 
 * `output_file` (`String`): File path to a location where the output will be saved.
 * `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `dump_info_file` (`String`): File path to where the additional information will be written.
+* `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
 * `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (csv-file) for what this does and how it works.
 * `output_plot` (`Map{Int, Dict{String, Any}`): Specification for output line plot. See section on output specification (interactive .html plot) for what this does and how it works.
 
