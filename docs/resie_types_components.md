@@ -48,7 +48,7 @@ The type refers to the type it is expected to have after being parsed by the JSO
 
 Generalised implementation of a bounded sink.
 
-Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
+Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
@@ -57,9 +57,6 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
-
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General bounded supply
 | | |
@@ -75,7 +72,7 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 
 Generalised implementation of a bounded source.
 
-Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
@@ -84,9 +81,6 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
-
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Bus
 | | |
@@ -120,7 +114,7 @@ The only implementation of special component `Bus`, used to connect multiple com
 
 Generalised implementation of a fixed sink.
 
-Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
+Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
@@ -129,9 +123,6 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
-
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General demand
 | | |
@@ -154,7 +145,7 @@ Alias to `FixedSink`.
 
 Generalised implementation of a fixed source.
 
-Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
+Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
@@ -163,9 +154,6 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
 | `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
-
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Grid connection
 | | |
