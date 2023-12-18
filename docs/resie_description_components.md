@@ -880,14 +880,13 @@ where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}
 
 $$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \cdot (T_{\text{amb}} - T_{i,1})$$
 with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T\) as the ambient air temperature.
-Another special case is the calculation of the temperature of the fluid node, which will be discussed in detail later.
 
+Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid is modelled in one node. Each of the five neighbouring nodes is assigned 1/5 of the soil volume surrounding the pipe and all of them have the same temperature.
 
-#### Phase Change
-In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhidienne]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
+![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
-[Note: The implementation of this effect in ReSiE has not been validated yet. ToDo]
-[^Muhidienne]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
+The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground. It is provided to the geothermal collector model as an input parameter of ReSiE.
+Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
 The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model, which is calculated using the following equation in accordance with (Ramming)[^Ramming].
@@ -897,16 +896,16 @@ $$R_p = \frac{1}{2\pi} \left( \frac{2}{\alpha_i \cdot D_i} + \frac{1}{\lambda_p}
 
 where \(R_p \) is the length-specific thermal pipe resistance, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe.
 
-The heat extraction or heat input capacity is related to the tube length of the collector and an average fluid temperature \(T_{\text{fl,average}}\) is calculated using the length-related thermal resistance \(R_p \):
-$$T_{\text{fl,average}} = T_{\text{soil,fluid surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
+The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
+$$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
 
-with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,fluid surrounding}}\) as the temperature of the node adjacent to the fluid node. 
+with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
 
-The three nodes that are surrounding the fluid node exchange the following heat flow with the fluid node, which represents the thermal energy that is transfered from the heat carrier fluid to or from the soil covered by the observation area:
+#### Phase Change
+In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhidienne]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
 
-$$ \dot{Q} = \frac{1}{R_p \cdot dz} \cdot A \cdot (T_{\text{fl,m}} - T_{\text{soil,fluid surrounding}}) $$
-where \(A \) is the contact area between the respective nodes. After calculating the temperature values ​​of all three the surrounding nodes, an average value is formed so that all three surrounging nodes have the same temperature.
-
+[Note: The implementation of this effect in ReSiE has not been validated yet. ToDo]
+[^Muhidienne]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
 
 Symbol | Description | Unit
 -------- | -------- | --------
@@ -936,9 +935,13 @@ Symbol | Description | Unit
 \(R_p \)  | length-specific thermal pipe resistance   | [(mK)/W]
 \(T\)  | Temperature   | [°C]
 \(T_{abs}\)  | absolute Temperature   | [K]
-\(T_{\text{fl,average}}\) | average fluid temperature   | [°C]
-\(T_{\text{soil,fluid surrounding}}\)| temperature of the node adjacent to the fluid node  | [°C]
+\(T_{\text{fl,am}}\) | Mean fluid temperature   | [°C]
+\(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
+
+
+
+
 
 
 ### Water
