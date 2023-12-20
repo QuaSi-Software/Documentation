@@ -10,7 +10,7 @@
 1. Start the julia REPL with `julia`
 1. Switch to the package REPL with `]` (no enter necessary)
 1. Activate the project environment: `activate .`
-1. Add required packages: `add ColorSchemes Debugger Infiltrator JSON PlotlyJS ResumableFunctions Test`
+1. Add required packages: `add ColorSchemes Colors Dates Debugger Infiltrator Interpolations JSON Logging PlotlyJS ResumableFunctions Test `
 1. Exit out of the package REPL with shortcut `Ctrl+c`
 1. Exit out of the julia REPL with `exit()`
 

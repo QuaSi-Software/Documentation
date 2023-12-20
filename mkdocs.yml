@@ -39,6 +39,7 @@ nav:
   - 'ReSiE: Simulation engine':
       - 'Installation and usage': 'resie_installation.md'
       - 'Input file format': 'resie_input_file_format.md'
+      - 'Logging': 'resie_logging.md'
   - 'ReSiE: Simulation model':
       - 'Fundamentals': 'resie_fundamentals.md'
       - 'Energy systems': 'resie_energy_systems.md'
