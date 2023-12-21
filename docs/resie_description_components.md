@@ -762,7 +762,7 @@ $$Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl
 
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
 Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
-For Re \(\leq\) 2300, which is laminar flow, an equation by Stephan[^Stephan]  is used:
+For Re \(\leq\) 2300, which is laminar flow, a simplified equation by Stephan[^Stephan]  is used:
 
 $$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{pipe}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{pipe}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
 
@@ -772,7 +772,7 @@ where \(Pr\) is the Prandtl number of the heat carrier fluid,  \(L_{\text{pipe}}
 \(D_i\) is the inner diameter of one U-pipe and \(Pr_W\) is the Prandtl number of water.
 
 For \(Re\) \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
-$$ Nu_{turbulent} = \frac{\frac{\zeta}{8 \cdot Re \cdot Pr}}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
+$$ Nu_{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
 Where \(\zeta\) is calculated as follows
 $$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$ 
 
@@ -895,12 +895,13 @@ The temperature calculation in the nodes neighbouring the pipe differs from the 
 Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model, which is calculated using the following equation in accordance with (Ramming)[^Ramming].
-$$R_p = \frac{1}{2\pi} \left( \frac{2}{\alpha_i \cdot D_i} + \frac{1}{\lambda_p} \cdot \ln\left(\frac{D_o}{D_i}\right) \right)$$
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Quelle: Type 710 Veröffentlichung) is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
+$$ k = \frac{\pi}{4} \cdot \left( \frac{D_o}{D_i \cdot \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\cdot D_o}{2 \cdot \lambda_p} + \frac{\Delta x_{min}}{2 \cdot \lambda_{soil}} \right)^{-1} $$
 
-[^Ramming]: K. Ramming: Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Technische Universität Dresden, 2007.
+where \(k\) is the heat transfer coefficient, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe. Multiplying by the outer cylinder area of the pipe and then dividing by the pipe length produces a length-specific value. The reciprocal of this length-specific heat transfer coefficient results in the length-specific thermal pipe resistance, which is used in this ReSiE model.
 
-where \(R_p \) is the length-specific thermal pipe resistance, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe.
+$$ R_p = \left( k \cdot \frac{2\pi \cdot r_{pipe} \cdot l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \cdot 2\pi \cdot r_{pipe}  \right)^{-1} $$
+
 
 The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
 $$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
