@@ -104,7 +104,7 @@ The only implementation of special component `Bus`, used to connect multiple com
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `connection_matrix` | `Dict{String,Any}` | N/N |  |  |
+| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See chapter on the input file format for details. |
 
 ### General fixed sink
 | | |
@@ -177,7 +177,7 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Draw_sum`, `Demand_sum`, `Supply_sum` |
+| **Tracked values** | `IN`, `OUT`, `Demand_sum`, `Supply_sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
@@ -222,7 +222,7 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT` (el), `OUT` (heat), `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Losses` |
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
@@ -244,7 +244,7 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN` (el), `OUT` (H2), `OUT` (waste heat), `Losses`, `Losses_heat`, `Losses_hydrogen` |
+| **Tracked values** | `IN`, `OUT`, `Losses`, `Losses_heat`, `Losses_hydrogen` |
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -294,7 +294,7 @@ The current implementation includes functionality to model a PLR-dependant therm
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN` (el), `IN` (cold), `OUT` (heat), `COP`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Losses` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
