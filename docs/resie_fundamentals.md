@@ -2,9 +2,9 @@
 
 The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to ReSiE, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
-The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
+The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of components to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
 
-[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or units that process a certain amount energy regardless of demand.
+[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or components that process a certain amount energy regardless of demand.
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
@@ -47,7 +47,7 @@ The third domain are demands, which encompass any kind of system or process that
 
 ## Energy system components
 
-As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transferring energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
+As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transferring energy. In the implementation the equipment is abstracted to a single component even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
 
 For other equipment this is not the case. For example an electrolyser requires several components before and after the electrolysis step, such as water purification and hydrogen postprocessing. However given that these components are not used for anything else, they are included in the energy system component model under the label of "electrolyser".
 
@@ -55,7 +55,7 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other units.
+* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components.
 * `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
@@ -69,21 +69,21 @@ This classification is used by the simulation engine to reason about the order i
 The simulation follows a fairly basic structure:
 
 ```pseudocode
-units = load_components()
-order = order_of_operations(units)
+components = load_components()
+order = order_of_operations(components)
 for time = t_start to t_end {
     ...
 }
 ```
 
-First the components are loaded and initialized from the input project file. Then the order of operations is determined. The units and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
+First the components are loaded and initialized from the input project file. Then the order of operations is determined. The components and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
 
 ### Main loop over time
 ```pseudocode
 for time = t_start to t_end {
-    perform_steps(units, order)
-    check_balances(units)
-    write_output(units)
+    perform_steps(components, order)
+    check_balances(components)
+    write_output(components)
     advance_simulation()
 }
 ```
