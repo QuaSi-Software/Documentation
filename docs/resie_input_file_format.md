@@ -12,9 +12,9 @@ The `JSON` format does not define comments. If there is a need to provide additi
 
 ### User address code
 
-The units / energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
+The energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
 
-An example for a UAC system could be a hierarchical structure based on location and affiliation of the units within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
+An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
 
 ## Project file structure
 
@@ -164,12 +164,12 @@ The specification for the components involved in the simulation is the most comp
 }
 ```
 
-The specification is a map mapping a unit's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
+The specification is a map mapping a component's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
-* `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
-* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `control_refs` (`List{String}`): A list of UACs of components that are required for performing control calculations.
+* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other components to which the component outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
 * `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the technical description of component types.
 * `connections` (`Dict{String, Any}`, Busses only): Configuration of the connections of components over a bus. Sub-configs are:
