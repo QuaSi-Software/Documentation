@@ -54,7 +54,7 @@ The overall structure of the project file is split into three general sections, 
 * `output_file` (`String`): File path to a location where the output will be saved.
 * `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `dump_info_file` (`String`): File path to where the additional information will be written.
-* * `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
+* `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
 * `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (CSV-file) for what this does and how it works.
 * `output_plot` (`Map{Int, Dict{String, Any}`): Specification for output line plot. See section on output specification (interactive .html plot) for what this does and how it works.
 
@@ -143,16 +143,7 @@ The specification for the components involved in the simulation is the most comp
         "type": "Bus",
         "medium": "m_h_w_ht1",
         "control_refs": [],
-        "output_refs": [
-            "TST_01_HZG_01_DEM",
-            "TST_01_HZG_01_BFT"
-        ],
-        "input_priorities": [
-            "TST_01_HZG_01_CHP",
-            "TST_01_HZG_01_HTP",
-            "TST_01_HZG_01_BFT"
-        ],
-        "connection_matrix": {
+        "connections": {
             "input_order": [
                 "TST_01_HZG_01_CHP",
                 "TST_01_HZG_01_HTP",
@@ -162,7 +153,7 @@ The specification for the components involved in the simulation is the most comp
                 "TST_01_HZG_01_DEM",
                 "TST_01_HZG_01_BFT"
             ],
-            "storage_loading": [
+            "energy_flow": [
                 [1, 0],
                 [1, 1],
                 [1, 0]
@@ -178,12 +169,15 @@ The specification is a map mapping a unit's UAC to the parameters required for i
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
 * `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
-* `output_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
-* `input_priorities` (`List{String}`, Busses only): Bus components implement an input priority, meaning that the order in which energy is drawn from the other components connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected components.
-* `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected components. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, columns are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other component, the matrix will be ignored! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
+* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the technical description of component types.
+* `connections` (`Dict{String, Any}`, Busses only): Configuration of the connections of components over a bus. Sub-configs are:
+    * `output_order` (`List{String}`): Similar to the entry `output_refs`, however the order of UACs in this list corresponds to the output priorities of components on the bus with entries at the beginning being given the highest priority and receiving energy first.
+    * `input_order` (`List{String}`): Similar to the entry `output_order` but for the inputs on the bus.
+    * `energy_flow` (`List{List{Int}}`): A matrix that defines which components are allowed to deliver energy to which other components. Rows correspond to the inputs and columns to outputs of the bus, both in the order defined in the entries `input_order` and `output_order`. The numbers should be 1 if the energy flow from the input (row) to the output (column) is allowed or 0 if it is not. No other numbers should be used. The following figure illustrates the principle of the `energy_flow` matrix on the basis of a bus with a CHP, a heat pump, a storage and a demand component. Only the heat pump is allowed to load the storage, while all three inputs (including storage) are allowed to deliver energy to the demand.
 <center>![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)</center>
-* `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of a component, the default medium type is overwritten. This may can be useful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected component. As alternative, all media names can be set user-defined.
+
 
 ## Order of operation
 
