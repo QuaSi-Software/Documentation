@@ -12,7 +12,7 @@ The description of each component type includes a block with a number of attribu
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy` |
+| **Tracked values** | `IN`, `Max_Energy`, `Losses` |
 
 The available models listed are subtypes to the implementation of a component, which each work slightly differently and might use different parameters. An example is the difference between a condensing gas boiler and a traditional one. **Note: At the moment there is no argument for the model, as each component currently only has one implemented model. In the future this will be extended to include a default model (when no argument is provided) and additional optional models.**
 
@@ -26,7 +26,7 @@ The description further lists which arguments the implementation takes. Let's ta
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
 | `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a constant value. |
 
 The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
 
@@ -48,15 +48,18 @@ The type refers to the type it is expected to have after being parsed by the JSO
 
 Generalised implementation of a bounded sink.
 
-Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the input to a static value. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General bounded supply
 | | |
@@ -72,15 +75,18 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 
 Generalised implementation of a bounded source.
 
-Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `static_power` | `Temperature` | N/N | 4000.0 | If given, sets the power of the output to a static value. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the output to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Bus
 | | |
@@ -98,31 +104,34 @@ The only implementation of special component `Bus`, used to connect multiple com
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `connection_matrix` | `Dict{String,Any}` | N/N |  |  |
+| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See chapter on the input file format for details. |
 
 ### General fixed sink
 | | |
 | --- | --- |
-| **Type name** | `Demand`|
+| **Type name** | `FixedSink`|
 | **File** | `energy_systems/general/fixed_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Load`, `Temperature` |
+| **Tracked values** | `IN`, `Demand`, `Temperature` |
 
 Generalised implementation of a fixed sink.
 
-Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `static_load` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the input energy to a static value. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `constant_demand` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
+| `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General demand
 | | |
@@ -141,19 +150,22 @@ Alias to `FixedSink`.
 | **Medium** | `medium`/`None` |
 | **Input media** |  |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `Out`, `Supply`, `Temperature` |
+| **Tracked values** | `OUT`, `Supply`, `Temperature` |
 
 Generalised implementation of a fixed source.
 
-Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, it can either be given a profile for the temperature or use a static temperature.
+Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `static_supply` | `Float` | N/N | 4000.0 | If given, ignores the energy profile and sets the output energy to a static value. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `constant_supply` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
+| `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `static_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a static value. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Grid connection
 | | |
@@ -165,7 +177,7 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `Out`, `Draw sum`, `Load sum` |
+| **Tracked values** | `IN`, `OUT`, `Demand_sum`, `Supply_sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
@@ -210,15 +222,15 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN`, `OUT`, `Losses` |
 
 A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
+| `power_gas` | `Float` | Y/N | 4000.0 | The maximum design power input (chemical input power). |
 | `electricity_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input chemical energy that is output as electricity. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_gas that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 
@@ -232,14 +244,14 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN`, `OUT`, `Losses`, `Losses_heat`, `Losses_hydrogen` |
 
 Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_el` | `Float` | Y/N | 4000.0 | The maximum electrical design power input. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_el that is required for the plant to run. |
 | `heat_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input electric energy that is output as heat. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
@@ -254,7 +266,7 @@ Implementation of an electrolyser splitting water into hydrogen and oxygen while
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT` |
+| **Tracked values** | `IN`, `OUT`, `Losses` |
 
 A boiler that transforms chemical fuel into heat.
 
@@ -265,8 +277,8 @@ The current implementation includes functionality to model a PLR-dependant therm
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_th` | `Float` | Y/N | 4000.0 | The maximum thermal design power output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
 | `max_thermal_efficiency` | `Float` | N/Y | 1.0 | The maximum thermal efficiency if no \(\eta(PLR)\) is used. |
@@ -282,18 +294,18 @@ The current implementation includes functionality to model a PLR-dependant therm
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Losses` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power` | `Float` | Y/N | 4000.0 | The maximum design power. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
+| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a static one. |
-| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a static one. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a static one. |
+| `constant_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant value. |
+| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a constant one. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a constant one. |
 
 ## Storage
 
@@ -307,7 +319,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A generic implementation for energy storage technologies.
 
@@ -326,7 +338,7 @@ A generic implementation for energy storage technologies.
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A storage for electricity.
 
@@ -345,7 +357,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -375,7 +387,7 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 

@@ -12,9 +12,9 @@ The `JSON` format does not define comments. If there is a need to provide additi
 
 ### User address code
 
-The units / energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
+The energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
 
-An example for a UAC system could be a hierarchical structure based on location and affiliation of the units within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
+An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
 
 ## Project file structure
 
@@ -34,6 +34,7 @@ The overall structure of the project file is split into three general sections, 
     "output_file": "./out.csv",
     "dump_info": true,
     "dump_info_file": "./info_dump.md",
+    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
     "output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
@@ -53,6 +54,7 @@ The overall structure of the project file is split into three general sections, 
 * `output_file` (`String`): File path to a location where the output will be saved.
 * `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `dump_info_file` (`String`): File path to where the additional information will be written.
+* `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
 * `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (CSV-file) for what this does and how it works.
 * `output_plot` (`Map{Int, Dict{String, Any}`): Specification for output line plot. See section on output specification (interactive .html plot) for what this does and how it works.
 
@@ -64,14 +66,14 @@ To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "output_keys": {
-    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT"],
+    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "Losses"],
     "TST_01_ELT_01_BAT": ["Load"],
     ...
 }
 ```
 The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
-The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. These additional variables do not have a medium associated with them and hence should be declared with their name alone.
+The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `Losses`, which represents the total energy losses, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see section ["Types of energy system components"](https://quasi-software.readthedocs.io/en/latest/resie_types_components/). 
 
 ### Output specification (interactive .html plot)
 
@@ -134,23 +136,14 @@ The specification for the components involved in the simulation is the most comp
             "high_threshold": 0.9,
             "low_threshold": 0.2
         },
-        "power": 12500,
+        "power_gas": 12500,
         "m_heat_out": "m_h_w_ht1"
     },
     "TST_01_HZG_01_BUS": {
         "type": "Bus",
         "medium": "m_h_w_ht1",
         "control_refs": [],
-        "output_refs": [
-            "TST_01_HZG_01_DEM",
-            "TST_01_HZG_01_BFT"
-        ],
-        "input_priorities": [
-            "TST_01_HZG_01_CHP",
-            "TST_01_HZG_01_HTP",
-            "TST_01_HZG_01_BFT"
-        ],
-        "connection_matrix": {
+        "connections": {
             "input_order": [
                 "TST_01_HZG_01_CHP",
                 "TST_01_HZG_01_HTP",
@@ -160,7 +153,7 @@ The specification for the components involved in the simulation is the most comp
                 "TST_01_HZG_01_DEM",
                 "TST_01_HZG_01_BFT"
             ],
-            "storage_loading": [
+            "energy_flow": [
                 [1, 0],
                 [1, 1],
                 [1, 0]
@@ -171,17 +164,20 @@ The specification for the components involved in the simulation is the most comp
 }
 ```
 
-The specification is a map mapping a unit's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
+The specification is a map mapping a component's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also chapter on the simulation model).
-* `control_refs` (`List{String}`): A list of UACs of units that are required for performing control calculations.
-* `output_refs` (`List{String}`): A list of UACs of other units to which the unit outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `control_refs` (`List{String}`): A list of UACs of components that are required for performing control calculations.
+* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other components to which the component outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
 * `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in the chapter on the simulation model. The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy.
-* `input_priorities` (`List{String}`, Busses only): Bus components implement an input priority, meaning that the order in which energy is drawn from the other components connected to the bus can be customized to control energy flow in accordance to an operation strategy. The given list should be a list of the UACs of the connected components.
-* `connection_matrix` (`List{String{Any}}`, Busses only): For busses, the connection matrix defines the input- and output order of the interconnected components. Currently, this is a doubling with `input_priorities` that will be resolved in future versions. The corresponding `storage_loading` matrix (rows are input_priorities, columns are output_priorities) can be given as matrix containing only 1 (true) or 0 (false). 1 means, a connection from input to output is allowed while 0 denys a connection from input to output. Note: This is currently only implemented if the output is a storage! If the output is an other component, the matrix will be ignored! The `storage_loading` matrix can be used to deny certain transformers to load a certain storage if they are connected to the same bus. The following figure illustrates the principle of the `storage_loading` matrix on the basis of the code example given above, where storage-loading is only allowed by the heat pump:
+* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the technical description of component types.
+* `connections` (`Dict{String, Any}`, Busses only): Configuration of the connections of components over a bus. Sub-configs are:
+    * `output_order` (`List{String}`): Similar to the entry `output_refs`, however the order of UACs in this list corresponds to the output priorities of components on the bus with entries at the beginning being given the highest priority and receiving energy first.
+    * `input_order` (`List{String}`): Similar to the entry `output_order` but for the inputs on the bus.
+    * `energy_flow` (`List{List{Int}}`): A matrix that defines which components are allowed to deliver energy to which other components. Rows correspond to the inputs and columns to outputs of the bus, both in the order defined in the entries `input_order` and `output_order`. The numbers should be 1 if the energy flow from the input (row) to the output (column) is allowed or 0 if it is not. No other numbers should be used. The following figure illustrates the principle of the `energy_flow` matrix on the basis of a bus with a CHP, a heat pump, a storage and a demand component. Only the heat pump is allowed to load the storage, while all three inputs (including storage) are allowed to deliver energy to the demand.
 <center>![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)</center>
-* `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in`, `m_el_out` are optional. If they are provided within the set of parameters of a component, the default medium type is overwritten. This may can be useful as e.g. the electrolyser default waste heat output is of type `m_h_w_lt1` and can therefore not be fed into a bus with medium `m_h_w_ht1`. To change this, a user defined entry in the input file for `m_heat_out: "m_h_w_ht1"` can be given. Note: The user-defined medium name has to match exactly the required medium name of the interconnected component. As alternative, all media names can be set user-defined.
+
 
 ## Order of operation
 
@@ -224,8 +220,14 @@ As discussed earlier, time series data is separated into its own file format so 
 Instead of a header row, there is a block of metadata describing important information on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name;value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information.
 
 * `time_step` (`Integer`): The time step, in seconds, used by the time series.
-* `is_power` (`Boolean`): If true, the data is considered to be power values as an average over the timespan each time step covers. If false, the data is considered as the work done over the time step. Values that don't fit into a power/work pattern can be listed as power, as this means the values are not modified and read as-is.
+* `is_power` (`Boolean`): If true, the data is considered to be power values as an average over the timespan each time step covers. If false, the data is considered as the work done over the time step. Values that don't fit into a power/work pattern, like temperatures or operation states,  **must** be listed as `is_power;true`, as this means the values are not modified and read as-is.
 
 ### Time series data
 
 Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`. The number value should use a point `.` as the decimal separator. The timestamp should be listed as seconds relative to the reference point used throughout the simulation.
+
+### Time step width
+
+ReSiE automatically converts the time series data of the profiles to the time step of the simulation, specified at `simulation_parameters": "time_step_seconds":`. Aggregation as well as segmentation of intensive (`is_power;true` for e.g. temperatures) and extensive values (`is_power;false` for e.g. energies) can be performed. Segmentation of intensive values is done using linear interpolation between the original time steps. During segmentation of extensive values instead, ReSiE divides the original value evenly among the smaller intervals. This means, each smaller time segment within a larger one receives the same value, effectively spreading the original value evenly over the time it covers. With extensive aggregation, the sum of the original values that compose the new time step is calculated, while with intensive values, the mean of the original values is taken to obtain the corresponding value of the new profile.
+
+Please note that currently only exact dividers or multiples of the time steps of the simulation and the profiles can be handeled by the algorithm (e.g. 60 min --> 15 min or 15 min --> 30 min). Otherwise an error will arise, like for 15 min --> 6 min or 15 min --> 20 min.
