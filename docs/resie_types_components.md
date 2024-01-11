@@ -303,7 +303,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `fixed_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant one. |
+| `constant_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant value. |
 | `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a constant one. |
 | `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a constant one. |
 
