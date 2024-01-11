@@ -109,7 +109,7 @@ The only implementation of special component `Bus`, used to connect multiple com
 ### General fixed sink
 | | |
 | --- | --- |
-| **Type name** | `Demand`|
+| **Type name** | `FixedSink`|
 | **File** | `energy_systems/general/fixed_sink.jl` |
 | **Available models** | `default` |
 | **System function** | `fixed_sink` |
