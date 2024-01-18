@@ -57,7 +57,7 @@ The overall structure of the project file is split into three general sections, 
 * `dump_info_file` (`String`): File path to where the additional information will be written.
 * `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
 * `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See section "Output specification (Sankey)" for details. 
-* `output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for output file. See section on "Output specification (CSV-file)" for what this does and how it works.
+* `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for output file. See section on "Output specification (CSV-file)" for what this does and how it works.
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See section on "Output specification (interactive .html plot)" for what this does and how it works.
 
 ### Output specification (Sankey)
@@ -79,12 +79,12 @@ Below is an example of a custom color list for an energy system with three diffe
 
 ### Output specification (CSV-file)
 
-The output values of each component can be written to a CSV-file. `output_keys` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_keys": "all"```, all possible output channels of all components will be written to the CSV-file, while for ```"nothing"``` no file will be created. 
+The output values of each component can be written to a CSV-file. `csv_output_keys` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all"```, all possible output channels of all components will be written to the CSV-file, while for ```"nothing"``` no file will be created. 
 
 To specify a custom selection of outputs, use the following syntax:
 
 ```json
-"output_keys": {
+"csv_output_keys": {
     "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "Losses"],
     "TST_01_ELT_01_BAT": ["Load"],
     ...
@@ -117,7 +117,7 @@ To define a custom plot, use the following syntax:
             ...
 }
 ```
-The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
 The results will be saved in `\output\output_plot.html`. The plot can be opened with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
 
