@@ -35,6 +35,7 @@ The overall structure of the project file is split into three general sections, 
     "dump_info": true,
     "dump_info_file": "./info_dump.md",
     "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "sankey_plot": "default",
     "output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
@@ -55,8 +56,26 @@ The overall structure of the project file is split into three general sections, 
 * `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `dump_info_file` (`String`): File path to where the additional information will be written.
 * `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
-* `output_keys` (`Map{String, List{String}}`): Specification for output file. See section on output specification (CSV-file) for what this does and how it works.
-* `output_plot` (`Map{Int, Dict{String, Any}`): Specification for output line plot. See section on output specification (interactive .html plot) for what this does and how it works.
+* `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See section "Output specification (Sankey)" for details. 
+* `output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for output file. See section on "Output specification (CSV-file)" for what this does and how it works.
+* `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See section on "Output specification (interactive .html plot)" for what this does and how it works.
+
+### Output specification (Sankey)
+
+The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be super helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
+
+In the `input_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
+For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
+
+Below is an example of a custom color list for an energy system with three different media (plus "Losses"):
+```json
+ "sankey_plot": {
+    "m_h_w_lt1": "indianred1",
+    "m_h_w_ht1": "red",
+    "m_e_ac_230v": "orange",
+    "Losses": "black"
+}
+```					
 
 ### Output specification (CSV-file)
 
