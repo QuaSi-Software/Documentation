@@ -209,6 +209,7 @@ As discussed earlier, time series data is separated into its own file format so 
 ```csv
 # time_step;900
 # is_power;false
+# time_format;seconds
 0;0.05
 900;0.15
 1800;0.1
@@ -221,6 +222,22 @@ Instead of a header row, there is a block of metadata describing important infor
 
 * `time_step` (`Integer`): The time step, in seconds, used by the time series.
 * `is_power` (`Boolean`): If true, the data is considered to be power values as an average over the timespan each time step covers. If false, the data is considered as the work done over the time step. Values that don't fit into a power/work pattern, like temperatures or operation states,  **must** be listed as `is_power;true`, as this means the values are not modified and read as-is.
+* `time_format` (`String`): specifies the format of the given time stamp. Can be either `seconds`, `hours` or a custom time format, e.g. `dd-mm-yyyy HH:MM`. All possible format types as provided by the Julia *Dates* module are listed in the table below:
+  
+    | Code | Examples	| Comment                                    |
+    |------|------------|--------------------------------------------|
+    | y    | 6	        | Numeric year with a fixed width            |
+    | Y    | 1996	    | Numeric year with a minimum width          |
+    | m    | 1, 12	    | Numeric month with a minimum width         |
+    | u    | Jan	    | Month name shortened to 3-chars            |
+    | U    | January	| Full month name                            |
+    | d    | 1, 31	    | Day of the month with a minimum width      |
+    | H    | 0, 23	    | Hour (24-hour clock) with a minimum width  |
+    | M    | 0, 59	    | Minute with a minimum width                |
+    | S    | 0, 59	    | Second with a minimum width                |
+    | s    | 000, 500	| Millisecond with a minimum width of 3      |
+    | e    | Mon, Tue	| Abbreviated days of the week               |
+    | E    | Monday	    | Full day of week name                      |
 
 ### Time series data
 
