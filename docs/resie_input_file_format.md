@@ -36,7 +36,7 @@ The overall structure of the project file is split into three general sections, 
     "dump_info_file": "./info_dump.md",
     "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
     "sankey_plot": "default",
-    "output_keys": {
+    "csv_output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
     },
