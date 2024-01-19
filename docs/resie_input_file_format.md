@@ -258,6 +258,8 @@ Instead of a header row, there is a block of metadata describing important infor
     | e    | Mon, Tue	| Abbreviated days of the week               |
     | E    | Monday	    | Full day of week name                      |
 
+    **Note:** This is currently not part of the ReSiE master branch and still under development! time_format is currently seconds only!
+
 ### Time series data
 
 Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`. The number value should use a point `.` as the decimal separator. The timestamp should be listed as seconds relative to the reference point used throughout the simulation.
