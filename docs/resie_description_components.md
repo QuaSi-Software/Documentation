@@ -758,18 +758,17 @@ $$\dot{m}_{\text{fl}} = \frac{|\dot{Q}_{\text{in,out}}|}{2 \cdot c_{p,\text{fl}}
 
 where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) the total heat extraction or input, \(c_{\text{p,fl}}\) the specific heat capacity of the fluid and \(\sigma_{\text{fl}}\) the spread between inlet and outlet temperatures, which is assumed to be constant within the whole simulation. Since the inner cross-section \(D_{i}\) of the tube is known (or set as a default value), statements about the flow condition in the probe tube can be made on the basis of the mass flow after calculating the Reynolds number \(Re\). This is relevant because the heat transfer coefficient on the inside of the tube \(\alpha_{i}\) depends strongly on the level of turbulence. The more turbulent the flow, the greater is the heat transfer coefficient. 
 
-$$Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
+$$ Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
 
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
 Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
-For Re \(\leq\) 2300, which is laminar flow, a simplified equation by Stephan[^Stephan]  is used:
+For Re \(\leq\) 2300, which is laminar flow, a simplified equation used in Ramming[^Ramming]  is used:
+$$ Nu = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \cdot D_i \cdot \text{Re}}{h_{\text{probe}} \cdot 2} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
+where \(Pr\) is the Prandtl number of the heat carrier fluid, \(D_i\) is the inner diameter of one U-pipe and
 
-$$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{pipe}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{pipe}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
+$$ k_a = 1.1 - \frac{1}{3.4 + 0.0667 \cdot Pr} ; k_n = 0.35 + \frac{1}{7.825 + 2.6 \cdot \sqrt{Pr}} $$
+[^Ramming]: K. Ramming: Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Dissertation, Technische Universität Dresden 2007. ISBN 9783940046413.
 
-[^Stephan]: W. Heidemann: Berechnung von Wärmeübertragern. Unterlagen zur Vorlesung. Institut für Gebäudeenergetik, Thermotechnik und Energiespeicherung, Universität Stuttgart, 2022.
-
-where \(Pr\) is the Prandtl number of the heat carrier fluid,  \(L_{\text{pipe}}\) is the total length of one U-pipe, 
-\(D_i\) is the inner diameter of one U-pipe and \(Pr_W\) is the Prandtl number of water.
 
 For \(Re\) \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
 $$ Nu_{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
@@ -895,12 +894,15 @@ The temperature calculation in the nodes neighbouring the pipe differs from the 
 Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Quelle: Type 710 Veröffentlichung) is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
+
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
+
 $$ k = \frac{\pi}{4} \cdot \left( \frac{D_o}{D_i \cdot \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\cdot D_o}{2 \cdot \lambda_p} + \frac{\Delta x_{min}}{2 \cdot \lambda_{soil}} \right)^{-1} $$
 
 where \(k\) is the heat transfer coefficient, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe. Multiplying by the outer cylinder area of the pipe and then dividing by the pipe length produces a length-specific value. The reciprocal of this length-specific heat transfer coefficient results in the length-specific thermal pipe resistance, which is used in this ReSiE model.
 
-$$ R_p = \left( k \cdot \frac{2\pi \cdot r_{pipe} \cdot l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \cdot 2\pi \cdot r_{pipe}  \right)^{-1} $$
+$$ R_p = \left( k \cdot \frac{\pi \cdot D_o \cdot l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \cdot \pi \cdot D_o  \right)^{-1} $$
 
 
 The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
