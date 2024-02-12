@@ -911,10 +911,10 @@ $$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}}
 with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
 
 #### Phase Change
-In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhidienne]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
+In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
 
 [Note: The implementation of this effect in ReSiE has not been validated yet. ToDo]
-[^Muhidienne]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
+[^Muhieddine]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
 
 Symbol | Description | Unit
 -------- | -------- | --------
