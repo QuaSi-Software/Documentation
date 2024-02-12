@@ -758,21 +758,20 @@ $$\dot{m}_{\text{fl}} = \frac{|\dot{Q}_{\text{in,out}}|}{2 \cdot c_{p,\text{fl}}
 
 where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) the total heat extraction or input, \(c_{\text{p,fl}}\) the specific heat capacity of the fluid and \(\sigma_{\text{fl}}\) the spread between inlet and outlet temperatures, which is assumed to be constant within the whole simulation. Since the inner cross-section \(D_{i}\) of the tube is known (or set as a default value), statements about the flow condition in the probe tube can be made on the basis of the mass flow after calculating the Reynolds number \(Re\). This is relevant because the heat transfer coefficient on the inside of the tube \(\alpha_{i}\) depends strongly on the level of turbulence. The more turbulent the flow, the greater is the heat transfer coefficient. 
 
-$$Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
+$$ Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
 
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
 Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
-For Re \(\leq\) 2300, which is laminar flow, an equation by Stephan[^Stephan]  is used:
+For Re \(\leq\) 2300, which is laminar flow, a simplified equation used in Ramming[^Ramming]  is used:
+$$ Nu = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \cdot D_i \cdot \text{Re}}{h_{\text{probe}} \cdot 2} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
+where \(Pr\) is the Prandtl number of the heat carrier fluid, \(D_i\) is the inner diameter of one U-pipe and
 
-$$Nu_{laminar} = \frac{\left(3.66 + 0.067 \cdot \left(\frac{Re \cdot Pr \cdot D_i}{L_{\text{pipe}}}\right)^{1.33}\right)}{\left(1 + 0.1 \cdot Pr \cdot \left(\frac{Re \cdot D_i}{L_{\text{pipe}}}\right)^{0.83}\right)} \cdot \left(\frac{Pr}{Pr_W}\right)^{0.1} $$ 
+$$ k_a = 1.1 - \frac{1}{3.4 + 0.0667 \cdot Pr} ; k_n = 0.35 + \frac{1}{7.825 + 2.6 \cdot \sqrt{Pr}} $$
+[^Ramming]: K. Ramming: Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Dissertation, Technische Universität Dresden 2007. ISBN 9783940046413.
 
-[^Stephan]: W. Heidemann: Berechnung von Wärmeübertragern. Unterlagen zur Vorlesung. Institut für Gebäudeenergetik, Thermotechnik und Energiespeicherung, Universität Stuttgart, 2022.
-
-where \(Pr\) is the Prandtl number of the heat carrier fluid,  \(L_{\text{pipe}}\) is the total length of one U-pipe, 
-\(D_i\) is the inner diameter of one U-pipe and \(Pr_W\) is the Prandtl number of water.
 
 For \(Re\) \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
-$$ Nu_{turbulent} = \frac{\frac{\zeta}{8 \cdot Re \cdot Pr}}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
+$$ Nu_{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
 Where \(\zeta\) is calculated as follows
 $$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$ 
 
@@ -886,33 +885,36 @@ where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}
 
 $$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \cdot (T_{\text{amb}} - T_{i,1})$$
 with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T\) as the ambient air temperature.
-Another special case is the calculation of the temperature of the fluid node, which will be discussed in detail later.
 
+Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid is modelled in one node. Each of the five neighbouring nodes is assigned 1/5 of the soil volume surrounding the pipe and all of them have the same temperature.
 
-#### Phase Change
-In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhidienne]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
+![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
-[Note: The implementation of this effect in ReSiE has not been validated yet. ToDo]
-[^Muhidienne]: M. Muhieddine, E. Canot, and R. March: Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
+The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground. It is provided to the geothermal collector model as an input parameter of ReSiE.
+Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model, which is calculated using the following equation in accordance with (Ramming)[^Ramming].
-$$R_p = \frac{1}{2\pi} \left( \frac{2}{\alpha_i \cdot D_i} + \frac{1}{\lambda_p} \cdot \ln\left(\frac{D_o}{D_i}\right) \right)$$
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
 
-[^Ramming]: K. Ramming: Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Technische Universität Dresden, 2007.
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
-where \(R_p \) is the length-specific thermal pipe resistance, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe.
+$$ k = \frac{\pi}{4} \cdot \left( \frac{D_o}{D_i \cdot \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\cdot D_o}{2 \cdot \lambda_p} + \frac{\Delta x_{min}}{2 \cdot \lambda_{soil}} \right)^{-1} $$
 
-The heat extraction or heat input capacity is related to the tube length of the collector and an average fluid temperature \(T_{\text{fl,average}}\) is calculated using the length-related thermal resistance \(R_p \):
-$$T_{\text{fl,average}} = T_{\text{soil,fluid surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
+where \(k\) is the heat transfer coefficient, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe. Multiplying by the outer cylinder area of the pipe and then dividing by the pipe length produces a length-specific value. The reciprocal of this length-specific heat transfer coefficient results in the length-specific thermal pipe resistance, which is used in this ReSiE model.
 
-with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,fluid surrounding}}\) as the temperature of the node adjacent to the fluid node. 
+$$ R_p = \left( k \cdot \frac{\pi \cdot D_o \cdot l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \cdot \pi \cdot D_o  \right)^{-1} $$
 
-The three nodes that are surrounding the fluid node exchange the following heat flow with the fluid node, which represents the thermal energy that is transfered from the heat carrier fluid to or from the soil covered by the observation area:
 
-$$ \dot{Q} = \frac{1}{R_p \cdot dz} \cdot A \cdot (T_{\text{fl,m}} - T_{\text{soil,fluid surrounding}}) $$
-where \(A \) is the contact area between the respective nodes. After calculating the temperature values ​​of all three the surrounding nodes, an average value is formed so that all three surrounging nodes have the same temperature.
+The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
+$$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
 
+with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
+
+#### Phase Change
+In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature. As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. 
+
+[Note: The implementation of this effect in ReSiE has not been validated yet. ToDo]
+[^Muhieddine]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
 
 Symbol | Description | Unit
 -------- | -------- | --------
@@ -942,9 +944,13 @@ Symbol | Description | Unit
 \(R_p \)  | length-specific thermal pipe resistance   | [(mK)/W]
 \(T\)  | Temperature   | [°C]
 \(T_{abs}\)  | absolute Temperature   | [K]
-\(T_{\text{fl,average}}\) | average fluid temperature   | [°C]
-\(T_{\text{soil,fluid surrounding}}\)| temperature of the node adjacent to the fluid node  | [°C]
+\(T_{\text{fl,am}}\) | Mean fluid temperature   | [°C]
+\(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
+
+
+
+
 
 
 ### Water
