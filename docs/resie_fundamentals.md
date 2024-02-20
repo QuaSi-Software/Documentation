@@ -14,6 +14,7 @@ Example of the energy flow of a gas boiler providing heat for the heating demand
 
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
+% First sentence is unnecessary complex.
 This can be done by first calculating the hot water demand \(E_{in,C}\) to be met, which is trivial from the perspective of the simulation as it is an input to the simulation. Then the gas boiler can meet this demand by burning gas to provide \(E_{out,B}\), which in turn imposes a demand of natural gas \(E_{in,B}\) and removes \(E_{loss}\) from the system as losses. Finally the grid connection can fulfill this gas demand \(E_{out,A}\) by drawing from outside the system boundary. Overall this behaviour can be summarized as:
 
 $$

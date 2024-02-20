@@ -19,6 +19,7 @@ The available models listed are subtypes to the implementation of a component, w
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
 The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values.
+% Last Sentence starts wrong.
 
 The description further lists which arguments the implementation takes. Let's take a look at an example:
 

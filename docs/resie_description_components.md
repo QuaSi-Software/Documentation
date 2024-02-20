@@ -911,6 +911,47 @@ Symbol | Description | Unit
 \(T_{\text{soil,fluid surrounding}}\)| temperature of the node adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
 
+### Solarthermal collector
+A solarthermal collector uses the energy from the sun to provide heat. Different collectors can be used, usually depending on the usecase and needed temperature. For all collector types the same simulation model is used.Typical types of colletors are:
+- flat plate collector
+- evacuated tube collector
+- WISC (wind and infrared sensitive collector)
+- PVT collector (photovoltaic thermal hybrid solar collector)
+
+### General model of solarthermal collector
+The model is based on the quasi dynamic model from DIN EN ISO 9806:2017[^ISO9806], which describes the extracted thermal power as:
+
+
+$$
+\begin{split} 
+\dot{Q} = & A_{\text{G}}(\eta_{\text{0,b}}K_{\text{b}}(\theta_{\text{L}},\theta_{\text{T}})G_{\text{b}} + 
+\eta_{\text{0,b}}K_{\text{d}}G_{\text{d}} -
+a_{\text{1}}(\vartheta_{\text{m}} - \vartheta_{\text{a}}) -
+a_{\text{2}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^2 -
+a_{\text{3}}u'(\vartheta_{\text{m}} - \vartheta_{\text{a}}) \\
+& + a_{\text{4}}(E_{\text{L}} - \sigma T_{\text{a}}^4) - 
+a_{\text{5}}\frac{d\vartheta_{\text{m}}}{dt} -
+a_{\text{6}}u'G - 
+a_{\text{7}}u'(E_{\text{L}} - \sigma T_{\text{a}}^4) -
+a_{\text{8}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^4),
+\end{split}
+$$
+
+where the variables are defined as 
+Symbol | Description | Unit
+-------- | -------- | --------
+$A_{\text{G}}$ | gross collectro area | $\text{m}^\text{2}$
+$\eta_{\text{0,b}}$ | zero-loss efficiency at $(\vartheta_{\text{m}} - \vartheta_{\text{a}})=0$K based on the beam solar irradience $G_{\text{b}}$ | -
+$K_{\text{b}}$ | incidence angle modifier (IAM) for beam irradiance | -
+$\theta_{\text{L}}$ | longitudal incidence angle | °
+$\theta_{\text{T}}$ | transversal incidence angle | °
+$G_{\text{b}}$ | beam solar irradience | W/$\text{m}^\text{2}$
+$K_{\text{d}}$ | incidence angle modifier (IAM) for diffuse irradiance | -
+$G_{\text{d}}$ | diffuse solar irradience | W/$\text{m}^\text{2}$
+$\vartheta_{\text{m}}$ | mean
+$\vartheta_{\text{a}}$
+
+[^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
 
 ### Water
 - groundwater well
