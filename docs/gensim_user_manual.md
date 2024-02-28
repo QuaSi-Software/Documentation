@@ -381,7 +381,7 @@ Optionally, individual facade components as well as the roof and floor plate of 
 
 ![adiabatic external elements pink colour](fig/231121_adiabatic_external_elements_colour.png)
 
-## **6 Standard building typologies**
+## **7 Standard building typologies**
 ###  **Overview and Import of typologies**
 
 To enable quick and easy simulation of standard building types like residential buildings, offices and others, we developed and tested standard parameter-sets including all required default parameters. The parameter-sets are based on common guidelines and standards. Although, the definition of the following parameters are not part of the typologies and must always be defined individually:
