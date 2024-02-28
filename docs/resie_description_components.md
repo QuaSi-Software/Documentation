@@ -661,24 +661,26 @@ Symbol | Description | Unit
 #### Overview
 Geothermal probes are vertical geothermal heat exchangers with a typical drilling depth of 50 - 150 m. Into the borehole, which usually has a diameter of 150 - 160 mm, pipes are laid. In most cases, two pipes are inserted into the borehole in a U-shape and the borehole is subsequently filled with filling material. The purpose of the filling material is to improve the thermal properties of the heat transfer between the probe tubes and the ground and to give the borehole stability. Geothermal probes serve as heat reservoirs for heat pumps and can also be used conversely as cold reservoirs in summer regeneration mode. In larger systems, several borehole heat exchangers are connected hydraulically in parallel to form fields of geothermal probes. Over longer periods of time, the temperature fields around adjacent probes in a field influence each other.
 There are several approaches to model geothermal probes. In ReSiE, an approach based on g-functions is chosen. Using the g-functions, temperature responses of the surrounding earth to changes in thermal in- and output power can be calculated, as illustrated in the figure below. This approach eliminates the need to numerically calculate the temperature field of the entire ground at each time step and is therefore computationally efficient. The g-function values are based on analytical mathematical computational equations, which will be discussed in more detail later. 
+
 ![g-function approach simplified ](fig/231016_g_function_approach_simple.svg)
 
-#### Basic Simplifications
+#### Basic simplifications
 The soil is assumed to be homogeneous with uniform and constant physical properties over time. The properties can be determined, for example, by a thermal response test, or estimated by assumptions of the soil typology with standard values from VDI 4640-1[^VDI4640-1]. In addition, it is assumed that the heat transport processes in the ground are based exclusively on heat conduction. Convective effects, like ground water flow, are therefore not taken into account. All probes in the probe field are assumed to be identical in geometry and design and are hydraulically connected in parallel, i.e. the same volume flow rate flows through all of them in each time step. The borehole and fluid temperatures of each individual probe are assumed to be the same and the total heat extraction and input rates are divided equally among all probes.
 
 [^VDI4640-1]: Verein Deutscher Ingenieure, VDI 4640 Blatt 1, Thermische Nutzung des Untergrunds - Grundlagen, Genehmigungen, Umweltaspekte: = Thermal use of the underground - fundamentals, approvals, environmental aspects. Berlin: Beuth Verlag GmbH, 2021.
 
 #### g-function approach
 The general g-function approach was introduced by Eskilson.[^Eskilson] The current temperature at the borehole wall \(T_B\) as response to a specific heat extraction or injection \(\tilde{q}_{in,out}\) within one timestep can be determined using the following equation: 
+
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
 $$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \cdot g(t)\ $$
 
-where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time (\t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
+where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time \(\t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
 
 $$ \tilde{q}_{in,out} = \frac{\dot{Q}_{in,out}}{h_{\text{probe}}}\ $$
 
-Since the heat extraction or injection rate varies with each time step, a superposition approach is chosen, which is based on Duhamels theorem.[^Özisik] The temperature at the borehole wall \(T_B\) is calculated by superimposing the temperature responses to past heat pulses:
+Since the heat extraction or injection rate varies with each time step, a superposition approach is chosen, which is based on Duhamels theorem[^Özisik]. The temperature at the borehole wall \(T_B\) is calculated by superimposing the temperature responses to past heat pulses:
 
 [^Özisik]: Özisik, M.N. Heat conduction. New York: Wiley-Interscience, 1980. ISBN 047105481X
 
@@ -690,56 +692,46 @@ $$ T_{\text{fl,avg}} = T_B + \tilde{q}_{in,out} \cdot R_B $$
 
 Since a uniform borehole wall temperature over the entire probe depth is assumed, a depth-averaged fluid temperature is calculated.
 
-Symbol | Description | Unit
--------- | -------- | --------
-\(\lambda_s\) | Heat conductivity of soil | [\(\frac{W}{mK}\)]
-\(g(t)\) | g-function  | [-]
-\(h_{\text{probe}}\) | probe depth | [m]
-i | Index Variable | [-]
-n | total numbers of time steps so far | [-]
-\(\tilde{q}_{in,out}\)  | specific heat extraction or injection   | [\(\frac{W}{m}\)]
-\(R_B\) | Thermal borehole resistance | [\(\frac{mK}{W}\)]
-t | current simulation time | [s]
-\(T_B\)  | Temperature at the borehole wall   | [°C]
-\(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
-\(T_{s,u}\) | Undisturbed ground temperature | [°C]
-
-#### Calculation of the g-function values
-There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler&Cook2021[^Spitler,Cook], which save a time-consuming calculation for g-functions of various probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. For each configuration, 27 pre-calculated g-function values are provided at different time points between which the ReSiE implementation interpolates in order to be able to access the corresponding g-function values for each simulation time step. The first interpolation point of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson 1987[^Eskilson]:
-[^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
+#### Determination of the g-function
+There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] in 2021, that is used in ReSiE, which save a time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values for each of almost 35\(\,\)0000 avaiblable configuration at different time points. Between these time nodes, ReSiE interpolates linearly in order to be able to access the corresponding g-function values for each simulation time step. The first node of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
 
 $$ t_S = \frac{h_{probe}^2}{9 \cdot a_{soil}} $$
 
-where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is done under the assumption that the temperature fields of the probe fields do not influence each other during these short periods of time.[^Li] Thus, a calculation equation for the g-function can be chosen that is only valid for a single probe. In ReSiE, the approach by Carslaw and Jaeger is implemented [^Carslaw,Jaeger], which simplifies the probe as an infinite cylindrical source or sink. The short-term g-function values \(g(t)\) can be calculated using the following equation:
+where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is curently done by linearly interpolating between the given time steps of the library, including a g-function value of zero at time step zero.
+
+A different approach was investigated to try to achieve a better representation of the short-time effects. This is done under the assumption that single probes in a probe field do not influence each other during these short periods of time.[^Li] Thus, a calculation method for the g-function can be chosen that is only valid for a single probe. Both an approach by Carslaw and Jaeger [^Carslaw,Jaeger] using an assumption of an infinite cylindrical source or sink and one by Kelvin[^Kelvin], described by Laloui and Loria[^LalouiLoria2020], using an infinite linesource approach were implemented and tested. Although, it was not possible to determine a reliable and reasonable intersection point between the calculated short- and from the library by Spitler and Cook extracted long-term g-function values. This could may be improved by directly fitting a ln() function to the first time step of the g-function from Spitler and Cook instead of just linearely interpolating as it is done currently. Nevertheless, the errors made with the chosen method of linear interpolation are supposed to be very small.
+
+The g-functions extracted from the library are transformed and interpolated to meet the desired probe length and the spacing between the probes as described in the manual of the library.
 
 [^Li]: M. Li, K. Zhu, Z. Fang: Analytical methods for thermal analysis of vertical ground heat exchangers. Advances in Ground-Source Heat Pump Systems, 2016. doi: [https://doi.org/10.1016/B978-0-08-100311-4.00006-6](https://doi.org/10.1016/B978-0-08-100311-4.00006-6).
 
 [^Carslaw,Jaeger]: H.S. Carslaw., J.C. Jaeger. Heat Flow in the Region bounded Internally by a Circular Cylinder. Proceedings of the Royal Society of Edinburgh, 1942. 
 
-$$ g(t) = \frac{2}{\pi} \int_{0}^{\infty} \frac{(exp(-s^2\cdot F_0) - 1)}{(J_1^2(s) + Y_1^2(s))} \cdot [J_0(R \cdot s) \cdot Y_1(s) - J_1(s) \cdot Y_0(R \cdot s)] \cdot \frac{ds}{s^2}\ $$
-Where \(J_0\),\(J_1\),\(Y_0\) and \(Y_1\) are Bessel-functions, \(s\) is an integral variable, \(F_0\) is the Fourier-Number and \(R\) is the radius ratio:
-$$ R = \frac{r_{\text{eq}}}{r_b} = \frac{2r_0}{r_b}\ $$
-with \(r_{\text{eq}}\) as the equivalent radius, \(r_0\) as the radius of an U-tube and \(r_b\) as the borehole radius. After calculating the g-function values for the single probe, an overlap with the g-function values from the library of Spitler&Cook2021[^Spitler,Cook] takes place. If both g-function value series do not have a common intersection point, the library values are used from the first grid point from Spitler&Cook, which take into account mutual probe influence over longer periods of time. Thus, the g-function is composed as shown in the grafics below, where "online library" is meant to be the one by Spitler&Cook. The time horiont at the x-axis is given in years (a):
-![composed g-function in detail ](fig/231025_composite_g_function.png)
-![composed g-function](fig/231030_composite_g_function_2.png)
+[^Kelvin]: T.W. Kelvin: Mathematical and Physical Papers. 1882. Cambridge University Press, London.
+
+[^LalouiLoria2020]: L. Laloui, A. F. Rotta Loria: Analysis and Design of Energy Geostructures - Theoretical Essentials and Practical Application, Academic Press, 2020. doi:[https://doi.org/10.1016/B978-0-12-816223-1.00009-6](https://doi.org/10.1016/B978-0-12-816223-1.00009-6).
 
 [^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu:  G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
+An exemplary g-function is plotted below where the time horiont at the x-axis is given in years (a):
+![composed g-function](fig/231030_composite_g_function_2.png)
 
-Symbol | Description | Unit
--------- | -------- | --------
-\(a_{soil}\)  | thermal diffusivity   | [\(m^2/s \)] 
-\(h_{probe}\)  | probe depth   | [m]
-\(J_0\),\(J_1\),\(Y_0\),\(Y_1\)  | Bessel-functions   | [-]
-\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | [m]
-\(r_0\)  | radius of a U-tube | [m]
-\(R\)  | radius ratio  | [-]
-\(T_B\)  | temperature at the borehole wall   | [°C]
-\(t_S\)  | steady-state time by Eskilson1987[^Eskilson]   | [s]
+The library with the precalculated g-functions is described in more detail in [^Spitler,Cook], avaibale at [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518). Several configuration categories are avaiblabe:
+
+- rectangle
+- zoned rectangle
+- open rectangle
+- C-shape
+- L-shape
+- U-shape
+- lopsided U-shape
+
+Each of the configuration categories contain several thousand probe field configurations, accessable by two keys, while some of the categories only require the first key. 
+The first key contains the number of probes in x and y direction, while the probes in x-direction have to be less or equal the number of probes in y-direction (e.g. "6_11" for a probe field with 6x11 probes). The second key is used to define the special shapes like zoned rectangles. For details on how to define the second key, please see the publication linked above.
 
 
 #### Thermal borehole resistance
-All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström1991[^Hellström]: 
+All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström[^Hellström]: 
 [^Hellström]: G. Hellström, Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Theorie. University of Lund, 1991.
 
 $$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_F}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_F \beta}{1-2 \pi \lambda_F \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
@@ -749,8 +741,12 @@ with the following substitutions:
 $$ \beta = \frac{1}{2\pi\alpha_i r_{0,inner}} + \frac{1}{2\pi\lambda_R}\ln\left(\frac{r_{0,outer}}{r_{0,inner}}\right)\ $$
 $$ \sigma = \frac{\lambda_F - \lambda_{soil}}{\lambda_F + \lambda_{soil}}\ $$
 $$ p = r_B^4 - r_D^4 $$
+$$ x = \begin{cases}
+                 \frac{1}{2} & \text{for U-probe} \\ 
+                 \frac{1}{4} & \text{for double-U-probe} 
+        \end{cases} $$
 
-where \(\lambda_F\) is the thermal conductivity of the backfill material, \(r_{0,outer}\) is the outer radius of a probe tube, \(r_{0,inner}\) is the inner radius of a probe tube, \(r_{B}\) is the borehole radius, \(r_{D}\) is the distance between the two adjacent probe tubes, \(\alpha_{i}\) is the heat transfer coefficient on the inside of the tube, and \(\lambda_{soil}\) is the thermal conductivity of the soil.
+where \(\lambda_F\) is the thermal conductivity of the backfill material, \(r_{0,outer}\) is the outer radius of a probe tube, \(r_{0,inner}\) is the inner radius of a probe tube, \(r_{B}\) is the borehole radius, \(r_{D}\) is the distance between the two adjacent probe tubes, \(\alpha_{i}\) is the heat transfer coefficient on the inside of the tube (see the calculation below), and \(\lambda_{soil}\) is the thermal conductivity of the soil.
 
 Energies are transferred between the coupled components in ReSiE, but not volume flows. For this reason, an average power is calculated at the beginning of each time step on the basis of the energy extracted within the known time step width.
 The spread of the heat transfer fluid is assumed to be constant during the operation. On the basis of the average heat energy input or output within the current time step, a mass flow can be calculated using the following equation, whereby this is halved in the case of an double U-probe.
@@ -760,56 +756,70 @@ where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) th
 
 $$ Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
 
-with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid.
-Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. 
-For Re \(\leq\) 2300, which is laminar flow, a simplified equation used in Ramming[^Ramming]  is used:
-$$ Nu = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \cdot D_i \cdot \text{Re}}{h_{\text{probe}} \cdot 2} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
-where \(Pr\) is the Prandtl number of the heat carrier fluid, \(D_i\) is the inner diameter of one U-pipe and
+with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid. Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. For Re \(\leq\) 2300, which is laminar flow, a simplified equation is used as suggestet by Ramming[^Ramming] :
 
-$$ k_a = 1.1 - \frac{1}{3.4 + 0.0667 \cdot Pr} ; k_n = 0.35 + \frac{1}{7.825 + 2.6 \cdot \sqrt{Pr}} $$
+$$ Nu_\text{laminar} = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \cdot D_i \cdot \text{Re}}{h_{\text{probe}} \cdot 2} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
+$$ \text{with  } k_a = 1.1 - \frac{1}{3.4 + 0.0667 \cdot Pr} \text{  ;  } k_n = 0.35 + \frac{1}{7.825 + 2.6 \cdot \sqrt{Pr}} $$
+
+where \(Pr\) is the Prandtl number of the heat carrier fluid and \(D_i\) the inner diameter of one U-pipe.
+
 [^Ramming]: K. Ramming: Bewertung und Optimierung oberflächennaher Erdwärmekollektoren für verschiedene Lastfälle. Dissertation, Technische Universität Dresden 2007. ISBN 9783940046413.
 
 
-For \(Re\) \(\geq\) \(10^4\), which is turbulent flow, an equation by Gielinski[^Gielinski_1] is used:
-$$ Nu_{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
+For \(Re\) > \(10^4\), which is turbulent flow, an equation by Gielinski1975[^Gielinski1975] is used to calculate the Nußelt number:
+$$ Nu_\text{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
 Where \(\zeta\) is calculated as follows
 $$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$ 
 
-[^Gielinski_1]: V. Gnielinski: Neue Gleichungen für den Wärme- und Stoffübergang in turbulent durchströmten Rohren und Kanälen.Forsch.Ing-wes 41(1):8–16, 1975.
+[^Gielinski1975]: V. Gnielinski: Neue Gleichungen für den Wärme- und Stoffübergang in turbulent durchströmten Rohren und Kanälen. Forsch. Ing.wes. 41(1):8–16, 1975.
 
-For 2300 \(\leq\) Re \(\leq\) \(10^4\), which is the transition between laminar and turbulent flow, an equation by Gielinski[^Gielinski_2] is used: 
+For 2300 < Re \(\leq\) \(10^4\), which is the transition between laminar and turbulent flow, an equation by Gielinski1995[^Gielinski1995] is used to calculate the resulting Nußelt number. 
 
-$$ Nu = (1-\gamma) \cdot Nu_{\text{laminar,2300}} + \gamma \cdot Nu_{turbulent,10^4} $$
+$$ Nu_{transient} = (1-\gamma) \cdot Nu_{\text{laminar,Re=2300}} + \gamma \cdot Nu_\text{turbulent,Re=10^4} $$
+$$ \text{with } \gamma = \frac{Re-2300}{10^4-2300} $$
 
-where \(\gamma\) is calculated as follows
-$$ \gamma = \frac{Re-2300}{10^4-2300} $$
+In fully laminar or turbulent flow, the described equations above are used without further adjustments. This results in the final Nußelt number as:
 
-Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated:
+$$ Nu = \begin{cases} 
+                Nu_\text{laminar} & \text{for } Re \leq 2300 \\ 
+                Nu_\text{transient} & \text{for } 2300 < Re \leq 10^4 \\ 
+                Nu_\text{turbulent} & \text{for } Re > 10^4 \\ 
+        \end{cases} $$
+
+Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated and with this, the thermal borehole resistance \(R_B\) (see above) can be determined:
 $$ \alpha_i = \frac{\lambda_{\text{fl}} \cdot Nu}{D_i} $$
 
-[^Gielinski_2]:  V. Gnielinski: Ein neues Berechnungsverfahren für die Wärmeübertragung im Übergangsbereich zwischen laminarer und turbulenter Rohrströmung. Forsch im Ing Wes 61:240–248, 1995.
+[^Gielinski1995]:  V. Gnielinski: Ein neues Berechnungsverfahren für die Wärmeübertragung im Übergangsbereich zwischen laminarer und turbulenter Rohrströmung. Forsch. Ing.wes. 61:240–248, 1995.
 
 Symbol | Description | Unit
 -------- | -------- | --------
 \(\alpha_{i}\) |heat transfer coefficient inside the tube| [W/\((m^{2} \cdot K)\)]
+\(\lambda_s\) | heat conductivity of soil | [\(\frac{W}{mK}\)]
 \(\nu_{\text{fl}}\)  |kinematic viscosity of the fluid | [\(m^{2}\)/s]
 \(\rho_{\text{fl}}\) |density of the fluid | [kg/\(m^{2}\)]
 \(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | [K]
+\(a_{soil}\)  | thermal diffusivity of the soil  | [\(m^2/s \)] 
 \(c_{\text{fl}}\)  |fluid velocity | [m/s]
 \(c_{\text{p,fl}}\)  | specific heat capacity of the fluid | [J/(kg K)]
-\(D_i\) |Inner diameter of a U-pipe| [m]
-\(J_0\),\(J_1\),\(Y_0\),\(Y_1\)  | Bessel-functions   | [-]
-\(L_{\text{pipe}}\) |Total length of a U-pipe (up and down) | [m] 
+\(D_i\) |inner diameter of a U-pipe| [m]
+\(g(t)\) | g-function  | [-]
+\(h_{\text{probe}}\) | probe depth | [m]
+i | index variable | [-]
 \(\dot{m}\)  | fluid mass flow | [kg/s]
+n | total numbers of time steps so far | [-]
 \(Nu\) |Nußelt number | [-]
-\(Pr\) |Prandtl number of the heat carrier Fluid| [-]
-\(Pr_W\) |Prandtl number of water| [-] 
+\(Pr\) |Prandtl number of the heat carrier fluid| [-]
 \(\dot{Q}_{\text{in,out}}\)  | total heat extraction or input | [W]
-\(r_0\)  | tadius of a U-tube | [m]
-\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | [m]
+\(\tilde{q}_{in,out}\)  | specific heat extraction or injection   | [\(\frac{W}{m}\)]
+\(r_0\)  | radius of a U-tube | [m]
+\(R_B\) | thermal borehole resistance | [\(\frac{mK}{W}\)]
 \(Re\) |Reynolds number | [-]
-\(T_B\)  | temperature at the borehole wall   | [°C]
-\(t_S\)  | steady-state time by Eskilson1987[^Eskilson]   | [s]
+\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | [m]
+t | current simulation time | [s]
+\(T_B\)  | temperature at the borehole wall   | [°C]
+\(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
+\(t_S\)  | steady-state time by Eskilson[^Eskilson]   | [s]
+\(T_{s,u}\) | undisturbed ground temperature | [°C]
 
 ### Geothermal Heat Collector
 
@@ -933,6 +943,7 @@ Symbol | Description | Unit
 \(E_{glob}\)  | measured global radiation   | [W/\(m^2\)]
 \(i\)  | Index for the node position in x-direction  | [-]
 \(j\)  | Index for the node position in y-direction  | [-]
+\(l_{\text{pipe}}\) |total length of a the pipe | [m] 
 \(n\)  | Index for the time step   | [-]
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W/m]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W/\(m^2\)]
