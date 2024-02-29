@@ -674,9 +674,9 @@ The general g-function approach was introduced by Eskilson.[^Eskilson] The curre
 
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
-$$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \cdot g(t)\ $$
+$$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \; g(t)\ $$
 
-where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time \(\t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
+where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time \(t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
 
 $$ \tilde{q}_{in,out} = \frac{\dot{Q}_{in,out}}{h_{\text{probe}}}\ $$
 
@@ -684,24 +684,24 @@ Since the heat extraction or injection rate varies with each time step, a superp
 
 [^Özisik]: Özisik, M.N. Heat conduction. New York: Wiley-Interscience, 1980. ISBN 047105481X
 
-$$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_s} \cdot g(t_n - t_{i-1}) \right]\ $$
+$$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_s} \; g(t_n - t_{i-1}) \right]\ $$
 
 The undisturbed ground temperature \(T_{s,u}\) can be assumed as a constant value averaged over the probe depth. With the assumption of a thermal borehole resistance \(R_{B}\) between the borehole wall and the circulating fluid, an average fluid temperature \(T_{\text{fl,avg}}\) can be calculated from the borehole temperature. The calculation approach of the thermal borehole resistance will be discussed in more detail later. 
 
-$$ T_{\text{fl,avg}} = T_B + \tilde{q}_{in,out} \cdot R_B $$
+$$ T_{\text{fl,avg}} = T_B + \tilde{q}_{in,out} \; R_B $$
 
 Since a uniform borehole wall temperature over the entire probe depth is assumed, a depth-averaged fluid temperature is calculated.
 
 #### Determination of the g-function
-There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] in 2021, that is used in ReSiE, which save a time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values for each of almost 35\(\,\)0000 avaiblable configuration at different time points. Between these time nodes, ReSiE interpolates linearly in order to be able to access the corresponding g-function values for each simulation time step. The first node of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
+There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] from 2021, that is used in ReSiE to avoid time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values at different time nodes for each of almost 35\(\,\)0000 avaiblable configurations. Between these time nodes, ReSiE interpolates linearly in order to be able to access the corresponding g-function values for each simulation time step. The first node of the library is always at \(ln(t/ t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
 
-$$ t_S = \frac{h_{probe}^2}{9 \cdot a_{soil}} $$
+$$ t_S = \frac{h_{probe}^2}{9 \, a_{soil}} $$
 
-where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is curently done by linearly interpolating between the given time steps of the library, including a g-function value of zero at time step zero.
+where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated for the missing short-term period. This is curently done by interpolating linearly between the given time steps of the library, including a g-function value of zero at time step zero.
 
-A different approach was investigated to try to achieve a better representation of the short-time effects. This is done under the assumption that single probes in a probe field do not influence each other during these short periods of time.[^Li] Thus, a calculation method for the g-function can be chosen that is only valid for a single probe. Both an approach by Carslaw and Jaeger [^Carslaw,Jaeger] using an assumption of an infinite cylindrical source or sink and one by Kelvin[^Kelvin], described by Laloui and Loria[^LalouiLoria2020], using an infinite linesource approach were implemented and tested. Although, it was not possible to determine a reliable and reasonable intersection point between the calculated short- and from the library by Spitler and Cook extracted long-term g-function values. This could may be improved by directly fitting a ln() function to the first time step of the g-function from Spitler and Cook instead of just linearely interpolating as it is done currently. Nevertheless, the errors made with the chosen method of linear interpolation are supposed to be very small.
+Different approaches were investigated to try to achieve a better representation of the short-time effects. This was done under the assumption that single probes in a probe field do not influence each other during these short periods of time.[^Li] Thus, a calculation method for the g-function can be chosen that is only valid for a single probe. Both an approach by Carslaw and Jaeger [^Carslaw,Jaeger] using an assumption of an infinite cylindrical source or sink and one by Kelvin[^Kelvin], described by Laloui and Loria[^LalouiLoria2020], using an infinite linesource approach were implemented and tested. Although, it was not possible to determine a reliable and reasonable intersection point between the calculated short- and from the library by Spitler and Cook extracted long-term g-function values. This could may be improved by directly fitting a ln() function to the first time step of the g-function from Spitler and Cook instead of just linearely interpolating as it is done currently. Nevertheless, the errors made with the chosen method of linear interpolation are supposed to be very small.
 
-The g-functions extracted from the library are transformed and interpolated to meet the desired probe length and the spacing between the probes as described in the manual of the library.
+The g-functions extracted from the library are transformed and interpolated in ReSiE to meet the desired probe length and the spacing between the probes as described in the manual of the library.
 
 [^Li]: M. Li, K. Zhu, Z. Fang: Analytical methods for thermal analysis of vertical ground heat exchangers. Advances in Ground-Source Heat Pump Systems, 2016. doi: [https://doi.org/10.1016/B978-0-08-100311-4.00006-6](https://doi.org/10.1016/B978-0-08-100311-4.00006-6).
 
@@ -731,10 +731,10 @@ The first key contains the number of probes in x and y direction, while the prob
 
 
 #### Thermal borehole resistance
-All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström[^Hellström]: 
+All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström1991[^Hellström]: 
 [^Hellström]: G. Hellström, Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Theorie. University of Lund, 1991.
 
-$$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_F}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_F \beta}{1-2 \pi \lambda_F \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
+$$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_F}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma \; ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_F \beta}{1-2 \pi \lambda_F \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
 
 with the following substitutions:
 
@@ -750,16 +750,18 @@ where \(\lambda_F\) is the thermal conductivity of the backfill material, \(r_{0
 
 Energies are transferred between the coupled components in ReSiE, but not volume flows. For this reason, an average power is calculated at the beginning of each time step on the basis of the energy extracted within the known time step width.
 The spread of the heat transfer fluid is assumed to be constant during the operation. On the basis of the average heat energy input or output within the current time step, a mass flow can be calculated using the following equation, whereby this is halved in the case of an double U-probe.
-$$\dot{m}_{\text{fl}} = \frac{|\dot{Q}_{\text{in,out}}|}{2 \cdot c_{p,\text{fl}} \cdot \sigma_{\text{fl}}}$$
+$$\dot{m}_{\text{fl}} = \frac{|\dot{Q}_{\text{in,out}}|}{2 \; c_{p,\text{fl}} \; \sigma_{\text{fl}}}$$
 
 where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) the total heat extraction or input, \(c_{\text{p,fl}}\) the specific heat capacity of the fluid and \(\sigma_{\text{fl}}\) the spread between inlet and outlet temperatures, which is assumed to be constant within the whole simulation. Since the inner cross-section \(D_{i}\) of the tube is known (or set as a default value), statements about the flow condition in the probe tube can be made on the basis of the mass flow after calculating the Reynolds number \(Re\). This is relevant because the heat transfer coefficient on the inside of the tube \(\alpha_{i}\) depends strongly on the level of turbulence. The more turbulent the flow, the greater is the heat transfer coefficient. 
 
-$$ Re = \frac{c_{\text{fl}} \cdot D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \frac{\pi}{4} \cdot D_i^2} \cdot \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \cdot \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \cdot \nu_{\text{fl}} \cdot D_i \cdot \pi}$$
+$$ Re = \frac{c_{\text{fl}} \; D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \; \frac{\pi}{4} \; D_i^2} \; \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \; \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \; \nu_{\text{fl}} \; D_i \; \pi}$$
 
 with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid. Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. For Re \(\leq\) 2300, which is laminar flow, a simplified equation is used as suggestet by Ramming[^Ramming] :
 
-$$ Nu_\text{laminar} = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \cdot D_i \cdot \text{Re}}{h_{\text{probe}} \cdot 2} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
-$$ \text{with  } k_a = 1.1 - \frac{1}{3.4 + 0.0667 \cdot Pr} \text{  ;  } k_n = 0.35 + \frac{1}{7.825 + 2.6 \cdot \sqrt{Pr}} $$
+$$ Nu_\text{laminar} = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \; D_i \; \text{Re}}{l_{pipe}} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
+$$ \text{with  } k_a = 1.1 - \frac{1}{3.4 + 0.0667 \; Pr} \\ 
+k_n = 0.35 + \frac{1}{7.825 + 2.6 \; \sqrt{Pr}} \\ 
+l_{pipe} = \begin{cases} 2 \; h_{\text{probe}} & \text{for U-probe} \\ 4 \; h_{\text{probe}}& \text{for double-U-probe} \end{cases}$$
 
 where \(Pr\) is the Prandtl number of the heat carrier fluid and \(D_i\) the inner diameter of one U-pipe.
 
@@ -767,15 +769,15 @@ where \(Pr\) is the Prandtl number of the heat carrier fluid and \(D_i\) the inn
 
 
 For \(Re\) > \(10^4\), which is turbulent flow, an equation by Gielinski1975[^Gielinski1975] is used to calculate the Nußelt number:
-$$ Nu_\text{turbulent} = \frac{\frac{\zeta}{8} \cdot Re \cdot Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \cdot \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
+$$ Nu_\text{turbulent} = \frac{\frac{\zeta}{8} \; Re \; Pr}{\left(1 + 12.7 \sqrt{\frac{\zeta}{8}} \; \left(Pr^{\frac{2}{3}} - 1\right)\right)} $$
 Where \(\zeta\) is calculated as follows
-$$ \zeta = \left(1.8 \cdot \log(Re) - 1.5\right)^{-2}$$ 
+$$ \zeta = \left(1.8 \; \log(Re) - 1.5\right)^{-2}$$ 
 
 [^Gielinski1975]: V. Gnielinski: Neue Gleichungen für den Wärme- und Stoffübergang in turbulent durchströmten Rohren und Kanälen. Forsch. Ing.wes. 41(1):8–16, 1975.
 
 For 2300 < Re \(\leq\) \(10^4\), which is the transition between laminar and turbulent flow, an equation by Gielinski1995[^Gielinski1995] is used to calculate the resulting Nußelt number. 
 
-$$ Nu_{transient} = (1-\gamma) \cdot Nu_{\text{laminar,Re=2300}} + \gamma \cdot Nu_\text{turbulent,Re=10^4} $$
+$$ Nu_{transient} = (1-\gamma) \; Nu_{\text{laminar,}Re=2300} + \gamma \; Nu_{\text{turbulent,}Re=10^4} $$
 $$ \text{with } \gamma = \frac{Re-2300}{10^4-2300} $$
 
 In fully laminar or turbulent flow, the described equations above are used without further adjustments. This results in the final Nußelt number as:
@@ -787,39 +789,39 @@ $$ Nu = \begin{cases}
         \end{cases} $$
 
 Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated and with this, the thermal borehole resistance \(R_B\) (see above) can be determined:
-$$ \alpha_i = \frac{\lambda_{\text{fl}} \cdot Nu}{D_i} $$
+$$ \alpha_i = \frac{\lambda_{\text{fl}} \; Nu}{D_i} $$
 
 [^Gielinski1995]:  V. Gnielinski: Ein neues Berechnungsverfahren für die Wärmeübertragung im Übergangsbereich zwischen laminarer und turbulenter Rohrströmung. Forsch. Ing.wes. 61:240–248, 1995.
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\alpha_{i}\) |heat transfer coefficient inside the tube| [W/\((m^{2} \cdot K)\)]
-\(\lambda_s\) | heat conductivity of soil | [\(\frac{W}{mK}\)]
-\(\nu_{\text{fl}}\)  |kinematic viscosity of the fluid | [\(m^{2}\)/s]
-\(\rho_{\text{fl}}\) |density of the fluid | [kg/\(m^{2}\)]
-\(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | [K]
-\(a_{soil}\)  | thermal diffusivity of the soil  | [\(m^2/s \)] 
-\(c_{\text{fl}}\)  |fluid velocity | [m/s]
-\(c_{\text{p,fl}}\)  | specific heat capacity of the fluid | [J/(kg K)]
-\(D_i\) |inner diameter of a U-pipe| [m]
+\(\alpha_{i}\) |heat transfer coefficient inside the tube| \([\frac{W}{m^2 K}]\)
+\(\lambda_s\) | heat conductivity of soil | \([\frac{W}{mK}]\)
+\(\nu_{\text{fl}}\)  |kinematic viscosity of the fluid | \([\frac{m^{2}}{s}]\)
+\(\rho_{\text{fl}}\) |density of the fluid | \([\frac{kg}{m^{2}}]\)
+\(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | \([K]\)
+\(a_{soil}\)  | thermal diffusivity of the soil  | \([\frac{m^2}{s}]\) 
+\(c_{\text{fl}}\)  |fluid velocity | \([\frac{m}{s}]\)
+\(c_{\text{p,fl}}\)  | specific heat capacity of the fluid | \([\frac{J}{kg K}]\)
+\(D_i\) |inner diameter of a U-pipe| \([m]\)
 \(g(t)\) | g-function  | [-]
-\(h_{\text{probe}}\) | probe depth | [m]
+\(h_{\text{probe}}\) | probe depth | \([m]\)
 i | index variable | [-]
-\(\dot{m}\)  | fluid mass flow | [kg/s]
+\(\dot{m}\)  | fluid mass flow | \([\frac{kg}{s}]\)
 n | total numbers of time steps so far | [-]
 \(Nu\) |Nußelt number | [-]
 \(Pr\) |Prandtl number of the heat carrier fluid| [-]
-\(\dot{Q}_{\text{in,out}}\)  | total heat extraction or input | [W]
-\(\tilde{q}_{in,out}\)  | specific heat extraction or injection   | [\(\frac{W}{m}\)]
-\(r_0\)  | radius of a U-tube | [m]
-\(R_B\) | thermal borehole resistance | [\(\frac{mK}{W}\)]
+\(\dot{Q}_{\text{in,out}}\)  | total heat extraction or input | \([W]\)
+\(\tilde{q}_{in,out}\)  | specific heat extraction or injection per probe meter  | \([\frac{W}{m}]\)
+\(r_0\)  | radius of a U-tube | \([m]\)
+\(R_B\) | thermal borehole resistance | \([\frac{mK}{W}]\)
 \(Re\) |Reynolds number | [-]
-\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | [m]
-t | current simulation time | [s]
-\(T_B\)  | temperature at the borehole wall   | [°C]
-\(T_{\text{fl,avg}}\) | Average fluid temperature | [°C]
-\(t_S\)  | steady-state time by Eskilson[^Eskilson]   | [s]
-\(T_{s,u}\) | undisturbed ground temperature | [°C]
+\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | \([m]\)
+t | current simulation time | \([s]\)
+\(T_B\)  | temperature at the borehole wall   | \([°C]\)
+\(T_{\text{fl,avg}}\) | Average fluid temperature | \([°C]\)
+\(t_S\)  | steady-state time by Eskilson[^Eskilson]   | \([s]\)
+\(T_{s,u}\) | undisturbed ground temperature | \([°C]\)
 
 ### Geothermal Heat Collector
 
@@ -843,28 +845,28 @@ Within the simulation domain, a computational grid is built up for the numerical
 However, this is also associated with a significant increase in computing time. In this model, the spatial step sizes between the computational nodes are not kept constant in order to keep the accuracy high only at necessary locations of the simulation area. These locations include the region around the collector pipe and the layers near the earth's surface, in order to be able to represent short-term heat extraction and input into the simulation area as accurately as possible. The computational nodes each represent control volumes of the soil with a constant temperature. By balancing the energy of the control volumes in each time step, their temperatures can be recalculated taking into account the heat storage effect. The calculation from \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) will be explained in detail later.
 
 The control volumes are calculated as follows:
-$$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \cdot \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \cdot \Delta z $$
+$$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z $$
 where \(V_{i,j}\) is the control volume around a node and \(\Delta x\), \(\Delta y\), and \(\Delta z\) are the variable location step widths in x, y, and z directions, respectively.
 
 
 #### Modelling of the soil
 In the context of this model, the soil is considered to be homogeneous with uniform and temporally constant physical properties. However, an extension to include several earth layers in y-direction would be possible in a simple way by assigning appropriate parameters to the computational nodes. The basis of the temperature calculation is the energy balance in each control volume for each time step:
 
-$$Q_{\text{in,out},i,j} = V_{i,j} \cdot \rho_{\text{soil}} \cdot c_{p,soil} \cdot (T_n - T_{n-1})_{i,j}$$
+$$Q_{\text{in,out},i,j} = V_{i,j} \; \rho_{\text{soil}} \; c_{p,soil} \; (T_n - T_{n-1})_{i,j}$$
 
 where \(Q_{\text{in,out},i,j}\) is the heat energy supplied or released between two time steps, \(V_{i,j}\) is the control volume, \(\rho_{soil}\) is the density of the soil, \(c_{p,soil}\) is the specific heat capacity of the soil , \(T\) is the temperature of the respective node, and \(n\) is an index for the time step. It is assumed that the heat transport between the volume elements in the soil is based exclusively on heat conduction. The heat fluxes \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) are supplied to or extracted from the adjacent volume elements around the node (i,j) and are calculated with the following equations:
 
-$$\dot{Q}_1 = A_{y,z} \cdot \lambda_{soil} \cdot \frac{(T_{i-1,j} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \cdot \Delta z \cdot \lambda_{soil} \cdot \frac{(T_{i-1,j} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_1 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i-1,j} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i-1,j} - T_{i,j})}{\Delta x_{i-1}}$$
 
-$$\dot{Q}_2 = A_{y,z} \cdot \lambda_{soil} \cdot \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \cdot \Delta z \cdot \lambda_{soil} \cdot \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i}$$
+$$\dot{Q}_2 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i}$$
 
-$$\dot{Q}_3 = A_{x,z} \cdot \lambda_{soil} \cdot \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \cdot \Delta z \cdot \lambda_{soil} \cdot \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}}$$
 
-$$\dot{Q}_4 = A_{x,z} \cdot \lambda_{soil} \cdot \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x)}{2} \cdot \Delta z \cdot \lambda_{soil} \cdot \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}}$$
 
 Where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil.
 The heat flows \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) supplied to and extracted from the volume element are summed up and multiplied by an internal time step size τ.
-$$Q_{\text{in,out},i,j} = (\dot{Q}_1 + \dot{Q}_2 + \dot{Q}_3 + \dot{Q}_4) \cdot \tau$$
+$$Q_{\text{in,out},i,j} = (\dot{Q}_1 + \dot{Q}_2 + \dot{Q}_3 + \dot{Q}_4) \; \tau$$
 
 ![numerical approach geothermal heat collector](fig/231016_numerical_approach_geothermal_heat_collector.svg)
 
@@ -872,10 +874,10 @@ If the value of τ is chosen too large, numerical instabilities and thus complet
 
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
-$$\tau_{\text{max}} = \frac{\rho_{soil} \cdot c_{p,soil} \cdot \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})}{4 \cdot \lambda_{soil}}$$
+$$\tau_{\text{max}} = \frac{\rho_{soil} \; c_{p,soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})}{4 \; \lambda_{soil}}$$
 
 By rearranging the equation of the energy balance from above, the new value for the temperature of each control volume can be calculated for the current time step as
-$$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \cdot c_{p,soil} \cdot \rho_{soil}} $$
+$$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \; c_{p,soil} \; \rho_{soil}} $$
 
 
 #### Boundary Conditions
@@ -884,16 +886,16 @@ In addition, the lateral simulation boundaries are considered adiabatic, so the 
 At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
 For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
 
-$$\dot{Q}_{3,i,1} = A_{x,z} \cdot (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x)}{2} \cdot \Delta z \cdot (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
+$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
 where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long-wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
 
-$$\dot{q}_{\text{glob}} = (1 - r) \cdot E_{\text{glob}}$$
+$$\dot{q}_{\text{glob}} = (1 - r) \; E_{\text{glob}}$$
 with \(r\) as the reflectance of the earth's surface and \(E_{glob}\) as the global radiation read from a weather dataset;
 
-$$\dot{q}_{\text{rad}} = \epsilon \cdot \sigma_{\text{Boltzmann}} \cdot (T_{\text{amb}}^4 - T_{abs,i,1}^4)$$
+$$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{amb}}^4 - T_{abs,i,1}^4)$$
 where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}\) is the Stefan-Boltzmann constant, and \(T_{abs}\) is the absolute temperature (in K);
 
-$$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \cdot (T_{\text{amb}} - T_{i,1})$$
+$$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \; (T_{\text{amb}} - T_{i,1})$$
 with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T\) as the ambient air temperature.
 
 Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid is modelled in one node. Each of the five neighbouring nodes is assigned 1/5 of the soil volume surrounding the pipe and all of them have the same temperature.
@@ -908,15 +910,15 @@ The description of the heat carrier fluid is very similar to the explanations in
 
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
-$$ k = \frac{\pi}{4} \cdot \left( \frac{D_o}{D_i \cdot \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\cdot D_o}{2 \cdot \lambda_p} + \frac{\Delta x_{min}}{2 \cdot \lambda_{soil}} \right)^{-1} $$
+$$ k = \frac{\pi}{4} \; \left( \frac{D_o}{D_i \; \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\; D_o}{2 \; \lambda_p} + \frac{\Delta x_{min}}{2 \; \lambda_{soil}} \right)^{-1} $$
 
 where \(k\) is the heat transfer coefficient, \(\alpha_i \) is the convective heat transfer coefficient on the inside of the pipe, \(\lambda_p\) is the thermal conductivity of the pipe, \(D_i \) is the inside diameter, and \(D_o \) is the outside diameter of the pipe. Multiplying by the outer cylinder area of the pipe and then dividing by the pipe length produces a length-specific value. The reciprocal of this length-specific heat transfer coefficient results in the length-specific thermal pipe resistance, which is used in this ReSiE model.
 
-$$ R_p = \left( k \cdot \frac{\pi \cdot D_o \cdot l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \cdot \pi \cdot D_o  \right)^{-1} $$
+$$ R_p = \left( k \; \frac{\pi \; D_o \; l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \; \pi \; D_o  \right)^{-1} $$
 
 
 The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
-$$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \cdot R_p$$
+$$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \; R_p$$
 
 with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
 
@@ -937,7 +939,7 @@ Symbol | Description | Unit
 \(\sigma_{\text{Boltzmann}}\) | Stefan-Boltzmann constant | [W/ \(m^2 K^4\)] 
 \(\tau\)  |  internal time step size  | [s] 
 \(A\)  | contact area between two adjacent control volumes  | [\(m^2\)]
-\(c_{p,soil}\)  | specific heat capacity of the soil   | [J/ \((kg \cdot K)\)]
+\(c_{p,soil}\)  | specific heat capacity of the soil   | [J/ \((kg \; K)\)]
 \(D_i \)  | inside diameter of the pipe   | [m]
 \(D_o \)  | outside diameter of the pipe   | [m]
 \(E_{glob}\)  | measured global radiation   | [W/\(m^2\)]
@@ -1157,7 +1159,7 @@ Three different energy or exergy loss mechanisms are taken into account as shown
 
 The temperature \(T_l\) in layer \(l\) with height \(\Delta z_l\) is given by the partial differential equation 
 $$
-\frac{\delta T_{STES,l} }{\delta t} = \underbrace{\xi_{STES} \frac{\delta^2 T_{STES,l}}{\delta z^2}}_{\text{diffusion}} + \underbrace{\frac{M_{STES,l} \ U_{STES,l}}{\rho_{STES} \ c_{p,STES} \ V_{STES,l}} \left(T_{STES,amb,l} - T_{STES,l}\right)}_{\text{energy losses to ambient}}  + \  \cdot  \cdot  \cdot \\ 
+\frac{\delta T_{STES,l} }{\delta t} = \underbrace{\xi_{STES} \frac{\delta^2 T_{STES,l}}{\delta z^2}}_{\text{diffusion}} + \underbrace{\frac{M_{STES,l} \ U_{STES,l}}{\rho_{STES} \ c_{p,STES} \ V_{STES,l}} \left(T_{STES,amb,l} - T_{STES,l}\right)}_{\text{energy losses to ambient}}  + \  \;  \;  \; \\ 
 \ \\
 \ \underbrace{\frac{\dot m_{STES} (T_{STES,l,in}-T_{STES,l})}{\rho_{STES} \ V_{STES,l}}}_{\text{direct (un-)loading}}
 $$
