@@ -107,4 +107,33 @@ Values provided in the project input file or in profiles should have these units
 
 ### Output units
 
-Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW. 
+Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW.
+
+## Component chains
+
+A "chain" refers to multiple components of the same type being connected to each other. As only transformer, busses and storages can have both an input and an output, only these three types can form chains. There is some special consideration for such component chains, which is discussed here. Although the word chain suggests a linear connection, a chain can be any connected sub-graph of the entire energy system with multiple branches. However such complex chains are rare in practise as they serve little purpose.
+
+### Transformer chains
+
+With multiple transformers in a chain there arises a problem in calculating the energy each transformer can process, as this depends on the energy the others can process. This is the main purpose behind the `potential` operation, which only exists for transformers and is used in a simple algorithm to solve the problem:
+
+1. The last transformer in a chain, where last refers to not outputting to another transformer, calculates its energy potentials assuming that any input or output that has not been determined yet is infinite.
+2. This repeats for the other transformers going to the front of the chain, where front refers to not having a transformer as an input.
+3. The transformer at the front now performs the `process` step, which is possible as now the whole energy system is specified in regards to energy potentials.
+4. This repeats for the other transformers going to the back of the chain, however each transformer recalculates its own potentials because the inputs will have changed from the previous assumed-as-infinite values.
+
+This back-and-forth approach works as it communicates the non-infinite demands and supplies from non-transformers across the chain and then recalculates with the correct `process` values once all potentials are specified.
+
+**Note:** At the moment this does not work if transformers are connected across one or more busses, because this is not recognised as a chain. This will be addressed in a future version of ReSiE.
+
+### Bus chains
+
+Because busses are both used as an abstraction over the actual hydraulical and electrical network of an energy system, as well as the component for distributing energy in a sub-network of the energy system, it often makes sense from a modelling perspective to have multiple busses of the same medium connected to each other, forming a chain. For example an energy system of a district might provide heat in a central bus that outputs to other busses in each building, which have local heat storages and other components.
+
+Given that energy can only flow in one direction in such a chain, the entire chain can be replaced by a single bus, which has all non-bus inputs and outputs as its own inputs and outputs. This is called a proxy bus, with the original busses being called the principals. During the construction of the proxy bus, the energy flow matrices of the principals, as well as the direction of energy flow between busses is taken into consideration to determine which inputs of the proxy bus can provide energy for which outputs and in which order this is happening.
+
+**Note:** This mechanism of a proxy bus only works if there no loops between the busses. This produces a modelling challenge as it would be convenient to model a district heating network as multiple busses that request and provide heat to/from each other. It is currently an open question how to best address this problem and we hope to improve this in future versions of ReSiE.
+
+<center>![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
+
+Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</center>
