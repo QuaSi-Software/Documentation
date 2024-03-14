@@ -63,7 +63,7 @@ This would result in the energy the source supplies not being used to fill stora
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy` |
+| **Tracked values** | `IN`, `Max_Energy`, `Temperature` |
 
 Generalised implementation of a bounded sink.
 
@@ -117,13 +117,15 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `Balance` |
+| **Tracked values** | `Balance`, `Transfer->UAC` |
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
+Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
+
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See chapter on the input file format for details. |
+| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
 
 ### General fixed sink
 | | |
@@ -196,7 +198,7 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Demand_sum`, `Supply_sum` |
+| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
