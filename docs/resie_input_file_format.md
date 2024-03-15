@@ -68,7 +68,7 @@ The overall structure of the project file is split into three general sections, 
 
 The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be super helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
-In the `input_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
+In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
 
 Below is an example of a custom color list for an energy system with three different media (plus "Losses"):
@@ -106,19 +106,19 @@ To define a custom plot, use the following syntax:
 
 ```json
 "output_plot": {
-            "1": {
-                "key": {"TST_HP_01": ["m_h_w_lt1 IN"]},
-                "axis": "left",
-                "unit": "kW",
-                "scale_factor": 0.001
-            },
-            "2": {
-                "key": {"TST_HP_01": ["m_h_w_ht1 OUT"]},
-                "axis": "left",
-                "unit": "kW",
-                "scale_factor": 0.001
-            }
-            ...
+    "1": {
+        "key": {"TST_HP_01": ["m_h_w_lt1 IN"]},
+        "axis": "left",
+        "unit": "kW",
+        "scale_factor": 0.001
+    },
+    "2": {
+        "key": {"TST_HP_01": ["m_h_w_ht1 OUT"]},
+        "axis": "left",
+        "unit": "kW",
+        "scale_factor": 0.001
+    }
+    ...
 }
 ```
 The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
@@ -223,7 +223,7 @@ Example of a generated order of operation:
     "TST_HP_01 s_process",
     "TST_SRC_01 s_process",
     "TST_GRI_01 s_process"
-    ]
+]
 ```
 
 
@@ -255,4 +255,4 @@ Following the metadata block, the time series data is listed with one `timestamp
 
 ReSiE automatically converts the time series data of the profiles to the time step of the simulation, specified at `simulation_parameters": "time_step_seconds":`. Aggregation as well as segmentation of intensive (`is_power;true` for e.g. temperatures) and extensive values (`is_power;false` for e.g. energies) can be performed. Segmentation of intensive values is done using linear interpolation between the original time steps. During segmentation of extensive values instead, ReSiE divides the original value evenly among the smaller intervals. This means, each smaller time segment within a larger one receives the same value, effectively spreading the original value evenly over the time it covers. With extensive aggregation, the sum of the original values that compose the new time step is calculated, while with intensive values, the mean of the original values is taken to obtain the corresponding value of the new profile.
 
-Please note that currently only exact dividers or multiples of the time steps of the simulation and the profiles can be handeled by the algorithm (e.g. 60 min --> 15 min or 15 min --> 30 min). Otherwise an error will arise, like for 15 min --> 6 min or 15 min --> 20 min.
+Please note that currently only exact dividers or multiples of the time steps of the simulation and the profiles can be handled by the algorithm (e.g. 60 min --> 15 min or 15 min --> 30 min). Otherwise an error will arise, like for 15 min --> 6 min or 15 min --> 20 min.
