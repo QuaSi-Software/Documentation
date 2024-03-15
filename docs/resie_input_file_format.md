@@ -12,9 +12,13 @@ The `JSON` format does not define comments. If there is a need to provide additi
 
 ### User address code
 
-The energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
+The energy system components in the project need to be addressed somehow as the connections work with these addresses as IDs. While the only requirement is that these User Address Codes (UAC) are unique, it makes sense to use an address system that provides additional information and is understandable by humans. This is especially useful if the results of the simulation are fed into BIM or monitoring software. Even if this is not the case, it still useful to use some kind of address system for easier debugging.
 
-An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank used in the first HVAC cycle of the building "A1".
+An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank (`BT`) used in the first (`01`) `HVAC` cycle of the building `A1` in a project with prefix `TST`.
+
+### Energy media
+
+The specification of components and outputs often mention a medium, such as `m_h_w_ht1 OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
 
 ## Project file structure
 

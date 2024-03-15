@@ -41,47 +41,38 @@ All energy handled by the simulation model exists in the form of some medium tha
 
 For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
-The following lists which media are currently implemented as default and what they represent.
+Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components like heat pumps. This is implemented as temperatures being communicated between components as separate values alongside supplied or requested energies. This differs from a full hydraulic/thermodynamic simulation where the temperature determines the energy.
 
-@TODO still correct?
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
+Because of temperatures being separated from the medium, media cannot be categorized by temperatures neatly. Instead regimes are used, which mostly refer to the nominal temperature. This helps to distinguish between low and high temperature heat inputs/ouputs even if the actual temperatures in each time step vary and might even be the same. Similar considerations can be made for properties like pressure or voltage.
 
-### Electricity
-* `m_e_ac_230v`: Household electricity at 230 V AC and 50/60 Hz.
+The name of the media used in the code of ReSiE and for defaults follows a scheme based on segments seperated by underscores, for example `m_c_g_natgas` for natural gas. The first segment is always `m`, which has technical reasons and helps distinguish media names from other similar variables. The second segment represents the type of energy the medium carries and the third segment is a subcategory of this which roughly describes the physical medium carrying the energy. The fourth segment distinguishes similar media as subtypes and must be unique within the category.
 
-### Chemicals - Gasses
-* `m_c_g_natgas`: A natural gas mix available through the public gas grid.
-* `m_c_g_h2`: Pure hydrogen gas.
-* `m_c_g_o2`: Pure oxygen gas.
+The following table presents a possible categorisation of media using the three segments and a number of default media names used by various implemented components as well as future models. This is not intended to be a complete categorisation of all forms of energy.
 
-### Heat - Low temperature water
-Different low temperature regimes:
+| Energy type | Medium category | Subtypes |
+| ----------- | --------------- | -------------------------------------------------------- |
+| `e`: electrical | `ac`: AC | `230v`: Household electricity at 230 V AC and 50/60 Hz. |
+| `c`: chemical | `g`: gasses | `natgas`: A natural gas mix available through the public gas grid. |
+|  |  | `h2`: Pure hydrogen gas. |
+|  |  | `o2`: Pure oxygen gas.[^1] |
+|  | `s`: solids | `chips`: Wood chips or pellets. |
+|  | `l`: liquids | `oil`: Heavy oil used in oil boilers. |
+| `h`: heat | `w`: water | `lt1`: First low temperature regime. |
+|  |  | `ht1`: First high temperature regime. |
+| `p`: pressure | `a`: air with<br>atmospheric<br>composition | `p1`: First pressure regime of gaseous air. |
 
-* `m_h_w_lt1`
-* `m_h_w_lt2`
-* `m_h_w_lt3`
-* `m_h_w_lt4`
-* `m_h_w_lt5`
-
-### Heat - High temperature water
-Different high temperature regimes:
-
-* `m_h_w_ht1`
-* `m_h_w_ht2`
-* `m_h_w_ht3`
-* `m_h_w_ht4`
-* `m_h_w_ht5`
+[^1]: Note that oxygen is not typically considered an energy carrier. At the moment no commodity transport model is implemented in ReSiE, which is why oxygen is listed as an energy carrier for the use in electrolysers. This will be addressed in future versions of ReSiE.
 
 ### User definable media names
-The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatively, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
+The names of all media can also be user-defined. The name of any medium of any in- and output of all components can be declared in the input file. This does not change the requirement that the names of media connected via direct input-output or via busses have to match each other.
 
-For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each component can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer. The specifiers can also be found in the [description of components](resie_description_components.md) for each component.
+For some components such as busses, grid connections, demands and some storages, the medium name of each component can be given with the specifier `medium` (`String`). For others, such as transformers and storages with temperature differentials, user-definable media names of each in- and output can be given using certain specifiers such as `m_heat_in` or `m_el_out`. The exact specifiers can be found in the [specification of component types](resie_types_components.md) for each component.
 
 ## Interfaces
 
-When writing the implementation of components a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
+When writing the implementation of components a problem has emerged in the functionality handling the processing[^2] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
 
-[^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
+[^2]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
 <center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
 
