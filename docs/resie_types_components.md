@@ -49,7 +49,7 @@ All components can be set to be dis-/allowed to un-/load storages to which they 
 }
 ```
 
-This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling if components can draw energy from storages the corresponding `unload_storages medium` parameter can be used.
+This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling, if components can draw energy from storages, the corresponding `unload_storages medium` parameter can be used.
 
 ## Boundary and connection components
 
