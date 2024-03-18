@@ -129,7 +129,7 @@ The base order is also illustrated in the following figure, adapted from [Ott202
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 
-If the simulation parameter `dump_info` is used, the generated order of operations is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom order of operations that can be imported via the project input file. See section on the [project file format](resie_input_file_format.md) for details.
+If the simulation parameter `auxiliary_info` is used, the generated order of operations is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom order of operations that can be imported via the project input file. See section on the [project file format](resie_input_file_format.md) for details.
 
 #### Cycles and feedback loops
 
