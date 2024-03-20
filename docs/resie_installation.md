@@ -19,7 +19,7 @@
 
 1. Switch into project directory: `cd /path/to/resie`
 1. Run the simulation with `julia --project=. src/resie-cli.jl examples/example_two_sector.json`
-1. Outputs of the example projects can be found in `output/out.csv` and `output/info_dump.md`
+1. Outputs of the example projects can be found in `output/out.csv` and `output/auxiliary_info.md`
 
 **Usage of ReSiE with VS Code**
 
