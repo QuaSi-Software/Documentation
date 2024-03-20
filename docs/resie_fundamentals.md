@@ -99,7 +99,7 @@ The simulation steps for each component are:
 * `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. No energy is processed in this step.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
-* `Distribute`: For bus components, distribute the energy balances on each connected interface and check the overall balance on the bus.
+* `Distribute`: For bus components, distribute energy supplied and requested by each connected component and calculate the energy transfered between connected busses.
 
 ### Determining order of operations
 
@@ -117,13 +117,15 @@ For each component of the energy system some or all of the simulation steps are 
     7. `Process`:  `Bounded source`, `Bounded sink` 
     8. `Distribute`: `Bus`
 
-    <!-- The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:  -->
-    <!-- ![Illustration of the base order of operation](fig/230515_base_OoO.svg)  -->
-    <!-- [^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy    systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review** -->
+
 
 1. Reorder the `Process` and `Potential` operations of each component connected to a bus so that it matches the bus' input priorities.
-2. Reorder the `Distribute` operation of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
+2. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
 3. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
+
+The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:
+![Illustration of the base order of operation](fig/230515_base_OoO.svg)
+[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 

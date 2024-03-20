@@ -41,46 +41,38 @@ All energy handled by the simulation model exists in the form of some medium tha
 
 For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
-The following lists which media are currently implemented as default and what they represent.
+Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components like heat pumps. This is implemented as temperatures being communicated between components as separate values alongside supplied or requested energies. This differs from a full hydraulic/thermodynamic simulation where the temperature determines the energy.
 
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
+Because of temperatures being separated from the medium, media cannot be categorized by temperatures neatly. Instead regimes are used, which mostly refer to the nominal temperature. This helps to distinguish between low and high temperature heat inputs/ouputs even if the actual temperatures in each time step vary and might even be the same. Similar considerations can be made for properties like pressure or voltage.
 
-### Electricity
-* `m_e_ac_230v`: Household electricity at 230 V AC and 50/60 Hz.
+The name of the media used in the code of ReSiE and for defaults follows a scheme based on segments seperated by underscores, for example `m_c_g_natgas` for natural gas. The first segment is always `m`, which has technical reasons and helps distinguish media names from other similar variables. The second segment represents the type of energy the medium carries and the third segment is a subcategory of this which roughly describes the physical medium carrying the energy. The fourth segment distinguishes similar media as subtypes and must be unique within the category.
 
-### Chemicals - Gasses
-* `m_c_g_natgas`: A natural gas mix available through the public gas grid.
-* `m_c_g_h2`: Pure hydrogen gas.
-* `m_c_g_o2`: Pure oxygen gas.
+The following table presents a possible categorisation of media using the three segments and a number of default media names used by various implemented components as well as future models. This is not intended to be a complete categorisation of all forms of energy.
 
-### Heat - Low temperature water
-Different low temperature regimes:
+| Energy type | Medium category | Subtypes |
+| ----------- | --------------- | -------------------------------------------------------- |
+| `e`: electrical | `ac`: AC | `230v`: Household electricity at 230 V AC and 50/60 Hz. |
+| `c`: chemical | `g`: gasses | `natgas`: A natural gas mix available through the public gas grid. |
+|  |  | `h2`: Pure hydrogen gas. |
+|  |  | `o2`: Pure oxygen gas.[^1] |
+|  | `s`: solids | `chips`: Wood chips or pellets. |
+|  | `l`: liquids | `oil`: Heavy oil used in oil boilers. |
+| `h`: heat | `w`: water | `lt1`: First low temperature regime. |
+|  |  | `ht1`: First high temperature regime. |
+| `p`: pressure | `a`: air with<br>atmospheric<br>composition | `p1`: First pressure regime of gaseous air. |
 
-* `m_h_w_lt1`
-* `m_h_w_lt2`
-* `m_h_w_lt3`
-* `m_h_w_lt4`
-* `m_h_w_lt5`
-
-### Heat - High temperature water
-Different high temperature regimes:
-
-* `m_h_w_ht1`
-* `m_h_w_ht2`
-* `m_h_w_ht3`
-* `m_h_w_ht4`
-* `m_h_w_ht5`
+[^1]: Note that oxygen is not typically considered an energy carrier. At the moment no commodity transport model is implemented in ReSiE, which is why oxygen is listed as an energy carrier for the use in electrolysers. This will be addressed in future versions of ReSiE.
 
 ### User definable media names
-The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatively, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
+The names of all media can also be user-defined. The name of any medium of any in- and output of all components can be declared in the input file. This does not change the requirement that the names of media connected via direct input-output or via busses have to match each other.
 
-For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each component can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer.
+For some components such as busses, grid connections, demands and some storages, the medium name of each component can be given with the specifier `medium` (`String`). For others, such as transformers and storages with temperature differentials, user-definable media names of each in- and output can be given using certain specifiers such as `m_heat_in` or `m_el_out`. The exact specifiers can be found in the [specification of component types](resie_types_components.md) for each component.
 
 ## Interfaces
 
-When writing the implementation of components a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
+When writing the implementation of components a problem has emerged in the functionality handling the processing[^2] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
 
-[^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
+[^2]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
 <center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
 
@@ -102,8 +94,37 @@ Currently, ReSiE is based on the following units:
 
 Values provided in the project input file or in profiles should have these units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). 
 
-Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
+**Note:** While some components would work the same given different units, e.g. [kW] and [kJ] for power and energy values in profiles, other components require specific units for some of their parameters, which have to match the units of the other parameters and profiles. Currently there is no mechanism to automatically convert between units, therefore it is not advised to use any other units.
 
-**Output units:**
+### Output units
 
-Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW. 
+Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW.
+
+## Component chains
+
+A "chain" refers to multiple components of the same type being connected to each other. As only transformer, busses and storages can have both an input and an output, only these three types can form chains. There is some special consideration for such component chains, which is discussed here. Although the word chain suggests a linear connection, a chain can be any connected sub-graph of the entire energy system with multiple branches. However such complex chains are rare in practise as they serve little purpose.
+
+### Transformer chains
+
+With multiple transformers in a chain there arises a problem in calculating the energy each transformer can process, as this depends on the energy the others can process. This is the main purpose behind the `potential` operation, which only exists for transformers and is used in a simple algorithm to solve the problem:
+
+1. The last transformer in a chain, where last refers to not outputting to another transformer, calculates its energy potentials assuming that any input or output that has not been determined yet is infinite.
+2. This repeats for the other transformers going to the front of the chain, where front refers to not having a transformer as an input.
+3. The transformer at the front now performs the `process` step, which is possible as now the whole energy system is specified in regards to energy potentials.
+4. This repeats for the other transformers going to the back of the chain, however each transformer recalculates its own potentials because the inputs will have changed from the previous assumed-as-infinite values.
+
+This back-and-forth approach works as it communicates the non-infinite demands and supplies from non-transformers across the chain and then recalculates with the correct `process` values once all potentials are specified.
+
+**Note:** At the moment this does not work if transformers are connected across one or more busses, because this is not recognised as a chain. This will be addressed in a future version of ReSiE.
+
+### Bus chains
+
+Because busses are both used as an abstraction over the actual hydraulical and electrical network of an energy system, as well as the component for distributing energy in a sub-network of the energy system, it often makes sense from a modelling perspective to have multiple busses of the same medium connected to each other, forming a chain. For example an energy system of a district might provide heat in a central bus that outputs to other busses in each building, which have local heat storages and other components.
+
+Given that energy can only flow in one direction in such a chain, the entire chain can be replaced by a single bus, which has all non-bus inputs and outputs as its own inputs and outputs. This is called a proxy bus, with the original busses being called the principals. These proxy busses are created for every bus chain within the preprocessing of ReSiE in order to facilitate easier calculation for the computation of energy flow and distribution via busses. For the simulation outputs, these proxy busses are then converted back to the original pricipal busses. During the construction of the proxy bus, the energy flow matrices of the principals, as well as the direction of energy flow between busses is taken into consideration to determine which inputs of the proxy bus can provide energy for which outputs and in which order this is happening.
+
+**Note:** This mechanism of a proxy bus only works if there are no loops between the busses. This produces a modelling challenge as it would be convenient to model a district heating network as multiple busses that request and provide heat to/from each other. It is currently an open question how to best address this problem and we hope to improve this in future versions of ReSiE.
+
+<center>![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
+
+Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</center>

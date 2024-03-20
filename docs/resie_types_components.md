@@ -32,6 +32,25 @@ The name of the entries should match the keys in the input file, which is carrie
 
 The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. In general, a temperature of `Nothing` implies that any temperature is accepted and only the amount of energy is revelant. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
+### Storage un-/loading
+
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists as direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `strategy` part of the parameter specification (compare [component specification](resie_input_file_format.md#components)). Here are exemplary parameters for a bounded supply:
+
+```
+{
+    "uac": "TST_SRC_01",
+    "type": "BoundedSupply",
+    "medium": "m_h_w_lt1",
+    ...
+    "strategy": {
+        "name": "default",
+        "load_storages m_h_w_lt1": false
+    }
+}
+```
+
+This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling, if components can draw energy from storages, the corresponding `unload_storages medium` parameter can be used.
+
 ## Boundary and connection components
 
 ### General bounded sink
@@ -44,7 +63,7 @@ The type refers to the type it is expected to have after being parsed by the JSO
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy` |
+| **Tracked values** | `IN`, `Max_Energy`, `Temperature` |
 
 Generalised implementation of a bounded sink.
 
@@ -98,13 +117,15 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `Balance` |
+| **Tracked values** | `Balance`, `Transfer->UAC` |
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
+Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
+
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See chapter on the input file format for details. |
+| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
 
 ### General fixed sink
 | | |
@@ -177,7 +198,7 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Demand_sum`, `Supply_sum` |
+| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum` |
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
 
