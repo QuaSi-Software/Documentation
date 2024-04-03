@@ -18,7 +18,12 @@ The results showed a high sensibility to the undisturbed ground temperature and 
 
 For a better overview, the daily averaged mean temperature within the probe field is compared betweeen ReSiE, EED and the measurement data in the following figure. The mean temperature difference (absolute, 1h time step, in the year 2014) between ReSiE and EED is 0.35 K (max. 7.3 K) and 0.55 K (max. 1.6 K) between ReSiE and the measurement data.
 
-![Validation of probe model with measurement data and EED: Average fluid temperature](fig/240402_probe_compare_EED_Measurement_ReSiE_GEW2014_daily.svg)
+![Validation of probe model with measurement data and EED: Average fluid temperature daily](fig/240402_probe_compare_EED_Measurement_ReSiE_GEW2014_daily.svg)
+
+Here, one week of the figure above is plotted with a higher temporal resolution of one hour:
+
+![Validation of probe model with measurement data and EED: Average fluid temperature hourly](fig/240402_probe_compare_EED_Measurement_ReSiE_GEW2014_hourly.svg)
+
 
 Also, a simulation performed with different time steps has been compared, from 15 minutes to 4 hours, showing only slight and expected differences in the average fluid temperature, caused by the different time resolution.
 
