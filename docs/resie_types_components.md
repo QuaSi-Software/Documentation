@@ -414,16 +414,16 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | --- | --- |
 | **Type name** | `GeothermalProbbe`|
 | **File** | `energy_systems/heat_sources/geothermal_probes.jl` |
-| **Available models** | default: `detailed` |
+| **Available models** | `simplified` (default), `detailed` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `fluid_reynolds_number` |
 
-A model of a single geothermal probe of a probe field of multiple geothermal probes.
+A model of a geothermal probe field or a single geothermal probe. Two models are avaiblable, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 
-**Model `detailed`:**
+**Model `simplified`:**
 
 The geothermal probe is modeled using precalculated g-functions. The model needs quite many input parameters. Especially the soil properties, including the undisturbed ground temperature, have a significant effect on the results. Therefore is it crucial to know the soil conditions at the investigated site. 
 
@@ -465,7 +465,7 @@ number_of_probes_y = 7
 key_2 = "2"  
 
 **zoned_rectangle**  
-Here, `number_of_probes_x` and `number_of_probes_y` define an unfilled rectangle with only one row of probes (like an open rectancle with `key_2 = 1`). Here, `key_2` then defines the shape of the inner assembly of probes forming a rectangle, which can be "2_5" (as "x_y) for an inner set of 2x5 probes, located inside of the outer ring.
+Here, `number_of_probes_x` and `number_of_probes_y` define an unfilled rectangle with only one row of probes (like an open rectancle with `key_2 = 1`). For zoned rectangles, `key_2` then defines the shape of the inner assembly of probes forming a rectangle, which can be "1_3" (as "x_y) for an inner set of 1x3 probes, located inside of the outer ring.
 
 <pre>
 Example:
@@ -551,19 +551,16 @@ key_2 = ""
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `probe_field_geometry` | `Float` | Y/Y | `rectangle` | [-] | type of probe field geometry, can be one of: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | Type of probe model: "simplified" with constant or "detailed" with calculated thermal borehole resistance in every time step. |
+| `probe_field_geometry` | `String` | Y/Y | `rectangle` | [-] | type of probe field geometry, can be one of: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration |
 | `number_of_probes_x` | `Int` | Y/Y | 1 | [-] | number of probes in x direction, corresponds to value of g-fuction library. Note that number_of_probes_x <= number_of_probes_y! |
 | `number_of_probes_y` | `Int` | Y/Y | 1 | [-] | number of probes in x direction, corresponds to value of g-fuction library. Note that number_of_probes_x <= number_of_probes_y! |
 | `probe_field_key_2` | `String` | Y/Y | "" | [-] | key2 of g-fuction library. Can also be "" if non is needed. The value depends on the chosen library type. |
-| `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
 | `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
 | `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
-| `shank_spacing` | `Float` | Y/Y | 0.1 | [m] | distance between inner pipes in borehole, diagonal through borehole center. required for calculation of thermal borehole resistance. |
 | `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
-| `borehole_thermal_resistance` | `Float` | Y/Y | 0.10 | [(mK)/W] | thermal resistance of borehole |
-| `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
-| `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
-| `loading_temperature` | `Temperature` | N/Y | nothing | [C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
+| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(mK)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
+| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
 | `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
 | `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | boreholewall starting temperature |
@@ -571,14 +568,27 @@ key_2 = ""
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(mK)] | heat conductivity of surrounding soil, homogenous and constant |
 | `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
-| `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(mK)] | heat conductivity of grout / filling material  |
+| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
+| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `do_create_plots` | `Bool` | Y/Y | true | [-] | flag if plots should be created during inizialisation (g-function and probe field layout) |
+
+**Model `detailed`:**
+
+The detailed model uses extended parameters to determine the thermal borehole resistance from the fluid to the soil. Therefore, the reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat conductivity of the pipe and the grout has to be given. The heat transmission from pipe to grout and grout to soil is neclected.
+
+To perform this calculation in every timestep, the following input parameters are required additionally to the ones of the simplified model, while the `borehole_thermal_resistance` is not needed anymore:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
+| `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
+| `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(mK)] | heat conductivity of inner pipes |
+| `shank_spacing` | `Float` | Y/Y | 0.1 | [m] | distance between inner pipes in borehole, diagonal through borehole center. required for calculation of thermal borehole resistance. |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of brine at 0 °C (25 % glycol 75 % water)  |
 | `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of brine at 0 °C (25 % glycol 75 % water)  |
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(mK)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
-| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
-| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
-| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
-| `do_create_plots` | `Bool` | Y/Y | true | [-] | flag if plots should be created during inizialisation (g-function and probe field layout) |
+| `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(mK)] | heat conductivity of grout (filling material)  |
