@@ -575,7 +575,7 @@ key_2 = ""
 
 **Model `detailed`:**
 
-The detailed model uses extended parameters to determine the thermal borehole resistance from the fluid to the soil. Therefore, the reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat conductivity of the pipe and the grout has to be given. The heat transmission from pipe to grout and grout to soil is neclected.
+The detailed model uses extended parameters to determine the thermal borehole resistance from the fluid to the soil. Therefore, an approach by Hellström (1991) is used to determine the effective thermal borehole resistance using the convective heat transfer coefficient within the pipe. For that, the reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat conductivity of the pipe and the grout has to be given. The heat transmission from pipe to grout and grout to soil is neclected.
 
 To perform this calculation in every timestep, the following input parameters are required additionally to the ones of the simplified model, while the `borehole_thermal_resistance` is not needed anymore:
 
