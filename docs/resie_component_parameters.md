@@ -1,5 +1,5 @@
 # Types of energy system components
-This document provides details on the component models and their implementations.
+This chapter provides details on the parameters of energy system components, which can be used in the [project input file](resie_input_file_format.md). For a detailed description of the mathematical models, see the [chapter on the component models](resie_energy_system_components.md).
 
 The description of each component type includes a block with a number of attributes that describe the type and how it connects to other components by its input and output interfaces. An example of such a block:
 
