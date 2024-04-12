@@ -66,8 +66,7 @@
 *[TMY]:     Typical Meteorological Year
 *[TRY]:     Test Reference Year
 *[VS Code]: Visual Studio Code
-
-
+*[EED]:     Energy Earth Designer (software)
 
 
 

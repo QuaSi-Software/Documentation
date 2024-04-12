@@ -559,13 +559,13 @@ key_2 = ""
 | `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
 | `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
 | `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
-| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(mK)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
+| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
 | `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
 | `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
 | `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | boreholewall starting temperature |
 | `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
-| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(mK)] | heat conductivity of surrounding soil, homogenous and constant |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 | `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
 | `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
@@ -584,11 +584,11 @@ To perform this calculation in every timestep, the following input parameters ar
 | `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
 | `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
 | `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
-| `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(mK)] | heat conductivity of inner pipes |
+| `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(Km)] | heat conductivity of inner pipes |
 | `shank_spacing` | `Float` | Y/Y | 0.1 | [m] | distance between inner pipes in borehole, diagonal through borehole center. required for calculation of thermal borehole resistance. |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of brine at 0 °C (25 % glycol 75 % water)  |
 | `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of brine at 0 °C (25 % glycol 75 % water)  |
-| `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(mK)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
+| `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
-| `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(mK)] | heat conductivity of grout (filling material)  |
+| `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
