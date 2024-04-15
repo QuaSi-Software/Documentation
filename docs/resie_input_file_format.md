@@ -22,28 +22,30 @@ The specification of components and outputs often mention a medium, such as `m_h
 
 ## Project file structure
 
-The overall structure of the project file is split into three general sections, each of which is discussed in more detail below.
+The overall structure of the project file is split into three general sections and one specific one, each of which is discussed in more detail in the following sections.
 
 ```json
 {
     "io_settings": {...},
     "simulation_parameters": {...},
-    "components": {...}
+    "components": {...},
+    "order_of_operation": {...}
 }
 ```
 
 ## Input / Output settings
 ```json
 "io_settings": {
-    "output_file": "./out.csv",
-    "dump_info": true,
-    "dump_info_file": "./info_dump.md",
-    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "auxiliary_info": true,
+    "auxiliary_info_file": "./auxiliary_info.md",
+    "sankey_plot_file": "./output/output_sankey.html",
     "sankey_plot": "default",
+    "csv_output_file": "./output/out.csv",
     "csv_output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
     },
+    "output_plot_file": "./output/output_plot.html",
 	"output_plot": {
 		"1": {
 			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"]},
@@ -56,12 +58,13 @@ The overall structure of the project file is split into three general sections, 
 },
 ```
 
-* `output_file` (`String`): File path to a location where the output will be saved.
-* `dump_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
-* `dump_info_file` (`String`): File path to where the additional information will be written.
-* `weather_file_path` (`String`): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
-* `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. 
-* `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
+* `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
+* `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
+* `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
+* `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
+* `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
+* `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details.
+* `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 
 ### Output specification (Sankey)
@@ -80,6 +83,8 @@ Below is an example of a custom color list for an energy system with three diffe
     "Losses": "black"
 }
 ```					
+
+The resulting plot will be saved by default in `./output/output_sankey.html`. The plot can be opened with any browser and offers some interactivity for the positions of elements.
 
 ### Output specification (CSV-file)
 
@@ -123,21 +128,22 @@ To define a custom plot, use the following syntax:
 ```
 The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
-The results will be saved in `\output\output_plot.html`. The plot can be opened with any browser and offers some possibilities of interactivity like zooming or hiding single data series.
-
+The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
 ## Simulation parameters
 ```json
 "simulation_parameters": {
     "start": 0,
     "end": 604800,
-    "time_step_seconds": 900
+    "time_step_seconds": 900,
+    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
 },
 ```
 
 * `start` (`Integer`): Start time of the simulation in seconds.
 * `end` (`Integer`): End time (inclusive) of the simulation in seconds.
 * `time_step_seconds` (`Integer`): Time step in seconds.
+* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
 
 **A note on time:** The simulation engine works entirely with timestamps relative to an arbitrary reference point. It is up to the user to choose these so that the simulation works well with the given inputs. The reference point can be the same as with the unix timestamp (1970-01-01 00:00:00) or it can be any number whatsoever as long as it is used consistently. The most important point is that the profiles used in the simulation match the reference point being used in the simulation parameters.
 
@@ -204,9 +210,9 @@ The specification is a map mapping a component's UAC to the parameters required 
 
 ## Order of operation
 
-The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `dump_info` flag and the `dump_info_file` path in the `io_settings` section described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
+The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `auxiliary_info` flag and the `auxiliary_info_file` path in the [Input/Output section](resie_input_file_format.md#input-output-settings) described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
 
-It may be convenient to first export the `dump_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `dump_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `components`. For a further description of the available operation steps, see [this section on the simulation sequence](resie_fundamentals.md#determining-order-of-operations). 
+It may be convenient to first export the `auxiliary_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `auxiliary_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation step, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `components`. For a further description of the available operation steps, see [this section on the simulation sequence](resie_fundamentals.md#determining-order-of-operations).
 
 Example of a generated order of operation:
 ```json
