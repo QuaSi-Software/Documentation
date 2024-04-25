@@ -66,7 +66,7 @@ The input parameter of the simulation above is given in the following table. The
 | unloading temperature spread [K]        | **1.5**       | -         | 0.62 in average |
 | loading temperature spread [K]          | **4.0**       | -         | 1.22 in average |
 
-The profile of the input (regeneratrion) and output (heating) energy of the probe field (Wh in 15 min resolution) as well as the input and result files of EED and ReSiE (average fluid temperature, hourly resolution, in °C) can be downloaded [here](data/validation_probe.zip).
+<!-- The profile of the input (regeneratrion) and output (heating) energy of the probe field (Wh in 15 min resolution) as well as the input and result files of EED and ReSiE (average fluid temperature, hourly resolution, in °C) can be downloaded [here](data/validation_probe.zip). -->
 
 Also, a simulation performed with different time steps has been compared, from 15 minutes to 4 hours, showing only slight and expected differences in the average fluid temperature, caused by the different time resolution.
 
