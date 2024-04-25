@@ -592,3 +592,52 @@ To perform this calculation in every timestep, the following input parameters ar
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
+
+
+**Examplary input file definition for geothermal probe:**
+
+```JSON
+
+    "TST_GTP_01": {
+        "type": "GeothermalProbes",
+        "m_heat_out": "m_h_w_lt1",
+        "control_refs": [],
+        "output_refs": [
+            "TST_HP_01"
+        ],
+        "model_type": "detailed",
+        "___GENERAL PARAMETER___": "",
+        "max_output_power": 150,
+        "max_input_power": 150,
+        "regeneration": true,
+        "soil_undisturbed_ground_temperature": 13,
+        "soil_heat_conductivity": 1.6 ,
+        "soil_density": 1800,
+        "soil_specific_heat_capacity": 2400,
+        "probe_field_geometry": "rectangle",
+        "number_of_probes_x": 3, 
+        "number_of_probes_y": 12,
+        "probe_field_key_2": "",
+        "borehole_spacing": 8,
+        "probe_depth": 150,
+        "borehole_diameter": 0.16,
+        "boreholewall_start_temperature": 13,
+        "unloading_temperature_spread": 1.5,
+        "loading_temperature_spread": 4,
+        "___SIMPLIFIED MODEL___": "",
+        "borehole_thermal_resistance": 0.1,
+        "___DETAILED MODEL___": "",
+        "probe_type": 2,
+        "pipe_diameter_outer": 0.032,
+        "pipe_diameter_inner": 0.0262,
+        "pipe_heat_conductivity": 0.42,
+        "shank_spacing": 0.1,
+        "fluid_specific_heat_capacity": 3795,
+        "fluid_density": 1052,
+        "fluid_kinematic_viscosity": 3.9e-6,
+        "fluid_heat_conductivity": 0.48,
+        "fluid_prandtl_number": 31.3,
+        "grout_heat_conductivity": 2
+        }
+
+```
