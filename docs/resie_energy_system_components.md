@@ -1,8 +1,8 @@
 # Technical description of main components
 
-In this chapter, the components that are used in ReSiE for the simulation of energy systems are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component, the implemented calculation rules and the required parameters are described. The latter are also listed in tabular form at the end of each subsection.
+In this chapter the mathematical models of components, that are used in ReSiE for the simulation of energy systems, are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component the implemented calculation rules and relevant physical quantities and parameters are described. You can find a detailed description of customizable parameters in the[corresponding chapter](resie_component_parameters.md).
 
-**Note: The described components are not implemented in ReSiE yet but will be included in upcoming versions! Currently, only simplified components are integrated. Also, the descriptions are not yet completed and may change later.**
+**Note: Not all components described here are implemented in ReSiE yet but all will be included in upcoming versions! Currently, only simplified component models are integrated. Also, the descriptions are not yet completed and may change later.**
 
 ## Convention
 
