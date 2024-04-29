@@ -1,4 +1,6 @@
-# General effects
+# General effects & traits
+
+Some effects of energy system components can be described in a manner applicable to a variety of components. For example all components transforming energy between media incur losses with an efficiency rate that might be dependent on the load on the component. This chapter describes these effects and introduces traits. If the description of a component is listed as implementing a trait, you can find the generalised description of the effects here.
 
 ## Reduction of usable heat during start-up of each component
 To account for transient effects, the reduction of the usable heat output during start-up of a component can be described using either linear oder exponential start-up and cool-down ramps. Both are described in the following.
@@ -125,15 +127,17 @@ return Q_out_new, t_shift_on, t_on, t_off
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
-## Non-linear part-load efficiency
+## Part-load ratio dependent efficiency
 
-Most components can be operated not only at full load, but also in part load operation. Due to several effects like the efficiency of electrical motors, inverters or thermal capacity effects, the efficiency of a component in part load usually differs from its efficiency at its full load operation point. How exactly the efficiency changes in part load depends on the specific component. Here, the general approach implemented in the simulation model is explained to consider part-load dependent efficiencies. This method needs to be extended for heat pumps which is described in the corresponding section.
+**Trait:** PLR-dependent efficiency
 
-The part-load ratio (PLR) in general is defined as:
+Most components can be operated not only at full load, but also in part load operation. Due to several effects like the efficiency of electrical motors, inverters or thermal capacity effects, the efficiency of a component in part load usually differs from its efficiency at its full load operation point. How exactly the efficiency changes in part load depends on the specific component. Here, the general approach implemented in the simulation model is explained to consider part-load dependent efficiencies. This method considers only the effect of the part load operation. Components that also operate at different efficiency depending on temperatures, specifically heat pumps, require to extend this method, which is described in the corresponding section of the component.
 
-\(PLR = \frac{\text{average loading power (el. or th.) of the component during current time step}}{\text{maximal possible power (el. or th.) of the component}} \)
+The part-load ratio (PLR) in general is defined as
 
-The change of the efficiency with respect to the PLR can be given as curve, for example as shown in the following figure for the efficiency of a motor in part-load operation (Source: Eppinger2021[^Eppinger2021]):
+\(PLR = \frac{\text{average loading power (el. or th.) of the component during current time step}}{\text{maximal possible power (el. or th.) of the component}} = \frac{E_{useful}}{E_{design}} \)
+
+with \(E_{design}\) being the design power of the component, usually rated to a certain output power. The change of the efficiency with respect to the PLR can be given as curve, for example as shown in the following figure for the efficiency of a motor in part-load operation (Source: Eppinger2021[^Eppinger2021]):
 
 <center>![motor efficiency](fig/230124_motor_efficiency_Eppinger2021.JPG)</center>
 
@@ -149,44 +153,32 @@ In the figure below, a part-load curve (orange curve) based on an exponential fu
 
 The basis for the consideration of non-linear part-load efficiencies is the user-defined efficiency curve of a component
 
-\(\eta(PLR)= f(PLR) \left (= \frac{E_{useful}(PLR)}{E_{expended}(PLR)} \right ) \)
+\(\eta(PLR) = \frac{E_{useful}(PLR)}{E_{expended}(PLR)}\)
 
-as shown exemplarily as orange curve in the figure above. \(f(PLR)\) can be a linear, an exponential or a partially defined function. The efficiency curve can also be a non-monotonic function as long as the function of the expended energy (yellow curve for electrical input in the figure above)
+as shown exemplarily as orange curve in the figure above. \(\eta(PLR)\) can be any continuous non-monotonic function as long as the function of the expended energy (yellow curve for electrical input in the figure above)
 
-\(E_{expended}(PLR)=\frac{PLR \ \ E_{useful,rated}}{\eta(PLR)} \) 
+\(E_{expended}(PLR)=\frac{PLR \cdot E_{design}}{\eta(PLR)} \)
 
-is monotonic in the range of \(PLR \in [0:1]\) and \( E_{useful,rated}\) depicts the rated power of the component. This is the case for all common part-load functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and inverted to get \(PLR(E_{expended})\). 
+is monotonic in the range of \(PLR \in [0:1]\). This is typically the case for common functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and numerically inverted to get a piece-wise linear approximation of \(PLR(E_{expended})\). For functions with strong gradients this assumption may not hold and lead to inconsistent behaviour.
 
 The part-load function of the useful energy, that is assumed to be linear,
 
-\(E_{useful}(PLR) = PLR \ \ E_{useful,rated}\)
+\(E_{useful}(PLR) = PLR \cdot E_{design}\)
 
 needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, the inverse is trivial and meets the original definition of the PLR:
 
-\(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\).
+\(PLR(E_{useful}) = \frac{E_{useful}}{E_{design}}\).
 
 During each timestep, both functions, \(E_{expended}(PLR)\) and \(E_{useful}(PLR)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
 
-### PLR calculation for Gas Boiler
+### Input-linearity and multiple outputs
 
-The following section provides a more detailed explanation of the calculations for maximal consumable gas and maximal produced heat for the GB under different operating strategies. At full load, no additional calculations are required, as the maximal consumable gas is equal to the maximal produced heat.
-Before diving deeper into the computation steps, it should be noted that for the thermal efficiency curve of the gas boiler a polynomial fit is used. The data points for the fit are obtained from the graph via the visual metric and fitted with the NumPy polyfit function. The fit closely resembles the orange curve, with the **only difference** being that the implemented curve is monotonically increasing across the entire partial-load ratio interval. LeeSeo2019[^LeeSeo2019] uses a similar curve for the thermal efficiency of a gas boiler but with slightly different parameter values. The reason for the disparity in values is that we were unable to replicate the values for the thermal efficiency with their coefficient values.
+The method described here implies that the output of the component is the one assumed to be linear in respect to the PLR. The method can be reversed if the input is linear and the output to be determined as a function of the PLR. In both cases the PLR is calculated for both available/demanded input and output energies as this is part of determining the operational state of the component.
 
-For a supply-driven strategy, the intake amount of gas is provided at the current time step. To determine PLR, the following procedure is followed: First, the output energy curve is divided by the thermal efficiency curve. Second, a lookup table is created. The entries in this table consist of tuples comprising the PLR value and the corresponding expended energy value, obtained in the first step. Finally, when estimating the part-load ratio corresponding to a provided energy input value, the upper and lower values around the provided value are identified using the lookup table. Once this is accomplished, the PLR value is calculated through linear interpolation.  
-The computed PLR value is then used to compute the thermal efficiency (gray function). Last but not least, the energy balance equation is solved to determine the maximum producible heat based on the obtained thermal efficiency of the gas boiler. This is achieved by simply multiplying the thermal efficiency by the maximum consumable gas.
-
-When a gas boiler (GB) is operated using a demand-driven strategy, the maximal produced heat and maximal consumable gas are determined as follows. First, the maximal produced heat is set to be equal to the rated power, instead of the demanded power. This prevents the case where the demanded power is infinite, which, in turn, would lead to a non-physical state. Second, the demand heat is checked to see if it exceeds the maximum producible heat. If this is the case, then the demand heat is limited to the maximum producible heat [^min_use_frac]. Afterwards, the part load ratio is calculated as \(PLR(E_{useful}) = \frac{E_{useful}}{E_{useful,rated}}\). Thermal efficiency is calculated by evaluating the pre-implemented function (orange curve) with the obtained PLR as input. Lastly, the maximal consumable gas is computed by solving the energy balance equation. In this case, the maximal produced heat is divided by the computed thermal efficiency.
-
-If several outputs on a component exist, like with an combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis.
-
-**ToDo**
-
-- Bezugsgröße für Berechnung der PLR definieren je Komponente? Oder pauschal auf thermischen Ausgang? Oder wählbar?
-- Aufteilung der Wirkungsgradänderung auf Input/Output (aktuell: eines linear, das andere alles; aber aber 50/50 denkbar)
+If several outputs on a component exist, like with a combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input parameters. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis. One of the outputs needs to be assumed as linear in respect to the part-load ratio in order for the calculations of the other outputs to be possible. This is typically the case for such transformers as one output is considered the primary, or operation-defining output; e.g. an electricity-driven CHP.
 
 [^Eppinger2021]: Eppinger, B. et al.(2021): Simulation of the Part Load Behavior of Combined Heat Pump-Organic Rankine Cycle Systems. In: *Energies 14 (13)*, S. 3870. doi: [10.3390/en14133870](https://doi.org/10.3390/en14133870).
-[^LeeSeo2019]: Lee, D.Y., Seo, B.M., Yoon, Y.B. et al. Heating energy performance and part load ratio characteristics of boiler staging in an office building. Front. Energy 13, 339–353 (2019). doi: [https://doi.org/10.1007/s11708-018-0596-5](https://doi.org/10.1007/s11708-018-0596-5).
-[^min_use_frac]: Assuming the demand heat would not be set to the maximal produced heat, then the usage fraction would be greater than 1. This theoretically would not produce any issues as the usage fraction is set to 1 if there is no smaller value.
+
 
 ## Minimum operation time
 
