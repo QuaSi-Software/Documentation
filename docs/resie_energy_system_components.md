@@ -1,16 +1,18 @@
 # Technical description of main components
 
-In this chapter the mathematical models of components, that are used in ReSiE for the simulation of energy systems, are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component the implemented calculation rules and relevant physical quantities and parameters are described. You can find a detailed description of customizable parameters in the[corresponding chapter](resie_component_parameters.md).
+In this chapter the mathematical models of components, that are used in ReSiE for the simulation of energy systems, are described. In this context a component is defined as one energy processing part (e.g. a heat pump) of the overall system, while the combination of multiple interconnected components is defined as an energy system. For each component the implemented calculation rules and relevant physical quantities and parameters are described. You can find a detailed description of customizable parameters in the [corresponding chapter](resie_component_parameters.md).
 
 **Note: Not all components described here are implemented in ReSiE yet but all will be included in upcoming versions! Currently, only simplified component models are integrated. Also, the descriptions are not yet completed and may change later.**
 
-## Convention
+## Conventions
 
 Symbols:
 
 - Scalars are shown in italic letters (normal math: \(T \ t\))
 - Vectors or time series in bold and italic letters (boldsymbol: \(\boldsymbol{T \ t}\))
-- Matrices are bold and non-italic (textbf: \(\textbf{T t}\)) 
+- Matrices are bold and non-italic (textbf: \(\textbf{T t}\))
+- Time-derivatives are noted with \(\dot{E}\), meaning \(\dot{E} = \frac{dE}{dt}\)
+- General energies are noted with \(E\), general power with \(\dot{E} = P\). Thermal energies are noted with \(Q\) and thermal power with \(\dot{Q}\).
  
 Components:
 
@@ -512,141 +514,60 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
 
+## Fuel boiler (FB)
+![Energy flow of fuel boiler](fig/240429_FuelBoiler.svg)
+
+Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
+
+Energy balance of fuel boiler:
+$$  \dot{Q}_{FB,out} = \dot{E}_{FB,fuel,in} - \dot{Q}_{FB,loss} = \eta_{FB}(PLR) \ \dot{E}_{FB,fuel,in}   $$
+
+**Inputs and outputs of the FB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{FB,out}\) | thermal power output of the FB | [W]
+\(\dot{E}_{FB,fuel,in}\) | energy demand of the FB as chemical fuel | [W]
+\(\dot{Q}_{FB,loss}\) | thermal losses of the FB | [W]
+
+**Parameters of the FB:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(Q_{FB,design}\) | rated thermal power output of the FB under full load (operating state 100 %) | [W]
+\(\eta_{FB}(PLR)\) | thermal efficiency of fuel boiler depending on the PLR | [-]
+\(PLR_{FB,min}\) | minimum allowed partial load of the GB | [-]
+
+### Typical efficiency functions
+**Note:** These are exemplary values and do not imply validation or extensive research.
+
+**Note:** An important part of choosing efficiency values is considering if the efficiency is relative to the lower, higher or gross heating value of the fuel. The simulation model outputs energy values for the required fuel for operation. How a given energy value corresponds to an amount of fuel is directly related to the heating value to which the efficiency is relative. For example, if a fuel with a GHV of 2.8\(\frac{kWh}{kg}\) and a fuel boiler with a constant efficiency of 0.9 relative to the GHV is used, this means a simulated heat output of 25.2 kWh can be expected from 10 kg or 28 \(kWh_{GHV}\) of input fuel.
+
+**Conventional gas-fired boiler**
+
+* Adapted from LeeSeo2019[^LeeSeo2019]: \(\eta(x) = 0.2822 + 2.2013 x - 2.8237 x^2 + 1.2 x^3\). Note that the coefficients in the paper do not match given values. The coefficients were adapted as we were not able to replicate the figures in the paper.
+
+**Wood pellet boiler**
+
+* Bottom-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.5%
+* Top-feed boiler, adapted from Verma2013[^Verma2013]: 70% at PLR of 0.3, 87% at PLR of 1.0
+* Horizontal-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.25%
+
+[^LeeSeo2019]: Lee, D.Y., Seo, B.M., Yoon, Y.B. et al. Heating energy performance and part load ratio characteristics of boiler staging in an office building. Front. Energy 13, 339–353 (2019). doi: [https://doi.org/10.1007/s11708-018-0596-5](https://doi.org/10.1007/s11708-018-0596-5).
+
+[^Verma2013]: Verma, V. K.; Bram, S.; Delattin, F.; Ruyck, J. de (2013): Real life performance of domestic pellet boiler technologies as a function of operational loads: A case study of Belgium. In: Applied Energy 101, S. 357–362. DOI: 10.1016/j.apenergy.2012.02.017.
+
 ## Gas boiler (GB)
-![Energy flow of gas boiler](fig/221021_Gasboiler.svg)
-
-Energy balance of gas boiler:
-$$  \dot{Q}_{GB,out} = \dot{E}_{GB,gas,in} - \dot{Q}_{GB,loss} = \eta_{GB}(PLR) \ \dot{E}_{GB,gas,in}   $$
-
-
-**Inputs and Outputs of the GB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{GB,out}\) | thermal power output of the GB | [W]
-\(\dot{E}_{GB,gas,in}\) | energy demand of the GB, natural or green gas (NCV or GCV)  | [W]
-\(\dot{Q}_{GB,loss}\) | thermal losses of the GB | [W]
-
-
-**Parameter of the GB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(Q_{GB,rated}\) | rated thermal power output of the GB under full load (operating state 100 %) | [W]
-\( \eta_{GB}(PLR)\) | thermal efficiency of gas boiler (regarding NCV or GCV) with respect to the PLR | [-]
-\(PL_{GB,min}\) | minimum allowed partial load of the GB | [-]
-\(MOT_{GB}\) | minimum operating time of the GB | [min]
-\(SUT_{GB}\) | start-up time of the GB until full heat supply (linear curve) | [min]
-\(CDT_{GB}\) | cool-down time of the GB from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the GB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{GB}\)  | current operating state of the GB (on, off, part load)   | [%]
-
+Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with burnable gasses as input.
 
 ## Oil heating (OH)
-![Energy flow of oil heating](fig/221028_Oil_heating.svg)
+Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with liquid fuel as input.
 
-Energy balance of oil heater:
-$$  \dot{Q}_{OH,out} = \dot{E}_{OH,oil,in} - \dot{Q}_{OH,loss} = \eta_{OH}(PLR) \ \dot{E}_{OH,oil,in}   $$
-
-
-**Inputs and Outputs of the OH:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{OH,out}\) | thermal power output of the OH | [W]
-\(\dot{E}_{OH,oil,in}\) | energy demand of the OH, fuel oil (NCV or GCV)  | [W]
-\(\dot{Q}_{OH,loss}\) | thermal losses of the OH | [W]
-
-
-**Parameter of the OH:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(Q_{OH,rated}\) | rated thermal power output of the OH under full load (operating state 100 %) | [W]
-\( \eta_{OH}(PLR)\) | thermal efficiency of oil heater (regarding NCV or GCV) with respect to the PLR | [-]
-\(PL_{OH,min}\) | minimum allowed partial load of the OH | [-]
-\(MOT_{OH}\) | minimum operating time of the OH | [min]
-\(SUT_{OH}\) | start-up time of the OH until full heat supply (linear curve) | [min]
-\(CDT_{OH}\) | cool-down time of the OH from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the OH:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{OH}\)  | current operating state of the OH (on, off, part load)   | [%]
-
-
-## Elecric heating rod (ER)
-![Energy flow of electric rod](fig/221028_ElectricRod.svg)
-
-Energy balance of electric heating rod:
-$$  \dot{Q}_{ER,out} = \dot{P}_{ER,el,in} - \dot{Q}_{ER,loss} = \eta_{ER}(PLR) \ \dot{P}_{ER,el,in}   $$
-
-
-**Inputs and Outputs of the ER:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{ER,out}\) | thermal power output of the ER | [W]
-\(\dot{P}_{ER,el,in}\) | electrical energy demand of the ER  | [W]
-\(\dot{Q}_{ER,loss}\) | thermal losses of the ER | [W]
-
-
-**Parameter of the ER:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(Q_{ER,rated}\) | rated thermal power output of the ER under full load (operating state 100 %) | [W]
-\( \eta_{ER}(PLR)\) | thermal efficiency of electric heating rod with respect to the PLR | [-]
-\(PL_{ER,min}\) | minimum allowed partial load of the ER | [-]
-\(MOT_{ER}\) | minimum operating time of the ER | [min]
-\(SUT_{ER}\) | start-up time of the ER until full heat supply (linear curve) | [min]
-\(CDT_{ER}\) | cool-down time of the ER from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the ER:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{ER}\)  | current operating state of the ER (on, off, part load)   | [%]
-
+## Electric heating rod (ER)
+Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with electricity as input. This is not physically correct, as electricity is not a chemical fuel, however the numerical mechanisms are the same.
 
 ## Biomass boiler (BB)
-![Energy flow of biomass boiler](fig/221028_BiomassBoiler.svg)
-
-Energy balance of biomass boiler:
-$$  \dot{Q}_{BB,out} = \dot{E}_{BB,biomass,in} - \dot{Q}_{BB,loss} = \eta_{BB}(PLR) \ \dot{E}_{BB,biomass,in}   $$
-
-**Inputs and Outputs of the BB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{BB,out}\) | thermal power output of the BB | [W]
-\(\dot{E}_{BB,biomass,in}\) | energy demand of the BB, biomass (NCV or GCV)  | [W]
-\(\dot{Q}_{BB,loss}\) | thermal losses of the BB | [W]
-
-**Parameter of the BB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(Q_{BB,rated}\) | rated thermal power output of the BB under full load (operating state 100 %) | [W]
-\( \eta_{BB}(PLR)\) | thermal efficiency of biomass boiler (regarding NCV or GCV, specific fuel and  moisture content) with respect to the PLR | [-]
-\(PL_{BB,min}\) | minimum allowed partial load of the BB | [-]
-\(MOT_{BB}\) | minimum operating time of the BB | [min]
-\(SUT_{BB}\) | start-up time of the BB until full heat supply (linear curve) | [min]
-\(CDT_{BB}\) | cool-down time of the BB from full heat supply to ambient (linear curve) | [min]
-
-**State variables of the BB:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{BB}\)  | current operating state of the BB (on, off, part load)   | [%]
+Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with solid biomass fuel as input.
 
 ## Heat sources 
 ### Soil
