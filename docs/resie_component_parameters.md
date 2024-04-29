@@ -592,7 +592,6 @@ key_2 = ""
 | `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
 | `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
-| `do_create_plots` | `Bool` | Y/Y | true | [-] | flag if plots should be created during inizialisation (g-function and probe field layout) |
 
 **Model `detailed`:**
 

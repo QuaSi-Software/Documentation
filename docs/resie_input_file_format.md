@@ -38,6 +38,9 @@ The overall structure of the project file is split into three general sections a
 "io_settings": {
     "auxiliary_info": true,
     "auxiliary_info_file": "./auxiliary_info.md",
+    "auxiliary_plots": true,
+    "auxiliary_plots_path": "./output",
+    "auxiliary_plots_formats": ["png", "svg"],
     "sankey_plot_file": "./output/output_sankey.html",
     "sankey_plot": "default",
     "csv_output_file": "./output/out.csv",
@@ -62,6 +65,9 @@ The overall structure of the project file is split into three general sections a
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
+* `auxiliary_plots` (`Boolean`): If true, ReSiE will create additional plots of components, if available (currently only available for geothermal probe). Defaults to `false`.
+* `auxiliary_plots_path` (`String`): (Optional) File path to where the additional plots will be saved. Defaults to `./output/`.
+* `auxiliary_plots_formats` (`Arrax{String}`): Array of file formats that should be created. Can be one or multiple of `["html", "pdf", "png", "ps", "svg"]`.
 * `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details.
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
