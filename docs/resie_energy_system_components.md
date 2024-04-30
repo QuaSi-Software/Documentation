@@ -693,13 +693,13 @@ $$ T_{\text{fl,avg}} = T_B + \tilde{q}_{in,out} \; R_B $$
 Since a uniform borehole wall temperature over the entire probe depth is assumed, a depth-averaged fluid temperature is calculated.
 
 #### Determination of the g-function
-There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] from 2021, that is used in ReSiE to avoid time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values at different time nodes for each of almost 35\(\,\)0000 avaiblable configurations. Between these time nodes, ReSiE interpolates in order to be able to access the corresponding g-function values for each simulation time step. The g-functions extracted from the library are transformed and interpolated in ReSiE to meet the desired probe length and the spacing between the probes as described in the manual of the library. The first node of the library is always at \(ln(t / t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
+There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] from 2021, that is used in ReSiE to avoid time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values at different time nodes for each of almost 35,000 available configurations. Between these time nodes, ReSiE interpolates in order to be able to access the corresponding g-function values for each simulation time step. The g-functions extracted from the library are transformed and interpolated in ReSiE to meet the desired probe length and the spacing between the probes as described in the manual of the library. The first node of the library is always at \(ln(t / t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
 
 $$ t_S = \frac{h_{probe}^2}{9 \, a_{soil}} $$
 
-where \(a_{soil}\) is the thermal diffusivity of the surrouding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after serveral days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated to fill the given 27 nodes of the precalculated g-function values with a finer discretisation. This is curently done by interpolating linearly between the given time steps of the library, except for the time span between \(t = 0\) and \(t_{1} = t_S e^{-8.5}\). Here, short-time effects of the probes are dominant and a linear interpolation would cause a significantly different system behaviour. A spline interpolation has been investigated as well, but the results were not satisfying. Other interpolation methods are difficult, as the g-function is not necessarily monotonically increasing as in the figure below, especially for small probe fields, and therefore a fit to a ln-function of the whole g-function is not possible.
+where \(a_{soil}\) is the thermal diffusivity of the surrounding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after several days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated to fill the given 27 nodes of the precalculated g-function values with a finer discretisation. This is curently done by interpolating linearly between the given time steps of the library, except for the time span between \(t = 0\) and \(t_{1} = t_S e^{-8.5}\). Here, short-time effects of the probes are dominant and a linear interpolation would cause a significantly different system behaviour. A spline interpolation has been investigated as well, but the results were not satisfying. Other interpolation methods are difficult, as the g-function is not necessarily monotonically increasing as in the figure below, especially for small probe fields, and therefore a fit to a ln-function of the whole g-function is not possible.
 
-Different approaches were investigated to try to achieve a better representation of the short-time effects. This was done under the assumption that single probes in a probe field do not influence each other during these short periods of time.[^Li] Thus, a calculation method for the g-function can be chosen that is only valid for a single probe. Both an approach by Carslaw and Jaeger [^Carslaw,Jaeger] using an assumption of an infinite cylindrical source or sink and one by Kelvin[^Kelvin], described by Laloui and Loria[^LalouiLoria2020], using an infinite linesource approach, were implemented and tested. Although, it was not possible to determine a reliable and reasonable intersection point between the calculated short-term g-function values and the long-term values from the library by Spitler and Cook. Therefore, in ReSie, a logarithmic function is directly fitted to the first given node of the g-function from Spitler and Cook instead of just linearely interpolating between the first node and the origin. This has shown significantly better results in the validation of the model relative to measurement data and to the results of the commercial software EED compared to a linear interpolation of short-term values. In particular, the short-term dynamic behavior of the model corresponds much better to the real behavior. The utilized logarithmic function for \(0 <= t < t_{1}\) has the following form
+Different approaches were investigated to try to achieve a better representation of the short-time effects. This was done under the assumption that single probes in a probe field do not influence each other during these short periods of time.[^Li] Thus, a calculation method for the g-function can be chosen that is only valid for a single probe. Both an approach by Carslaw and Jaeger [^Carslaw,Jaeger] using an assumption of an infinite cylindrical source or sink and one by Kelvin[^Kelvin], described by Laloui and Loria[^LalouiLoria2020], using an infinite line source approach, were implemented and tested. Although, it was not possible to determine a reliable and reasonable intersection point between the calculated short-term g-function values and the long-term values from the library by Spitler and Cook. Therefore, in ReSie, a logarithmic function is directly fitted to the first given node of the g-function from Spitler and Cook instead of just linearly interpolating between the first node and the origin. This has shown significantly better results in the validation of the model relative to measurement data and to the results of the commercial software EED compared to a linear interpolation of short-term values. In particular, the short-term dynamic behavior of the model corresponds much better to the real behavior. The utilized logarithmic function for \(0 <= t < t_{1}\) has the following form
 
 $$ f(t)=a \, ln(b \, t) $$
 
@@ -708,11 +708,11 @@ and is fitted to intersect with the first two nodes of the non-interpolated g-fu
 $$ a = \frac{g_1}{\log\left( t_1 \exp\left(\frac{\log\left(\frac{ t_1^{g_2}}{ t_2^{g_1}}\right)}{g_1 - g_2}\right)\right)} \quad \text{and} $$
 $$ b = \exp\left(\frac{\log\left(\frac{ t_1^{g_2}}{ t_2^{g_1}}\right)}{g_1 - g_2}\right) .$$
 
-The fitted funktion \(f(t)\) is only applied for \(0 <= t < t_{1}\) to the resulting g-function, as the shape of the further precalculated g-function may not represent a ln-function, depending on the probe field. The deviations in the results made by applying a linear interpolation between the nodes for \( t > t_{1}\) are considered to be neglectible.
+The fitted function \(f(t)\) is only applied for \(0 <= t < t_{1}\) to the resulting g-function, as the shape of the further precalculated g-function may not represent a ln-function, depending on the probe field. The deviations in the results made by applying a linear interpolation between the nodes for \( t > t_{1}\) are considered to be neglectable.
 
 An exemplary g-function for one year (time step is one hour) is plotted below, with the fitted logarithmic function for short-term effects and a linear interpolation between the nodes of the long-term g-function from Spitler and Cook:
 
-![g-function example](fig/240402_probe_g_funcion_example.png)
+![g-function example](fig/240402_probe_g_function_example.png)
 
 [^Li]: M. Li, K. Zhu, Z. Fang: Analytical methods for thermal analysis of vertical ground heat exchangers. Advances in Ground-Source Heat Pump Systems, 2016. doi: [https://doi.org/10.1016/B978-0-08-100311-4.00006-6](https://doi.org/10.1016/B978-0-08-100311-4.00006-6).
 
@@ -724,7 +724,7 @@ An exemplary g-function for one year (time step is one hour) is plotted below, w
 
 [^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu:  G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
-The library with the precalculated g-functions is described in more detail in [^Spitler,Cook], avaibale at [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518). Several configuration categories are avaiblabe:
+The library with the precalculated g-functions is described in more detail in [^Spitler,Cook], available at [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518). Several configuration categories are available:
 
 - rectangle
 - zoned rectangle
@@ -735,7 +735,7 @@ The library with the precalculated g-functions is described in more detail in [^
 - lopsided U-shape
 
 Each of the configuration categories contain several thousand probe field configurations, accessable by two keys, while some of the categories only require the first key. 
-The first key contains the number of probes in x and y direction, while the probes in x-direction have to be less or equal the number of probes in y-direction (e.g. "6_11" for a probe field with 6x11 probes). The second key is used to define the special shapes like zoned rectangles. For details on how to define the second key, please see the publication linked above.
+The first key contains the number of probes in x and y direction, while the number of probes in x-direction has to be less or equal to the number of probes in y-direction (e.g. "6_11" for a probe field with 6x11 probes). The second key is used to define the special shapes like zoned rectangles. For details on how to define the second key, please see the publication linked above.
 
 
 #### Thermal borehole resistance
@@ -764,7 +764,7 @@ where \(\dot{m}\) represents the fluid mass flow, \(\dot{Q}_{\text{in,out}}\) th
 
 $$ Re = \frac{c_{\text{fl}} \; D_i}{\nu_{\text{fl}}} = \frac{\dot{m}_{\text{fl}}}{\rho_{\text{fl}} \; \frac{\pi}{4} \; D_i^2} \; \frac{D_i}{\nu_{\text{fl}}} = \frac{4 \; \dot{m}_{\text{fl}}}{\rho_{\text{fl}} \; \nu_{\text{fl}} \; D_i \; \pi}$$
 
-with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid. Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. For Re \(\leq\) 2300, which is laminar flow, a simplified equation is used as suggestet by Ramming[^Ramming] :
+with \(c_{\text{fl}}\) as the fluid velocity, \(\nu_{\text{fl}}\) as the kinematic viscosity of the fluid and \(\rho_{\text{fl}}\) as the density of the fluid. Based on the Reynolds number \(Re\), a corresponding calculation equation of the Nußelt number \(Nu\) will be used in the following, depending on the flow condition. For Re \(\leq\) 2300, which is laminar flow, a simplified equation is used as suggested by Ramming[^Ramming] :
 
 $$ Nu_\text{laminar} = \left( \left( \frac{k_a}{1-k_n} \left( \frac{\text{Pr} \; D_i \; \text{Re}}{l_{pipe}} \right)^{k_n} \right)^3 + 4.364^3 \right)^{\frac{1}{3}} $$
 $$ \text{with  } k_a = 1.1 - \frac{1}{3.4 + 0.0667 \; Pr} \\ 
@@ -816,7 +816,7 @@ Symbol | Description | Unit
 \(h_{\text{probe}}\) | probe depth | \([m]\)
 i | index variable | [-]
 \(\dot{m}\)  | fluid mass flow | \([\frac{kg}{s}]\)
-n | total numbers of time steps so far | [-]
+n | total number of time steps so far | [-]
 \(Nu\) |Nußelt number | [-]
 \(Pr\) |Prandtl number of the heat carrier fluid| [-]
 \(\dot{Q}_{\text{in,out}}\)  | total heat extraction or input | \([W]\)
@@ -824,7 +824,7 @@ n | total numbers of time steps so far | [-]
 \(r_0\)  | radius of a U-tube | \([m]\)
 \(R_B\) | thermal borehole resistance | \([\frac{mK}{W}]\)
 \(Re\) |Reynolds number | [-]
-\(r_{\text{eq}}\)  | equivalent radius of cyldindric heat source or sink | \([m]\)
+\(r_{\text{eq}}\)  | equivalent radius of cylindric heat source or sink | \([m]\)
 t | current simulation time | \([s]\)
 \(T_B\)  | temperature at the borehole wall   | \([°C]\)
 \(T_{\text{fl,avg}}\) | Average fluid temperature | \([°C]\)
