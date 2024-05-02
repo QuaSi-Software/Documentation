@@ -155,11 +155,11 @@ The basis for the consideration of non-linear part-load efficiencies is the user
 
 \(\eta(PLR) = \frac{E_{useful}(PLR)}{E_{expended}(PLR)}\)
 
-as shown exemplarily as orange curve in the figure above. \(\eta(PLR)\) can be any continuous non-monotonic function as long as the function of the expended energy (yellow curve for electrical input in the figure above)
+as shown exemplarily as orange curve in the figure above. \(\eta(PLR)\) can be any continuous function, including non-monotonic ones, as long as the function of the expended energy (yellow curve for electrical input in the figure above)
 
 \(E_{expended}(PLR)=\frac{PLR \cdot E_{design}}{\eta(PLR)} \)
 
-is monotonic in the range of \(PLR \in [0:1]\). This is typically the case for common functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and numerically inverted to get a piece-wise linear approximation of \(PLR(E_{expended})\). For functions with strong gradients this assumption may not hold and lead to inconsistent behaviour.
+is monotonic in the range of \(PLR \in [0:1]\). This is typically the case for common functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and numerically inverted to get a piece-wise linear approximation of \(PLR(E_{expended})\). For functions with strong gradients this assumption of monotonicity of \(E_{expended}(PLR)\) may not hold and lead to inconsistent behaviour.
 
 The part-load function of the useful energy, that is assumed to be linear,
 
