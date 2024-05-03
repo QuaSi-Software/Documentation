@@ -51,6 +51,21 @@ All components can be set to be dis-/allowed to un-/load storages to which they 
 
 This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling, if components can draw energy from storages, the corresponding `unload_storages medium` parameter can be used.
 
+### Efficiency functions
+Various components, particularly transformers, require an efficiency function to determine how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping a part-load ratio on [0,1] to an efficiency factor on [0,1].
+
+For the configuration of components a selected number of different cases are implemented. If a function is known, but cannot be precisely modelled using one of these parameterised functions, it is possible to use a piece-wise linear approximation, which is also useful to model data-driven functions.
+
+In the project file the definition of an efficiency functions should look like this: `<function_model>:<list_of_numbers>` with `function_model` being a string (see below) and `list_of_numbers` being a comma-seperated list of numbers with a period as decimal seperator and no thousands-seperator. The meaning of the numbers depends on the function model.
+
+Three different function models are implemented:
+
+* const: Takes one number and uses it as a constant efficiency factor.
+* poly: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
+* pwlin: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
+
+Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance.
+
 ## Boundary and connection components
 
 ### General bounded sink
@@ -293,8 +308,6 @@ A boiler that transforms chemical fuel into heat.
 
 This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
 
-The current implementation includes functionality to model a PLR-dependant thermal efficiency \(\eta(PLR)\), however the efficiency curve is not customizable without code changes until a system for functions-as-parameters is in place.
-
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
@@ -302,8 +315,8 @@ The current implementation includes functionality to model a PLR-dependant therm
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
-| `max_thermal_efficiency` | `Float` | N/Y | 1.0 | The maximum thermal efficiency if no \(\eta(PLR)\) is used. |
-| `is_plr_dependant` | `Boolean` | N/Y | False | Toggle if \(\eta(PLR)\) is used or not. |
+| `efficiency` | `String` | Y/Y | `const:0.9` | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | N/Y | `30` | See [description of efficiency functions](#efficiency-functions). |
 
 ### Heat pump
 | | |
