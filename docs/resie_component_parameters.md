@@ -439,3 +439,236 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | `switch_point` | `Float` | Y/Y | 0.25 | Partial load at which the adaptive output temperature calculation switches. |
 | `high_temperature` | `Temperature` | Y/Y | 90.0 | The high end of the adaptive in-/output temperature. |
 | `low_temperature` | `Temperature` | Y/Y | 15.0 | The low end of the adaptive in-/output temperature. |
+
+
+## Heat sources and sinks
+
+### Geothermal probes
+| | |
+| --- | --- |
+| **Type name** | `GeothermalProbes`|
+| **File** | `energy_systems/heat_sources/geothermal_probes.jl` |
+| **Available models** | `simplified` (default), `detailed` |
+| **System function** | `storage` |
+| **Medium** |  |
+| **Input media** | `m_heat_in`/`m_h_w_ht1` |
+| **Output media** | `m_heat_out`/`m_h_w_lt1` |
+| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `fluid_reynolds_number` |
+
+A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
+
+**Model `simplified`:**
+
+The geothermal probe is modeled using precalculated g-functions. The model needs quite many input parameters. Especially the soil properties, including the undisturbed ground temperature, have a significant effect on the results. Therefore is it crucial to know the soil conditions at the investigated site. 
+
+The g-function is taken from the library provided within the repository. There are different configurations available: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration. Each of them can be specified by the number of probes in x and y direction (note that the number of probes defined for x has to be less or equal the number of probes defined for y). Some of the configurations, like zoned rectangles, require an additional key, that is specified in the documentation of the library in detail, available [here](https://gdr.openei.org/files/1325/LibraryOverview_v11.1%20(1).pdf) within the publication [doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
+
+A short overview is given in the following. Note that not all configurations are available. Check the documentation linked above or the included text files that contain all possible key combinations for the different probe field configurations.
+
+**rectangle**  
+Here, only `number_of_probes_x` and `number_of_probes_y` are required. They define the number of rows in x and y direction, while y >= x. The rectangle that is defined with these two parameters is filled completely with probes.
+
+<pre>
+Example:
+o o o  
+o o o  
+o o o  
+o o o  
+</pre>
+
+number_of_probes_x = 3  
+number_of_probes_y = 4  
+key_2 = ""  
+
+**open_rectangle**  
+Here, `number_of_probes_x` and `number_of_probes_y` define a probe field as for a normal rectangle. This rectangle is not filled, instead `key_2` defines the number of outer rows that should be considered. This allows for the creation of a single-row rectangle, or a rectangle field that has a "hole" in the middle.
+
+<pre>
+Example:
+o o o o o  
+o o o o o  
+o o   o o  
+o o   o o  
+o o   o o  
+o o o o o  
+o o o o o  
+</pre>
+
+number_of_probes_x = 5  
+number_of_probes_y = 7  
+key_2 = "2"  
+
+**zoned_rectangle**  
+Here, `number_of_probes_x` and `number_of_probes_y` define an unfilled rectangle with only one row of probes (like an open rectancle with `key_2 = 1`). For zoned rectangles, `key_2` then defines the shape of the inner assembly of probes forming a rectangle, which can be "1_3" (as "x_y") for an inner set of 1x3 probes, located inside of the outer ring.
+
+<pre>
+Example:
+o o o o o  
+o       o  
+o   o   o  
+o   o   o  
+o   o   o  
+o       o  
+o o o o o  
+</pre>
+
+number_of_probes_x = 5  
+number_of_probes_y = 7  
+key_2 = "1_3"  
+
+**U_configurations**  
+Here, `number_of_probes_x` and `number_of_probes_y` define the number of probes forming a single-row rectangle that is left open at the top end. The `key_2` then defines the number of rows that are forming this U-shape.
+
+<pre>
+Example:
+o o   o o  
+o o   o o  
+o o   o o  
+o o o o o  
+o o o o o  
+</pre>
+
+number_of_probes_x = 5  
+number_of_probes_y = 5  
+key_2 = "2"  
+
+**lopsided_U_configuration**  
+Lopsided U is an U-configuration with some probes missing at the top right corner. This is only available as single-row U. The keys `number_of_probes_x` and `number_of_probes_y` define the general shape of the U, while `key_2` then represents the number of removed probes from the top right corner at the right side of the U. 
+
+<pre>
+Example:
+o         
+o         
+o       o  
+o       o  
+o       o  
+o o o o o  
+</pre>
+
+number_of_probes_x = 5  
+number_of_probes_y = 6  
+key_2 = "2"  
+
+**C_configuration**  
+C-configurations are only available as single-row C-shapes, where the C is turned 90° anti-clockwise. A C-shape is like an U-shape with some more probes at the top row attempting to close the U to form an open rectangle. `number_of_probes_x` and `number_of_probes_y` define the number of probes forming an unfilled single-row rectangle, while `key_2` defines the number of probes that are removed from the top end of the rectangle. If possible, they are removed symmetrically starting from the center. If that is not possible due to an uneven number, the single leftover probe is removed at the left side.
+
+<pre>
+Example:
+o o     o o  
+o         o  
+o         o  
+o         o  
+o         o  
+o o o o o o  
+</pre>
+
+number_of_probes_x = 6  
+number_of_probes_y = 6  
+key_2 = "2"  
+
+**L_configuration**  
+L-configurations are currently only available as single-row L shapes. They are defined like rectangles, but the probe field then only contains a L with a single row that is not filled with other probes.
+
+<pre>
+Example:
+o   
+o   
+o   
+o   
+o o o  
+</pre>
+
+number_of_probes_x = 3  
+number_of_probes_y = 5  
+key_2 = ""  
+
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | Type of probe model: "simplified" with constant or "detailed" with calculated thermal borehole resistance in every time step. |
+| `probe_field_geometry` | `String` | Y/Y | `rectangle` | [-] | type of probe field geometry, can be one of: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration |
+| `number_of_probes_x` | `Int` | Y/Y | 1 | [-] | number of probes in x direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
+| `number_of_probes_y` | `Int` | Y/Y | 1 | [-] | number of probes in y direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
+| `probe_field_key_2` | `String` | Y/Y | "" | [-] | key2 of g-function library. Can also be "" if none is needed. The value depends on the chosen library type. |
+| `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
+| `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
+| `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
+| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
+| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
+| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
+| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
+| `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+| `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
+| `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
+| `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
+| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
+| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+
+**Model `detailed`:**
+
+The detailed model uses extended parameters to determine the thermal borehole resistance from the fluid to the soil. Therefore, an approach by Hellström (1991) is used to determine the effective thermal borehole resistance using the convective heat transfer coefficient within the pipe. For that, the Reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat conductivity of the pipe and the grout has to be given. The heat transmission from pipe to grout and grout to soil is neglected.
+
+To perform this calculation in every timestep, the following input parameters are required additionally to the ones of the simplified model, while the `borehole_thermal_resistance` is not needed anymore:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
+| `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
+| `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
+| `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(Km)] | heat conductivity of inner pipes |
+| `shank_spacing` | `Float` | Y/Y | 0.1 | [m] | distance between inner pipes in borehole, diagonal through borehole center. required for calculation of thermal borehole resistance. |
+| `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of brine at 0 °C (25 % glycol 75 % water)  |
+| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of brine at 0 °C (25 % glycol 75 % water) |
+| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of brine at 0 °C (25 % glycol 75 % water)  |
+| `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
+| `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
+| `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
+
+
+**Examplary input file definition for geothermal probe:**
+
+```JSON
+    "TST_GTP_01": {
+        "type": "GeothermalProbes",
+        "m_heat_out": "m_h_w_lt1",
+        "control_refs": [],
+        "output_refs": [
+            "TST_HP_01"
+        ],
+        "model_type": "detailed",
+        "___GENERAL PARAMETER___": "",
+        "max_output_power": 150,
+        "max_input_power": 150,
+        "regeneration": true,
+        "soil_undisturbed_ground_temperature": 13,
+        "soil_heat_conductivity": 1.6 ,
+        "soil_density": 1800,
+        "soil_specific_heat_capacity": 2400,
+        "probe_field_geometry": "rectangle",
+        "number_of_probes_x": 3, 
+        "number_of_probes_y": 12,
+        "probe_field_key_2": "",
+        "borehole_spacing": 8,
+        "probe_depth": 150,
+        "borehole_diameter": 0.16,
+        "boreholewall_start_temperature": 13,
+        "unloading_temperature_spread": 1.5,
+        "loading_temperature_spread": 4,
+        "___SIMPLIFIED MODEL___": "",
+        "borehole_thermal_resistance": 0.1,
+        "___DETAILED MODEL___": "",
+        "probe_type": 2,
+        "pipe_diameter_outer": 0.032,
+        "pipe_diameter_inner": 0.0262,
+        "pipe_heat_conductivity": 0.42,
+        "shank_spacing": 0.1,
+        "fluid_specific_heat_capacity": 3795,
+        "fluid_density": 1052,
+        "fluid_kinematic_viscosity": 3.9e-6,
+        "fluid_heat_conductivity": 0.48,
+        "fluid_prandtl_number": 31.3,
+        "grout_heat_conductivity": 2
+    }
+```
