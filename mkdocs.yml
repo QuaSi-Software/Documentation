@@ -47,6 +47,7 @@ nav:
       - 'Operation and control': 'resie_operation_control.md'
       - 'Energy system components': 'resie_energy_system_components.md'
       - 'General effects & traits': 'resie_transient_effects.md'
+      - 'Validation': 'resie_validation.md'
   - 'ReSiE: Examples':
       - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - 'GenSim: Generic Building Simulation':

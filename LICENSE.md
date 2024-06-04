@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023 Authors: Iris Achterfeld, Alissia Herbrand, Vivien Langhans, Etienne Ott, Heiner Steinacker, Matthias Stickel
+Copyright (c) 2023 Authors: Iris Achterfeld, Alissia Herbrand, Vivien Langhans, Etienne Ott, Heiner Steinacker, Matthias Stickel, Adrian Vollmer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -20,6 +20,7 @@
 | CSV          | Comma-Separated Values [data format]                                        |
 | DC           | Direct Current                                                              |
 | DWD          | German weather service (Deutscher Wetterdienst)                             |
+| EED          | Energy Earth Designer (software)                                            |
 | EER          | Energy Efficiency Ratio                                                     |
 | EPW          | Energy Plus Weather                                                         |
 | ER           | Electric Heating Rod                                                        |
