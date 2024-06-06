@@ -461,63 +461,58 @@ dispatch strategy | method of dispatching the units of the electrolyser to meet 
 
 
 ## Combined heat and power plant (CHPP)
+Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
+
+A CHPP turns the energy stored in a chemical fuel into electricity and heat at a temperature usable for heating and DHW purposes. Typical examples are internal combustion engines or gas turbines. Because the outputs are not produced independently of each other, control of the CHPP has to consider one output as the target to meet while the other is a by-product that has to be consumed, stored or transported.
+
 ![Energy flow of CHPP](fig/221021_CHPP.svg)
 
-<!---
-Definition of power-to-heat ratio of CHPP:
-$$ r_{CHPP,PTH} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} = \frac{P_{el,CHPP,rated}}{\dot{Q}_{CHPP,rated}}  $$
--->
-Energy balance on CHPP:
-$$  \dot{E}_{CHPP,gas,in} = P_{el,CHPP,out} + \dot{Q}_{CHPP,out} + \dot{Q}_{CHPP,loss} $$ 
+Energy balance of a CHPP:
+$$ \dot{E}_{fuel} = P_{el} + \dot{Q}_{heat} + \dot{Q}_{loss} $$
 
-Calculation of electric power output:
-$$  P_{el,CHPP,out} = \eta_{CHPP,el} \ \dot{E}_{CHPP,gas,in}   $$ 
+The production of electricity and heat follows different efficiency curves:
 
-Calculation of thermal power output:
-$$  \dot{Q}_{CHPP,out} = \eta_{CHPP,thermal} \ \dot{E}_{CHPP,gas,in}   $$ 
+$$ P_{el} = \eta_{el}(\kappa) \cdot \dot{E}_{fuel} $$
+$$ \dot{Q}_{heat} = \eta_{heat}(\kappa) \cdot \dot{E}_{fuel} $$
 
-Calculation of thermal losses in CHPP:
-$$ \dot{Q}_{CHPP,loss} = (1-\eta_{CHPP,thermal}+\eta_{CHPP,el}) \ \dot{E}_{CHPP,gas,in} $$
+Because the nominal power \(\dot{E}_{rated}\) of a CHPP is typically either given as \(P_{el}\) or \(\dot{Q}_{heat}\) at \(\kappa = 1.0\), an efficiency curve for the fuel input (relative to either one of the outputs) is also needed. Note that this efficiency is larger than 1.0 as it relates to the amount of fuel consumed to produce a certain output, which is necessarily smaller. For example if the nominal power is given as relative to the electricity output, then the inputs and outputs are calculated with the following relations:
 
-Relation of electric and thermal power output:
-$$ P_{el,CHPP,out} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} \ \dot{Q}_{CHPP,out} =  r_{CHPP,PTH}  \ \dot{Q}_{CHPP,out}  $$
+$$ P_{el} = \kappa \cdot \dot{E}_{rated} $$
+$$ \dot{Q}_{heat} = \eta_{heat}(\kappa) \cdot P_{el} $$
+$$ \dot{E}_{fuel} = \eta_{fuel}(\kappa) \cdot P_{el} $$
 
-The part-load dependent efficiency as described in the chapter "general transient effects" can be considered as well.
+The losses are calculated as a direct result of the energy balance:
 
-**ToDo:** part-load dependent efficiency definition with heat and electricity --> two efficiency curves? One efficiency curve and the second one related to the first one?
+$$ \dot{Q}_{loss} = \dot{E}_{fuel} - P_{el} - \dot{Q}_{heat} $$
+
+**Inputs and Outputs of the CHPP**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(P_{el}\) | electric power output of the CHPP | [W]
+\(\dot{Q}_{heat}\) | thermal power output of the CHPP | [W]
+\(\dot{E}_{fuel}\) | fuel input power of the CHPP | [W]
+\(\dot{Q}_{loss}\) | thermal energy losses of the CHPP | [W]
+\(T_{out}\) | temperature of heat output | [°C]
+
+**Parameters of the CHPP**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{E}_{rated}\) | nominal power of the CHPP at \(\kappa = 1.0\) | [W]
+\(\eta_{heat}(\kappa)\) | thermal efficiency as function of \(\kappa\) | [-]
+\(\eta_{el}(\kappa)\) | electric efficiency as function of \(\kappa\) | [-]
+\(\eta_{fuel}(\kappa)\) | fuel efficiency as function of \(\kappa\) | [-]
+\(\kappa_{min}\) | minimum allowed PLR of the CHPP | [-]
+\(T_{out}\) | temperature of heat output | [°C]
+
+### Typical efficiency functions
+
+**Note:** These are exemplary values and do not imply validation or extensive research.
+
 Part load curve e.g in Urbanucci2019[^Urbanucci2019]
 
 [^Urbanucci2019]: Urbanucci, Luca; Testi, Daniele; Bruno, Joan Carles (2019): Integration of Reversible Heat Pumps in Trigeneration Systems for Low-Temperature Renewable District Heating and Cooling Microgrids. *Applied Sciences 9 (15), S. 3194.*, doi: [10.3390/app9153194](https://doi.org/10.3390/app9153194).
-
-**Inputs and Outputs of the CHPP:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(P_{el,CHPP,out}\) | electric power output of the CHPP | [W]
-\(P_{el,CHPP}\) | electric power provided by the CHPP | [W]
-\(\dot{Q}_{CHPP,out}\) | thermal power output of the CHPP | [W]
-\(\dot{E}_{CHPP,gas,in}\) | energy demand of the CHPP, natural or green gas (NCV or GCV)  | [W]
-\(\dot{Q}_{CHPP,loss}\) | thermal energy losses of the CHPP | [W]
-
-**Parameter of the CHPP:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(P_{el,CHPP,rated}\) | rated electric power output of the CHPP under full load (operating state 100 %) | [W]
-\(\dot{Q}_{CHPP,rated}\) | rated thermal power output of the CHPP under full load (operating state 100 %) | [W]
-\(\eta_{CHPP,thermal}(PLR)\) | thermal efficiency of CHPP, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
-\(\eta_{CHPP,el}(PLR)\) | electrical efficiency of CHPP, including self-use of electrical energy, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
-\(PL_{CHPP,min}\) | minimum allowed partial load of the CHPP | [-]
-\(MOT_{CHPP}\) | minimum operating time of the CHPP | [min]
-\(SUT_{CHPP}\) | start-up time of the CHPP until full heat supply (linear curve) | [min]
-\(CDT_{CHPP}\) | cool-down time of the CHPP from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the CHPP:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
 
 
 
