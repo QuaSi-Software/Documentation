@@ -362,16 +362,16 @@ The general energy and mass flow in the electrolyser as well as the losses consi
 
 ![Energy flow of electrolyser](fig/221013_Elektrolyser.svg)
 
-The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{HEL,H_2}\)) or mass flow (\(\dot{m}_{HEL,H_2}\))) and the consumption of electrical energy (\( P_{el,HEL} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of hydrogen:
+The relationship between supplied hydrogen of the electrolysis (energy \(\dot{E}_{H_2}\) or mass flow \(\dot{m}_{H_2}\)) and the consumption of electrical energy \(P_{el}\) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of hydrogen:
 $$
 \begin{align}
-\dot{E}_{HEL,H_2}=  P_{el,HEL} \enspace \eta_{HEL,H_2}
+\dot{E}_{H_2}=  P_{el} \enspace \eta_{H_2}
 \end{align}
 $$
 
 $$ 
 \begin{equation}
-\dot{m}_{HEL,H_2} =  \frac{\dot{E}_{HEL,H_2}}{e_{H_2}} 
+\dot{m}_{H_2} =  \frac{\dot{E}_{H_2}}{e_{H_2}} 
 \end{equation}
 $$
 
@@ -383,79 +383,82 @@ Due to the difficulty of finding good numbers for parameters as well as reducing
 
 The figure above shows the inputs and outputs of the reduced model with the following relations:
 
-$$ \dot{E}_{HEL,H_2} = \eta_{H_2}(\kappa) \ P_{HEL,el} $$
+$$ \dot{E}_{H_2} = \eta_{H_2}(\kappa) \ P_{el} $$
 
-$$ \dot{E}_{HEL,H_2,out} = (\eta_{H_2}(\kappa) - \eta_{H_2,loss}(\kappa)) \ P_{HEL,el} $$
+$$ \dot{E}_{H_2,out} = (\eta_{H_2}(\kappa) - \eta_{H_2,loss}(\kappa)) \ P_{el} $$
 
-$$ P_{HEL,H_2,loss} = \dot{E}_{HEL,H_2} - \dot{E}_{HEL,H_2,out} $$
+$$ P_{H_2,loss} = \dot{E}_{H_2} - \dot{E}_{H_2,out} $$
 
-$$ \dot{Q}_{HEL,heat,high} = \eta_{heat,high}(\kappa) \ P_{HEL,el} $$
+$$ \dot{Q}_{heat,high} = \eta_{heat,high}(\kappa) \ P_{el} $$
 
-$$ \dot{Q}_{HEL,heat,low} = \eta_{heat,low}(\kappa) \ P_{HEL,el} $$
+$$ \dot{Q}_{heat,low} = \eta_{heat,low}(\kappa) \ P_{el} $$
 
-$$ \dot{Q}_{HEL,loss,heat} = P_{HEL,el} - \dot{Q}_{HEL,heat,high} - \dot{Q}_{HEL,heat,low} - \dot{E}_{HEL,H_2} $$
+$$ \dot{Q}_{loss,heat} = P_{el} - \dot{Q}_{heat,high} - \dot{Q}_{heat,low} - \dot{E}_{H_2} $$
 
-$$ P_{HEL,losses} = \dot{Q}_{HEL,loss,heat} - P_{HEL,H_2,loss} $$
+$$ P_{losses} = \dot{Q}_{loss,heat} - P_{H_2,loss} $$
 
-Since the oxygen produced during the electrolysis process can also be utilized under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{HEL,O_2,out}\) is determined from the stoichiometric ratio of the hydrolysis reaction equation:
+Since the oxygen produced during the electrolysis process can also be utilized under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{O_2,out}\) is determined from the stoichiometric ratio of the hydrolysis reaction equation:
 
-$$ \dot{m}_{HEL,O_2,out} =  v_{O_2,H_2} \ \dot{m}_{HEL,H_2} $$
+$$ \dot{m}_{O_2,out} =  v_{O_2,H_2} \ \dot{m}_{H_2} $$
 $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{2 \cdot atomic \ mass \ H_2} = \frac{2 \cdot 15.999 \ u}{2 \cdot 2 \cdot 1.0008 \ u} = 7.9386 $$
 
 **Note: At the moment the pressure, at which the stacks operate and the hydrogen is extracted and purified, is assumed to be constant throughout the entire process and does not affect efficiencies or heat by-products. This might be addressed in a future release.**
 
 ### Unit dispatch
 
-Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{HEL}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The inputs are outputs over all units active in a single timestep are summed together with no losses between the units.
+Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The inputs are outputs over all units active in a single timestep are summed together with no losses between the units.
 
-Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{HEL,min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{HEL,min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
+Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
 
-**Note:** The electrolyser is only operated between \(\kappa_{HEL,min}\) and maximum 100 % load. A specification of power above nominal power, which can occur in practice under certain circumstances, is not supported. The efficiency curves should take this into account. The nominal power should reflect the maximum operation point that can be sustained for several hours.
+**Note:** The electrolyser is only operated between \(\kappa_{min}\) and maximum 100 % load. A specification of power above nominal power, which can occur in practice under certain circumstances, is not supported. The efficiency curves should take this into account. The nominal power should reflect the maximum operation point that can be sustained for several hours.
 
 The currently implemented dispatch strategies for electrolysers are:
 
-* **Equal distribution:** This spreads the load evenly across all units. This is a simplified model that ignores \(\kappa_{HEL,min,unit}\).
-* **Equal distribution with minimum power fraction:** Same as an equal distribution, however if the total \(\kappa\) is lower than \(\kappa_{HEL,min,unit}\), then a number of units are activated at a calculated \(\kappa\) to ensure the minimum restriction is observed and the demand is met.
+* **Equal distribution:** This spreads the load evenly across all units. This is a simplified model that ignores \(\kappa_{min,unit}\).
+* **Equal distribution with minimum power fraction:** Same as an equal distribution, however if the total \(\kappa\) is lower than \(\kappa_{min,unit}\), then a number of units are activated at a calculated \(\kappa\) to ensure the minimum restriction is observed and the demand is met.
 * **Try optimal PLR:** Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low \(\kappa\) or close to the nominal power, falls back to activating only one or all units.
 
 **Inputs and Outputs of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{HEL,el}\) | electrical power requirement of the electrolyser | [W]
-\(\dot{m}_{HEL,O_2,out}\) | oxygen mass flow delivered by the electrolyser | [kg/h]
-\(\dot{m}_{HEL,H_2}\) | hydrogen mass flow produced by the electrolyser (before \(H_2\) losses) | [kg/h]
-\(\dot{m}_{HEL,H_2,out}\) | hydrogen mass flow provided by the electrolyser (after \(H_2\) losses) | [kg/h]
-\(\dot{E}_{HEL,H_2}\) | hydrogen energy flow discharged from the electrolyser (before \(H_2\) losses) | [W]
-\(\dot{E}_{HEL,H_2,out}\) | hydrogen energy flow provided by the electrolyser (after \(H_2\) losses) | [W]
-\(P_{HEL,loss,H2}\) | \(H_2\) losses | [W]
-\(\dot{Q}_{HEL,heat,high}\) | high temperature heat provided by the electrolyser | [W]
-\(\dot{Q}_{HEL,heat,low}\) | low temperature heat provided by the electrolyser | [W]
-\(\dot{Q}_{HEL,loss}\) | thermal losses (unusable waste heat) | [W]
-\(P_{HEL,losses}\) | Overall losses of the electrolyser | [W]
+\(P_{el}\) | electrical power requirement of the electrolyser | [W]
+\(\dot{m}_{O_2,out}\) | oxygen mass flow delivered by the electrolyser | [kg/h]
+\(\dot{m}_{H_2}\) | hydrogen mass flow produced by the electrolyser (before \(H_2\) losses) | [kg/h]
+\(\dot{m}_{H_2,out}\) | hydrogen mass flow provided by the electrolyser (after \(H_2\) losses) | [kg/h]
+\(\dot{E}_{H_2}\) | hydrogen energy flow discharged from the electrolyser (before \(H_2\) losses) | [W]
+\(\dot{E}_{H_2,out}\) | hydrogen energy flow provided by the electrolyser (after \(H_2\) losses) | [W]
+\(P_{loss,H2}\) | \(H_2\) losses | [W]
+\(\dot{Q}_{heat,high}\) | high temperature heat provided by the electrolyser | [W]
+\(\dot{Q}_{heat,low}\) | low temperature heat provided by the electrolyser | [W]
+\(\dot{Q}_{loss}\) | thermal losses (unusable waste heat) | [W]
+\(P_{losses}\) | Overall losses of the electrolyser | [W]
 
 **Parameters of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{HEL,el,rated}\) | total electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
-\(N_{HEL}\) | number of units that make up the electrolyser plant | [-]
+\(P_{el,rated}\) | total electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
+\(N\) | number of units that make up the electrolyser plant | [-]
 dispatch strategy | method of dispatching the units of the electrolyser to meet demand | [-]
 \(\eta_{H_2}(\kappa)\) | efficiency of hydrogen production of each unit as function of \(\kappa\) | [-]
 \(\eta_{H_2,loss}(\kappa)\) | percentage of hydrogen losses of each unit as function of \(\kappa\) | [-]
 \(\eta_{heat,high}(\kappa)\) | efficiency of high temperature heat production of each unit as function of \(\kappa\) | [-]
 \(\eta_{heat,low}(\kappa)\) | efficiency of low temperature heat production of each unit as function of \(\kappa\) | [-]
-\(\kappa_{HEL,min,unit}\) | minimum \(\kappa\) of each unit | [-]
-\(\kappa_{HEL,min}\) | minimum total \(\kappa\) of the electrolyser | [-]
+\(\kappa_{min,unit}\) | minimum \(\kappa\) of each unit | [-]
+\(\kappa_{min}\) | minimum total \(\kappa\) of the electrolyser | [-]
+\(\kappa_{opt}\) | optimal \(\kappa\) of each unit at which \(H_2\) production is most efficient | [-]
 \(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value) | [Wh/kg]
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
-\(T_{HEL,heat,high}\) | cooling HT fluid outlet temperature of electrolyser | [°C]
-\(T_{HEL,heat,low}\) | cooling LT fluid outlet temperature of electrolyser | [°C]
+\(T_{heat,high}\) | cooling HT fluid outlet temperature of electrolyser | [°C]
+\(T_{heat,low}\) | cooling LT fluid outlet temperature of electrolyser | [°C]
 
 ### Typical efficiency functions
 **Note:** These are exemplary values and do not imply validation or extensive research.
 
 [^Fisch2023]: Fisch, Norbert, Tobias Nusser, and Simon Marx. "10 Climate Impact of Green Hydrogen in an Urban Context." Innovations and Challenges of the Energy Transition in Smart City Districts (2023): 145
+
+
 
 ## Combined heat and power plant (CHPP)
 ![Energy flow of CHPP](fig/221021_CHPP.svg)
@@ -516,29 +519,31 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
 
+
+
 ## Fuel boiler (FB)
 ![Energy flow of fuel boiler](fig/240429_FuelBoiler.svg)
 
 Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
 
 Energy balance of fuel boiler:
-$$ \dot{Q}_{FB,out} = \dot{E}_{FB,fuel,in} - \dot{Q}_{FB,loss} = \eta_{FB}(\kappa) \ \dot{E}_{FB,fuel,in} $$
+$$ \dot{Q}_{heat} = \dot{E}_{fuel} - \dot{Q}_{loss} = \eta_{heat}(\kappa) \ \dot{E}_{fuel} $$
 
 **Inputs and outputs of the FB:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{FB,out}\) | thermal power output of the FB | [W]
-\(\dot{E}_{FB,fuel,in}\) | energy demand of the FB as chemical fuel | [W]
-\(\dot{Q}_{FB,loss}\) | thermal losses of the FB | [W]
+\(\dot{Q}_{heat}\) | thermal power output of the FB | [W]
+\(\dot{E}_{fuel}\) | energy demand of the FB as chemical fuel | [W]
+\(\dot{Q}_{loss}\) | thermal losses of the FB | [W]
 
 **Parameters of the FB:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(Q_{FB,design}\) | rated thermal power output of the FB under full load (operating state 100 %) | [W]
-\(\eta_{FB}(\kappa)\) | thermal efficiency of fuel boiler as function of \(\kappa\) | [-]
-\(\kappa_{FB,min}\) | minimum allowed partial load of the GB | [-]
+\(\dot{Q}_{design}\) | rated thermal power output of the FB at \(\kappa = 1.0\) | [W]
+\(\eta_{heat}(\kappa)\) | thermal efficiency of fuel boiler as function of \(\kappa\) | [-]
+\(\kappa_{min}\) | minimum allowed PLR of the FB | [-]
 
 ### Typical efficiency functions
 **Note:** These are exemplary values and do not imply validation or extensive research.
