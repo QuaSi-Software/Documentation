@@ -18,6 +18,8 @@ Components:
 
 - Energy flows into a component are positive, energy flows out of a component are negative
 - Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected components
+- The maximum power that a component can consume or produce is called the nominal power or design power. This is typically defined by one of the inputs or outputs of the component, for example as the electric power draw of an electrolyser or the heat production of a gas boiler.
+- The fraction of utilised power divided by nominal power at a given point in time is called the part load ratio (PLR), or operation point, or power fraction, and can be signified with \(\kappa\) for the sake of brevity
 
 ## Heat pump (HP)
 ### General description of HP
@@ -381,15 +383,15 @@ Due to the difficulty of finding good numbers for parameters as well as reducing
 
 The figure above shows the inputs and outputs of the reduced model with the following relations:
 
-$$ \dot{E}_{HEL,H_2} = \eta_{H_2}(PLR) \ P_{HEL,el} $$
+$$ \dot{E}_{HEL,H_2} = \eta_{H_2}(\kappa) \ P_{HEL,el} $$
 
-$$ \dot{E}_{HEL,H_2,out} = (\eta_{H_2}(PLR) - \eta_{H_2,loss}(PLR)) \ P_{HEL,el} $$
+$$ \dot{E}_{HEL,H_2,out} = (\eta_{H_2}(\kappa) - \eta_{H_2,loss}(\kappa)) \ P_{HEL,el} $$
 
 $$ P_{HEL,H_2,loss} = \dot{E}_{HEL,H_2} - \dot{E}_{HEL,H_2,out} $$
 
-$$ \dot{Q}_{HEL,heat,high} = \eta_{heat,high}(PLR) \ P_{HEL,el} $$
+$$ \dot{Q}_{HEL,heat,high} = \eta_{heat,high}(\kappa) \ P_{HEL,el} $$
 
-$$ \dot{Q}_{HEL,heat,low} = \eta_{heat,low}(PLR) \ P_{HEL,el} $$
+$$ \dot{Q}_{HEL,heat,low} = \eta_{heat,low}(\kappa) \ P_{HEL,el} $$
 
 $$ \dot{Q}_{HEL,loss,heat} = P_{HEL,el} - \dot{Q}_{HEL,heat,high} - \dot{Q}_{HEL,heat,low} - \dot{E}_{HEL,H_2} $$
 
@@ -406,15 +408,15 @@ $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{2 \cdot atomic \ m
 
 Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{HEL}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The inputs are outputs over all units active in a single timestep are summed together with no losses between the units.
 
-Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(PL_{HEL,min,unit}\) of each unit tends to be fairly high and a lower overall \(PL_{HEL,min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
+Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{HEL,min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{HEL,min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
 
-**Note:** The electrolyser is only operated between \(PL_{HEL,min}\) and maximum 100 % load. A specification of power above nominal power, which can occur in practice under certain circumstances, is not supported. The efficiency curves should take this into account. The nominal power should reflect the maximum operation point that can be sustained for several hours.
+**Note:** The electrolyser is only operated between \(\kappa_{HEL,min}\) and maximum 100 % load. A specification of power above nominal power, which can occur in practice under certain circumstances, is not supported. The efficiency curves should take this into account. The nominal power should reflect the maximum operation point that can be sustained for several hours.
 
 The currently implemented dispatch strategies for electrolysers are:
 
-* **Equal distribution:** This spreads the load evenly across all units. This is a simplified model that ignores \(PL_{HEL,min,unit}\).
-* **Equal distribution with minimum power fraction:** Same as an equal distribution, however if the total PLR is lower than \(PL_{HEL,min,unit}\), then a number of units are activated at a calculated PLR to ensure the minimum restriction is observed and the demand is met.
-* **Try optimal PLR:** Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low PLR or close to the nominal power, falls back to activating only one or all units.
+* **Equal distribution:** This spreads the load evenly across all units. This is a simplified model that ignores \(\kappa_{HEL,min,unit}\).
+* **Equal distribution with minimum power fraction:** Same as an equal distribution, however if the total \(\kappa\) is lower than \(\kappa_{HEL,min,unit}\), then a number of units are activated at a calculated \(\kappa\) to ensure the minimum restriction is observed and the demand is met.
+* **Try optimal PLR:** Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low \(\kappa\) or close to the nominal power, falls back to activating only one or all units.
 
 **Inputs and Outputs of the Electrolyser:**
 
@@ -439,12 +441,12 @@ Symbol | Description | Unit
 \(P_{HEL,el,rated}\) | total electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
 \(N_{HEL}\) | number of units that make up the electrolyser plant | [-]
 dispatch strategy | method of dispatching the units of the electrolyser to meet demand | [-]
-\(\eta_{H_2}(PLR)\) | efficiency of hydrogen production of each unit as function of PLR | [-]
-\(\eta_{H_2,loss}(PLR)\) | percentage of hydrogen losses of each unit as function of PLR | [-]
-\(\eta_{heat,high}(PLR)\) | efficiency of high temperature heat production of each unit as function of PLR | [-]
-\(\eta_{heat,low}(PLR)\) | efficiency of low temperature heat production of each unit as function of PLR | [-]
-\(PL_{HEL,min,unit}\) | minimum PLR of each unit | [-]
-\(PL_{HEL,min}\) | minimum total PLR of the electrolyser | [-]
+\(\eta_{H_2}(\kappa)\) | efficiency of hydrogen production of each unit as function of \(\kappa\) | [-]
+\(\eta_{H_2,loss}(\kappa)\) | percentage of hydrogen losses of each unit as function of \(\kappa\) | [-]
+\(\eta_{heat,high}(\kappa)\) | efficiency of high temperature heat production of each unit as function of \(\kappa\) | [-]
+\(\eta_{heat,low}(\kappa)\) | efficiency of low temperature heat production of each unit as function of \(\kappa\) | [-]
+\(\kappa_{HEL,min,unit}\) | minimum \(\kappa\) of each unit | [-]
+\(\kappa_{HEL,min}\) | minimum total \(\kappa\) of the electrolyser | [-]
 \(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value) | [Wh/kg]
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
 \(T_{HEL,heat,high}\) | cooling HT fluid outlet temperature of electrolyser | [°C]
@@ -520,7 +522,7 @@ Symbol | Description | Unit
 Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
 
 Energy balance of fuel boiler:
-$$  \dot{Q}_{FB,out} = \dot{E}_{FB,fuel,in} - \dot{Q}_{FB,loss} = \eta_{FB}(PLR) \ \dot{E}_{FB,fuel,in}   $$
+$$ \dot{Q}_{FB,out} = \dot{E}_{FB,fuel,in} - \dot{Q}_{FB,loss} = \eta_{FB}(\kappa) \ \dot{E}_{FB,fuel,in} $$
 
 **Inputs and outputs of the FB:**
 
@@ -535,8 +537,8 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(Q_{FB,design}\) | rated thermal power output of the FB under full load (operating state 100 %) | [W]
-\(\eta_{FB}(PLR)\) | thermal efficiency of fuel boiler depending on the PLR | [-]
-\(PLR_{FB,min}\) | minimum allowed partial load of the GB | [-]
+\(\eta_{FB}(\kappa)\) | thermal efficiency of fuel boiler as function of \(\kappa\) | [-]
+\(\kappa_{FB,min}\) | minimum allowed partial load of the GB | [-]
 
 ### Typical efficiency functions
 **Note:** These are exemplary values and do not imply validation or extensive research.
@@ -545,12 +547,12 @@ Symbol | Description | Unit
 
 **Conventional gas-fired boiler**
 
-* Adapted from LeeSeo2019[^LeeSeo2019]: \(\eta(x) = 0.2822 + 2.2013 x - 2.8237 x^2 + 1.2 x^3\). Note that the coefficients in the paper do not match given values. The coefficients were adapted as we were not able to replicate the figures in the paper.
+* Adapted from LeeSeo2019[^LeeSeo2019]: \(\eta(\kappa) = 0.2822 + 2.2013 \kappa - 2.8237 \kappa^2 + 1.2 \kappa^3\). Note that the coefficients in the paper do not match given values. The coefficients were adapted as we were not able to replicate the figures in the paper.
 
 **Wood pellet boiler**
 
 * Bottom-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.5%
-* Top-feed boiler, adapted from Verma2013[^Verma2013]: 70% at PLR of 0.3, 87% at PLR of 1.0
+* Top-feed boiler, adapted from Verma2013[^Verma2013]: 70% at \(\kappa = 0.3\), 87% at \(\kappa = 1.0\)
 * Horizontal-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.25%
 
 [^LeeSeo2019]: Lee, D.Y., Seo, B.M., Yoon, Y.B. et al. Heating energy performance and part load ratio characteristics of boiler staging in an office building. Front. Energy 13, 339–353 (2019). doi: [https://doi.org/10.1007/s11708-018-0596-5](https://doi.org/10.1007/s11708-018-0596-5).
