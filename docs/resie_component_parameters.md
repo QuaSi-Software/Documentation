@@ -262,15 +262,19 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
 | **Tracked values** | `IN`, `OUT`, `Losses` |
 
-A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat and electricity.
+A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_gas` | `Float` | Y/N | 4000.0 | The maximum design power input (chemical input power). |
-| `electricity_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input chemical energy that is output as electricity. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_gas that is required for the plant to run. |
+| `power_el` | `Float` | Y/N | 4000.0 | The design power of electrical output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
 | `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
+| `efficiency_fuel_in` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_el_out` | `String` | Y/Y | `pwlin:0.01,0.17,0.25,0.31,0.35,0.37,0.38,0.38,0.38` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_out` | `String` | Y/Y | `pwlin:0.8,0.69,0.63,0.58,0.55,0.52,0.5,0.49,0.49` | See [description of efficiency functions](#efficiency-functions). |
+| `linear_interface` | `String` | Y/Y | `fuel_in` | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `8` | See [description of efficiency functions](#efficiency-functions). |
 
 ### Electrolyser
 | | |
@@ -281,18 +285,39 @@ A Combined Heat and Power Plant (CHPP) that transforms combustible gas into heat
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
-| **Output media** | `m_heat_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
+| **Output media** | `m_heat_ht_out`/`m_h_w_ht1`, `m_heat_lt_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
 | **Tracked values** | `IN`, `OUT`, `Losses`, `Losses_heat`, `Losses_hydrogen` |
 
-Implementation of an electrolyser splitting water into hydrogen and oxygen while providing the waste heat as output.
+Implementation of an electrolyser splitting pute water into hydrogen and oxygen while providing the waste heat as output.
+
+If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` is not set and does not require to be connected to another component or bus. The energy that is calculated to be put out on this interface is then added to `Losses_heat` instead.
+
+**Dispatch strategies:**
+
+* `all_equal`: This spreads the load evenly across all units. This is a simplified model that ignores `min_power_fraction`.
+* `equal_with_mpf`: Same as an equal distribution, however if the total PLR is lower than `min_power_fraction`, then a number of units are activated at a calculated PLR to ensure the minimum restriction is observed and the demand is met.
+* `try_optimal`: Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low PLR or close to the nominal power, falls back to activating only one or all units.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `power_el` | `Float` | Y/N | 4000.0 | The maximum electrical design power input. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_el that is required for the plant to run. |
-| `heat_fraction` | `Float` | Y/Y | 0.4 | Fraction of the input electric energy that is output as heat. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `output_temperature` | `Temperature` | N/Y | 55.0 | The temperature of the heat output. |
+| `nr_switchable_units` | `UInt` | Y/Y | 1 | The number of units that can be switched on/off to meet demand. |
+| `dispatch_strategy` | `String` | Y/Y | `equal_with_mpf` | The dispatch strategy to be used to switch on/off units. |
+| `min_power_fraction` | `Float` | Y/Y | 0.4 | The minimum PLR that is required for one unit of the electrolyser to run. |
+| `min_power_fraction_total` | `Float` | Y/Y | 0.2 | The minimum PLR that is required for the whole plant to run. |
+| `optimal_unit_plr` | `Float` | Y/Y | 0.65 | The optimal PLR for each unit at which hydrogen production is most efficient. Only required if dispatch strategy `try_optimal` is used. |
+| `min_run_time` | `UInt` | Y/Y | 3600 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `heat_lt_is_usable` | `Bool` | Y/Y | false | Toggle if the low temperature heat output is usable. |
+| `output_temperature_ht` | `Temperature` | Y/Y | 55.0 | The temperature of the high temperature heat output. |
+| `output_temperature_lt` | `Temperature` | Y/Y | 25.0 | The temperature of the low temperature heat output. |
+| `linear_interface` | `String` | Y/Y | `el_in` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_el_in` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_ht_out` | `String` | Y/Y | `const:0.15` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_lt_out` | `String` | Y/Y | `const:0.07` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_h2_out` | `String` | Y/Y | `const:0.57` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_h2_out_lossless` | `String` | Y/Y | `const:0.6` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_o2_out` | `String` | Y/Y | `const:0.6` | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `1` | See [description of efficiency functions](#efficiency-functions). |
 
 ### Fuel boiler
 | | |
@@ -314,11 +339,13 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
 | `power_th` | `Float` | Y/N | 4000.0 | The maximum thermal design power output. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
+| `min_power_fraction` | `Float` | Y/Y | 0.1 | The minimum fraction of the design power_th that is required for the plant to run. |
+| `min_run_time` | `UInt` | Y/Y | 0 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
-| `efficiency` | `String` | Y/Y | `const:0.9` | See [description of efficiency functions](#efficiency-functions). |
-| `nr_discretization_steps` | `UInt` | N/Y | `30` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_fuel_in` | `String` | Y/Y | `const:1.1` | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
+| `linear_interface` | `String` | Y/Y | `heat_out` | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `30` | See [description of efficiency functions](#efficiency-functions). |
 
 ### Heat pump
 | | |
