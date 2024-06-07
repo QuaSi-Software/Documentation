@@ -406,7 +406,7 @@ $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{2 \cdot atomic \ m
 
 ### Unit dispatch
 
-Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The inputs are outputs over all units active in a single timestep are summed together with no losses between the units.
+Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{unit}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The inputs are outputs over all units active in a single timestep are summed together with no losses between the units.
 
 Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
 
@@ -439,7 +439,7 @@ Symbol | Description | Unit
 Symbol | Description | Unit
 -------- | -------- | --------
 \(P_{el,rated}\) | total electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
-\(N\) | number of units that make up the electrolyser plant | [-]
+\(N_{unit}\) | number of units that make up the electrolyser plant | [-]
 dispatch strategy | method of dispatching the units of the electrolyser to meet demand | [-]
 \(\eta_{H_2}(\kappa)\) | efficiency of hydrogen production of each unit as function of \(\kappa\) | [-]
 \(\eta_{H_2,loss}(\kappa)\) | percentage of hydrogen losses of each unit as function of \(\kappa\) | [-]
@@ -456,7 +456,18 @@ dispatch strategy | method of dispatching the units of the electrolyser to meet 
 ### Typical efficiency functions
 **Note:** These are exemplary values and do not imply validation or extensive research.
 
-[^Fisch2023]: Fisch, Norbert, Tobias Nusser, and Simon Marx. "10 Climate Impact of Green Hydrogen in an Urban Context." Innovations and Challenges of the Energy Transition in Smart City Districts (2023): 145
+**Constant efficiencies**
+
+* Adapted from a realised \(1 \ MW_e\) PEM electrolyser described in Fisch2023[^Fisch2023] from the data of 2023, a year of mostly nominal operation. Of note is that the electrolyser was still in the process of being improved. The values are thus perhaps somewhat pessimistic for the expected efficiency.
+    * \(\eta_{heat,low}(\kappa) = 0.0664\)
+    * \(\eta_{heat,high}(\kappa) = 0.161\)
+    * \(\eta_{H_2}(\kappa) = 0.617\)
+    * \(\eta_{H_2,loss}(\kappa) = 0.04\) Note: This value was estimated.
+    * \(\kappa_{min,unit} = 0.4\)
+    * \(\kappa_{min,unit} = 0.25\)
+    * \(N_{unit} = 4\)
+
+[^Fisch2023]: Norbert Fisch, Tobias Nusser, and Simon Marx. "10 Climate Impact of Green Hydrogen in an Urban Context." Innovations and Challenges of the Energy Transition in Smart City Districts (2023): 145
 
 
 
