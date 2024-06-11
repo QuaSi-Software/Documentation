@@ -133,11 +133,11 @@ return Q_out_new, t_shift_on, t_on, t_off
 
 Most components can be operated not only at full load, but also in part load operation. Due to several effects like the efficiency of electrical motors, inverters or thermal capacity effects, the efficiency of a component in part load usually differs from its efficiency at its full load operation point. How exactly the efficiency changes in part load depends on the specific component. Here, the general approach implemented in the simulation model is explained to consider part-load dependent efficiencies. This method considers only the effect of the part load operation. Components that also operate at different efficiency depending on temperatures, specifically heat pumps, require to extend this method, which is described in the corresponding section of the component.
 
-The part-load ratio (PLR) in general is defined as
+The part load ratio (PLR) \(\kappa\) in general is defined as
 
-\(PLR = \frac{\text{average loading power (el. or th.) of the component during current time step}}{\text{maximal possible power (el. or th.) of the component}} = \frac{E_{useful}}{E_{design}} \)
+\(\kappa = \frac{\text{average loading power (el. or th.) of the component during current time step}}{\text{maximal possible power (el. or th.) of the component}} = \frac{E_{useful}}{E_{design}} \)
 
-with \(E_{design}\) being the design power of the component, usually rated to a certain output power. The change of the efficiency with respect to the PLR can be given as curve, for example as shown in the following figure for the efficiency of a motor in part-load operation (Source: Eppinger2021[^Eppinger2021]):
+with \(E_{design}\) being the design power of the component, usually rated to a certain output power. The change of the efficiency with respect to \(\kappa\) can be given as curve, for example as shown in the following figure for the efficiency of a motor in part-load operation (Source: Eppinger2021[^Eppinger2021]):
 
 <center>![motor efficiency](fig/230124_motor_efficiency_Eppinger2021.JPG)</center>
 
@@ -153,27 +153,27 @@ In the figure below, a part-load curve (orange curve) based on an exponential fu
 
 The basis for the consideration of non-linear part-load efficiencies is the user-defined efficiency curve of a component
 
-\(\eta(PLR) = \frac{E_{useful}(PLR)}{E_{expended}(PLR)}\)
+\(\eta(\kappa) = \frac{E_{useful}(\kappa)}{E_{expended}(\kappa)}\)
 
-as shown exemplarily as orange curve in the figure above. \(\eta(PLR)\) can be any continuous function, including non-monotonic ones, as long as the function of the expended energy (yellow curve for electrical input in the figure above)
+as shown exemplarily as orange curve in the figure above. \(\eta(\kappa)\) can be any continuous function, including non-monotonic ones, as long as the function of the expended energy (yellow curve for electrical input in the figure above)
 
-\(E_{expended}(PLR)=\frac{PLR \cdot E_{design}}{\eta(PLR)} \)
+\(E_{expended}(\kappa)=\frac{\kappa \cdot E_{design}}{\eta(\kappa)} \)
 
-is monotonic in the range of \(PLR \in [0:1]\). This is typically the case for common functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(PLR)\). During preprocessing, the function \(E_{expended}(PLR)\) is calculated from \(\eta(PLR)\) and numerically inverted to get a piece-wise linear approximation of \(PLR(E_{expended})\). For functions with strong gradients this assumption of monotonicity of \(E_{expended}(PLR)\) may not hold and lead to inconsistent behaviour.
+is monotonic in the range of \(\kappa \in [0:1]\). This is typically the case for common functions as the change in efficiency is not as big as the impact of the PLR on the energy curve \(E_{expended}(\kappa)\). During preprocessing, the function \(E_{expended}(\kappa)\) is calculated from \(\eta(\kappa)\) and numerically inverted to get a piece-wise linear approximation of \(\kappa(E_{expended})\). For functions with strong gradients this assumption of monotonicity of \(E_{expended}(\kappa)\) may not hold and lead to inconsistent behaviour.
 
 The part-load function of the useful energy, that is assumed to be linear,
 
-\(E_{useful}(PLR) = PLR \cdot E_{design}\)
+\(E_{useful}(\kappa) = \kappa \cdot E_{design}\)
 
-needs to be inverted as well. As \(E_{useful}(PLR)\) is assumed to be linear, the inverse is trivial and meets the original definition of the PLR:
+needs to be inverted as well. As \(E_{useful}(\kappa)\) is assumed to be linear, the inverse is trivial and meets the original definition of the PLR:
 
-\(PLR(E_{useful}) = \frac{E_{useful}}{E_{design}}\).
+\(\kappa(E_{useful}) = \frac{E_{useful}}{E_{design}}\).
 
-During each timestep, both functions, \(E_{expended}(PLR)\) and \(E_{useful}(PLR)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
+During each timestep, both functions, \(E_{expended}(\kappa)\) and \(E_{useful}(\kappa)\), are evaluated according to the operational strategy to determine the part load ratio that is needed to meet the demand while not exceeding the maximum available power.
 
 ### Input-linearity and multiple outputs
 
-The method described here implies that the output of the component is the one assumed to be linear in respect to the PLR. The method can be reversed if the input is linear and the output to be determined as a function of the PLR. In both cases the PLR is calculated for both available/demanded input and output energies as this is part of determining the operational state of the component.
+The method described here implies that the output of the component is the one assumed to be linear in respect to \(\kappa\). The method can be reversed if the input is linear and the output to be determined as a function of \(\kappa\). In both cases \(\kappa\) is calculated for both available/demanded input and output energies as this is part of determining the operational state of the component.
 
 If several outputs on a component exist, like with a combined heat and power plant, each output can have its own independent efficiency curve, so several efficiency curves are needed as input parameters. In this case, it is necessary to ensure that the part-load factor is based on the same definition for all part-load depended efficiency curves to ensure comparability and a consistent basis. One of the outputs needs to be assumed as linear in respect to the part-load ratio in order for the calculations of the other outputs to be possible. This is typically the case for such transformers as one output is considered the primary, or operation-defining output; e.g. an electricity-driven CHP.
 

@@ -18,6 +18,8 @@ Components:
 
 - Energy flows into a component are positive, energy flows out of a component are negative
 - Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected components
+- The maximum power that a component can consume or produce is called the nominal power or design power. This is typically defined by one of the inputs or outputs of the component, for example as the electric power draw of an electrolyser or the heat production of a gas boiler.
+- The fraction of utilised power divided by nominal power at a given point in time is called the part load ratio (PLR), or operation point, or power fraction, and can be signified with \(\kappa\) for the sake of brevity
 
 ## Heat pump (HP)
 ### General description of HP
@@ -345,174 +347,197 @@ Symbol | Description | Unit
 
 
 ## Hydrogen Electrolyser (HEL)
+
+Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
+
 The hydrogen electrolyser uses electrical energy to split water into its components hydrogen (\(H_2\)) and oxygen (\(O_2\)) as shown in the following reaction equation: 
 
 $$ 2 \ H_2O \rightarrow 2 \ H_2 + O_2 $$
 
-If the electrical energy is provided by renewable energies, the resulting hydrogen is labeled as "green hydrogen" and can be used to decarbonize the mobility or industrial sector or fed into the natural gas grid. The waste heat generated in the process can be used directly by feeding it into a heat network or via an intermediate heat pump. For flexible operation, it is possible to discharge the waste heat to the environment using a chiller. The use of waste heat is an important factor for the overall efficiency of the electrolyser. 
+While there is electrolyser technology to work with other chemical reactions or solutions of minerals in water (e.g. sea water hydrolysis), this model focuses on electrolysers splitting purified water as this is the most relevant technology at time of writing.
+
+The use of waste heat of the electrolysis is an important factor for the overall efficiency of the electrolyser. This importance stems from both a substantial, non-reducable part of the input electricity being transformed into waste heat and by several effects concerning the temperature and availability of the heat outputs.
 
 The general energy and mass flow in the electrolyser as well as the losses considered in the model can be seen in the following figure.
 
 ![Energy flow of electrolyser](fig/221013_Elektrolyser.svg)
 
-The relationship between supplied hydrogen of the electrolysis (energy (\(\dot{E}_{HEL,H_2}\)) or mass flow (\(\dot{m}_{HEL,H_2}\))) and the consumption of electrical energy (\( P_{el,HEL} \)) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of the hydrogen:
+The relationship between supplied hydrogen of the electrolysis (energy \(\dot{E}_{H_2}\) or mass flow \(\dot{m}_{H_2}\)) and the consumption of electrical energy \(P_{el}\) is given in the following equation, where \(e_{H_2}\) can be either the net or the gross calorific value of hydrogen:
 $$
 \begin{align}
-\dot{E}_{HEL,H_2}=  P_{el,HEL} \enspace \eta_{HEL,H_2}
+\dot{E}_{H_2}=  P_{el} \enspace \eta_{H_2}
 \end{align}
 $$
 
 $$ 
 \begin{equation}
-\dot{m}_{HEL,H_2} =  \frac{\dot{E}_{HEL,H_2}}{e_{H_2}} 
+\dot{m}_{H_2} =  \frac{\dot{E}_{H_2}}{e_{H_2}} 
 \end{equation}
 $$
 
-Due to the purification losses of the hydrogen caused by the reduction of oxygen molecules contained in the hydrogen gas in the catalyst, depending on the electrolysis technology, the actually obtained hydrogen energy or mass flow is reduced by the proportion of the hydrogen losses \(\eta_{H_2 \ purification}\) to the energy or mass flows, supplemented with index \(out\):
-$$ \dot{E}_{HEL,H_2,out}=  (1-\eta_{H_2 \ purification}) \ \dot{E}_{HEL,H_2} $$
+Some part of the waste heat apart of the cooling loop can potentially be utilised. Electrolysers tend to be designed for high power draw and subsequentially produce a comparitively large amount of low temperature waste heat from power system cooling, radiative and conductive losses of the stacks and pressure handling, among other sources. Depending on the installation and configuration of the equipment some of this low temperature waste heat can be usable instead of being removed from the energy system entirely. A realised \(1 \ MW_e\) PEM electrolyser [^Stickel2024] was reported to make use of the low temperature waste heat and produce in 2023, via a heat pump, 261 MWh high temperature heat using 91 MWh of electricity for a COP of 2.87. However as not all installations can make use of this waste heat, in the model this can be toggled off, which will cause the low temperature waste heat to be counted towards the overall losses of the electrolyser.
 
-$$ \dot{m}_{HEL,H_2,out} = (1-\eta_{H_2 \ purification}) \ \dot{m}_{HEL,H_2} $$
+Due to the difficulty of finding good numbers for parameters as well as reducing the model complexity to energy balances, the model displayed above is restructured to combine the losses of water purification and power electronics by affecting the efficiency of producing hydrogen from input electricity and the amount of high and low temperature waste heat. The losses of hydrogen from purification processes is modeled as two efficiencies curves for produced hydrogen with one including losses and one excluding them.
 
+![Reduced model of electrolyser energy flow](fig/240603_Elektrolyser_reduced.svg)
 
-Conversely, by rearranging and substituting the previous equations from a required hydrogen mass flow, the electrical power consumption can be calculated as follows:
-$$ P_{el,HEL} =  \frac{\dot{m}_{HEL,H_2,out} \ e_{H_2}}{\eta_{HEL,H_2} \ (1 - \eta_{H_2 \ purification})}  $$
+The figure above shows the inputs and outputs of the reduced model with the following relations:
 
-The usable waste heat from the electrolysis process \(\dot{Q}_{HEL,waste heat}\) is determined, depending on the available information, as
-$$\dot{Q}_{HEL,waste heat} = \eta_{HEL,heat} \enspace (1-\eta_{HEL,H_2}) \enspace P_{el,HEL} = \frac{(1 - \eta_{HEL,H_2}) \ \eta_{HEL,heat} } { (1 - \eta_{H_2 \ purification}) \ \eta_{HEL,H_2} } \ \dot{E}_{HEL,H_2,out} $$ 
+$$ \dot{E}_{H_2} = \eta_{H_2}(\kappa) \ P_{el} $$
 
-With an increase of operation time, the efficiency in hydrogen production of the stacks of electrolysers is decreasing while the efficiency of heat production is increased. This is due to degradation effects in the stacks. This effect of aging of the stack cells can be expressed by an correction factor for each the hydrogen (\(\delta_{HEL,H_2} < 0\)) and the heat (\(\delta_{HEL,heat}\) > 0) related efficiency. These correction factors are given in the change of percentage points per 10.000 full load hours (FLH), where the full load hours are determined by dividing the total hydrogen produced by the nominal hydrogen output of the electrolyser. The efficiencies of hydrogen and heat production are therefore corrected in every timestep using the nominal efficiency at the point of the beginning of life of the electrolyser, the correction factors and the passed FLH.
+$$ \dot{E}_{H_2,out} = (\eta_{H_2}(\kappa) - \eta_{H_2,loss}(\kappa)) \ P_{el} $$
 
-$$ \eta_{HEL,H_2} = \eta_{HEL,H_2,start} + \left ( \frac{\delta_{HEL,H_2}}{100} \ {\frac{FLH}{10.000}} \right )$$
-$$ \eta_{HEL,heat} = \eta_{HEL,heat,start} + \left ( \frac{\delta_{HEL,heat}}{100} \ {\frac{FLH}{1.000}} \right ) $$
-$$ \text{with } FLH = \frac{\text{total hydrogen produced since start [kg]}}{\text{nominal hydrogen production [kg]}} $$
+$$ P_{H_2,loss} = \dot{E}_{H_2} - \dot{E}_{H_2,out} $$
 
-Keep in mind: Test if sum of efficiencies will reach values > 1 or if one efficiency falls below zero for the given maximum changing intervale of the stacks (ToDo)
+$$ \dot{Q}_{heat,high} = \eta_{heat,high}(\kappa) \ P_{el} $$
 
-With a known mass flow \(\dot{m}_{HP,cool}\) and the specific heat capacity of the heat transfer medium of the heat recovery \(c_{p,cool}\) as well as a known inlet temperature \(T_{HEL,cool,in}\), the outlet temperature of the heat transfer medium from the cooling circuit \(T_{HEL,cool,out}\) can be determined by rearranging the following equation:
-$$\dot{Q}_{HEL,waste heat} = \dot{m}_{HP,cool} \enspace c_{p,cool} \enspace (T_{HEL,hot,out} - T_{HEL,cool,in})$$
+$$ \dot{Q}_{heat,low} = \eta_{heat,low}(\kappa) \ P_{el} $$
 
-The heat loss \(\dot{Q}_{HEL,loss}\), which cannot be used and is dissipated to the environment via heat transport mechanisms, is calculated as follows
+$$ \dot{Q}_{loss,heat} = P_{el} - \dot{Q}_{heat,high} - \dot{Q}_{heat,low} - \dot{E}_{H_2} $$
 
-$$  \dot{Q}_{HEL,loss} = P_{el,HEL} - \dot{Q}_{HEL,waste heat} - \dot{E}_{HEL,H_2} \\ =  P_{el,HEL} \ (1 - \eta_{HEL,heat} + \eta_{HEL,heat} \ \eta_{HEL,H_2} - \eta_{HEL,H_2}) $$
+$$ P_{losses} = \dot{Q}_{loss,heat} - P_{H_2,loss} $$
 
-The actual needed power supply of the electrolyser \(P_{el,HEL,supply}\) increases by losses in the power electronics and results from the electrical reference power \(P_{el,HEL}\) and the losses in the power electronics \(\eta_{HEL,PE}\) to
-$$ P_{el,HEL,supply} = \frac{P_{el,HEL}}{\eta_{HEL,PE}} $$
+Since the oxygen produced during the electrolysis process can also be utilized under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{O_2,out}\) is determined from the stoichiometric ratio of the hydrolysis reaction equation:
 
-Since the oxygen produced during the electrolysis process can also be utilized economically under certain circumstances, the resulting oxygen mass flow \(\dot{m}_{HEL,O_2,out}\) is determined from the stoichiometric ratio of the reaction equation of the water splitting described at the beginning:
+$$ \dot{m}_{O_2,out} =  v_{O_2,H_2} \ \dot{m}_{H_2} $$
+$$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{2 \cdot atomic \ mass \ H_2} = \frac{2 \cdot 15.999 \ u}{2 \cdot 2 \cdot 1.0008 \ u} = 7.9386 $$
 
-$$  \dot{m}_{HEL,O_2,out} =  v_{O_2,H_2} \enspace  \dot{m}_{HEL,H_2} $$
-$$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{atomic \ mass \ 2 \ H_2} = \frac{2 * 15,9990 \ u}{2*2*1,0008 \ u} = 7,9386 $$
+**Note: At the moment the pressure, at which the stacks operate and the hydrogen is extracted and purified, is assumed to be constant throughout the entire process and does not affect efficiencies or heat by-products. This might be addressed in a future release.**
 
-The required mass flow of water \(\dot{m}_{HEL,H_2O,in}\) can be determined from the supplied masses of hydrogen and oxygen and the purification losses in the water treatment unit, characterized by the fraction of purification losses \(\eta_{H_2O \ treatment}\).
-$$ \dot{m}_{HEL,H_2O,in} = \frac{\dot{m}_{HEL,H_2}  + \dot{m}_{HEL,O_2,out}}{1- \eta_{H_2O \ treatment}} $$
+### Unit dispatch
 
-**Assumption:** The electrolyser is only operated between minimum 0 % and maximum 100 % load. A specification of power above nominal power, which frequently occurs in practice, is not supported. 
+Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{unit}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The electricity input of the overall electrolyser is split across the active units in a single timestep with no losses occuring before the split. Rather, each unit individually calculates its losses from the available energy. In a similar manner the hydrogen, oxygen and heat outputs are summed over the active units with losses being considered by each.
+
+Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
+
+**Note:** The electrolyser is only operated between \(\kappa_{min}\) and maximum 100 % load. A specification of power above nominal power, which can occur in practice under certain circumstances, is not supported. The efficiency curves should take this into account. The nominal power should reflect the maximum operation point that can be sustained for several hours.
+
+The currently implemented dispatch strategies for electrolysers are:
+
+* **Equal distribution:** This spreads the load evenly across all units. This is a simplified model that ignores \(\kappa_{min,unit}\).
+* **Equal distribution with minimum power fraction:** Same as an equal distribution, however if the total \(\kappa\) is lower than \(\kappa_{min,unit}\), then a number of units are activated at a calculated \(\kappa\) to ensure the minimum restriction is observed and the demand is met.
+* **Try optimal PLR:** Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low \(\kappa\) or close to the nominal power, falls back to activating only one or all units.
 
 **Inputs and Outputs of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,HEL}\)   | electrical power requirement of the electrolyser   | [W]
-\(P_{el,HEL,supply}\)   | electrical power requirement of the electrolyser incl. losses of power electronics   | [W]
-\(\dot{m}_{HEL,H_2O,in}\)  | water mass flow fed to the electrolyser  | [kg/h]
-\(\dot{m}_{HEL,O_2,out}\)  | oxygen mass flow delivered by the electrolyser  | [kg/h]
-\(\dot{m}_{HEL,H_2}\)  | hydrogen mass flow produced by the electrolyser (before \(H_2\)-cleaning losses)  | [kg/h]
-\(\dot{m}_{HEL,H_2,out}\)  | hydrogen mass flow provided by the electrolyser (after \(H_2\)-cleaning losses)  | [kg/h]
-\(\dot{E}_{HEL,H_2}\)  | hydrogen energy flow discharged from the electrolyser (before \(H_2\)-cleaning losses) | [W]
-\(\dot{E}_{HEL,H_2,out}\)  | hydrogen energy flow provided by the electrolyser \(after (H_2\)-cleaning losses) | [W]
-\(T_{HEL,cooling,in}\)   | cooling fluid inlet temperature of electrolyser   | [°C]
-\(T_{HEL,cooling,out}\)   | cooling fluid outlet temperature of electrolyser   | [°C]
-\(\dot{Q}_{HEL,waste heat}\)  | waste heat provided by the electrolyser  | [W]
-\(\dot{Q}_{HEL,loss}\)  | thermal losses in electrolyser (unused waste heat))  | [W]
+\(P_{el}\) | electrical power requirement of the electrolyser | [W]
+\(\dot{m}_{O_2,out}\) | oxygen mass flow delivered by the electrolyser | [kg/h]
+\(\dot{m}_{H_2}\) | hydrogen mass flow produced by the electrolyser (before \(H_2\) losses) | [kg/h]
+\(\dot{m}_{H_2,out}\) | hydrogen mass flow provided by the electrolyser (after \(H_2\) losses) | [kg/h]
+\(\dot{E}_{H_2}\) | hydrogen energy flow discharged from the electrolyser (before \(H_2\) losses) | [W]
+\(\dot{E}_{H_2,out}\) | hydrogen energy flow provided by the electrolyser (after \(H_2\) losses) | [W]
+\(P_{loss,H2}\) | \(H_2\) losses | [W]
+\(\dot{Q}_{heat,high}\) | high temperature heat provided by the electrolyser | [W]
+\(\dot{Q}_{heat,low}\) | low temperature heat provided by the electrolyser | [W]
+\(\dot{Q}_{loss}\) | thermal losses (unusable waste heat) | [W]
+\(P_{losses}\) | Overall losses of the electrolyser | [W]
 
-**Parameter of the Electrolyser:**
+**Parameters of the Electrolyser:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,HEL,rated}\) | electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
-\(\eta_{HEL,H_2,start}(x_{HEL},P_{el,HEL,rated})\) | efficiency of hydrogen production of the electrolyser (\(\dot{E}_{HEL,H_2,out}\) related to \(P_{el,HEL}\) as a function of operating state, plant size and plant type at the beginning of live) | [-]
-\(\eta_{HEL,heat,start}\) | efficiency of the usable heat extraction of the electrolyser (related to \(1-\eta_{HEL,H_2}\) at the beginning of live)   | [-]
-\(\delta_{HEL,H_2}\) | linear decrease of efficiency of hydrogen production due to degradation per 10.000 full load hours, typically < 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\) 
-\(\delta_{HEL,heat}\) | linear increase of efficiency of heat production due to degradation per 10.000 full load hours, typically > 0  | \(\left [ \frac{\%-points}{\text{10.000 full load hours}}\right ]\)
-\(\eta_{HEL,LE}\) | efficiency of the power electronics of the electrolyser | [-]
-\(PL_{HEL,min}\) | minimum allowed partial load of the electrolyser | [-]
-\(MOT_{HEL}\) | minimum operating time of the electrolyser | [min]
-\(SUT_{HEL}\) | start-up time of the electrolyser until full heat supply (linear curve) | [min]
-\(CDT_{HEL}\) | cool-down time of the electrolyser from full heat supply to ambient (linear curve) | [min]
-\(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value)
+\(P_{el,rated}\) | total electric power consumption of the electrolyser under full load (operating state 100 %) | [W]
+\(N_{unit}\) | number of units that make up the electrolyser plant | [-]
+dispatch strategy | method of dispatching the units of the electrolyser to meet demand | [-]
+\(\eta_{H_2}(\kappa)\) | efficiency of hydrogen production of each unit as function of \(\kappa\) | [-]
+\(\eta_{H_2,loss}(\kappa)\) | percentage of hydrogen losses of each unit as function of \(\kappa\) | [-]
+\(\eta_{heat,high}(\kappa)\) | efficiency of high temperature heat production of each unit as function of \(\kappa\) | [-]
+\(\eta_{heat,low}(\kappa)\) | efficiency of low temperature heat production of each unit as function of \(\kappa\) | [-]
+\(\kappa_{min,unit}\) | minimum \(\kappa\) of each unit | [-]
+\(\kappa_{min}\) | minimum total \(\kappa\) of the electrolyser | [-]
+\(\kappa_{opt}\) | optimal \(\kappa\) of each unit at which \(H_2\) production is most efficient | [-]
+\(e_{H_2} \) | mass-dependent energy of hydrogen (net calorific value or gross calorific value) | [Wh/kg]
 \(v_{O_2,H_2} \) | stoichiometric mass-based ratio of oxygen and hydrogen supply during electrolysis | [kg \(O_2\) / kg \(H_2\)]
-\(\eta_{H_2 \ purification} \) | percentage of purification losses in hydrogen purification | [%]
-\(\eta_{H_2O \ treatment} \) | percentage of purification losses in water treatment | [%]
-\(p_{H_2,HEL} \) | pressure of hydrogen supply | [bar]
-\(p_{O_2,HEL} \) | pressure of oxygen supply | [bar]
-\(T_{HEL,cooling,in,max}\) | max. allowed temperature of cooling medium input | [°C]
+\(T_{heat,high}\) | cooling HT fluid outlet temperature of electrolyser | [°C]
+\(T_{heat,low}\) | cooling LT fluid outlet temperature of electrolyser | [°C]
 
+### Typical efficiency functions
+**Note:** These are exemplary values and do not imply validation or extensive research.
 
-**State variables of the Electrolyser:**
+**Constant efficiencies**
 
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{HEL}\)  | current 	operating state (on, off, part load)   | [%]
+* Adapted from a realised \(1 \ MW_e\) PEM electrolyser described in Stickel2024[^Stickel2024] from the data of 2023, a year of mostly nominal operation. Of note is that the electrolyser was still in the process of being improved. The values are thus perhaps somewhat pessimistic for the expected efficiency.
+    * \(\eta_{heat,low}(\kappa) = 0.0664\)
+    * \(\eta_{heat,high}(\kappa) = 0.161\)
+    * \(\eta_{H_2}(\kappa) = 0.617\)
+    * \(\eta_{H_2,loss}(\kappa) = 0.04\) Note: This value was estimated.
+    * \(\kappa_{min,unit} = 0.4\)
+    * \(\kappa_{min,unit} = 0.25\)
+    * \(N_{unit} = 4\)
 
+[^Stickel2024]: Matthias Walter Stickel "Technisches Monitoring & Betriebsoptimierung im Reallabor - Erzeugung von grünem Wasserstoff und Abwärmenutzung inmitten des Stadtquartiers" Poster presentation at 15. Energiewendebauen Projektetreffen (2024) Kassel, [Category D of the poster results](https://ewb.innoecos.com/Group/15.Treffen.Kassel/MediaGallery/Start/Index/66515)
 
 ## Combined heat and power plant (CHPP)
+Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
+
+A CHPP turns the energy stored in a chemical fuel into electricity and heat at a temperature usable for heating and DHW purposes. Typical examples are internal combustion engines or gas turbines. Because the outputs are not produced independently of each other, control of the CHPP has to consider one output as the target to meet while the other is a by-product that has to be consumed, stored or transported.
+
 ![Energy flow of CHPP](fig/221021_CHPP.svg)
 
-<!---
-Definition of power-to-heat ratio of CHPP:
-$$ r_{CHPP,PTH} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} = \frac{P_{el,CHPP,rated}}{\dot{Q}_{CHPP,rated}}  $$
--->
-Energy balance on CHPP:
-$$  \dot{E}_{CHPP,gas,in} = P_{el,CHPP,out} + \dot{Q}_{CHPP,out} + \dot{Q}_{CHPP,loss} $$ 
+Energy balance of a CHPP:
+$$ \dot{E}_{fuel} = P_{el} + \dot{Q}_{heat} + \dot{Q}_{loss} $$
 
-Calculation of electric power output:
-$$  P_{el,CHPP,out} = \eta_{CHPP,el} \ \dot{E}_{CHPP,gas,in}   $$ 
+The production of electricity and heat follows different efficiency curves:
 
-Calculation of thermal power output:
-$$  \dot{Q}_{CHPP,out} = \eta_{CHPP,thermal} \ \dot{E}_{CHPP,gas,in}   $$ 
+$$ P_{el} = \eta_{el}(\kappa) \cdot \dot{E}_{fuel} $$
+$$ \dot{Q}_{heat} = \eta_{heat}(\kappa) \cdot \dot{E}_{fuel} $$
 
-Calculation of thermal losses in CHPP:
-$$ \dot{Q}_{CHPP,loss} = (1-\eta_{CHPP,thermal}+\eta_{CHPP,el}) \ \dot{E}_{CHPP,gas,in} $$
+Because the nominal power \(\dot{E}_{rated}\) of a CHPP is typically either given as \(P_{el}\) or \(\dot{Q}_{heat}\) at \(\kappa = 1.0\), an efficiency curve for the fuel input (relative to either one of the outputs) is also needed. Note that this efficiency is larger than 1.0 as it relates to the amount of fuel consumed to produce a certain output, which is necessarily smaller. For example if the nominal power is given as relative to the electricity output, then the inputs and outputs are calculated with the following relations:
 
-Relation of electric and thermal power output:
-$$ P_{el,CHPP,out} = \frac{\eta_{CHPP,el}}{\eta_{CHPP,thermal}} \ \dot{Q}_{CHPP,out} =  r_{CHPP,PTH}  \ \dot{Q}_{CHPP,out}  $$
+$$ P_{el} = \kappa \cdot \dot{E}_{rated} $$
+$$ \dot{Q}_{heat} = \eta_{heat}(\kappa) \cdot P_{el} $$
+$$ \dot{E}_{fuel} = \eta_{fuel}(\kappa) \cdot P_{el} $$
 
-The part-load dependent efficiency as described in the chapter "general transient effects" can be considered as well.
+The losses are calculated as a direct result of the energy balance:
 
-**ToDo:** part-load dependent efficiency definition with heat and electricity --> two efficiency curves? One efficiency curve and the second one related to the first one?
-Part load curve e.g in Urbanucci2019[^Urbanucci2019]
+$$ \dot{Q}_{loss} = \dot{E}_{fuel} - P_{el} - \dot{Q}_{heat} $$
 
-[^Urbanucci2019]: Urbanucci, Luca; Testi, Daniele; Bruno, Joan Carles (2019): Integration of Reversible Heat Pumps in Trigeneration Systems for Low-Temperature Renewable District Heating and Cooling Microgrids. *Applied Sciences 9 (15), S. 3194.*, doi: [10.3390/app9153194](https://doi.org/10.3390/app9153194).
-
-**Inputs and Outputs of the CHPP:**
+**Inputs and Outputs of the CHPP**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(P_{el,CHPP,out}\) | electric power output of the CHPP | [W]
-\(P_{el,CHPP}\) | electric power provided by the CHPP | [W]
-\(\dot{Q}_{CHPP,out}\) | thermal power output of the CHPP | [W]
-\(\dot{E}_{CHPP,gas,in}\) | energy demand of the CHPP, natural or green gas (NCV or GCV)  | [W]
-\(\dot{Q}_{CHPP,loss}\) | thermal energy losses of the CHPP | [W]
+\(P_{el}\) | electric power output of the CHPP | [W]
+\(\dot{Q}_{heat}\) | thermal power output of the CHPP | [W]
+\(\dot{E}_{fuel}\) | fuel input power of the CHPP | [W]
+\(\dot{Q}_{loss}\) | thermal energy losses of the CHPP | [W]
+\(T_{out}\) | temperature of heat output | [°C]
 
-**Parameter of the CHPP:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(P_{el,CHPP,rated}\) | rated electric power output of the CHPP under full load (operating state 100 %) | [W]
-\(\dot{Q}_{CHPP,rated}\) | rated thermal power output of the CHPP under full load (operating state 100 %) | [W]
-\(\eta_{CHPP,thermal}(PLR)\) | thermal efficiency of CHPP, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
-\(\eta_{CHPP,el}(PLR)\) | electrical efficiency of CHPP, including self-use of electrical energy, function of PLR (regarding NCV or GCV, needs to correspond to \(\dot{E}_{CHPP,gas,in}\)) | [-]
-\(PL_{CHPP,min}\) | minimum allowed partial load of the CHPP | [-]
-\(MOT_{CHPP}\) | minimum operating time of the CHPP | [min]
-\(SUT_{CHPP}\) | start-up time of the CHPP until full heat supply (linear curve) | [min]
-\(CDT_{CHPP}\) | cool-down time of the CHPP from full heat supply to ambient (linear curve) | [min]
-
-
-**State variables of the CHPP:**
+**Parameters of the CHPP**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(x_{CHPP}\)  | current operating state of the CHPP (on, off, part load)   | [%]
+\(\dot{E}_{rated}\) | nominal power of the CHPP at \(\kappa = 1.0\) | [W]
+\(\eta_{heat}(\kappa)\) | thermal efficiency as function of \(\kappa\) | [-]
+\(\eta_{el}(\kappa)\) | electric efficiency as function of \(\kappa\) | [-]
+\(\eta_{fuel}(\kappa)\) | fuel efficiency as function of \(\kappa\) | [-]
+\(\kappa_{min}\) | minimum allowed PLR of the CHPP | [-]
+\(T_{out}\) | temperature of heat output | [°C]
+
+### Typical efficiency functions
+
+**Note:** These are exemplary values and do not imply validation or extensive research.
+
+A general overview of CHP technology can be found in Ebrahimi2015[^Ebrahimi2015].
+
+**Internal combustion engines**
+
+Relevant technologies include reciprocating / piston engines fed by natural gas or petroleum. Heat extraction is done by exhaust gas heat recovery and the motor jacketing cooling system. For engines of fairly large nominal power (\(> 1 \ MW_e\)) the motor oil / lube is also cooled and can provide additional heat output.
+
+*Adapted from Ebrahimi2015:*
+
+Piece-wise linear functions relative to fuel input.
+
+&nbsp; | Support values
+--- | ---
+\(\kappa\) | 0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0
+\(\eta_{el}\) | 0.01, 0.17, 0.25, 0.31, 0.35, 0.37, 0.38, 0.38, 0.38
+\(\eta_{heat}\) no oil | 0.8, 0.69, 0.63, 0.58, 0.55, 0.52, 0.5, 0.49, 0.49
+\(\eta_{heat}\) total | 0.93, 0.79, 0.71, 0.65, 0.61, 0.57, 0.55, 0.53, 0.53
+
+[^Ebrahimi2015]: Ebrahimi, Masood; Keshavarz, Ali (2015): 2 - CCHP Technology. In: Mohamed Abdallah El-Reedy und Ali Keshavarz (Hg.): Combined cooling, heating and power. Decision-making, design and optimization. Amsterdam, Netherlands, Oxford, UK, Waltham, MA: Elsevier, S. 35–91.
+
 
 ## Fuel boiler (FB)
 ![Energy flow of fuel boiler](fig/240429_FuelBoiler.svg)
@@ -520,23 +545,23 @@ Symbol | Description | Unit
 Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
 
 Energy balance of fuel boiler:
-$$  \dot{Q}_{FB,out} = \dot{E}_{FB,fuel,in} - \dot{Q}_{FB,loss} = \eta_{FB}(PLR) \ \dot{E}_{FB,fuel,in}   $$
+$$ \dot{Q}_{heat} = \dot{E}_{fuel} - \dot{Q}_{loss} = \eta_{heat}(\kappa) \ \dot{E}_{fuel} $$
 
 **Inputs and outputs of the FB:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{FB,out}\) | thermal power output of the FB | [W]
-\(\dot{E}_{FB,fuel,in}\) | energy demand of the FB as chemical fuel | [W]
-\(\dot{Q}_{FB,loss}\) | thermal losses of the FB | [W]
+\(\dot{Q}_{heat}\) | thermal power output of the FB | [W]
+\(\dot{E}_{fuel}\) | energy demand of the FB as chemical fuel | [W]
+\(\dot{Q}_{loss}\) | thermal losses of the FB | [W]
 
 **Parameters of the FB:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(Q_{FB,design}\) | rated thermal power output of the FB under full load (operating state 100 %) | [W]
-\(\eta_{FB}(PLR)\) | thermal efficiency of fuel boiler depending on the PLR | [-]
-\(PLR_{FB,min}\) | minimum allowed partial load of the GB | [-]
+\(\dot{Q}_{design}\) | rated thermal power output of the FB at \(\kappa = 1.0\) | [W]
+\(\eta_{heat}(\kappa)\) | thermal efficiency of fuel boiler as function of \(\kappa\) | [-]
+\(\kappa_{min}\) | minimum allowed PLR of the FB | [-]
 
 ### Typical efficiency functions
 **Note:** These are exemplary values and do not imply validation or extensive research.
@@ -545,12 +570,12 @@ Symbol | Description | Unit
 
 **Conventional gas-fired boiler**
 
-* Adapted from LeeSeo2019[^LeeSeo2019]: \(\eta(x) = 0.2822 + 2.2013 x - 2.8237 x^2 + 1.2 x^3\). Note that the coefficients in the paper do not match given values. The coefficients were adapted as we were not able to replicate the figures in the paper.
+* Adapted from LeeSeo2019[^LeeSeo2019]: \(\eta(\kappa) = 0.2822 + 2.2013 \kappa - 2.8237 \kappa^2 + 1.2 \kappa^3\). Note that the coefficients in the paper do not match given values. The coefficients were adapted as we were not able to replicate the figures in the paper.
 
 **Wood pellet boiler**
 
 * Bottom-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.5%
-* Top-feed boiler, adapted from Verma2013[^Verma2013]: 70% at PLR of 0.3, 87% at PLR of 1.0
+* Top-feed boiler, adapted from Verma2013[^Verma2013]: 70% at \(\kappa = 0.3\), 87% at \(\kappa = 1.0\)
 * Horizontal-feed boiler, adapted from Verma2013[^Verma2013]: Constant 88.25%
 
 [^LeeSeo2019]: Lee, D.Y., Seo, B.M., Yoon, Y.B. et al. Heating energy performance and part load ratio characteristics of boiler staging in an office building. Front. Energy 13, 339–353 (2019). doi: [https://doi.org/10.1007/s11708-018-0596-5](https://doi.org/10.1007/s11708-018-0596-5).
