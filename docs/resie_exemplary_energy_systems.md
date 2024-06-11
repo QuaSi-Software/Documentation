@@ -23,6 +23,19 @@ This example demonstrates how an energy system with a heat pump can be structure
 
 For a slightly more advanced version you can remove the line `"constant_cop": 3.0` from the subconfig of the heat pump. The varying temperatures of input and output are then considered in a simplified Carnot-efficiency calculation and result in a dynamic COP.
 
+## Heating and cooling demands
+![Heating and cooling demands in one energy system](fig/examples/240610_heating_and_cooling.svg)
+
+File: `examples/heating_and_cooling.json`
+
+In this example a heating and a cooling demand are satisfied by making use of the low temperature heat as the source for the heat pump supplying high temperature heat, while only the excess is removed as waste heat. The excess is elevated to a higher level so that heat exchangers can effectively remove the heat from the system. This demonstrates that a cooling demand is in fact a heat source in disguise and can be modelled as a fixed supply of low temperature heat.
+
+There is no additional heat supplier in the system, which is only possible as the cooling demand has a fairly high base load all the time and a heat storage is used to buffer peaks. This could model an office building which, in addition to room cooling, also produces waste heat from a cluster of servers.
+
+**Note:** At the moment a heat pump can supply multiple components, in this case the buffer tank and the heating demand, at the same time, but only at the higher of the two temperatures. This makes the HP less efficient than it could be as it will supply the heating demand with 70 °C heat even if the requested temperature is lower. This will likely be addressed in future updates.
+
+**Note:** At the moment the order of operations determined by ReSiE for this energy systems does not work as expected as it prioritises the second HP over the first. This is solved by manually adjusting the order of operations and importing it in the input file. This issue will likely be addressed in future updates.
+
 ## District with sector coupling
 ![Complex district energy system with multiple sectors](fig/examples/240411_multisector_district.svg)
 
