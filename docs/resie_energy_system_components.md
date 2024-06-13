@@ -594,6 +594,13 @@ Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with
 ## Biomass boiler (BB)
 Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with solid biomass fuel as input.
 
+
+## Heat exchanger
+![Energy flow of a heat exchanger](fig/240613_heat_exchanger.svg)
+
+There are many different types of heat exchangers, all of which result in different calculations when derived from first principles of thermodynamics. As detailed thermodynamics and hydraulics are not part of ReSiE's simulation model, a simplified model is used. Of the three inputs \(T_{source,in}\), \(T_{sink,in}\), \(\dot{Q}_{in}\) and three outputs \(T_{source,out}\), \(T_{sink,out}\), \(\dot{Q}_{out}\), typically \(T_{source,out}\) and \(T_{sink,in}\) remain unknown.
+
+
 ## Heat sources
 Some sources of heat, such as ground sources, require detailed models and are described in their own sections. A generic implementation for heat sources is provided, which can model any type of heat source which only provides heat, but does not take any in. Ground sources typically must be regenerated outside of the heating period and thus act as a seasonal storage of heat.
 
@@ -615,6 +622,31 @@ water | district heating network (supply only) | [Generic Heat Source](resie_ene
 air | ambient air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
 air | exhaust air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
 air | hot air absorber | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+
+
+### Generic Heat Source
+![Energy flow of a generic heat source](fig/240613_generic_heat_source.svg)
+
+Acts as a general bounded supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
+
+If the heat exchanger model is used then \(T_{sink,out} = T_{source,in} - \Delta T\), otherwise \(T_{sink,out} = T_{source,in}\). Furthermore it is assumed that the heat exchanger can always be controlled and operated in such a way that \(\dot{Q}_{in} = \dot{Q}_{out}\), meaning that losses are considered to occur on the input side and thus outside of the energy system.
+
+**Inputs and outputs:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{out}\) | thermal power output | [W]
+\(T_{source,in}\) | temperature of the input side | [°C]
+\(T_{source,in}\) | temperature of the output side | [°C]
+
+**Parameters:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{max}\) | maximum power of the heat source, either constant or from a profile | [W]
+\(T_{source,in}\) | temperature of the input side, either constant or from a profile | [°C]
+\(\Delta T\) | reduction of temperature to the output side | [K]
+
 
 ### Geothermal Probes
 
