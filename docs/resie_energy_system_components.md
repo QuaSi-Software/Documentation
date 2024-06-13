@@ -594,13 +594,27 @@ Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with
 ## Biomass boiler (BB)
 Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with solid biomass fuel as input.
 
-## Heat sources 
-### Soil
-- geothermal probes --> see below
-- geothermal collector --> see below
-- geothermal basket collector --> not included for now
-- geothermal trensh collector --> not included for now
-- geothermal spiral collector --> not included for now
+## Heat sources
+Some sources of heat, such as ground sources, require detailed models and are described in their own sections. A generic implementation for heat sources is provided, which can model any type of heat source which only provides heat, but does not take any in. Ground sources typically must be regenerated outside of the heating period and thus act as a seasonal storage of heat.
+
+**Typical sources of heat**
+
+heat medium | name | implementation
+--- | --- | ---
+ground | probes | [Geothermal Probes](resie_energy_system_components.md#geothermal-probes)
+ground | horizontal collector | [Geothermal Heat Collector](resie_energy_system_components.md#geothermal-heat-collector)
+ground | basket collector | not implemented
+ground | trensh collector | not implemented
+ground | spiral collector | not implemented
+water | groundwater well | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | surface waters | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | waste heat from industrial processes | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | waste water | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | solar thermal collector | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | district heating network (supply only) | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | ambient air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | exhaust air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | hot air absorber | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
 
 ### Geothermal Probes
 
@@ -914,26 +928,6 @@ Symbol | Description | Unit
 \(T_{\text{fl,am}}\) | Mean fluid temperature   | [°C]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
-
-
-
-
-
-
-### Water
-- groundwater well
-- surface waters: Temperature regression from measurement data: Harvey2011
-- waste heat from industrial processes
-- wastewater
-- solar thermal collector
-
-### Air 
-- ambient air
-- exhaust air
-- hot air absorber
-
-### External source
-- district heating network
 
 
 ## Chiller
