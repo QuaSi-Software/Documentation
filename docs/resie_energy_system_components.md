@@ -594,13 +594,93 @@ Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with
 ## Biomass boiler (BB)
 Modelled as [fuel boiler](resie_energy_system_components.md#fuel-boiler-fb) with solid biomass fuel as input.
 
-## Heat sources 
-### Soil
-- geothermal probes --> see below
-- geothermal collector --> see below
-- geothermal basket collector --> not included for now
-- geothermal trensh collector --> not included for now
-- geothermal spiral collector --> not included for now
+
+## Heat exchanger
+![Energy flow of a heat exchanger](fig/240613_heat_exchanger.svg)
+
+There are many different types of heat exchangers, all of which result in different calculations when derived from first principles of thermodynamics. As detailed thermodynamics and hydraulics are not part of ReSiE's simulation model, a simplified model is used. Of the three inputs \(T_{source,in}\), \(T_{sink,in}\), \(\dot{Q}_{in}\) and three outputs \(T_{source,out}\), \(T_{sink,out}\), \(\dot{Q}_{out}\), typically \(T_{source,out}\) and \(T_{sink,in}\) remain unknown. Here, "source" and "sink" stand in for the commonly called hot and cold sides of a heat exchanger.
+
+**Approximation of temperature reduction**
+
+Given the unknown variables and the number of heat exchanger variations, no definitive calculation of \(T_{sink,out}\), which is the important variable for further calculations of other components, seems possible. The simplest solution is a reduction by a fixed amount (which might be zero). A more complicated approach is based on the logarithmic mean temperature difference (LMTD), which is defined as
+
+$${LMTD} = \frac{\Delta T_A - \Delta T_B}{\ln{\Delta T_A} - \ln{\Delta T_B}}$$
+$$\Delta T_A = T_{source,in} - T_{sink,out}$$
+$$\Delta T_B = T_{source,out} - T_{sink,in}$$
+
+for a counter-current heat exchanger. Similar calculations can be made for cocurrent and cross-current heat exchangers. Setting \(\Delta T_B = \alpha \cdot \Delta T_A\) allows us to disregard the unknown variables by introducing a new one in the form of \(\alpha\), which is a measure for the temperature spread across the length of the exchange area. As heat exchangers are designed for a specific range in temperatures and mass flow, \(\alpha\) is expected to change in respect to the temperatures, becoming smaller the more \(T_{source,in}\) approaches the extreme sides of the range.
+
+This leads to the following formulation:
+
+$$T_{source,in,avg} = \frac{1}{2} \cdot (T_{source,in,max} + T_{source,in,min})$$
+$$\alpha(T_{source,in}) = 1 - \frac{abs(T_{source,in,avg} - T_{source,in})}{(T_{source,in,max} - T_{source,in,min})}$$
+$$\alpha_c = min(\alpha_{max},\ \alpha(T_{source,in}))$$
+$$T_{sink,out} = T_{source,in} - L_{min} \cdot \frac{\ln{\alpha_c^{-1}}}{1-\alpha_c}$$
+
+with \([T_{source,in,min},\ T_{source,in,max}]\) being the design temperature range and \(L_{min} \cdot \alpha_{max}^{-1}\) being the minimal reduction in temperature.
+
+**Note:** This is not a fully sound formulation, but has been deemed sufficiently accurate to values from experience.
+
+## Heat sources
+Some sources of heat, such as ground sources, require detailed models and are described in their own sections. A generic implementation for heat sources is provided, which can model any type of heat source which only provides heat, but does not take any in. Ground sources typically must be regenerated outside of the heating period and thus act as a seasonal storage of heat.
+
+**Typical sources of heat**
+
+heat medium | name | implementation
+--- | --- | ---
+ground | probes | [Geothermal Probes](resie_energy_system_components.md#geothermal-probes)
+ground | horizontal collector | [Geothermal Heat Collector](resie_energy_system_components.md#geothermal-heat-collector)
+ground | basket collector | not implemented
+ground | trensh collector | not implemented
+ground | spiral collector | not implemented
+water | groundwater well | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | surface waters | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | waste heat from industrial processes | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | waste water | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | solar thermal collector | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+water | district heating network (supply only) | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | ambient air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | exhaust air | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+air | hot air absorber | [Generic Heat Source](resie_energy_system_components.md#generic-heat-source)
+
+
+### Generic Heat Source
+![Energy flow of a generic heat source](fig/240613_generic_heat_source.svg)
+
+Acts as a general bounded supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
+
+The heat exchanger can be modelled with a constant temperature reduction, a LMTD-based approach or no reduction at all.
+
+$$
+T_{sink,out} = \begin{cases}
+    T_{source,in} &\text{for no reduction} \\[5pt]
+    T_{source,in} - \Delta T &\text{for constant reduction} \\[5pt]
+    T_{source,in} - L_{min} \cdot \frac{\ln{\alpha_c^{-1}}}{1-\alpha_c} &\text{for LMTD-based reduction} \\
+\end{cases} \\
+$$
+
+Furthermore it is assumed that the heat exchanger can always be controlled and operated in such a way that \(\dot{Q}_{in} = \dot{Q}_{out}\), meaning that losses are considered to occur on the input side and thus outside of the energy system.
+
+**Inputs and outputs:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{out}\) | thermal power output | [W]
+\(T_{source,in}\) | temperature of the input side | [°C]
+\(T_{source,in}\) | temperature of the output side | [°C]
+
+**Parameters:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{max}\) | maximum power of the heat source, either constant or from a profile | [W]
+\(T_{source,in}\) | temperature of the input side, either constant or from a profile | [°C]
+`reduction model` | which reduction model to use | [-]
+\(\Delta T\) | constant reduction of temperature to the output side | [K]
+\(T_{source,in,min}\) | minimal temperature of the design range | [°C]
+\(T_{source,in,max}\) | maximal temperature of the design range | [°C]
+\(L_{min}\) | minimal reduction of temperature (plus \(\alpha\)-correction) | [K]
+
 
 ### Geothermal Probes
 
@@ -914,26 +994,6 @@ Symbol | Description | Unit
 \(T_{\text{fl,am}}\) | Mean fluid temperature   | [°C]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
-
-
-
-
-
-
-### Water
-- groundwater well
-- surface waters: Temperature regression from measurement data: Harvey2011
-- waste heat from industrial processes
-- wastewater
-- solar thermal collector
-
-### Air 
-- ambient air
-- exhaust air
-- hot air absorber
-
-### External source
-- district heating network
 
 
 ## Chiller

@@ -41,6 +41,7 @@
 | JSON         | JavaScript Object Notation [data format]                                    |
 | K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
+| LMTD         | Logarithmic mean temperature difference                                     |
 | MOT          | Minimum Operation Time                                                      |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
 | NFA          | Net floor area (NRF) of a building                                          |

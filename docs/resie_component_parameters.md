@@ -472,6 +472,55 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 
 ## Heat sources and sinks
 
+### Generic heat source
+| | |
+| --- | --- |
+| **Type name** | `GenericHeatSource`|
+| **File** | `energy_systems/heat_sources/generic_heat_source.jl` |
+| **Available models** | `simplified` (default) |
+| **System function** | `bounded_source` |
+| **Medium** | `medium`/`None` |
+| **Input media** | |
+| **Output media** | `None`/`auto` |
+| **Tracked values** | `OUT`, `Max_Energy`, `Temperature_src_in`, `Temperature_snk_out` |
+
+A generic heat source for various sources of heat.
+
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
+
+| Name | Type | R/D | Example | Description |
+| ----------- | ------- | --- | ------------------------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `temperature_reduction_model` | `String` | Y/Y | `none` | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
+| `min_source_in_temperature` | `Float` | N/N | -10.0 | Minimum source input temperature. |
+| `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
+| `minimal_reduction` | `Float` | N/Y | 2.0 | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
+
+**Examplary input file definition**
+
+```JSON
+"TST_SRC_01": {
+    "type": "GenericHeatSource",
+    "medium": "m_h_w_lt1",
+    "control_refs": [],
+    "output_refs": [
+        "TST_BUS_TH_01"
+    ],
+    "max_power_profile_file_path": "./profiles/tests/source_heat_max_power.prf",
+    "temperature_profile_file_path": "./profiles/examples/general/src_heat_temp_var_avg25.prf",
+    "temperature_reduction_model": "lmtd",
+    "min_source_in_temperature": 5,
+    "max_source_in_temperature": 35,
+    "scale": 2000
+}
+```
+
+
 ### Geothermal probes
 | | |
 | --- | --- |
