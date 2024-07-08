@@ -161,7 +161,7 @@ Interdependencies occur when there are allowed connections between two branches 
 There are some constellations of transformers that cause problems when determining the order of operation with the above algorithm. If a simulation gives an unexpected result, this may be due to an incorrect calculation order. It can then help to use the order output in auxiliary_info as the basis for a custom-defined `order_of_operation` in the input file that can map the energy system correctly (see [this section](../resie_input_file_format/#order-of-operation)). If calculation time does not matter much, it may be possible to achieve an optimal calculation result by adding further potential steps. The following lists a 
 non-exhaustive collection of these problematic constellations:
 
--   A middle bus or middle transformer that is part of a parallel branch may cause problems at the moment for the automated generation of the order of operation. Although, it should be possible to simulate these energy systems with a custom order.
+-   A middle bus or middle transformer that is part of a parallel branch may cause problems for the automated generation of the order of operation. Although, it should be possible to simulate these energy systems with a custom order.
   
 <center>![Middle Transformer in parallels](fig/240708_transformer_chain_ooo_problematic_systems_MT_in_parallel.svg)</center>
 
