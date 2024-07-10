@@ -42,10 +42,13 @@
 | K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | LMTD         | Logarithmic mean temperature difference                                     |
+| MB           | Middle Bus                                                                  |
 | MOT          | Minimum Operation Time                                                      |
+| MT           | Middle Transformer                                                          |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
 | NFA          | Net floor area (NRF) of a building                                          |
 | OH           | Oil Heating                                                                 |
+| PB           | Parallel Branch                                                             |
 | PLF          | Part Load Factor                                                            |
 | PLR          | Part Load Ratio                                                             |
 | PTES         | Pit Thermal Energy Storage                                                  |
