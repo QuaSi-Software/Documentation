@@ -96,14 +96,16 @@ The simulation steps for each component are:
 
 * `Reset`: Reset values for the next time step.
 * `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, if these are already known at this point.
-* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. No energy is processed in this step.
+* `Potential`: Calculates the potential energy that can be processed by a transformer. This is necessary when several transformers are connected directly or through busses, as this might lead to multiple solutions of how to operate the transformers. No energy is processed in this step.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
 * `Distribute`: For bus components, distribute energy supplied and requested by each connected component and calculate the energy transfered between connected busses.
 
 ### Determining order of operations
 
-For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
+For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. **Note:** In the following "order of operations" and "order of operation" is used as they describe the same concept albeit with slightly different meaning.
+
+Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
@@ -116,16 +118,13 @@ For each component of the energy system some or all of the simulation steps are 
     6. `Load`: `Storage`
     7. `Process`:  `Bounded source`, `Bounded sink` 
     8. `Distribute`: `Bus`
-
-
-
-1. Reorder the `Process` and `Potential` operations of each component connected to a bus so that it matches the bus' input priorities.
-2. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
-3. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
+2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is also technically not a rearrangement, as it happens during establishing the base order.
+4. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
+5. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
 
 The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:
 ![Illustration of the base order of operation](fig/230515_base_OoO.svg)
-[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review**
+[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series*
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 
