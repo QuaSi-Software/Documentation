@@ -170,6 +170,9 @@ non-exhaustive collection of these problematic constellations:
 <center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MTs.svg)</center>
 
 - Energy systems without a connection to any grid (insular system) may not find an optimal solution at the point where the storages are empty! Adding a grid in the simulation can help to find a suitable order of operation and an appropriate solution of the simulation. The grid input/output can then be seen as necessary energy balancing required to operate the insular system in a stable manner.
+- Energy systems with multiple middle busses with heat sources of different temperatures in the rear MB used by a heat pump can cause problems in the calculation. The branches of the rear MB should be calculated forward to make sure that the rear heat pump knows the available energy and the temperatures. However, due to the interconnected nature of these middle buses, the rear MB is calculated in reverse in order to allow information to propagate to the first MB. Unfortunately, this order can lead to balance errors. These errors occur because the rear heat pump, which operates based on different COPs, doesn't have prior knowledge of the available energy during its potential step. It assumes that it will receive all the necessary energy at the temperature prioritized as the highest input. A custom order may help to solve this.
+<center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MBs.svg)</center>
+
 
 ### Bus chains
 
