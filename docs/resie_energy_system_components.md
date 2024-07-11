@@ -700,9 +700,9 @@ The general g-function approach was introduced by Eskilson.[^Eskilson] The curre
 
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
-$$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_s} \; g(t)\ $$
+$$ T_B = T_{s,u} + \frac{\tilde{q}_{in,out}}{2\pi\lambda_{soil}} \; g(t)\ $$
 
-where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_s\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time \(t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
+where \(T_{s,u}\) is the undisturbed ground temperature, \(\lambda_{soil}\) is the heat conductivity of the soil and \(g(t)\) the pre-calculated g-function value at the current simulation time \(t\). \(\tilde{q}_{in,out}\) can be calculated with the total heat extraction rate for one single probe \(\dot{Q}_{in,out}\), which is constant over each time step, and with the probe depth \(h_{\text{probe}}\). \(\dot{Q}_{in,out}\) is considered to be uniform over the entire depth of the probe. 
 
 $$ \tilde{q}_{in,out} = \frac{\dot{Q}_{in,out}}{h_{\text{probe}}}\ $$
 
@@ -710,7 +710,7 @@ Since the heat extraction or injection rate varies with each time step, a superp
 
 [^Özisik]: Özisik, M.N. Heat conduction. New York: Wiley-Interscience, 1980. ISBN 047105481X
 
-$$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_s} \; g(t_n - t_{i-1}) \right]\ $$
+$$ T_B = T_{s,u} + \sum_{i=1}^n \left[ \frac{\tilde{q}_{in,out,i} - \tilde{q}_{in,out,i-1}}{2\pi\lambda_{soil}} \; g(t_n - t_{i-1}) \right]\ $$
 
 The undisturbed ground temperature \(T_{s,u}\) can be assumed as a constant value averaged over the probe depth. With the assumption of a thermal borehole resistance \(R_{B}\) between the borehole wall and the circulating fluid, an average fluid temperature \(T_{\text{fl,avg}}\) can be calculated from the borehole temperature. The calculation approach of the thermal borehole resistance will be discussed in more detail later. 
 
@@ -768,19 +768,19 @@ The first key contains the number of probes in x and y direction, while the numb
 All considered heat transfer processes within a borehole are summarized in the thermal borehole resistance, which is used to calculate a fluid temperature from a borehole temperature. The calculation of the thermal borehole resistance for the determination of the average fluid temperature \(T_{\text{fl,avg}}\) in ReSiE is based on an approach by Hellström1991[^Hellström]: 
 [^Hellström]: G. Hellström, Ground Heat Storage: Thermal Analyses of Duct Storage Systems. Theorie. University of Lund, 1991.
 
-$$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_F}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma \; ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_F \beta}{1-2 \pi \lambda_F \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
+$$ R_B = x \left[\beta + \frac{1}{2 \pi \lambda_{filling}}\left[ln\left( \frac{r_B^2}{2 r_{0,outer}r_D}\right)+\sigma \; ln\left( \frac{r_B^4}{p}\right)-\frac{\frac{r_{0,outer}^2}{4 r_D^2}\left(1-\sigma \frac{4 r_D^4}{p}\right)^2}{\frac{1+2\pi \lambda_{filling} \beta}{1-2 \pi \lambda_{filling} \beta}+\frac{r_{0,outer}^2}{4 r_D^2}\left(1+ \sigma \frac{16 r_B^4 r_D^4}{p^2}\right)}\right]\right] $$
 
 with the following substitutions:
 
-$$ \beta = \frac{1}{2\pi\alpha_i r_{0,inner}} + \frac{1}{2\pi\lambda_R}\ln\left(\frac{r_{0,outer}}{r_{0,inner}}\right)\ $$
-$$ \sigma = \frac{\lambda_F - \lambda_{soil}}{\lambda_F + \lambda_{soil}}\ $$
+$$ \beta = \frac{1}{2\pi\alpha_i r_{0,inner}} + \frac{1}{2\pi\lambda_{pipe}}\ln\left(\frac{r_{0,outer}}{r_{0,inner}}\right)\ $$
+$$ \sigma = \frac{\lambda_{filling} - \lambda_{soil}}{\lambda_{filling} + \lambda_{soil}}\ $$
 $$ p = r_B^4 - r_D^4 $$
 $$ x = \begin{cases}
                  \frac{1}{2} & \text{for U-probe} \\ 
                  \frac{1}{4} & \text{for double-U-probe} 
         \end{cases} $$
 
-where \(\lambda_F\) is the thermal conductivity of the backfill material, \(r_{0,outer}\) is the outer radius of a probe tube, \(r_{0,inner}\) is the inner radius of a probe tube, \(r_{B}\) is the borehole radius, \(r_{D}\) is the distance between the two adjacent probe tubes, \(\alpha_{i}\) is the heat transfer coefficient on the inside of the tube (see the calculation below), and \(\lambda_{soil}\) is the thermal conductivity of the soil.
+where \(\lambda_{filling}\) is the thermal conductivity of the backfill material, \(r_{0,outer}\) is the outer radius of a probe tube, \(r_{0,inner}\) is the inner radius of a probe tube, \(r_{B}\) is the borehole radius, \(r_{D}\) is the distance between the two adjacent probe tubes, \(\alpha_{i}\) is the heat transfer coefficient on the inside of the tube (see the calculation below), and \(\lambda_{soil}\) is the thermal conductivity of the soil.
 
 Energies are transferred between the coupled components in ReSiE, but not volume flows. For this reason, an average power is calculated at the beginning of each time step on the basis of the energy extracted within the known time step width.
 The spread of the heat transfer fluid is assumed to be constant during the operation. On the basis of the average heat energy input or output within the current time step, a mass flow can be calculated using the following equation, whereby this is halved in the case of an double U-probe.
@@ -823,14 +823,17 @@ $$ Nu = \begin{cases}
         \end{cases} $$
 
 Based on the calculated Nußelt number, the heat transfer coefficient on the inside of the tube is calculated and with this, the thermal borehole resistance \(R_B\) (see above) can be determined:
-$$ \alpha_i = \frac{\lambda_{\text{fl}} \; Nu}{D_i} $$
+$$ \alpha_i = \frac{\lambda_{fluid} \; Nu}{D_i} $$
 
 [^Gielinski1995]:  V. Gnielinski: Ein neues Berechnungsverfahren für die Wärmeübertragung im Übergangsbereich zwischen laminarer und turbulenter Rohrströmung. Forsch. Ing.wes. 61:240–248, 1995.
 
 Symbol | Description | Unit
 -------- | -------- | --------
 \(\alpha_{i}\) |heat transfer coefficient inside the tube| \([\frac{W}{m^2 K}]\)
-\(\lambda_s\) | heat conductivity of soil | \([\frac{W}{mK}]\)
+\(\lambda_{soil}\) | thermal conductivity of soil | \([\frac{W}{mK}]\)
+\(\lambda_{filling}\) | thermal conductivity of the backfill material | \([\frac{W}{mK}]\)
+\(\lambda_{fluid}\) | thermal conductivity of fluid | \([\frac{W}{mK}]\)
+\(\lambda_{pipe}\) | thermal conductivity of the pipe | \([\frac{W}{mK}]\)
 \(\nu_{\text{fl}}\)  |kinematic viscosity of the fluid | \([\frac{m^{2}}{s}]\)
 \(\rho_{\text{fl}}\) |density of the fluid | \([\frac{kg}{m^{2}}]\)
 \(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | \([K]\)

@@ -67,6 +67,9 @@
 *[TRY]:     Test Reference Year
 *[VS Code]: Visual Studio Code
 *[EED]:     Energy Earth Designer (software)
+*[MB]:      Middle Bus
+*[MT]:      Middle Transformer
+*[PB]:      Parallel Branch
 
 
 
