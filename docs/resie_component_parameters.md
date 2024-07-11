@@ -95,7 +95,7 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
 | `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General bounded supply
 | | |
@@ -122,7 +122,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
 | `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Bus
 | | |
@@ -169,7 +169,7 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
 | `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### General demand
 | | |
@@ -203,7 +203,7 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
 | `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
-Note that either `temperature_profile_file_path`, `static_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ### Grid connection
 | | |
@@ -215,15 +215,20 @@ Note that either `temperature_profile_file_path`, `static_temperature` **or** `t
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum` |
+| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum`, `Temperature` |
 
-Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary.
+Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file).
 
 If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulutative value.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `is_source` | `Boolean` | Y/Y | `True` | If true, the grid connection acts as a source. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
+| `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
+| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
 ## Other sources and sinks
 
