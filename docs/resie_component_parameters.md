@@ -71,6 +71,14 @@ Because not all functions are (easily) invertible a numerical approximation of t
 ### Control modules
 For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
 
+Some parameters specify behaviour of multiple modules on the same component as well as other control behaviour of the component. As the `control_modules` subconfig is a list and cannot hold parameters, these are specified in the `control_parameters` subconfig. In addition to [the storage un-/loading flags](resie_component_parameters.md) these general control parameters are:
+
+| | |
+| --- | --- |
+| **aggregation_plr_limit** | How the upper PLR limit is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
+| **aggregation_charge** | How the charging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+| **aggregation_discharge** | How the discharging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+
 #### Economical discharge
 Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
 
