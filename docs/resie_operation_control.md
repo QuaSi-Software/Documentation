@@ -46,37 +46,33 @@ The following described the currently implemented control modules. The required 
 
 ## State machines
 
-State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
+Some control modules make use of state machines in their calculation. State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
 
-<center>![Example of a state machine with two states](fig/example_state_machine.png)</center>
+<center>![Example of a state machine with two states](fig/240718_example_state_machine.svg)</center>
 
-The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions. When the state machine is checked to advance its state[^2] and the expression of a transition evaluates as true, it is followed to the new state.
+The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions as compared to symbols in the input alphabet in the common definition. When the state machine is checked to advance its state and the expression of a transition evaluates as true, it is followed to the new state.
 
 One addition to the common concept of a state machine is that the implementation in ReSiE keeps track of how many steps a state machine was in the current state.
 
-[^2]: Usually this happens once a simulation step for each state machine, but in the general definition of a state machine this is not time-dependant and works on "turns".
-
 ### Conditions
 
-The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which components it needs access. As the specific components are not defined before the project is loaded, these requirements affect the type and possibly the medium of the components, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizable parameters with default values.
+The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. The information they require for evaluation is defined in the parameters of the control module making use of the state machine. Apart from scalar parameter values such as thresholds, the conditions might require being linked to other components so current values can be requested from them.
 
 The example above uses three different conditions:
 
-* `BT >= X%`: Checks if a linked buffer tank is above X% capacity.
-* `BT < X%`: Checks if a linked buffer tank is below X% capacity.
-* `Min. run time`: Checks if the component the state machine controls has been in the current state for longer or equal than its minimum run time.
-
-To make sure that the buffer tank is not overfilled, the component linked to this buffer checks this condition itself during each timestep by comparing the free storage space and the possible energy that could be delivered to the buffer tank while considering the minimum partial load of the component. Therefore, this condition is not included in the state machine.  
+* `tank load >= 90%`: Checks if the load of the linked buffer tank is above 90% of its capacity.
+* `tank load < 30%`: Checks if the load of the linked buffer tank is below 30% of its capacity.
+* `run time >= min. run time`: Checks if the state machine has been in the current state for longer than the defined minimum run time.
 
 ### Truth table
 
 The transitions for each state are defined using a truth table over the conditions involved, resulting in a new state (which may result in the current state again). This has the advantage that is covers every possible case implicitly, but also has the disadvantage that this might result in large truth tables for state machines with many conditions.
 
-| **BT >= X%** | **Min. run time** | **New state** | 
+| **tank load >= 90%** | **Min. run time** | **New state** |
 | --- | --- | --- |
 | true | true | Off |
 | false | true | Fill tank |
 | true | false | Fill tank |
 | false | false | Fill tank |
 
-The example above shows the truth table used for the state "Fill tank", which has two conditions. In this case, the buffer tank should be filled exept of the case where both the minimum run time has reached and the buffer tanks is filled above the defined upper load state. The condition to not overfill the buffer tank is handled by each component during each time step and not by the state machine.
+The example above shows the truth table used for the state "Fill tank", which has two conditions. The state machine will stay in the current state until both conditions are true, in which case the new state will be "Off".
