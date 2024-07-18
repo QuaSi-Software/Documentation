@@ -68,6 +68,49 @@ Three different function models are implemented:
 
 Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance. In particular if a piece-wise linear interpolation is used it makes sense to use the same number of discretization steps so that the support values overlap for both the efficiency function and its inverse.
 
+### Control modules
+For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
+
+#### Economical discharge
+Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
+
+**Note:** At the moment there is no mechanism to prevent the battery to be fully discharged in a single timestep. This will be changed in a future update.
+
+This module is implemented for the following component types: `Battery`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `economical_discharge` |
+| **pv_threshold** | Treshold of the PV plant below which discharge is allowed. Absolute value in Wh. |
+| **min_charge** | The minimum charge level required for discharge to be allowed. Defaults to `0.2`. |
+| **discharge_limit** | The charge level to which the battery is discharged, below which discharge is stopped. Defaults to `0.05` |
+| **pv_plant_uac** | The UAC of the PV plant that is linked to the module. |
+| **battery_uac** | The UAC of the battery to which the module is attached. |
+
+#### Profile limited
+Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
+
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `profile_limited` |
+| **profile_path** | File path to the profile with the limit values. Must be a `.prf` file. |
+
+#### Storage-driven
+Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
+
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `storage_driven` |
+| **low_threshold** | The storage charge threshold below which operation is turned on. Defaults to `0.2`.
+| **high_treshold** | The storage charge threshold above which operation is turned off. Defaults to `0.95`.
+| **min_run_time** | Minimum run time for the "on" state. Absolute value in seconds. Defaults to `1800`.
+| **storage_uac** | The UAC of the storage component linked to the module.
+
+
 ## Boundary and connection components
 
 ### General bounded sink
