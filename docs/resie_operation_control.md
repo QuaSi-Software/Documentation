@@ -9,23 +9,7 @@ Because the general calculation of energies of components might require informat
 Each component is assigned a controller that handles general mechanisms of control and updates any [control modules](resie_operation_control.md#control-modules) that might be attached to the component.
 
 ### Storage un-/loading flags
-All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `control_parameters` entry of the component parameter specification (compare [component specification](resie_input_file_format.md#components)). Here are exemplary parameters for a `BoundedSupply`:
-
-```json
-{
-    "uac": "TST_SRC_01",
-    "type": "BoundedSupply",
-    "medium": "m_h_w_lt1",
-    ...
-    "control_parameters": {
-        "load_storages m_h_w_lt1": false
-    }
-}
-```
-
-This would result in the energy the source supplies not being used to fill storages. The name of the `load_storages medium` parameter must match the name of the medium of the input/output in question. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The medium name might also be set directly, for example with `m_heat_in` for a `HeatPump`.
-
-Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `control_parameters` entry of the component parameter specification (compare [component specification](resie_component_parameters.md#storage-un-loading)). Similarly, components can be configured to be dis-/allowed to draw energy from storages. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
 ### Consideration of interfaces for the potential step
 Transformer components perform fairly complex calculations of their operation in the `potential` step (which is repeated in the `process` step). As part of this calculation they check how much energy is available on each of their input/output interfaces. Due to this complexity it is in rare cases necessary to specify that a particular input/output shouldn't be taken into account. This can be controlled with parameters in the `control_parameters` entry of the component configuration.

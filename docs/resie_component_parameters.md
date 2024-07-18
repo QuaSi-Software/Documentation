@@ -33,23 +33,23 @@ The name of the entries should match the keys in the input file, which is carrie
 The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. In general, a temperature of `Nothing` implies that any temperature is accepted and only the amount of energy is revelant. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
 ### Storage un-/loading
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. Here are exemplary parameters for a `BoundedSupply`:
 
-All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists as direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `strategy` part of the parameter specification (compare [component specification](resie_input_file_format.md#components)). Here are exemplary parameters for a bounded supply:
-
-```
+```json
 {
     "uac": "TST_SRC_01",
     "type": "BoundedSupply",
     "medium": "m_h_w_lt1",
     ...
-    "strategy": {
-        "name": "default",
+    "control_parameters": {
         "load_storages m_h_w_lt1": false
     }
 }
 ```
 
-This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling, if components can draw energy from storages, the corresponding `unload_storages medium` parameter can be used.
+This would result in the output of the source not being used to fill storages. The name of the `load_storages medium` parameter must match the name of the medium of the input/output in question. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The medium name might also be set directly, for example with `m_heat_in` for a `HeatPump`.
+
+Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
 ### Efficiency functions
 Various components, particularly transformers, require an efficiency function to determine how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping a part-load ratio on [0,1] to an efficiency factor.
