@@ -33,23 +33,23 @@ The name of the entries should match the keys in the input file, which is carrie
 The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. In general, a temperature of `Nothing` implies that any temperature is accepted and only the amount of energy is revelant. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
 ### Storage un-/loading
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. Here are exemplary parameters for a `BoundedSupply`:
 
-All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists as direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `strategy` part of the parameter specification (compare [component specification](resie_input_file_format.md#components)). Here are exemplary parameters for a bounded supply:
-
-```
+```json
 {
     "uac": "TST_SRC_01",
     "type": "BoundedSupply",
     "medium": "m_h_w_lt1",
     ...
-    "strategy": {
-        "name": "default",
+    "control_parameters": {
         "load_storages m_h_w_lt1": false
     }
 }
 ```
 
-This would result in the energy the source supplies not being used to fill storages. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The `load_storages medium` parameter must match the name of the medium of the input/output, however that is set or derived. For controlling, if components can draw energy from storages, the corresponding `unload_storages medium` parameter can be used.
+This would result in the output of the source not being used to fill storages. The name of the `load_storages medium` parameter must match the name of the medium of the input/output in question. The medium name `m_h_w_lt1` is, in this case, derived from the parameter `medium`. The medium name might also be set directly, for example with `m_heat_in` for a `HeatPump`.
+
+Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
 ### Efficiency functions
 Various components, particularly transformers, require an efficiency function to determine how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping a part-load ratio on [0,1] to an efficiency factor.
@@ -67,6 +67,57 @@ Three different function models are implemented:
 * pwlin: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
 
 Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance. In particular if a piece-wise linear interpolation is used it makes sense to use the same number of discretization steps so that the support values overlap for both the efficiency function and its inverse.
+
+### Control modules
+For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
+
+Some parameters specify behaviour of multiple modules on the same component as well as other control behaviour of the component. As the `control_modules` subconfig is a list and cannot hold parameters, these are specified in the `control_parameters` subconfig. In addition to [the storage un-/loading flags](resie_component_parameters.md) these general control parameters are:
+
+| | |
+| --- | --- |
+| **aggregation_plr_limit** | How the upper PLR limit is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
+| **aggregation_charge** | How the charging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+| **aggregation_discharge** | How the discharging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+
+#### Economical discharge
+Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
+
+**Note:** At the moment there is no mechanism to prevent the battery to be fully discharged in a single timestep. This will be changed in a future update.
+
+This module is implemented for the following component types: `Battery`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `economical_discharge` |
+| **pv_threshold** | Treshold of the PV plant below which discharge is allowed. Absolute value in Wh. |
+| **min_charge** | The minimum charge level required for discharge to be allowed. Defaults to `0.2`. |
+| **discharge_limit** | The charge level to which the battery is discharged, below which discharge is stopped. Defaults to `0.05` |
+| **pv_plant_uac** | The UAC of the PV plant that is linked to the module. |
+| **battery_uac** | The UAC of the battery to which the module is attached. |
+
+#### Profile limited
+Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
+
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `profile_limited` |
+| **profile_path** | File path to the profile with the limit values. Must be a `.prf` file. |
+
+#### Storage-driven
+Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
+
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `storage_driven` |
+| **low_threshold** | The storage charge threshold below which operation is turned on. Defaults to `0.2`.
+| **high_treshold** | The storage charge threshold above which operation is turned off. Defaults to `0.95`.
+| **min_run_time** | Minimum run time for the "on" state. Absolute value in seconds. Defaults to `1800`.
+| **storage_uac** | The UAC of the storage component linked to the module.
+
 
 ## Boundary and connection components
 

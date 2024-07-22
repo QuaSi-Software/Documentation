@@ -161,23 +161,28 @@ The specification for the components involved in the simulation is the most comp
 "components": {
     "TST_01_HZG_01_CHP": {
         "type": "CHPP",
-        "control_refs": ["TST_01_HZG_01_BFT"],
         "output_refs": [
             "TST_01_HZG_01_BUS",
             "TST_01_ELT_01_BUS"
         ],
-        "strategy": {
-            "name": "storage_driven",
-            "high_threshold": 0.9,
-            "low_threshold": 0.2
+        "control_parameters": {
+            "load_storages m_e_ac_230v": false
         },
-        "power_gas": 12500,
+        "control_modules": [
+            {
+                "name": "storage_driven",
+                "high_threshold": 0.9,
+                "low_threshold": 0.2,
+                "min_run_time": 3600,
+                "storage_uac": "TST_01_HZG_01_BFT"
+            }
+        ],
+        "power_el": 12500,
         "m_heat_out": "m_h_w_ht1"
     },
     "TST_01_HZG_01_BUS": {
         "type": "Bus",
         "medium": "m_h_w_ht1",
-        "control_refs": [],
         "connections": {
             "input_order": [
                 "TST_01_HZG_01_CHP",
@@ -199,15 +204,18 @@ The specification for the components involved in the simulation is the most comp
 }
 ```
 
-The specification is a map mapping a component's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in the chapter on the various types. In the following we discuss the parameters common to most or all types.
+The specification is a map mapping a component's UAC to the parameters required for initialization of that component. Parameters specific to the type of the component can be found in [the chapter on the various types](resie_component_parameters.md). In the following we discuss the parameters common to most or all types.
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also [this explanation](resie_energy_systems.md#energy-media)).
-* `control_refs` (`List{String}`): A list of UACs of components that are required for performing control calculations.
 * `output_refs` (`List{String}`, non-Busses only): A list of UACs of other components to which the component outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
-* `strategy` (`String`): Parameters for the operation strategy of the component. Specific parameters depend on implementation and can be found in [this chapter](resie_operation_control.md). The `strategy` entry can be omitted from the component entry, in which case a default strategy is used. If it is given, must contain at least the entry `name`, which must match exactly the internal name of a strategy or `default`. This sub-config is also used to specify [storage un-/loading control](resie_component_parameters.md#storage-un-loading).
+* `control_parameters` (`Dict{String,Any}`): Parameters of the control and operational strategy of the component. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations. This entry can be omitted.
+* `control_modules` (`List{Dict{String,Any}}`): List of control modules, where each entry holds the required parameters for that module. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations on control modules. This list can be omitted if no module is activated for the component.
 * `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
-* `connections` (`Dict{String, Any}`, Busses only): Configuration of the connections of components over a bus. Sub-configs are:
+
+The following parameter entries are for `Bus` components only:
+
+* `connections` (`Dict{String, Any}`): Configuration of the connections of components over a bus. Sub-configs are:
     * `output_order` (`List{String}`): Similar to the entry `output_refs`, however the order of UACs in this list corresponds to the output priorities of components on the bus with entries at the beginning being given the highest priority and receiving energy first.
     * `input_order` (`List{String}`): Similar to the entry `output_order` but for the inputs on the bus.
     * `energy_flow` (`List{List{Int}}`): A matrix that defines which components are allowed to deliver energy to which other components. Rows correspond to the inputs and columns to outputs of the bus, both in the order defined in the entries `input_order` and `output_order`. The numbers should be 1 if the energy flow from the input (row) to the output (column) is allowed or 0 if it is not. No other numbers should be used. The following figure illustrates the principle of the `energy_flow` matrix on the basis of a bus with a CHP, a heat pump, a storage and a demand component. Only the heat pump is allowed to load the storage, while all three inputs (including storage) are allowed to deliver energy to the demand.
