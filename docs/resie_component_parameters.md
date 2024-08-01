@@ -413,7 +413,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Losses`, `MixingTemperature_Input`, `MixingTemperature_Output` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
@@ -476,7 +476,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
 
@@ -587,7 +587,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `fluid_reynolds_number` |
+| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `current_input_temperature`, `fluid_reynolds_number` |
 
 A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 

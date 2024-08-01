@@ -1,6 +1,6 @@
 # Energy systems
 
-In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban strict of two buildings is shown in the figure below.
+In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban district of two buildings is shown in the figure below.
 
 ![A multi-sector example energy system](fig/example_energy_system.svg)
 
@@ -195,3 +195,18 @@ Given that energy can only flow in one direction in such a chain, the entire cha
 <center>![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
 
 Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</center>
+
+
+## Bus and interface functionalities with temperature layers
+
+The general purpose and functionality of interfaces in a simple one-to-one connection between two components have already been described above. However, when multiple interfaces connect several components using a bus as an intermediate distributor, the system becomes more complex. Interfaces must not only transfer information about demands and sources but also convey the maximum energy determined during the transformer's potential step and the actual energy during the process step.
+
+The complexity increases further when heat pumps are involved, as interfaces must handle different temperature levels simultaneously. This is somewhat contrary to the general definition of media, which typically represent one temperature per time step. For example, consider a heat pump connected to two sources with different supply temperatures and two demands, each with different demand temperatures as shown in the figure below. Since a heat pump cannot send two temperatures simultaneously via an interface, the model abstracts this operation by splitting it within a time step. For instance, within a 15-minute time step, the heat pump might provide a high temperature for hot water for 5 minutes and a low temperature for underfloor heating for 10 minutes. At the same time, it can draw energy from two sources at different temperatures, resulting in various COPs based on the composition of the individual input and output layers. This results in an average mixing temperature over the current time step for the input and output interfaces based on the current distribution of energy flows and their temperatures.
+
+<center>![Temperature layer of heat pump with multiple sources and demands](fig/240730_temperature_layer.svg)</center>
+
+During the potential step, the maximum required and available energies at the respective temperatures are calculated and written to the interface. The interface then forwards this information to the bus, which stores the information and allocates the energy to other components. The method can also be used to override the priorities on the bus, which are set to a constant ordering for the entire simulation. This allows the heat pump to determine during its potential and process steps from which source it draws energy in the current time step, regardless of the priorities on the bus.
+
+If there are other transformers in the list of sources or sinks that have not yet been calculated at the time of the heat pump's potential step, the heat pump might lack complete information for its calculations. This is shown in the modified example from above in the figure below. While the temperatures are written during the control step and non-transformer components also write their maximum energy in this step, the energies of transformers are only calculated later during the potential or process step. To address this, a mechanism allows the heat pump to determine how much energy it could supply or take for each temperature, regardless of the current energy distribution to other inputs or outputs. The bus handles any excess energy by linearly reducing the theoretically maximum possible energy at other temperatures proportionally when energy is called up at one temperature. This ensures a closed-loop step-by-step calculation, even with incomplete information. Full information (energies and temperatures) must be available at least for the input or output, which should be ensured by the algorithm determining the order of operations.
+
+<center>![Temperature layer of heat pump with multiple sources and demands with other transformer](fig/240730_temperature_layer_transformer.svg)</center>
