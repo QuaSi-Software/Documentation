@@ -723,7 +723,7 @@ A custom g-function for a specific probe field with specific soil conditions can
 
 The file needs to have the following structure (without the notes):
 
-```
+```txt
 comment1                // comments can be given without limitation
 number_of_probes: 42    // required variable
 ***                     // start of data has to be specified with three stars
