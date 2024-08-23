@@ -721,7 +721,7 @@ Since a uniform borehole wall temperature over the entire probe depth is assumed
 #### Determination of the g-function
 There are a number of approaches of varying complexity for determining the g-functions. Fortunately, there are already precomputed libraries, such as the open-source library of Spitler and Cook[^Spitler,Cook] from 2021, that is used in ReSiE to avoid time-consuming calculation for g-functions of a specific probe field configurations. The probe field configuration is understood as the number of probes in the field, the respective probe depth, the distance between the probes and the overall geometric arrangement of the probes. The library by Spitler and Cook offers 27 pre-calculated g-function values at different time nodes for each of almost 35,000 available configurations. Between these time nodes, ReSiE interpolates in order to be able to access the corresponding g-function values for each simulation time step. The g-functions extracted from the library are transformed and interpolated in ReSiE to meet the desired probe length and the spacing between the probes as described in the manual of the library. The first node of the library is always at \(ln(t / t_S) = -8.5\), where \(t_S\) is the steady-state time defined by Eskilson in 1987[^Eskilson]:
 
-$$ t_S = \frac{h_{probe}^2}{9 \, a_{soil}} $$
+$$ t_S = \frac{h_{probe}^2}{9 \, a_{soil}} \quad \text{with} \quad a_{soil} = \frac{\lambda_{soil}}{\rho_{\text{soil}} \; c_{\text{p,soil}}}  $$
 
 where \(a_{soil}\) is the thermal diffusivity of the surrounding earth and \(h_{probe}\) is the probe depth. Depending on the thermal properties of the soil, the first given value in the library mentioned above at \(ln(t/ t_S) = -8.5\) corresponds to a time \(t\) after several days to weeks. Since the simulation time step size is in the range of a few minutes to hours, further g-function values must be calculated to fill the given 27 nodes of the precalculated g-function values with a finer discretisation. This is curently done by interpolating linearly between the given time steps of the library, except for the time span between \(t = 0\) and \(t_{1} = t_S e^{-8.5}\). Here, short-time effects of the probes are dominant and a linear interpolation would cause a significantly different system behaviour. A spline interpolation has been investigated as well, but the results were not satisfying. Other interpolation methods are difficult, as the g-function is not necessarily monotonically increasing as in the figure below, especially for small probe fields, and therefore a fit to a ln-function of the whole g-function is not possible.
 
@@ -835,11 +835,13 @@ Symbol | Description | Unit
 \(\lambda_{fluid}\) | thermal conductivity of fluid | \([\frac{W}{mK}]\)
 \(\lambda_{pipe}\) | thermal conductivity of the pipe | \([\frac{W}{mK}]\)
 \(\nu_{\text{fl}}\)  |kinematic viscosity of the fluid | \([\frac{m^{2}}{s}]\)
-\(\rho_{\text{fl}}\) |density of the fluid | \([\frac{kg}{m^{2}}]\)
+\(\rho_{\text{fl}}\) |density of the fluid | \([\frac{kg}{m^{3}}]\)
+\(\rho_{\text{soil}}\) |density of the soil | \([\frac{kg}{m^{3}}]\)
 \(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | \([K]\)
 \(a_{soil}\)  | thermal diffusivity of the soil  | \([\frac{m^2}{s}]\) 
 \(c_{\text{fl}}\)  |fluid velocity | \([\frac{m}{s}]\)
 \(c_{\text{p,fl}}\)  | specific heat capacity of the fluid | \([\frac{J}{kg K}]\)
+\(c_{\text{p,soil}}\)  | specific heat capacity of the soil | \([\frac{J}{kg K}]\)
 \(D_i\) |inner diameter of a U-pipe| \([m]\)
 \(g(t)\) | g-function  | [-]
 \(h_{\text{probe}}\) | probe depth | \([m]\)

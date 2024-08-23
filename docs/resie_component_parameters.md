@@ -595,9 +595,9 @@ A model of a geothermal probe field or a single geothermal probe. Two models are
 
 The geothermal probe is modeled using precalculated g-functions. The model needs quite many input parameters. Especially the soil properties, including the undisturbed ground temperature, have a significant effect on the results. Therefore is it crucial to know the soil conditions at the investigated site. 
 
-The g-function is taken from the library provided within the repository. There are different configurations available: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration. Each of them can be specified by the number of probes in x and y direction (note that the number of probes defined for x has to be less or equal the number of probes defined for y). Some of the configurations, like zoned rectangles, require an additional key, that is specified in the documentation of the library in detail, available [here](https://gdr.openei.org/files/1325/LibraryOverview_v11.1%20(1).pdf) within the publication [doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
+The g-function can be either imported from a text file or can be taken from the library provided within the repository. There are different configurations available: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration. Each of them can be specified by the number of probes in x and y direction (note that the number of probes defined for x has to be less or equal the number of probes defined for y). Some of the configurations, like zoned rectangles, require an additional key, that is specified in the documentation of the library in detail, available [here](https://gdr.openei.org/files/1325/LibraryOverview_v11.1%20(1).pdf) within the publication [doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
-A short overview is given in the following. Note that not all configurations are available. Check the documentation linked above or the included text files that contain all possible key combinations for the different probe field configurations.
+A short overview of the included configurations is given in the following. Note that not all configurations are available. Check the documentation linked above or the included text files that contain all possible key combinations for the different probe field configurations. To import a g-function from another source, see the description below.
 
 **rectangle**  
 Here, only `number_of_probes_x` and `number_of_probes_y` are required. They define the number of rows in x and y direction, while y >= x. The rectangle that is defined with these two parameters is filled completely with probes.
@@ -716,29 +716,81 @@ number_of_probes_x = 3
 number_of_probes_y = 5  
 key_2 = ""  
 
+**Import g-function from txt-file**
+
+A custom g-function for a specific probe field with specific soil conditions can be calculated e.g. using the python package [pygfunction
+](https://github.com/MassimoCimmino/pygfunction) and imported as a text file to ReSiE.
+
+The file needs to have the following structure (without the notes):
+
+```
+comment1                // comments can be given without limitation
+number_of_probes: 42    // required variable
+***                     // start of data has to be specified with three stars
+-8.84569; 1.07147
+-7.90838; 1.38002
+-7.24323; 1.65958
+-6.68104; 1.99430
+-6.16948; 2.28428
+-5.68586; 2.62013
+-5.21865; 2.90993
+-4.76141; 3.01677
+...
+```
+
+The first column has to hold the normalized logarithmic time, \(ln(\text{real time} [s] / t_S)\) with 
+\(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m^2/s]})\) as the steady-state time defined by Eskilson.
+
+The second column, separatey by a semicolon, holds the g-function values.
+Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/custom_g-function_geothermal_probe.txt).
+
+If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
+
+**General parameter**
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `model_type` | `String` | Y/Y | `simplified` | [-] | Type of probe model: "simplified" with constant or "detailed" with calculated thermal borehole resistance in every time step. |
+| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
+| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `max_probe_temperature_loading` | `Float` | N/N | 50 | [°C] | maximum temperature allowed for regeneration |
+| `min_probe_temperature_unloading` | `Float` | N/N | 6 | [°C] | minimum temperature allowed for unloading |
+| `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
+| `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
+| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
+| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
+| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
+| `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
+| `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+
+**Parameter for simple model only**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
+
+
+**Parameter to get g-function from the included library**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `probe_field_geometry` | `String` | Y/Y | `rectangle` | [-] | type of probe field geometry, can be one of: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration |
 | `number_of_probes_x` | `Int` | Y/Y | 1 | [-] | number of probes in x direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
 | `number_of_probes_y` | `Int` | Y/Y | 1 | [-] | number of probes in y direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
 | `probe_field_key_2` | `String` | Y/Y | "" | [-] | key2 of g-function library. Can also be "" if none is needed. The value depends on the chosen library type. |
-| `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
 | `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
-| `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
-| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
-| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
-| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
-| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
-| `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
-| `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
-| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 | `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
-| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
-| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
-| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
+
+
+**Externally importing g-function from a file**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `g_function_file_path` | `String` | Y/N | "path/to/file.txt" | [-] | absolute or relative path to a txt file containing an externally calculated g-function |
+
 
 **Model `detailed`:**
 
@@ -759,6 +811,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
 
 **Examplary input file definition for geothermal probe:**
@@ -773,23 +826,26 @@ To perform this calculation in every timestep, the following input parameters ar
         ],
         "model_type": "detailed",
         "___GENERAL PARAMETER___": "",
-        "max_output_power": 150,
         "max_input_power": 150,
+        "max_output_power": 150,
         "regeneration": true,
+        "max_probe_temperature_loading": 45, 
+        "min_probe_temperature_unloading": 6,
+        "probe_depth": 150,
+        "borehole_diameter": 0.16,
+        "loading_temperature_spread": 4,
+        "unloading_temperature_spread": 1.5,
         "soil_undisturbed_ground_temperature": 13,
-        "soil_heat_conductivity": 1.6 ,
-        "soil_density": 1800,
-        "soil_specific_heat_capacity": 2400,
+        "boreholewall_start_temperature": 13,
+        "___G-FUNCTION FROM LIBRARY___": "",
         "probe_field_geometry": "rectangle",
         "number_of_probes_x": 3, 
         "number_of_probes_y": 12,
         "probe_field_key_2": "",
         "borehole_spacing": 8,
-        "probe_depth": 150,
-        "borehole_diameter": 0.16,
-        "boreholewall_start_temperature": 13,
-        "unloading_temperature_spread": 1.5,
-        "loading_temperature_spread": 4,
+        "soil_density": 1800,
+        "soil_specific_heat_capacity": 2400,
+        "soil_heat_conductivity": 1.6 ,  // also needed for detailed model        
         "___SIMPLIFIED MODEL___": "",
         "borehole_thermal_resistance": 0.1,
         "___DETAILED MODEL___": "",
