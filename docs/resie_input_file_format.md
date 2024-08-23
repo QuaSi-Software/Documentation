@@ -249,16 +249,41 @@ Example of a generated order of operation:
 
 ## Profile file format
 
-As discussed earlier, time series data is separated into its own file format so as to not clutter the project file and turn it unreadable. This profile file format resembles a `CSV` format with a few additions.
+As discussed earlier, time series data is separated into its own file format so as to not clutter the project file and turn it unreadable. This profile file format resembles a `CSV` format with a few additions. Meta information can be provided by adding a `#` to the start of a line.
+
+Three different ways of defining a profile can be chosen by the parameter `time_definition`: Values only with a given startdate and a time step (`startdate_timestepsize`), a given timestamp with a custom unit along with the data and a startdate (`startdate_timestamp`) or a datetime stamp in a user-defined format, optionaly with a time zone if DST are included (`datestamp`). The `time_zone` has to be given in the IANA (Internet Assigned Numbers Authority) format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). If no time zone is given, the datetime stamp is assumend to be local standard time, which is also used internally in ReSiE. Note that leap days will be filtered out in order to be consistent with weather files.
+
+For three different methods, exampls are given below: 
 
 ```csv
-# time_step;900
-# is_power;false
-# time_format;seconds
-0;0.05
-900;0.15
-1800;0.1
+# time_definition; 		     startdate_timestepsize
+# profile_start_date; 	     01.01.2020 00:00
+# profile_start_date_format; dd.mm.yyyy HH:MM
+# profile_time_step_seconds; 900
+0.881964197
+0.929535186
 ...
+```
+
+```csv
+# time_definition; 			 startdate_timestamp
+# profile_start_date; 		 01.01.2020 00:00:00
+# profile_start_date_format; dd.mm.yyyy HH:MM:SS
+# timestamp_format; 		 seconds 
+0;     0.881964197
+900;   0.929535186
+...
+```
+
+```csv
+# time_definition; 	datestamp
+# timestamp_format; dd.mm.yyyy HH:MM 
+# time_zone: 		Europe/Berlin
+01.01.2020 00:00;	0.881964197
+01.01.2020 01:00;	0.929535186
+...
+
+Note: If time_zone is not given, then local time without DST is assumed.
 ```
 
 ### Metadata
