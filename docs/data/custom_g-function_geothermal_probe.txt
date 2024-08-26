@@ -2,7 +2,7 @@ G-Function calculated using pygfunction v2.2.3 for a rectangular probe field wit
 The following parameters were used for the calculation:
 method: detailed with 8 segments 
 borehole depth: 25 m
-borehole spacing: 10m
+borehole spacing: 10 m
 borehole radius: 0.110 m
 borehole buried depth: 0.5 m
 ground thermal diffusivity: 8.745e-7 m2/s    
