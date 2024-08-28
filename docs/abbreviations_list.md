@@ -37,6 +37,7 @@
 | HP           | Heat Pump                                                                   |
 | HR           | Heat recovery                                                               |
 | HVAC         | Heating, Ventilation and Air Conditioning                                   |
+| IANA         | Internet Assigned Numbers Authority                                         |
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
 | JSON         | JavaScript Object Notation [data format]                                    |

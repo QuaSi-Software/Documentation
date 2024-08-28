@@ -44,6 +44,7 @@ The overall structure of the project file is split into three general sections a
     "sankey_plot_file": "./output/output_sankey.html",
     "sankey_plot": "default",
     "csv_output_file": "./output/out.csv",
+    "csv_time_unit": "hours",
     "csv_output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
@@ -63,6 +64,7 @@ The overall structure of the project file is split into three general sections a
 ```
 
 * `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
+* `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
@@ -72,7 +74,7 @@ The overall structure of the project file is split into three general sections a
 * `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details.
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
-* `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
+* `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 
 ### Output specification (Sankey)
@@ -153,15 +155,15 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
 ```
 
 * `start` (`String`): Start time of the simulation as datetime format.
-* `end` (`String`): End time (inclusive) of the simulation in as datetime format.
+* `end` (`String`): End time (inclusive) of the simulation as datetime format, will be rounded down to the nearest multiple of time_step.
 * `start_end_unit` (`String`): Datetime format specifier for start and end time.
 * `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
 * `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
-* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
+* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
 * `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 
-**A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end`. Internally, all profile datetime indexes are converted to local standard time without daylight savings. Leap days are filtered out to ensure consistency with weather data sets. See the chapter profiles below for more information on time.
+**A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below for more information on time.
 
 ## Components
 
@@ -284,7 +286,7 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     900;   0.929535186
     ...
 ```
-- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column), optionaly with a time zone if DST are included. The `time_zone` has to be given in the IANA (Internet Assigned Numbers Authority) format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! Note that leap days will be filtered out in order to be consistent with weather files.
+- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column), optionaly with a time zone if DST are included. The `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! Note that leap days will be filtered out in order to be consistent with weather files.
 ```csv
     # time_definition: 	datestamp
     # timestamp_format: dd.mm.yyyy HH:MM 
@@ -297,15 +299,15 @@ Three different ways of defining a profile can be chosen by the parameter `time_
 
 ### Metadata
 
-Instead of a header row, there is a block of metadata describing important information on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name:value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information.
+Ahead of the data, a block of metadata describes important information on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name:value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information. Just make sure that the lines start with a `#`.
 
 * `data_type` (`String`): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs.
-* `time_definition` (`String`): Specifies the definition of timestamp, see above for details. Has to be one of `startdate_timestepsize`, `startdate_timestamp`, `datestamp`.
+* `time_definition` (`String`): Specifies the kind of the definition of the timestamp, see above for details. Has to be one of `startdate_timestepsize`, `startdate_timestamp`, `datestamp`.
 * `profile_start_date` (`DateTime`): The date of the first datapoint of the profile (only for `startdate_timestepsize` or `startdate_timestamp`)
 * `profile_start_date_format` (`String`): The datetime format for the `profile_start_date` (only for `startdate_timestepsize` or `startdate_timestamp`).
-* `profile_time_step_seconds` (`Integer`): The profile time step in seconds (only required for `startdate_timestepsize`).
-* `timestamp_format` (`String`): The format specifier for the datetime index (only for `startdate_timestamp` or `datestamp`). Can be `seconds`, `minutes`, `hours` or a custom datetime format.
-* `time_zone` (`String`): A timezone in IANA format that applies for the datetime index. Only required if a daylight saving is included. Only for `datestamp`.
+* `profile_time_step_seconds` (`Integer`): The profile time step in seconds. Only required for `startdate_timestepsize`, but can be given for other time_definitions as well (if not given, the timestep will be detected from the data).
+* `timestamp_format` (`String`): The format specifier for the datetime index (only for `startdate_timestamp` or `datestamp`). Can be `seconds`, `minutes`, `hours` or a custom datetime format. See table below for details on the datetime formatter.
+* `time_zone` (`String`): A timezone in [IANA format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that applies for the datetime index. Only required if a daylight saving is included. Only for `datestamp`.
 
 The format specifier for a custom datetime format can be composed from the table below, that holds a selection of the possible format types that are defined by the Julia *Dates* module:
   
@@ -324,16 +326,37 @@ The format specifier for a custom datetime format can be composed from the table
 
 For example, a date is given as `24.12.2024 00:00`, the corresponding datetime format would be `dd.mm.yyyy HH:MM`. Or, `Dec/24/2024 000000` could be read in with the format specifier `u/dd/yyyy HHMMSS`
 
-### Time and time series data
+### Time series data
 
-Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`, or only a value per line, depending on the `time_definition`. The number value should use a point `.` as the decimal separator. If a datestamp is given as timestamp, note that leap days will be filtered out. If the datestamp includes daylight savings, a timezone has to be specified to ensure correct internal handling.
+Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`, or only a value per line, depending on the `time_definition`. The number value should use a point `.` as the decimal separator. If a datestamp is given as timestamp, note that leap days will be filtered out. If the datestamp includes daylight savings, a timezone has to be specified to ensure correct internal handling. Currently, only profiles with an equidistant time step width are supported.
 
-To ensure accurate simulation results, users must adhere to the following guidelines:
+### Handling of time, time zones and weather data
 
-- **Alignment of time steps across profiles**: Ensure that the considered year in all profiles are synchronized, particularly concerning their starting day. This is important because the first weekday of a year can significantly affect energy demand profiles. 
-- **Consistency of weather-related data:** Weather-dependent demand (such as heating demand) or supply profiles (like PV and wind power) must be simulated using the same weather data that is provided to ReSiE. Inconsistencies in weather data can result in inaccurate demand or supply simulations.
+As the [pvlib documentation](https://pvlib-python.readthedocs.io/en/stable/user_guide/timetimezones.html) perfectly summarises, "dealing with time and time zones can be a frustrating experience in any programming language and for any application". We try to be as clear as possible about how ReSiE deals with time and timestamps.
+
+Internally, ReSiE works with timestamps in seconds relative to the starting date of the simulation. Along to the timestamp in seconds, a datetime for each simulation step is used to read out the related data of the given profiles. For all profile data, a corresponding datetime index is either read out of the profile file or is created with the given metadata during initialization. The datetime profiles are internally converted to local standard time without any DST. This also applies to the datestamp of the output! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets, as usually they are given with 8760 hours per year. "Filtered out" means that if data is given with a datestamp on the 29.2, it is skipped completely.
+
+The weather data can be read in from an EPW file or from a DWD .dat file. Both are mapped to a datestamp covering the simulation period. The weather data is repeated, if more than one year should be simulated. This also works for fractions of a year, e.g. if only December and January should be simulated. 
+
+In energy systems with a high share of renewable energies, the weather has a key role for the simulation results. Therefore, special attention should be paid to the time definition of the weather data. This is particularly important if the horizontal solar radiation has to be converted to a tilted surface. Therefore, the solar position and directly related to this a precise time has to be given along with the radiation data. A shift of half an hour of the time can have significant impact on the solar position and therefore on the effective radiation on a tilted surface. This is particularly noticeable with vertical surfaces.
+
+To complicate matters, the definitions of time from DWD and EPW are not consistent. The DWD defines the solar radiation given at a specific timestep as the mean value over the period *previous* to the time indicated. The air temperature is measured half an hour *before* the given time as an instantaneous value.[^DWD_TRY_documentation] Although the EPW standard specifies the solar radiation energies (yes, EPW is energy and DWD is power) in the same way as the DWD as the "total amount of [...] solar radiation received [..] during the hour *preceding* the time indicated"[^EnergyPlus_EPW_Definition], temperatures are given as instantaneous temperatures "at the time indicated"[^EnergyPlus_EPW_Definition] respectively the *current* timestep and must therefore be postponed by half an hour for correct mapping to the datetime index. The datestamp used in ReSiE for weather data starts on 1. January at 00:00 and is mapped to the first data point of the TRY (‘hour 1’, in Europe this would be CET without DST, which is "winter time" all year long). This means that in ReSiE, the data specified for a datestamp represents the hour **following** the time indicated. While the ambient temperature is an instantaneous value from half an hour *ahead* of the timestamp, the solar radiation data is the mean/sum of the hour *ahead* of the current timestamp. When entering profile data from measurements, this should be considered accordingly!
+
+**Note on EPW**: Any DST or timezones that can be defined in the EPW header are not taken into account in ReSiE. A theoretically definable timestep deviating from 1 hour can currently not be handled either in ReSiE using the global weather file! Use individual profiles if you want to use data with a higher temporal resolution.
+
+For details on the definition of the EPW format, see the DesignBuilder documentation[^EnergyPlus_EPW_Definition]. For more information on the .dat DWD format for typical meteorological years, refer to the documentation, available at [^DWD_TRY_documentation] (German only).
+
+[^DWD_TRY_documentation]: Deutscher Wetterdienst: Handbuch Ortsgenaue Testreferenzjahre von Deutschland für mittlere, extreme und zukünftige Witterungsverhältnisse. 2017. Available at [here](http://www.bbsr.bund.de/BBSR/DE/FP/ZB/Auftragsforschung/5EnergieKlimaBauen/2013/testreferenzjahre/try-handbuch.pdf?__blob=publicationFile&v=).
+
+[^EnergyPlus_EPW_Definition]: DesignBuilder: EnergyPlus Weather File (EPW) Format. Available [here](https://designbuilder.co.uk/cahelp/Content/EnergyPlusWeatherFileFormat.htm).
+
+
+In general, to ensure accurate simulation results, users must adhere to the following guidelines:
+
+- **Alignment of time steps across profiles**: Ensure that the considered year in all profiles is the same, particularly concerning the starting day when dealing with demands. This is important because the first weekday of a year can significantly affect energy demand profiles. 
+- **Consistency of weather-related data:** Weather-dependent demand (such as heating demand) or supply profiles (like PV and wind power) should be simulated using the same weather data that is provided to ReSiE. Inconsistencies in weather data can result in inaccurate demand or supply simulations.
 - **Uniform definition of time steps across simulation tools**: It is crucial to maintain a consistent definition of the time step across different simulation tools and weather data sets. Specifically, ensure clarity on whether the value provided for a particular time step represents the period before, around, or after the specified timestamp. 
-- **Handling of localized time and daylight savings time (DST)**: When using localized time, especially where daylight saving time is observed, schedules must be carefully managed to align with the correct timestamps. If a profile uses a time zone that observes DST, ReSiE internally converts it to local standard time because weather data typically does not include DST adjustments. For instance, a schedule indicating a start time of 7 am in Europe/Berlin corresponds to 7 am in both summer and winter in localized time, but this translates to 6 am in local standard time during summer. Therefore, if your profile includes DST, you must provide a timestamp along with a time zone identifier to ensure accurate handling within ReSiE.
+- **Handling of localized time and daylight savings time (DST)**: When using localized time, especially when daylight saving time is included, schedules must be carefully managed to align with the correct timestamps. If a profile uses a time zone that includes DST, ReSiE internally converts it to local standard time because weather data typically does not include DST adjustments. For instance, if a demand profile was externally calculated based on a schedule indicating a start time of 7 am in Europe/Berlin, this corresponds to 7 am in both summer and winter in localized time, but it translates to 6 am in local standard time during summer. Therefore, if your profile includes DST, you must provide a timestamp along with a time zone identifier to ensure accurate handling within ReSiE.
 
 ### Aggregation and segmentation of profile data
 
