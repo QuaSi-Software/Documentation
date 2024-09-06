@@ -22,8 +22,10 @@ Components:
 - The fraction of utilised power divided by nominal power at a given point in time is called the part load ratio (PLR), or operation point, or power fraction, and can be signified with \(\kappa\) for the sake of brevity
 
 ## Heat pump (HP)
-### General description of HP
-As heat pumps, electrically driven variable-speed and on-off compressor heat pumps can be integrated into the simulation model of ReSiE. Their general system chart with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
+Heat pumps use thermodynamic cycles to elevate a medium on one side of the cycle to a higher temperature by lowering the temperature of the medium on the other side, which requires an input of electricity to run the sub-components. The electricity used becomes part of the heat being moved. Heat pump technologies include plants to provide buildings or heat networks with heat for room heating and DHW, as well as other uses such as refrigeration components or Peltier elements. While there are also heat pumps using chemical fuels instead of electricity, these are not included in the model within ReSiE. The two most common technologies, electrically driven variable-speed and on-off compressor heat pumps, are the best fit for the heat pump model described in the following.
+
+### General description
+The general system chart of a heat pump with the denotation of the in- and outputs is shown in the figure below. In general, a gaseous refrigerant is compressed by the compressor requiring electrical energy, resulting in a high temperature of the refrigerant. The refrigerant is then condensed in the condenser and it releases the energy to the condenser liquid at a high temperature level. After that, the refrigerant is expanded and completely liquefied in the expansion valve. In the following evaporator, the refrigerant is then evaporated at a low temperature level with the help of a low-temperature heat source, after which it is fed back into the compressor.
 
 ![General System chart of a heat pump](fig/221018_HeatPump_system_chart.svg)
 
@@ -47,17 +49,21 @@ $$\dot{Q}_{out} = \frac{COP}{COP -1} \ \dot{Q}_{in} \mathrm{\quad with \quad} \d
 
 The power of the heat pump's electric supply, including the losses of the power electronics, is given as: 
 
-$$P_{el,supply} = \frac{P_{el}}{\eta_{LE}}$$
+$$P_{el,supply} = \frac{P_{el}}{\eta_{PS}}$$
 
-Since the temperatures of the heat flows entering and leaving the heat pump, which have not been considered so far, may also be relevant for connected components, the heat outputs can be calculated on the basis of the respective mass flow \(\dot{m}\) and the physical properties of the heat transfer medium (specific heat capacity \(c_{p}\) and, if applicable, the density \(\rho\)) by rearranging the following equation:
+However, as the efficiency of a heat pump becomes quite complicated to calculate and is often determined from data sheets or measurements, the efficiency of the power supply by itself is difficult to determine. Thus it is not considered separately from the other factors and not included in the model within ReSiE as a separate factor.
 
-$$ \dot{Q} = \dot{m} \ c_{p} \ (T_{max} - T_{min}) $$
+While ReSiE deals in energy values and energy flow (power), if required the following equation can be used to determine other variables of the heat input or output:
 
-As a chiller follows the same principle as a heat pump, the same component can be used to simulate both technologies. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\). This leads to the definition of the energy efficiency ratio (EER) for chillers as
+$$ \dot{Q} = \dot{m} \ c_{p} \ (T_{in} - T_{out}) $$
+
+where \(\dot{m}\) is the mass flow of the medium and \(c_{p}\) its specific heat capacity.
+
+As a chiller follows the same principle as a heat pump, where the lowering of temperature is the desired outcome. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\). This leads to the definition of the energy efficiency ratio (EER) for chillers as
  
-$$ EER = \frac{\dot{Q}_{in}}{P_{el}} = \frac{\dot{Q}_{out} - P_{el}}{P_{el}} = COP - 1   $$
+$$ EER = \frac{\dot{Q}_{in}}{P_{el}} = \frac{\dot{Q}_{out} - P_{el}}{P_{el}} = COP - 1 $$
 
-As shown, the COP can be transferred to the EER. In the following, the description is made for heat pumps. The only adaption that has to be done for chillers is the change of the useful energy. Also, the efficiency function needs to be changed to EER (\(T_{source,in}\), \(T_{sink,out}\)) (if used) and for nonlinear part load efficiency the useful energy \(\dot{Q}_{in}\) is assumed to be the linear reference energy instead of \(\dot{Q}_{out}\) as for heating mode.
+Because cooling demands in ReSiE are modeled as fixed sources of heat, no changes in the heat pump definition is required and the EER is not needed for the calculations.
 
 ### Modelling approaches for HP: Overview
 According to [Blervaque2015][^Blervaque2015], four different categories are described in the literature when it comes to the simulation of heat pumps:
