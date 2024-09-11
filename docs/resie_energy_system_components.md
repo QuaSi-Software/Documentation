@@ -913,7 +913,7 @@ If the value of τ is chosen too large, numerical instabilities and thus complet
 
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
-$$\tau_{\text{max}} = \frac{\rho_{soil} \; c_{p,soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})}{4 \; \lambda_{soil}}$$
+$$\tau_{\text{max}} = \frac{\rho_{soil} \; c_{p,soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})^2}{4 \; \lambda_{soil}}$$
 
 By rearranging the equation of the energy balance from above, the new value for the temperature of each control volume can be calculated for the current time step as
 $$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \; c_{p,soil} \; \rho_{soil}} $$
