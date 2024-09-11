@@ -198,7 +198,7 @@ As described in the [corresponding section](resie_transient_effects.md#part-load
 
 #### Icing-losses of heat pumps with air as source medium
 
-To account for icing losses of heat pumps with air as source medium, the approach presented in TRNSYS Type 401 is used[^Wetter1996]. When considering icing-losses, make sure that icing losses are not already included in the polynomials for thermal and electrical power!
+To account for icing losses of heat pumps with air as source medium, the approach presented in TRNSYS Type 401 is used[^Wetter1996]. When enabling calculation of icing-losses it is necessary to ensure that the COP curves do not already take icing into consideration.
 
 For the calculation of icing losses, five coefficients are needed: \(c_{ice,A}\), \(c_{ice,B}\), \(c_{ice,C}\), \(c_{ice,D}\) and \(c_{ice,E}\). According to the Type 401, icing losses are calculated using a superposition of a gaussian curve with its maximum between 0 °C and 5 °C representing the maximum likelihood of frost within the heat pump (high absolute humidity) and a linear curve, representing the higher sensible energy effort to heat-up the components of the heat pump for defrosting. Exemplary curves are shown in the following figure (linear, gauss and superposition):
 
@@ -216,7 +216,7 @@ $$
 
 \(\Delta COP_{ice,loss}\) can then be used to reduce the COP for icing losses:
 
-$$ COP_{ice,corrected} =  COP \ (1-\Delta COP_{ice,loss}) $$
+$$ COP_{ice,corrected} =  COP \ (1- \frac{1}{100} \ \Delta COP_{ice,loss}) $$
 
 According to the results found in Wei2021[^Wei2021], it is assumed that the decrease of the COP due to icing losses will only increase the power input of the heat pump. It will not affect the thermal power output.
 
