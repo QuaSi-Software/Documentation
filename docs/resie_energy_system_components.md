@@ -224,51 +224,77 @@ According to the results found in Wei2021[^Wei2021], it is assumed that the decr
 
 
 ### Steps to perform in the simulation model of the heat pump
-The calculation is based on TRNSYS Type 401[^Wetter1996] that is almost similar to Type 204[^Alfjei1996] (Type 204 provides an english documentation). The cycling losses of the heat pump in both TRNSYS models are calculated using an exponential function to describe the thermal capacity effects during heat-up and cool-down. Here, these cycling losses will only be used during start and stop of the heat pump - actual cycling losses from on-off heatpumps will be considered separately in the process to allow the consideration of modulating heat pumps as well.
+The following section shows the calculation steps that are performed in the heat pump model of ReSiE to determine operation.
 
-There are two different possibilities in calculating the full load power of the heat pump in dependence of \(T_{sink,out}\) and \(T_{source,in}\). An overview of the simulation steps and the required inputs are given in the following figure. A detailed description of the process shown in the figure is given below. Each of the main steps is described in more detail in the previous chapter.
+#### Slicing algorithm
+A heat pump can be set up within an energy system such that multiple sources and/or multiple sinks are connected to it via busses. This corresponds to a real system providing heat for different demands (such as room heating and DHW) or being supplied with sources of different temperatures with the aim of preferably using higher source temperatures for increased efficiency. A real system would typically supply one sink at a time based on temperatures in pipes or tanks and similarly switch between sources based on their temperatures. In the model the heat pump cuts the current time step into slices such that exactly one source layer and exactly one sink layer is considered in each slice and the amount of time spent on each slice adds up to equal or less than the entire time step.
 
-![Heat pump calculation steps](fig/230110_HeatPump_calculation_steps.svg)
+![Slicing algorithm example for two sources and two sinks](fig/240826_heat_pump_slicing_algorithm.svg)
 
-Steps to calculate the electrical and thermal energy in- and outputs of HP using a polynomial fit of the thermal and electrical power (compare to left side of figure above):
+The figure above shows how the algorithm works for an example with two sources and two sinks and a limited amount of electricity available. Both sources and sinks are sorted according to priorities, but the heat pump could also change the order based on [control modules](resie_operation_control.md#control-modules). The algorithm goes through four steps to calculate which source layer supplies how much heat to which sink layer and how much electricity is used overall:
 
-- using polynomial fits to calculate stationary thermal in- and output and electrical full-load power at given temperatures of \(T_{sink,out}\) and \(T_{source,in}\) for given nominal thermal power
-    - differing source and sink medium: 
-        - air-water
-        - water-water
-        - sole-water
-    - differing temperature range: 
-        - normal heat pump
-        - high-temperature heat pump
-    - polynomial fits have to be normalized to rated power at specified temperatures! Rated power has to be related always to the same temperature lift according to DIN EN 14511 --> different fits for normal (B10/W35, W10/W35, A10/W35) and high temperature (B35/W85, W35/W85) heat pumps  
-- reduce thermal power output due to transient capacity effects during start-up as average over current timestep and calculate COP\(_{transient}\) at full load with calculated thermal and electrical power
-- may adjust COP\(_{transient}\) by icing losses for air-water and air-air heat pumps; calculate COP\(_{transient,ice}\), recalculate electrical input power
-- get demand/availability of thermal or electrical energy (mind \(\eta_{PE}\)!), differing if thermal and/or electric energy related operation strategy is chosen
-- calculate smallest non-linear part-load ratio (PLR) with current demand and temperature-dependent, transient full-load power and precalculated value tables from PLF-curve, in dependency of heat pump type (inverter, on-off)
-- calculate part-load thermal and electrical energy, recalculate COP\(_{transient,ice,partload}\)
+1. In the first step source 1 has 4 units of energy left at 25 °C to supply 7 units of heat at 70 °C and 4 units of electricity are available. With a COP of 4.0, the result is that the source layer is used up completely, which requires 2 units of electricity and produces 6 units of heat.
+2. In the second step 1 unit of heat is left to be supplied at 70 °C. The second source layer supplies 0.5 units of heat and requires 0.5 units of electricity, for a COP of 2.0.
+3. In the third step the second sink layer with 5 units of heat at 45 °C can be supplied from the remaining 5.5 units of the second source layer. With a COP of 4.0 this requires 1.25 units of electricity. If the remaining available electricity had been less than 1.5 units, some energy of the second sink layer would have been left unsupplied.
+4. In the fourth step one of the inputs or outputs, namely the heat output, was used up completely and the algorithm finishes.
 
-If universal data table or the Carnot-COP reduced by an efficiency factor should be used instead of the more accurate model described above, a different calculation approach is needed (compare right side in the figure above):
+Note that the algorithm also works with sources and sinks that can supply/request an infinite amount of energy as long as it is never the heat input *and* heat output that are infinite.
 
-- Get power at current temperatures
-    - using nominal power without a temperature-dependency or
-    - using polynomial fits to calculate stationary thermal **or** electrical full-load power at given temperatures of \(T_{sink,out}\) and \(T_{source,in}\), depending on control strategy (see above)
-- get stationary full-load COP at given temperatures of \(T_{sink,out}\) and \(T_{source,in}\) either from
-    - COP data table (fitted to polynomials in pre-calculation) or
-    - Carnot-COP reduced by an efficiency factor
-- determine the unknown, non-controlled full load power (electrical or thermal) with known, controlled power and COP
-- continue with transient capacity effects as described above
+#### Process of calculating energies for one slice
+The following pseudo-code example shows how the energies for one slice are calculated:
 
-Contrary to the TRNSYS Type 401, the mass flow here is variable and not constant within two time steps, therefore the \(T_{sink,out}\) and \(\dot{Q}_{sink,out}\) can be calculated directly without the need of iteration as implemented in Type 401. Here, the \(T_{sink,out}\) is a fixed, user-specified value in the presented simplified model. 
+```pseudo
+function energies_for_one_slice(
+    available_heat_in,
+    available_el_in,
+    available_heat_out,
+    T_source_in,
+    T_sink_out,
+    kappa
+) returns
+    used_heat_in,
+    used_el_in,
+    used_heat_out
+begin
 
-The polynomials describing the temperature-depended thermal and electrical power of the heat pump need to be normalized to the power consumption at the rated operation point in order to be able to auto-scale the size in parameter variation studies. Therefore, the following steps are necessary:
+    if (COP is constant) then
+        COP = COP_const()
+    else if (T_source_in >= T_sink_out) then
+        COP = COP_bypass()
+    else
+        COP = COP_dynamic(T_source_in, T_sink_out, kappa)
+        COP = COP * (1 - icing_losses(T_source_in) / 100)
+    end
 
-- fit data to polynomial for thermal and electrical energy
-- calculate power at specified nominal temperatures with generated fitted polynomial
-- normalize polynomial to calculated rated power at specific temperature using a fraction_factor
+    used_heat_in = available_heat_in
+    used_el_in = used_heat_in / (COP - 1)
+    used_heat_out = used_heat_in + used_el_in
+
+    if (used_heat_out > available_heat_out) then
+        used_heat_out = available_heat_out
+        used_el_in = used_heat_out / COP
+        used_heat_in = used_el_in * (COP - 1)
+    end
+
+    if (used_el_in > available_el_in) then
+        used_el_in = available_el_in
+        used_heat_in = used_el_in * (COP - 1)
+        used_heat_out = used_heat_in + used_el_in
+    end
+end
+```
+This function is not concerned with the power at which the heat pump can operate for the given slice and does not decide the PLR. The inputs to the function are available energies (or to be supplied for the heat output), temperatures and the PLR. They are specific to the slice in question.
+
+#### Part load operation and optimisation of PLR
+Given the slicing algorithm and the function `energies_for_one_slice` as described above, it is then the question of how much power is available for each slice and at which PLR each slice is performed. The minimum and maximum power for each slice depends only temperatures, however the PLR does affect the COP.
+
+As a first pass the slicing algorithm is run with full power for each slice and the calculation stops when the power fraction concerning the energy sums over all slices reaches the maximum power fraction. Usually this is `1.0`, however this might be limited by [control modules](resie_operation_control.md#control-modules). Because the maximum power of each slices varies, so does how much time each slice takes to produce the calculated amount of energy of that slice.
+
+Because the first pass is calculated with full power for each slice and the algorithm stops if the maximum power fraction has been reached, it is guaranteed that the heat pump can fulfill the slices as they have been calculated within the frame of the timestep. However if there is time "left over", it could be the case that recalculating the slices with lower \(\kappa\) for some or all slices leads to an improvement in the efficiency while still observing the power limitations. This leads to an optimisation problem if \(\kappa_{opt} < 1\), for example for inverter heat pumps (see [this section](resie_energy_system_components.md#part-load-efficiency)).
+
+**Note:** At time of writing a proof-of-concept optimisation option has been implemented, however it leads to a hefty step down in performance and does not work very well in approaching the global optimum. It is recommended to only use it for detailed simulations of a heat pump when poor performance is not an issue.
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
-
-[^Alfjei1996]: Afjei T., Wetter M., Glass A. (1997): TRNSYS Type 204 - Dual-stage compressor heat pump including frost and cycle losses. Model description and implementation in TRNSYS, Versin 2. Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf](https://simulationresearch.lbl.gov/wetter/download/type204_hp.pdf)
 
 
 **Inputs und Outputs of the Heat Pump:**
