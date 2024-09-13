@@ -59,12 +59,6 @@ $$ \dot{Q} = \dot{m} \ c_{p} \ (T_{in} - T_{out}) $$
 
 where \(\dot{m}\) is the mass flow of the medium and \(c_{p}\) its specific heat capacity.
 
-As a chiller follows the same principle as a heat pump, where the lowering of temperature is the desired outcome. The difference is the definition of the efficiency, as for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\). This leads to the definition of the energy efficiency ratio (EER) for chillers as
- 
-$$ EER = \frac{\dot{Q}_{in}}{P_{el}} = \frac{\dot{Q}_{out} - P_{el}}{P_{el}} = COP - 1 $$
-
-Because cooling demands in ReSiE are modeled as fixed sources of heat, no changes in the heat pump definition is required and the EER is not needed for the calculations.
-
 ### Modelling approaches: Overview
 According to [Blervaque2015][^Blervaque2015], four different categories are described in the literature when it comes to the simulation of heat pumps:
 
@@ -329,6 +323,25 @@ Symbol | Description | Unit
 \(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control | [-]
 \(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled | [-]
 \(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air-sourced heat pumps only) | [-]
+
+
+## Chiller
+Various technologies exist to provide cooling power on a scale of buildings or for industrial processes. All of them function similar to [heat pumps](resie_energy_system_components.md#heat-pump-hp) in that they transfer heat from one end of a thermodynamic cycle to the other. The difference is that for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\).
+
+Regarding the efficiency of a chiller, a common concept is the energy efficiency ratio (EER) defined as:
+ 
+$$ EER = \frac{\dot{Q}_{in}}{P_{el}} = \frac{\dot{Q}_{out} - P_{el}}{P_{el}} = COP - 1 $$
+
+Because cooling demands in ReSiE are modeled as fixed sources of heat, no changes in the heat pump definition is required and the EER is not needed for calculation. This should be taken into account when consulting literature to determine the efficiency as sometimes the EER value is listed, but labeled as COP.
+
+The example ["Heating and cooling demands"](resie_exemplary_energy_systems.md#heating-and-cooling-demands) shows how a cooling demand can be handled using a heat pump.
+
+### Compression chiller (CC)
+Compression chillers are modeled as compression [heat pumps](resie_energy_system_components.md#heat-pump-hp). The produced waste heat, at a higher temperature then the cooling demand, can be removed from the system by a generic bounded sink.
+
+### Absorption/adsorption chiller (AAC)
+
+Absorption/adsorption chillers are not implemented yet.
 
 
 ## Hydrogen Electrolyser (HEL)
@@ -982,60 +995,6 @@ Symbol | Description | Unit
 \(T_{\text{fl,am}}\) | Mean fluid temperature   | [°C]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
-
-
-## Chiller
-### Simple model of compression  chiller (SCC)
-A simple model of an air cooled compression chiller is implemented to account for rather irrelevant cooling demands without significant changes in temperatures of the energy to be cooled. This model is a rough approximation, but offers a fast and easy calculation. It is based on a constant seasonal energy efficiency ratio (SEER) as yearly average of the energy efficiency ratio (EER) without part-load dependent or temperature dependent efficiency. The energy flow chart is given below. The displayed temperature are only for illustration and will not be considered in this simple model.
-
-![Energy flow of simple compression chiller](fig/230207_Chiller_simple_energyflow.svg)
-
-The SEER is defined as
-
-\( SEER =  \text{yearly average of} \ \frac{\text{cooling power} \ \dot{Q}_{SCC,in}}{\text{electricity demand} \ P_{el,SCC,supply}}  \)
-
-Comparing the definition of the EER to the COP given in the chapter of heat pumps, the following relation of the two efficiencies for heat pumps and compression chillers can be obtained
-
-\(EER = COP - 1 \)
-
-In this simple model, a constant SEER is given and set equivalent to the EER in every timestep to calculate the electrical power \(P_{el,SCC,supply}\) needed to cool down a given amount of thermal energy \(Q_{SCC,in}\) in every timestep:
-
-\(P_{el,SCC,supply} = \frac{\dot{Q}_{SCC,in}}{EER}  \)
-
-The thermal output power, calculated from the energy balance of the chiller
-
-\(\dot{Q}_{SCC,out} = P_{el,SCC,supply} + \dot{Q}_{SCC,in} = \dot{Q}_{SCC,loss}\),
-
-is transferred to the environment by an air cooler and labeled as losses.
-
-**Inputs and Outputs of the SCC:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{SCC,out}\) | thermal power output of the SCC to the ambient air (= \(\dot{Q}_{SCC,losses}\)) | [W]
-\(\dot{Q}_{SCC,in}\) | thermal power input into the SSC, equals the thermal cooling power | [W]
-\(P_{el,SCC,in}\) | electrical energy power input in the SCC | [W]
-
-**Parameter of the SCC:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(SEER_{SSC}\) | Seasonal energy efficiency ratio (SEER) of the compressor chiller (= constant for all temperatures and part-load)| [-]
-\(Q_{SCC,in,rated}\) | rated thermal power input of the SCC under full load | [W]
-\(PL_{SSC,min}\) | minimum allowed partial load of the SCC with respect to \(\dot{Q}_{SCC,in}\) | [-]
-
-**State variables of the SSC:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(x_{SSC}\)  | current operating state of the SSC (on, off, part load)   | [%]
-
-### General model for compression chiller (CC)
-The general model of a compression chiller, including a part-load dependent and temperature dependent efficiency, is modeled in the same way as the heat pump described in the chapter "Heat pump". Instead of defining the thermal energy output as useful energy, the thermal energy input is defined as useful energy. Accordingly, the efficiency is described differently, as EER for the compression chiller instead of COP for heat pumps (see also the section above on the definition of EER).
-
-### General model for absorption/adsorption chiller (AAC)
-
-Absorption/adsorption chiller are not implemented yet (ToDo).
 
 
 ## Short-term thermal energy storage (STTES)
