@@ -70,6 +70,4 @@
 *[MB]:      Middle Bus
 *[MT]:      Middle Transformer
 *[PB]:      Parallel Branch
-
-
-
+*[DHW]:     Domestic Hot Water

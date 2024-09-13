@@ -35,7 +35,7 @@ The energy balance of the heat pump model is shown in the following figure:
 
 ![Energy flow of heat pump](fig/221006_HeatPump_Energyflow.svg)
  
-Using the electrical power \(P_{el,supply}\), reduced by the losses of the power electronics \(P_{el,loss}\), an energy flow \(\dot{Q}_{in}\) with temperature \(T_{source,in}\) is transformed to the energy flow \(\dot{Q}_{out}\) with temperature \(T_{sink,out}\). The efficiency of the heat pump is defined by the coefficient of performance (COP). The COP determines the electrical power \(P_{el}\) required to raise the temperature of a mass flow from the lower temperature level \(T_{source,in}\) to \(T_{sink,out}\): 
+Using the electrical power \(P_{el,in}\), an energy flow \(\dot{Q}_{in}\) with temperature \(T_{source,in}\) is transformed to the energy flow \(\dot{Q}_{out}\) with temperature \(T_{sink,out}\). The efficiency of the heat pump is defined by the coefficient of performance (COP). The COP determines the electrical power \(P_{el}\) required to raise the temperature of a mass flow from the lower temperature level \(T_{source,in}\) to \(T_{sink,out}\): 
 
 $$ COP = \frac{\dot{Q}_{out}}{P_{el}} \quad  \leq \quad COP_{Carnot} = \frac{T_{sink,out}[K]}{T_{sink,out}-T_{source,in} } $$
 
@@ -83,12 +83,12 @@ There are several aspects to be considered when simulating a heat pump based on 
 
 The COP of a heat pump, representing the efficiency in a current timestep, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
 
-Additionally, the maximum thermal power of the heat pump is not constant for different operational temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given for a specific heat pump is only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
+Additionally, the maximum thermal power of the heat pump is not constant for different operational temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given in the literature for a specific heat pump is usually only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
 
 [^DINEN14511]: DIN EN 14511:2018 (2018): Air conditioner, liquid chilling packages and heat pumps for space heating and cooling and process chillers, with electrically driven compressors. DIN e.V., Beuth-Verlag, Berlin.
 
 Furthermore, the efficiency and therefore the COP is changing in part load operation. In the past, mostly on-off heat pump were used, regulating the total power output in a given time span by alternating the current state between on and off. This causes efficiency losses mostly due to thermal capacity effects and initial compression power needed at each start, or rather the compression losses at each shutdown. [Socal2021][^Socal2021]
-In the last few years, modulating heat pumps have become more common, using a frequency inverter at the electrical power input to adjust the speed of the compression motor and therefore affect the thermal power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the nominal power output. In the literature, many research groups have investigated this effect, compare for example to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
+In the last few years, modulating heat pumps have become more common, using a frequency inverter at the electrical power input to adjust the speed of the compression motor and therefore affect the thermal power output. Interestingly, this method leads to an efficiency increase in part load operation with a peak in efficiency at around 30 to 60 % of the maximum power output. In the literature, many research groups have investigated this effect, compare for example to Bettanini2003[^Bettanini2003], Toffanin2019[^Toffanin2019], Torregrosa-Jaime2008[^Torregrosa-Jaime2008], Fuentes2019[^Fuentes2019], Blervaque2015[^Blervaque2015] or Fahlen2012[^Fahlen2012].
 
 When heat pumps with air as source medium are used, the losses due to icing effects need to be considered as well.
 
@@ -109,24 +109,27 @@ For a more realistic representation, all four discussed effects need to be consi
 ### Modelling approaches: Detail
 #### Temperature-dependent COP
 
-The temperature-dependent COP can be calculated from different methods:
+The temperature-dependent \(COP_{dynamic}\) can be calculated from different methods:
 
 - Using the \(COP_{Carnot}\) with the Carnot efficiency factor \(\eta_{Carnot}\) as explained above. This is easy, simple and fast, but leads to unrealistically high efficiency with small temperature differences between source and sink.
-- Looking up the COP in a look-up table in dependence of the condenser outlet and the evaporator inlet temperature. These are usually taken from manufacturer data sheets and/or measurements and interpolated between support values.
-- Calculating the COP fraction of temperature-dependent electrical and thermal power, gained from the maximum power output of the heat pump, which is itself a function of the inlet and outlet temperatures. This method however implies that the heat pump runs at full power, as the COP furthermore changes with the PLR (see following sections).
+- Looking up the \(COP_{dynamic}\) in a look-up table in dependence of the condenser outlet and the evaporator inlet temperature. These are usually taken from manufacturer data sheets and/or measurements and interpolated between support values.
+- Calculating the \(COP_{dynamic}\) as fraction of temperature-dependent electrical and thermal power, gained from the maximum power output of the heat pump, which is itself a function of the inlet and outlet temperatures. This method however implies that the heat pump runs at full power, as the COP furthermore changes with the PLR (see following sections).
 
-As example for a lookup-table COP (second bulletpoint above), the following figure from Steinacker2022[^Steinacker2022] shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature. In three dimensions, this figure would result in a surface that can be interpolated between the given support values.
+As example for a lookup-table COP, the following figure from Steinacker2022[^Steinacker2022] shows a map of a high-temperature heat pump as a set of curves, depending on the evaporator inlet and condenser outlet temperature and assuming full power. In three dimensions, this figure would result in a surface that can be interpolated between the given support values.
 
 ![COP chart of heat pump](fig/COP_chart_example.png)
 
 For ReSiE the first two were chosen as available methods, with the Carnot method mostly for cases in which little information on the heat pump is available or high performance is required. For the method using lookup-tables, bi-linear interpolation is done for values between the support values. 
 
 ##### By-pass
-When the source temperature is equal or higher than the requested sink temperature, a heat pump does not have to go through the thermodynamic cycle and can instead carry the heat from the source to the sink acting like a heat exchanger. In real systems this still requires some electricity to run the pumps and the sensors. To model this, a constant high COP is chosen to approximate the work the pumps have to perform.
+When the source temperature is equal or higher than the requested sink temperature, a heat pump does not have to go through the thermodynamic cycle and can instead carry the heat from the source to the sink acting like a heat exchanger. In real systems this still requires some electricity to run the pumps and the sensors. To model this, a constant, relatively high \(COP_{bypass}\) is chosen to approximate the work the pumps have to perform.
+
+##### Losses
+All effects that are considered in the heat pump model and that could be interpreted as a loss of usable energy are modelled by reducing the efficiency of the heat pump. In addition the efficiency curves are often given by measurements or data sheets, which cannot infer losses as a seperate quantity. It is therefore difficult to definitely calculate the losses incurred by the operation of the heat pump. Instead the heat pump will require more electricity input compared to a model without these losses, but will not track losses as an output.
 
 #### Maximum and minimum thermal output power
 
-With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump can be modeled independently, but also in relation to the source and sink temperatures. The power is defined as the thermal output of the heat pump.
+With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump can be modeled independently, but also in relation to the source and sink temperatures. The power is defined as the thermal output of the heat pump. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump is defined as the highest maximum power value over all possible temperature values and at \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of temperature values. For the model it is important that \(\dot{Q}_{out} < \dot{Q}_{out,max}\) in all cases.
 
 Comparing available data of many different heat pumps from Stiebel-Eltron[^Stiebel-EltronTool], specifically those with air as the source medium, three important observations can be made:
 
@@ -190,11 +193,14 @@ For on-off heat pumps, \(a = 1\) and \(\kappa_{opt} = 1\).
 **Note:** If this formulation is chosen, for the moment it is required to enter it as a range of support values with linear interpolation between. A future update might implement this formulation directly.
 
 ##### Calculating energies from the part-load-dependent efficiency
-As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function on the PLR through numerical inversion in a pre-processing step. However because of reasons described in the section on the slicing algorithm, this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to a performance decrease for heat pumps with exactly one source and exactly one sink. A future update might address this problem.
+As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function on the PLR through numerical inversion in a pre-processing step. However because of reasons described in [the section on the slicing algorithm](resie_energy_system_components.md#slicing-algorithm), this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to worse performance for heat pumps with exactly one source and exactly one sink as compared to the theoretical case. A future update might address this problem.
 
 [^Socal2021]: Socal, Laurent (2021): Heat pumps: lost in standards, *REHVA Journal August 2021*.
 [^Filliard2009]: Filliard, Bruno; Guiavarch, Alain; Peuportier, Bruno (2009): Performance evaluation of an air-to-air heat pump coupled with temperate air-sources integrated into a dwelling. *Eleventh International Building Simulation Conference 2009*, S. 2266–73, Glasgow.
 [^Lachance2021]:Lachance, Alex; Tamasauskas, Justin; Breton, Stéphanie; Prud’homme, Solange (2021): Simulation based assessment on representativeness of a new performance rating procedure for cold climate air source heat pumps. *E3S Web Conf. 246, S. 6004.* doi: [10.1051/e3sconf/202124606004](https://doi.org/10.1051/e3sconf/202124606004).
+
+##### Cycling losses, start-up ramps and cooldown
+The general effect of energy system components experiencing reduced output power and/or efficiency during a starting phase of operation is described in [this section](resie_transient_effects.md#part-load-ratio-dependent-efficiency). This effect is also observed for heat pumps and described in the literature. At the moment this effect is not included in the model and not implemented. This will be included in a future update as it is a vital part of a detailed operational simulation.
 
 #### Icing-losses of heat pumps with air as source medium
 
@@ -304,43 +310,25 @@ Symbol | Description | Unit
 \(\dot{Q}_{in}\) | heat flow supplied to the HP (heat source) | [W]
 \(\dot{Q}_{out}\) | heat flow leaving the HP (heat sink) | [W]
 \(P_{el}\) | electric power demand of the HP | [W]
-\(P_{el,supply}\) | electric power demand of the HP incl. losses of the power electronics | [W]
-\(T_{sink,in}\) | condenser inlet temperature - not used | [°C]
 \(T_{sink,out}\) | condenser outlet temperature | [°C]
 \(T_{source,in}\) | evaporator inlet temperature | [°C]
-\(T_{source,out}\) | evaporator outlet temperature - not used | [°C]
+\(COP\) | calculated COP | [-]
+\(T_{in,mixed}\) | weighted-mean of chosen input temperatures | [°C]
+\(T_{out,mixed}\) | weighted-mean of chosen output temperatures | [°C]
 
-**Parameter of the Heat Pump:** 
-
-Symbol | Description | Unit
--------- | -------- | --------
-\(\dot{Q}_{rated}\) | rated thermal energy output of heat pump at specified conditions |  [W]
-\(\dot{Q}_{max}(T_{sink,out}, T_{source,in})\) | (normalized) polynomial of maximum full load thermal heat output at given temperatures | [W]
-\(P_{el,max}(T_{sink,out}, T_{source,in})\) | (normalized) polynomial of maximum full load electrical power output at given temperatures | [W]
-or ||
-\(f_{\dot{Q} reduction}\) | linear reduction factor for nominal full load thermal output power with respect to \(T_{source,in}\) | [%/°C]
-\(f_{P_{el} reduction}\) | linear reduction factor for nominal full load electrical input power with respect to \(T_{sink,out}\) | [%/°C]
-\(COP(T_{sink,out}, T_{source,in})\) | coefficient of performance (COP) of the heat pump depending on \(T_{sink,out}\) and \(T_{source,in}\) | [-]
-\(\eta_{Carnot}\) | efficiency factor of heat pump, reduces the Carnot-COP | [-]
-and | |
-\(PL_{min}\) | minimum possible part load of the heat pump |  [%]
-\(PLR_{max}\) | part load ratio at point of maximum efficiency (inverter only) |  [-]
-\(PLF_{max}\) | part load factor at point of maximum efficiency (inverter only) |  [-]
-\(PLF_{PLR=1}\) | part load factor at part load ratio = 1 (inverter only) | [-]
-\(cc\) | coefficient for part load curve according to DIN EN 14825 | [-]
-\(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air heat pump only) | [-]
-\(\eta_{PE}\) | efficiency of power electronics of heat pump | [-]
-\(MOT\) | minimum operating time of heat pump | [min]
-\(SUT\) | start-up time of the HP until full heat supply (linear curve) | [min]
-\(CDT\) | cool-down time of the HP from full heat supply to ambient (linear curve) | [min]
-
-
-**State Variables of Heat Pump:**
+**Parameters of the Heat Pump:** 
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(x\)  | current operating state (on, off, part load)   | [%]
-
+\(\dot{Q}_{nominal}\) | nominal thermal energy output of heat pump |  [W]
+\(\dot{Q}_{out,max}(T_{source,in}, T_{sink,out})\) | function for maximum thermal heat output at given temperatures | [W]
+\(\dot{Q}_{out,min}(T_{source,in}, T_{sink,out})\) | function for minimum thermal heat output at given temperatures | [W]
+\(COP_{dynamic}(T_{source,in}, T_{sink,out}, \kappa)\) | function for COP depending on \(T_{source,in}\), \(T_{sink,out}\) and \(\kappa\) | [-]
+\(COP_{constant}\) | constant COP, if given overrides dynamic COP and bypass calculation | [-]
+\(COP_{bypass}\) | COP during bypass operation | [-]
+\(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control | [-]
+\(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled | [-]
+\(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air-sourced heat pumps only) | [-]
 
 
 ## Hydrogen Electrolyser (HEL)
