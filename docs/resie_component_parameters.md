@@ -625,7 +625,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
 | `minimal_reduction` | `Float` | N/Y | 2.0 | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
 
-**Examplary input file definition**
+**Exemplary input file definition for GenericHeatSource**
 
 ```JSON
 "TST_SRC_01": {
@@ -829,48 +829,48 @@ To perform this calculation in every timestep, the following input parameters ar
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
 
 
-**Examplary input file definition for geothermal probe:**
+**Exemplary input file definition for GeothermalProbe:**
 
 ```JSON
-    "TST_GTP_01": {
-        "type": "GeothermalProbes",
-        "m_heat_out": "m_h_w_lt1",
-        "control_refs": [],
-        "output_refs": [
-            "TST_HP_01"
-        ],
-        "model_type": "detailed",
-        "___GENERAL PARAMETER___": "",
-        "max_output_power": 150,
-        "max_input_power": 150,
-        "regeneration": true,
-        "soil_undisturbed_ground_temperature": 13,
-        "soil_heat_conductivity": 1.6 ,
-        "soil_density": 1800,
-        "soil_specific_heat_capacity": 2400,
-        "probe_field_geometry": "rectangle",
-        "number_of_probes_x": 3, 
-        "number_of_probes_y": 12,
-        "probe_field_key_2": "",
-        "borehole_spacing": 8,
-        "probe_depth": 150,
-        "borehole_diameter": 0.16,
-        "boreholewall_start_temperature": 13,
-        "unloading_temperature_spread": 1.5,
-        "loading_temperature_spread": 4,
-        "___SIMPLIFIED MODEL___": "",
-        "borehole_thermal_resistance": 0.1,
-        "___DETAILED MODEL___": "",
-        "probe_type": 2,
-        "pipe_diameter_outer": 0.032,
-        "pipe_diameter_inner": 0.0262,
-        "pipe_heat_conductivity": 0.42,
-        "shank_spacing": 0.1,
-        "fluid_specific_heat_capacity": 3795,
-        "fluid_density": 1052,
-        "fluid_kinematic_viscosity": 3.9e-6,
-        "fluid_heat_conductivity": 0.48,
-        "fluid_prandtl_number": 31.3,
-        "grout_heat_conductivity": 2
-    }
+"TST_GTP_01": {
+    "type": "GeothermalProbes",
+    "m_heat_out": "m_h_w_lt1",
+    "control_refs": [],
+    "output_refs": [
+        "TST_HP_01"
+    ],
+    "model_type": "detailed",
+    "___GENERAL PARAMETER___": "",
+    "max_output_power": 150,
+    "max_input_power": 150,
+    "regeneration": true,
+    "soil_undisturbed_ground_temperature": 13,
+    "soil_heat_conductivity": 1.6 ,
+    "soil_density": 1800,
+    "soil_specific_heat_capacity": 2400,
+    "probe_field_geometry": "rectangle",
+    "number_of_probes_x": 3,
+    "number_of_probes_y": 12,
+    "probe_field_key_2": "",
+    "borehole_spacing": 8,
+    "probe_depth": 150,
+    "borehole_diameter": 0.16,
+    "boreholewall_start_temperature": 13,
+    "unloading_temperature_spread": 1.5,
+    "loading_temperature_spread": 4,
+    "___SIMPLIFIED MODEL___": "",
+    "borehole_thermal_resistance": 0.1,
+    "___DETAILED MODEL___": "",
+    "probe_type": 2,
+    "pipe_diameter_outer": 0.032,
+    "pipe_diameter_inner": 0.0262,
+    "pipe_heat_conductivity": 0.42,
+    "shank_spacing": 0.1,
+    "fluid_specific_heat_capacity": 3795,
+    "fluid_density": 1052,
+    "fluid_kinematic_viscosity": 3.9e-6,
+    "fluid_heat_conductivity": 0.48,
+    "fluid_prandtl_number": 31.3,
+    "grout_heat_conductivity": 2
+}
 ```
