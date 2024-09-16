@@ -123,13 +123,18 @@ All effects that are considered in the heat pump model and that could be interpr
 
 #### Maximum and minimum thermal output power
 
-With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump can be modeled independently, but also in relation to the source and sink temperatures. The power is defined as the thermal output of the heat pump. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump is defined as the highest maximum power value over all possible temperature values and at \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of temperature values. For the model it is important that \(\dot{Q}_{out} < \dot{Q}_{out,max}\) in all cases.
+With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump can be modeled independently, but also in relation to the source and sink temperatures. The power is defined as the thermal output of the heat pump. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump is defined as the highest maximum power value over all possible temperature values and at \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of temperature values. For the model it is important that \(\dot{Q}_{out} \leq \dot{Q}_{nominal}\) in all cases.
 
 Comparing available data of many different heat pumps from Stiebel-Eltron[^Stiebel-EltronTool], specifically those with air as the source medium, three important observations can be made:
 
 * The minimum power of a heat pump also plays a role as this can be a significant fraction of the maximum power and in some cases even limit the heat pump to a single on-or-off operational state at a fixed power
 * The maximum and minimum power values vary a lot across the possible source and sink temperatures
 * The differences between heat pump systems necessitates that the curves, if this information is available, can be given as input to the simulation for improved accuracy compared to averaged curves
+
+The curves are used in the calculation of maximum and minimum power and should return values in \([0,1]\):
+
+$$ \dot{Q}_{out,max} = f_{max}(T_{source,in},T_{sink,out}) \cdot \dot{Q}_{nominal}$$
+$$ \dot{Q}_{out,min} = f_{min}(T_{source,in},T_{sink,out}) \cdot \dot{Q}_{nominal}$$
 
 If no specific curves are known for the heat pump, a model based on biquadratic polynomials is described in TRNSYS Type 401 and can be used as a best guess:
 
@@ -139,7 +144,7 @@ $$ \dot{Q}_{out,max} = c_{q1} + c_{q2} \ \bar{T}_{source,in} + c_{q3} \ \bar{T}_
 where all temperatures are normalised according to
 $$ \bar{T} = \frac{T \ [°C]}{273.15} + 1 $$
 
-Note that this does not include a formulation for minimum power, which is assumed to be zero. It is an open question if any set of coefficient exists, that can represent most heat pump technologies with reasonable accuracy. We would be glad to include these as default values.
+Note that this does not include a formulation for minimum power, which is assumed to be zero. It is an open question if any set of coefficients exists, that can represent most heat pump technologies with reasonable accuracy. We would be glad to include these as default values.
 
 [^Stiebel-EltronTool]: Stiebel-Eltron Heat Pump Toolbox: [https://www.stiebel-eltron.com/toolbox/waermepumpe/](https://www.stiebel-eltron.com/toolbox/waermepumpe/)
 
@@ -167,7 +172,7 @@ The part-load behavior depends also on the type of the heat pump (on-off or inve
 
 Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. In Lachance2021[^Lachance2021], several part load curves are compared.
 
-A unified formulation for on-off and inverter heat pumps can be dervied from descriptions in the literature. The PLF curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the PLF calculation in DIN EN 14825 for water-based on-off heatpumps, differing from the cited paper but according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as linear. The definition of these curve can be done entering the coefficient \(c\) and the coordinates of the two points highlighted in the figure below. Here, \(c\) is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
+A unified formulation for on-off and inverter heat pumps can be derived from descriptions in the literature. The PLF curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the PLF calculation in DIN EN 14825 for water-based on-off heatpumps, differing from the cited paper according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as linear. The definition of these curve can be done entering the coefficient \(c\) and the coordinates of the two points highlighted in the figure below. Here, \(c\) is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
 
 ![Input curve for part load efficiency of inverter heat pump](fig/230119_PartLoadPowerCurve_input.JPG)
 
@@ -235,8 +240,8 @@ The figure above shows how the algorithm works for an example with two sources a
 
 1. In the first step source 1 has 4 units of energy left at 25 °C to supply 7 units of heat at 70 °C and 4 units of electricity are available. With a COP of 4.0, the result is that the source layer is used up completely, which requires 2 units of electricity and produces 6 units of heat.
 2. In the second step 1 unit of heat is left to be supplied at 70 °C. The second source layer supplies 0.5 units of heat and requires 0.5 units of electricity, for a COP of 2.0.
-3. In the third step the second sink layer with 5 units of heat at 45 °C can be supplied from the remaining 5.5 units of the second source layer. With a COP of 4.0 this requires 1.25 units of electricity. If the remaining available electricity had been less than 1.5 units, some energy of the second sink layer would have been left unsupplied.
-4. In the fourth step one of the inputs or outputs, namely the heat output, was used up completely and the algorithm finishes.
+3. In the third step the second sink layer with 5 units of heat at 45 °C can be supplied from the remaining 5.5 units of the second source layer. With a COP of 4.0 this requires 1.25 units of electricity. If the remaining available electricity had been less than 1.25 units, some energy of the second sink layer would have been left unsupplied.
+4. In the fourth step it is detected that one of the inputs or outputs, namely the heat output, was used up completely and the algorithm finishes.
 
 Note that the algorithm also works with sources and sinks that can supply/request an infinite amount of energy as long as it is never the heat input *and* heat output that are infinite.
 
