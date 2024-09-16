@@ -448,18 +448,51 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `MixingTemperature_Input`, `MixingTemperature_Output` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
 | Name | Type | R/D | Example | Description |
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `constant_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant value. |
-| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a constant one. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a constant one. |
+| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
+| `cop_function` | `String` | Y/Y | `carnot:0.4:const:1.0` | See [description of function definitions](#cop-functions). The function for the the dynamic COP with the temperature-dependent part in the first function and the PLR-dependent part in the second.
+| `bypass_cop` | `Float` | Y/Y | 15.0 | A constant COP value used for bypass operation. |
+| `max_power_function` | `String` | Y/Y | `const:1.0` | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:1.0` | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `consider_icing` | `Bool` | N/Y | false | If true, enables the calculation of icing losses. |
+| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | Parameters for the icing losses model. |
+| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperatures and uses a constant one. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperatures and uses a constant one. |
+| `optimise_slice_dispatch` | `Bool` | N/Y | false | If true, enables the optimisation of slice dispatch. |
+| `optimal_plr` | `Float` | N/N | 0.45 | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. |
+| `nr_optimisation_passes` | `UInt` | N/Y | 10 | The number of passes the optimisation algorithm performs. Note that this heavily impacts performance. |
+
+#### Exemplary input file definition for HeatPump
+**Simple heat pump with constant COP and fixed output temperature**
+```json
+"TST_TH_HP_01": {
+    "type": "HeatPump",
+    "output_refs": ["TST_TH_BUS_01"],
+    "power_th": 12000,
+    "cop_function": "const:3.0",
+    "output_temperature": 70.0
+}
+```
+
+**Air-sourced heat pump with dynamic COP and variable power from data sheets**
+```json
+"TST_TH_HP_01": {
+    "type": "HeatPump",
+    "output_refs": ["TST_TH_BUS_01"],
+    "power_th": 20000,
+    "cop_function": "field:0,45,55,65,75,85,95,105;0,3.79,3.26,2.87,2.57,2.34,2.15,1.99;10,4.59,3.79,3.26,2.87,2.57,2.34,2.15;20,5.93,4.59,3.79,3.26,2.87,2.57,2.34;30,8.74,5.93,4.59,3.79,3.26,2.87,2.57;40,20.15,8.74,5.93,4.59,3.79,3.26,2.87;50,20.15,20.15,8.74,5.93,4.59,3.79,3.26;60,20.15,20.15,20.15,8.74,5.93,4.59,3.79;70,20.15,20.15,20.15,20.15,8.74,5.93,4.59;80,20.15,20.15,20.15,20.15,20.15,8.74,5.93;90,20.15,20.15,20.15,20.15,20.15,20.15,8.74;100,20.15,20.15,20.15,20.15,20.15,20.15,20.15:poly:0.4,0.6",
+    "max_power_function": "poly-2:0.6625,0.0008929,-0.001",
+    "min_power_function": "poly-2:0.5125,0.0001786,-0.001",
+    "bypass_cop": 20.15,
+    "consider_icing": true
+}
+```
+
 
 ## Storage
 
