@@ -7,14 +7,11 @@ The description of each component type includes a block with a number of attribu
 | --- | --- |
 | **Type name** | `BoundedSink`|
 | **File** | `energy_systems/general/bounded_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
 | **Tracked values** | `IN`, `Max_Energy`, `Losses` |
-
-The available models listed are subtypes to the implementation of a component, which each work slightly differently and might use different parameters. An example is the difference between a condensing gas boiler and a traditional one. **Note: At the moment there is no argument for the model, as each component currently only has one implemented model. In the future this will be extended to include a default model (when no argument is provided) and additional optional models.**
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
@@ -161,7 +158,6 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | --- | --- |
 | **Type name** | `BoundedSink`|
 | **File** | `energy_systems/general/bounded_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -188,7 +184,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `BoundedSupply`|
 | **File** | `energy_systems/general/bounded_supply.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -215,7 +210,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `Bus`|
 | **File** | `energy_systems/connections/bus.jl` |
-| **Available models** | `default` |
 | **System function** | `bus` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -235,7 +229,6 @@ Note that the tracked value `Transfer->UAC` refers to an output value that corre
 | --- | --- |
 | **Type name** | `FixedSink`|
 | **File** | `energy_systems/general/fixed_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `fixed_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -269,7 +262,6 @@ Alias to `FixedSink`.
 | --- | --- |
 | **Type name** | `FixedSupply`|
 | **File** | `energy_systems/general/fixed_supply.jl` |
-| **Available models** | `default` |
 | **System function** | `fixed_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** |  |
@@ -296,7 +288,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `GridConnection`|
 | **File** | `energy_systems/connections/grid_connection.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_source`, `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -323,7 +314,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `PVPlant`|
 | **File** | `energy_systems/electric_producers/pv_plant.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `fixed_source` |
 | **Medium** | |
 | **Input media** | |
@@ -346,7 +336,6 @@ The energy it produces in each time step must be given as a profile, but can be 
 | --- | --- |
 | **Type name** | `CHPP`|
 | **File** | `energy_systems/electric_producers/chpp.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
@@ -372,7 +361,6 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | --- | --- |
 | **Type name** | `Electrolyser`|
 | **File** | `energy_systems/others/electrolyser.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
@@ -415,7 +403,6 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | --- | --- |
 | **Type name** | `FuelBoiler`|
 | **File** | `energy_systems/heat_producers/fuel_boiler.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
@@ -443,7 +430,6 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | --- | --- |
 | **Type name** | `HeatPump`|
 | **File** | `energy_systems/heat_producers/heat_pump.jl` |
-| **Available models** | default: `carnot` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
@@ -501,7 +487,6 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | --- | --- |
 | **Type name** | `Storage`|
 | **File** | `energy_systems/general/storage.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -520,7 +505,6 @@ A generic implementation for energy storage technologies.
 | --- | --- |
 | **Type name** | `Battery`|
 | **File** | `energy_systems/storage/battery.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
@@ -539,7 +523,6 @@ A storage for electricity.
 | --- | --- |
 | **Type name** | `BufferTank`|
 | **File** | `energy_systems/storage/buffer_tank.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
@@ -547,8 +530,6 @@ A storage for electricity.
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A short-term storage for heat of thermal carrier fluids, typically water.
-
-**Model `simplified`:**
 
 If the adaptive temperature calculation is activated, the temperatures for the input/output of the BT depends on the load state. If it is sufficiently full (depends on the `switch_point`), the BT can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
 
@@ -569,7 +550,6 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | --- | --- |
 | **Type name** | `SeasonalThermalStorage`|
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
@@ -577,8 +557,6 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
-
-**Model `simplified`:**
 
 If the adaptive temperature calculation is activated, the temperatures for the input/output of the STES depends on the load state. If it is sufficiently full (depends on the `switch_point`), the STES can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
 
@@ -601,7 +579,6 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | --- | --- |
 | **Type name** | `GenericHeatSource`|
 | **File** | `energy_systems/heat_sources/generic_heat_source.jl` |
-| **Available models** | `simplified` (default) |
 | **System function** | `bounded_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -650,7 +627,6 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | --- | --- |
 | **Type name** | `GeothermalProbes`|
 | **File** | `energy_systems/heat_sources/geothermal_probes.jl` |
-| **Available models** | `simplified` (default), `detailed` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
