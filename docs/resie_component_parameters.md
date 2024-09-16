@@ -51,22 +51,57 @@ This would result in the output of the source not being used to fill storages. T
 
 Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
-### Efficiency functions
-Various components, particularly transformers, require an efficiency function to determine how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping a part-load ratio on [0,1] to an efficiency factor.
+### Function definitions
+Various components, particularly transformers, require an input of functions to determine efficiency, available power and other variables. The definition of a function in the project file is a string and should look like `function_model:values` with `function_model` refering to one of the implemented function prototypes (see specific sub-sections below) and `values` being data required to parameterise the prototype. Various function prototypes are implemented for different purposes.
+
+In general `:` is used as seperator between model and values and `,` as seperator for numbers with `.` as decimal point. Some component parameters take in two functions, which are concatenated with `:` again. For example `poly:0.1,2.4:const:0.7`.
+
+#### Efficiency functions
+Used to determine an efficiency factor of how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping \(\kappa \in [0,1]\) to an efficiency factor.
 
 Because the efficiency must always be defined in relation on input or output of the component, the functionality supports this interface being defined as linear. This means that the amount of energy on this interface is strictly linear to the PLR multiplied with the design power. The other interfaces of the component are then calculated with efficiencies relative to this linear interface. Example: A fuel boiler defined with linear heat output would have a constant efficiency of 1.0 on the heat output and a different efficiency on the fuel input. If the conversion from fuel to heat is 90% efficient, this results in an efficiency factor of 1.1 on the fuel input.
 
 For the configuration of components a selected number of different cases are implemented. If a function is known, but cannot be precisely modelled using one of these parameterised functions, it is possible to use a piece-wise linear approximation, which is also useful to model data-driven functions.
 
-The definition of an efficiency function in the project file, for example a parameter `efficiency_heat_out`, should look like this: `<function_model>:<list_of_numbers>` with `function_model` being a string (see below) and `list_of_numbers` being a comma-seperated list of numbers with a period as decimal seperator and no thousands-seperator. The meaning of the numbers depends on the function model.
+**Implemented function prototypes**
 
-Three different function models are implemented:
+* `const`: Takes one number and uses it as a constant efficiency factor. E.g. `const:0.9`.
+* `poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
+* `pwlin`: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
 
-* const: Takes one number and uses it as a constant efficiency factor. E.g. `const:0.9`.
-* poly: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
-* pwlin: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
+**Discretization**
 
 Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance. In particular if a piece-wise linear interpolation is used it makes sense to use the same number of discretization steps so that the support values overlap for both the efficiency function and its inverse.
+
+#### COP functions
+Used by heat pumps and similar components to calculate the COP depending on input/output temperatures and the PLR. Instead of a single three-dimensional function the input is composed of a two-dimensional function for the temperature part and [an efficiency function](#efficiency-functions) for a PLF part. This assumes that the PLF function is independent of the temperatures, as described [in the model](resie_energy_system_components.md#part-load-efficiency). A possible input: `carnot:0.4:poly:0.5,0.4`
+
+**Implemented function prototypes**
+
+These refer to the temperature-dependent part.
+
+* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
+* `carnot`: Calculates the COP as fraction of the Carnot-COP. E.g. `carnot:0.4`.
+* `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal variables values are interpreted as the inclusive boundaries of the field. Variables values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
+
+An example of a field definition with additional line breaks and spaces added for clarity:
+```
+"field:
+ 0, 0,10,20,30;
+ 0,15, 9, 6, 4;
+10,15,15,10, 7;
+20,15,15,15,11"
+```
+The first row are the grid points along the \(T_{sink,out}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 30 °C with a spacing of 10 K. The first column are the grid points along the \(T_{source,in}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 20 °C with a spacing of 10 K. The support values are the COP (at \(\kappa = 1\)), for example a value of 10 for \(T_{source,in} = 10, \ T_{sink,out} = 20\).
+
+#### Power functions
+Used by heat pumps and similar components to calculate the minimum and maximum power available, depending on temperature values, as fraction of the nominal power. Return values should therefore be in \([0,1]\).
+
+**Implemented function prototypes**
+
+* `const`: Takes one number and uses it as a constant fraction. E.g. `const:1.0`.
+* `poly-2`: A 2D-polynomial of order two. Takes a list of nine values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ y^2 + c_6 \ xy + c_7 \ x^2y + c_8 \ xy^2 + c_9 \ x^2y^2\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0`.
+
 
 ### Control modules
 For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
