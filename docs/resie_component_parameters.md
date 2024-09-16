@@ -52,9 +52,9 @@ This would result in the output of the source not being used to fill storages. T
 Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
 ### Function definitions
-Various components, particularly transformers, require an input of functions to determine efficiency, available power and other variables. The definition of a function in the project file is a string and should look like `function_model:values` with `function_model` refering to one of the implemented function prototypes (see specific sub-sections below) and `values` being data required to parameterise the prototype. Various function prototypes are implemented for different purposes.
+Various components, particularly transformers, require an input of functions to determine efficiency, available power and other variables. The definition of a function in the project file is a string and should look like `function_prototype:values` with `function_prototype` refering to one of the implemented function prototypes (see specific sub-sections below) and `values` being data required to parameterise the prototype. Various function prototypes are implemented for different purposes.
 
-In general `:` is used as seperator between model and values and `,` as seperator for numbers with `.` as decimal point. Some component parameters take in two functions, which are concatenated with `:` again. For example `poly:0.1,2.4:const:0.7`.
+In general `:` is used as seperator between prototype and values and `,` as seperator for numbers with `.` as decimal point. Some component parameters take in two functions, which are concatenated with `:` again. For example `poly:0.1,2.4:const:0.7`.
 
 #### Efficiency functions
 Used to determine an efficiency factor of how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping \(\kappa \in [0,1]\) to an efficiency factor.
