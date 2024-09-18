@@ -150,6 +150,18 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **min_run_time** | Minimum run time for the "on" state. Absolute value in seconds. Defaults to `1800`.
 | **storage_uac** | The UAC of the storage component linked to the module.
 
+#### Temperature sorting
+Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` steps are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+
+This module is implemented for the following component types: `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `temperature_sorting` |
+| **input_temps** | Sets if the inputs are sorted by minimum or maximum temperature. Should be `max` (default) or `min`.
+| **input_order** | Sets the direction in which the inputs are sorted. Should be `asc` or `desc` (default).
+| **output_temps** | Sets if the outputs are sorted by minimum or maximum temperature. Should be `max` or `min` (default).
+| **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default) or `desc`.
 
 ## Boundary and connection components
 
