@@ -444,7 +444,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `cop_function` | `String` | Y/Y | `carnot:0.4:const:1.0` | See [description of function definitions](#cop-functions). The function for the the dynamic COP with the temperature-dependent part in the first function and the PLR-dependent part in the second.
 | `bypass_cop` | `Float` | Y/Y | 15.0 | A constant COP value used for bypass operation. |
 | `max_power_function` | `String` | Y/Y | `const:1.0` | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
-| `min_power_function` | `String` | Y/Y | `const:1.0` | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:0.2` | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
 | `consider_icing` | `Bool` | N/Y | false | If true, enables the calculation of icing losses. |
 | `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | Parameters for the icing losses model. |
 | `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperatures and uses a constant one. |
