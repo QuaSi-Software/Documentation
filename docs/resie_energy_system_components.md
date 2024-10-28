@@ -902,6 +902,7 @@ The control volumes are calculated as follows:
 $$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z $$
 where \(V_{i,j}\) is the control volume around a node and \(\Delta x\), \(\Delta y\), and \(\Delta z\) are the variable location step widths in x, y, and z directions, respectively.
 
+The implemented solver uses explicit finite difference method for the central nodes combined with appropriate boundary conditions (no-flux to the right, Dirichlet to the ground).
 
 #### Modelling of the soil
 In the context of this model, the soil is considered to be homogeneous with uniform and temporally constant physical properties. 
