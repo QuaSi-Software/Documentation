@@ -874,14 +874,29 @@ For modeling horizontal geothermal collectors, a numerical approach is chosen he
 
 In the figure below, a schematic sectional view of the two-dimensional simulation domain is shown. A symmetrical temperature distribution in positive and negative x-direction of the collector tube axis is assumed to save computing time. Furthermore, boundary effects and interaction between adjacent collector tubes are neglected. Therefore, the simulation range in the x-direction includes half the pipe spacing between two adjacent collector pipes including half a collector pipe, where the outer simulation boundaries are assumed to be adiabatic. In y-direction the depth of the simulation area is freely adjustable. Because the lower simulation boundary conditions are assumed to be constant, a sufficiently large distance between the simulation boundary and the collector pipe should be considered, to avoid the calculation results being too strongly influenced by the constant temperature. 
 
-[Currently work in Progress: Automatic discretization]
-
 The simulation area in z-direction is necessary exclusively for the later formation of control surfaces and volumes around the computational nodes for energy balancing and includes the pipe length.
 
 ![simulation domain geothermal heat collector](fig/231017_simulation_domain_geothermal_heat_collector.svg)
 
-Within the simulation domain, a computational grid is built up for the numerical calculation of the temperature field in each time step. The nodes in x-direction get the index "i", those in y-direction the index "j". The narrower the spatial step size is defined between the computational nodes in x- and y-direction, the finer the computational grid is and the more accurate the calculated temperature values are. 
-However, this is also associated with a significant increase in computing time. In this model, the spatial step sizes between the computational nodes are not kept constant in order to keep the accuracy high only at necessary locations of the simulation area. These locations include the region around the collector pipe and the layers near the earth's surface, in order to be able to represent short-term heat extraction and input into the simulation area as accurately as possible. The computational nodes each represent control volumes of the soil with a constant temperature. By balancing the energy of the control volumes in each time step, their temperatures can be recalculated taking into account the heat storage effect. The calculation from \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) will be explained in detail later.
+Within the simulation domain, a computational grid is built up for the numerical calculation of the temperature field in each time step. The nodes in x-direction get the index "i" (horizontal), those in y-direction the index "j" (vertical). The smaller the spatial step size defined between computational nodes in the x- and y-directions, the finer the computational grid becomes, leading to more accurate temperature calculations. However, this is also associated with a significant increase in computing time. In this model, the spatial step sizes between the computational nodes are not equally spread, instead a non-uniform grid is used. Areas with high energy fluctuations, like the area around the collector pipe and the layers near the earth's surface as well as the lower boundary, are simulated with a finer mesh to be able to represent short-term energy gradients, while areas with low energy fluctuations are modelled with a wider mesh. This allows for a good balance of accuracy and computational speed. The overall accuracy can be adjusted by the minimal mesh width and the factor the mesh increases from node to node. The following presets are made, all using an expansion factor of 2.0, meaning the grid width is doubled from node to node until the maximum width is reached.
+
+| Accuracy Mode    | Minimum Mesh Width | Maximum Mesh Width  |
+|------------------|--------------------|---------------------|
+| very_rough       | `D_o`              | `D_o * 256`         |
+| rough            | `D_o / 2`          | `D_o * 128`         |
+| normal           | `D_o / 4`          | `D_o * 64`          |
+| high             | `D_o / 8`          | `D_o * 32`          |
+| very_high        | `D_o / 16`         | `D_o * 16`          |
+
+Here, a grid with the accuracy mode "normal" is shown as example:
+
+<center>![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}</center>
+
+The following figure presents a convergence study for the numerical grid used in the geothermal collector across the different accuracy modes outlined above (with an additional "extreme_rough" to clarify the convergence). Notably, starting with the "normal" accuracy mode, convergence is observed, particularly during the soil’s phase change stage.
+
+![convergence study for geothermal collector mesh](fig/241028_collector_convergence_study_with_freezing.svg)
+
+The computational nodes each represent control volumes of the soil with a constant temperature. By balancing the energy of the control volumes in each time step, their temperatures can be recalculated taking into account the heat storage effect. The calculation from \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) will be explained in detail later.
 
 The control volumes are calculated as follows:
 $$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z $$
@@ -1001,7 +1016,7 @@ $$ T_{lat} = \frac{T_{\text{freezing upper limit}} + T_{\text{freezing lower lim
 
 where \(T_{\text{freezing upper limit}} \) and \(T_{\text{freezing lower limit}} \) are the upper and lower temperature limit of the freezing process, \(T_{lat}\) the mid point between these upper and lower temperature limit and \(\Delta T_{lat}\) is the temperature difference between the upper and lower temperature limit. \(h_{lat}\) is the specific freezing (or fusion) enthalpy of the soil and \(c_{soil,\ unfr} \) and \(c_{soil,\ fr} \) are the specific heat capacity of the unfrozen and frozen soil. As \(c_{soil}(T)\) is used in the energy balances of every volume element, but also depends on the soil temperature, a solving algorithm is used to determine it's correct value as well as the correct temperature of each volume element in every time step.
 
-As a result, the heat capacity takes on significantly larger values during the phase change, so that the temperature deviation between the time steps becomes minimal. This effect is shown in the following figure, where a constant demand of energy is taken from a volume element of soil.
+As a result, the heat capacity significantly increases during the phase change, minimizing the temperature variation between time steps. This effect is illustrated in the following figure, where a constant energy demand is drawn from a soil volume element.
 
 ![Temperature of a volument element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
 
