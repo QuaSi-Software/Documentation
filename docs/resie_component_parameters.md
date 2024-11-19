@@ -928,7 +928,7 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `use_dynamic_fluid_properties` | `Bool` | N/Y | true | [-] | flag if temperature dependend calculation of the fluid Reynolds number adapted from TRNSYS Type 710 should be used (true), defaults to false|
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | true | [-] | flag if empirical temperature dependend calculation of the fluid Reynolds number adapted from TRNSYS Type 710 should be used (true), defaults to false|
 | `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the caluclation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
 | `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
