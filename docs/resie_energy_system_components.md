@@ -978,7 +978,22 @@ The temperature calculation in the nodes neighbouring the pipe differs from the 
 Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Here, additionally to the method for the calculation of the laminar Nußelt number for the determination of the convective heat transfer coefficient on the inside of the pipe \(\alpha_i \) introduced by Ramming and explained above, a method by Stephan[^Stephan1959] [^Waermeatlas] is implemented and can be chosen in the user input file:
+
+$$ Nu_\text{laminar, Stephan} = 3.66 + 
+\frac{
+    0.0677 \left( {Re}_{{fluid}} \cdot {Pr}_{{fluid}} \cdot \frac{D_i}{l_{pipe}} \right)^{1.33}
+}{
+    1 + 0.1 \cdot {Pr}_{{fluid}} \left( {Re}_{{fluid}} \cdot \frac{D_i}{l_{pipe}} \right)^{0.83}
+}
+\cdot \left( \frac{{Pr}_{{fluid}}}{{Pr}_{{water}}} \right)^{0.11}
+$$
+
+[^Stephan1959]: Stephan, Karl (1959): Wärmeübergang und Druckabfall bei nicht ausgebildeter Laminarströmung in Rohren und in ebenen Spalten. In: Chemie Ingenieur Technik 31 (12), S. 773–778. DOI: 10.1002/cite.330311204.
+
+[^Waermeatlas]: VDI-Gesellschaft Verfahrenstechnik und Chemieingenieurwesen (2013): VDI-Wärmeatlas. Mit 320 Tabellen. 11., bearb. und erw. Aufl. Berlin, Heidelberg: Springer Vieweg.
+
+Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
 
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
@@ -1047,6 +1062,8 @@ Symbol | Description | Unit
 \(j\)  | Index for the node position in y-direction  | [-]
 \(l_{\text{pipe}}\) |total length of a the pipe | [m] 
 \(n\)  | Index for the time step   | [-]
+\(Nu\)  | Nußelt number	   | [-]
+\(Pr\)  | Prandtl number	|
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m^2\)]
 \(\dot{q}_{\text{rad}}\)  |  long-wave radiation exchange with the ambient   | [W / \(m^2\)]
@@ -1054,6 +1071,7 @@ Symbol | Description | Unit
 \(\dot{Q}\)  | heat extraction or injection rate   | [W]
 \(Q_{\text{in,out},i,j}\)  | heat energy supplied or released between two time steps   | [J]
 \(r\)  | reflectance of the earth's surface   | [-]
+\(R_e \)  | Reynolds number   | [-]
 \(R_p \)  | length-specific thermal pipe resistance   | [(m K) / W]
 \(T\)  | Temperature   | [°C]
 \(T_{abs}\)  | absolute Temperature   | [K]
