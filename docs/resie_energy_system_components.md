@@ -970,11 +970,11 @@ with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the
 Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid 
 is modelled in one node. Each of the five neighbouring nodes are set to \(\Delta x = \Delta y = D_o / 2\) while the two volumina at the 
 mirror axis are cut in half. To each of the five nodes, 1/4, and 1/8 for the halved nodes, of the soil volume surrounding the pipe 
-is assigned.
+is assigned as simplification, however, the temperature of the five nodes is averaged afterwards.
 
 ![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
-The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground. It is provided to the geothermal collector model as an input parameter of ReSiE.
+The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground.
 Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid

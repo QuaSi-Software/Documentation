@@ -873,7 +873,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `fluid_reynolds_number` (detailed only), `ambient_temperature`, `global_radiation_power` |
+| **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
 
 A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters.
 
@@ -890,6 +890,8 @@ A model of a geothermal collector that can also be used to simulate a cold distr
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
 | `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
 | `max_input_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum input power per collector area |
+| `fluid_min_output_temperature` | `Float` | N/Y | -5 | [°C] | minimum output temperature of the fluid for unloading, defaults to "Nothing" |
+| `fluid_max_input_temperature` | `Float` | N/Y | 60 | [°C] | maximum input temperature of the fluid for loading, defaults to "Nothing" |
 | `phase_change_upper_boundary_temperature` | `Float` | Y/Y | -0.25 | [°C] | the upper boundary of the phase change temperature range |
 | `phase_change_lower_boundary_temperature` | `Float` | Y/Y | -1.0 | [°C] | the lower boundary of the phase change temperature range |
 | `number_of_pipes` | `Float` | Y/Y | 1 | [-] | the number of parallel collector pipes |
@@ -926,6 +928,8 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | true | [-] | flag if temperature dependend calculation of the fluid Reynolds number adapted from TRNSYS Type 710 should be used (true), defaults to true|
+| `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the caluclation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
 | `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of the fluid |
