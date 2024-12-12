@@ -1098,23 +1098,23 @@ $$
 $$
 
 The thermal losses into the ground are only condsidered for the model "ideally mixed".
-With the user-given ratio of radius (\(r\)) to height (\(h\)) of the cylinder (minimum A/V is reached with r/h = 0.5) and the volume, all surfaces can be calculated:
+With the user-given ratio of height (\(h\)) to radius (\(r\)) of the cylinder (minimum A/V is reached with hr = 2) and the volume, all surfaces can be calculated:
 
-$$ V_{STTES} = \pi * r^2 * h $$
+$$ V_{STTES} = \pi \ r^2 \ h $$
 
 leads to
 
-$$ r = \sqrt[3]{\frac{r/h * V_{STTES}}{\pi}} \qquad \text{and} \qquad h = \frac{r}{r/h} $$
+$$ r = \sqrt[3]{\frac{V_{STTES}}{hr \ \pi}} \qquad \text{and} \qquad h = hr \ r $$
 
 and
 
-$$ A_{STTES,barrel}= 2 \pi r h \qquad \text{and} \qquad A_{STTES,top} = A_{STTES,bottom} = \pi  r^2 $$
+$$ A_{STTES,barrel}= 2 \pi \ r \ h \qquad \text{and} \qquad A_{STTES,top} = A_{STTES,bottom} = \pi \ r^2 $$
 
 For the ideally stratisfied model, \(\dot{Q}_{STTES,losses} \) leads to a reduction of the energy content of the storage by:
 
 $$ Q_{STTES,losses} = \dot{Q}_{STTES,losses} \ \ \Delta \ t $$
 
-For the ideally mixed model, a linear reduction of the temperature results in the new temperatre of the storage:
+For the ideally mixed model, a linear reduction of the temperature results in the new temperature of the storage:
 
 $$ T_{STTES,afterloss} = T_{STTES,t} - \frac{Q_{STTES,losses}}{Q_{STTES,curent}} (T_{STTES,t} -  T_{STTES,cold}) $$
 
@@ -1140,7 +1140,7 @@ Symbol | Description | Unit
 \(V_{STTES}\)  | volume of the STTES | [m\(^3\)]
 \(r\)  | radius of the cylindical STTES | [m]
 \(h\)  | height of the cylindical STTES | [m]
-\(r/h\)  | radius to height ratio of the cylindical STTES | [-]
+\(hr\)  | height to radius ratio (h/r) of the cylindical STTES | [-]
 \(A_{STTES,barrel}\)  | surface area of the cylinder barrel | [m\(^2\)]
 \(A_{STTES,top}\)  | surface area of the cylinder top | [m\(^2\)]
 \(A_{STTES,bottom}\)  | surface area of the cylinder bottom | [m\(^2\)]
