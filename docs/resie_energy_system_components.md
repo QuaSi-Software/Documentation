@@ -1058,9 +1058,15 @@ Absorption/adsorption chiller are not implemented yet (ToDo).
 ## Short-term thermal energy storage (STTES)
 ![Energy flow of STTES](fig/221028_STTES.svg)
 
-The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers.
+The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of the both models are available. Here, a switchpoint is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
 
 ![Scetch of STTES](fig/221021_STTES_scetch.svg)
+
+![Switchpoint model](fig/241213_buffer_tank_switchpoint_model.svg)
+
+The tree models are compared in the following figure, showing the output temperature during unloading at a constant unloading rate and without losses. 
+
+![Unloading temperauture curve of differnet models of the buffer tank](fig/241213_comparison_buffertank_models.png)
 
 Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. Also, possible energy gains into the cold layer are not included.
 This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simuation of the thermal stratification.
@@ -1150,9 +1156,9 @@ Symbol | Description | Unit
 \(T_{STTES,cold}\)  | rated lower temperature of the STTES | [°C]
 \(T_{STTES,ambientair}\)  | ambient temperature of the air around the STTES | [°C]
 \(T_{STTES,ambientground}\)  | ground temperature below the STTES | [°C]
-\(U_{STTES,barrel}\)  | thermal conductivity of the barrel of the STTES | [W/m\(^2\)K]
-\(U_{STTES,top}\)  | thermal conductivity of the top of the STTES | [W/m\(^2\)K]
-\(U_{STTES,bottom}\)  | thermal conductivity of the bottom of the STTES | [W/m\(^2\)K]
+\(U_{STTES,barrel}\)  | thermal transmission of the barrel of the STTES | [W/m\(^2\)K]
+\(U_{STTES,top}\)  | thermal transmission of the top of the STTES | [W/m\(^2\)K]
+\(U_{STTES,bottom}\)  | thermal transmission of the bottom of the STTES | [W/m\(^2\)K]
 
 **State variables of the STTES:**
 
@@ -1300,9 +1306,9 @@ Symbol | Description | Unit
 \(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m\(^3\)]
 \(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
 \(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m\(^2\)/s]
-\(U_{STES,lid}\)  | heat transfer coefficient of the STES' lid | [W/m\(^2\) K]
-\(U_{STES,wall}\)  | heat transfer coefficient of the STES' wall | [W/m\(^2\) K]
-\(U_{STES,bottom}\)  | heat transfer coefficient of the STES' bottom | [W/m\(^2\) K]
+\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m\(^2\) K]
+\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m\(^2\) K]
+\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m\(^2\) K]
 \(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
 \(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
 \(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]
