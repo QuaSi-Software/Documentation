@@ -482,15 +482,15 @@ A short-term storage for heat, stored with a thermal heat carrier fluid, typical
 
 Three model types are available. The model `ideally_stratified` assumes two adiabatically separated temperature layers, 
 the upper one with `high_temperature` and the lower one with `low_temperature`. 
-Here, possible losses are only energy losses affecting the amount of energy in the hot layer without reducing it's temperature. 
+Here, possible losses are only energy losses affecting the amount of energy in the hot layer without reducing its temperature. 
 Note that no gains into the cold layer are included in the model.
 
 The `ideally_mixed` model assumes a perfectly mixed storage, meaning the whole storage always has the same temperature 
 between `high_temperature` and `low_temperature`. Here, losses result in a decrease of temperature of the storage medium. 
-Note that the storage has it's high temperature only at a load of 100% and that connected components may not accept 
+Note that the storage has its high temperature only at a load of 100% and that connected components may not accept 
 temperatures at a lower temperature. 
 
-The `balanced`model is a combination of the latter two models. Here, a switchpoint is defined as the percentage of the
+The `balanced`model is a combination of the latter two models. Here, a `switch_point` is defined as the fraction of the
 load of the storage where the model switches from ideally stratified to ideally mixed.
 
 Independent of the model, the input temperature is always required at `high_temperature`.
@@ -518,7 +518,7 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | ----------- | ------- | --- | ------- | ---- | ----------- |
 | `switch_point` | `Float` | Y/Y | 0.15 |  [-] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
 
-**Paramter to consider losses (only for consider_losses = true):**
+**Parameter to consider losses (only for consider_losses = true):**
 
 | Name        | Type    | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ------- | ---- | ----------- |
