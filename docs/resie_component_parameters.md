@@ -471,30 +471,69 @@ A storage for electricity.
 | --- | --- |
 | **Type name** | `BufferTank`|
 | **File** | `energy_systems/storage/buffer_tank.jl` |
-| **Available models** | default: `simplified` |
+| **Available models** | `ideally_stratified`, `balanced`, `ideally_mixed` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
 
-A short-term storage for heat of thermal carrier fluids, typically water.
+A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
-**Model `simplified`:**
+Three model types are available. The model `ideally_stratified` assumes two adiabatically separated temperature layers, 
+the upper one with `high_temperature` and the lower one with `low_temperature`. 
+Here, possible losses are only energy losses affecting the amount of energy in the hot layer without reducing it's temperature. 
+Note that no gains into the cold layer are included in the model.
 
-If the adaptive temperature calculation is activated, the temperatures for the input/output of the BT depends on the load state. If it is sufficiently full (depends on the `switch_point`), the BT can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+The `ideally_mixed` model assumes a perfectly mixed storage, meaning the whole storage always has the same temperature 
+between `high_temperature` and `low_temperature`. Here, losses result in a decrease of temperature of the storage medium. 
+Note that the storage has it's high temperature only at a load of 100% and that connected components may not accept 
+temperatures at a lower temperature. 
 
-If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+The `balanced`model is a combination of the latter two models. Here, a switchpoint is defined as the percentage of the
+load of the storage where the model switches from ideally stratified to ideally mixed.
 
+Independent of the model, the input temperature is always required at `high_temperature`.
+For the size of the buffer tank, either the `volume` or the `capacity` can be given. If a capacity is given and no losses are considered,
+the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the BT. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the BT. |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
-| `switch_point` | `Float` | Y/Y | 0.15 | Partial load at which the adaptive output temperature calculation switches. |
-| `high_temperature` | `Temperature` | Y/Y | 75.0 | The high end of the adaptive in-/output temperature. |
-| `low_temperature` | `Temperature` | Y/Y | 20.0 | The low end of the adaptive in-/output temperature. |
+**General parameter:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `model_type` | `String` | Y/Y | "ideally_stratified" | [-] | type of the buffer tank model: `ideally_stratified`, `balanced`, `ideally_mixed` |
+| `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
+| `volume` | `Float` | Y/N | 15.5 |  [\(m^3\)] | volume of the BT: Note that either volume or capacity should be given.  |
+| `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m^3\)] | density of the heat carrier medium |
+| `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
+| `initial_load` | `Float` | Y/Y | 80.0 |  [%] [0:100] |the initial load state of the buffer tank, defaults to zero |
+| `max_load_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
+| `max_unload_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
+
+**Parameter for the "balanced" model:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `switch_point` | `Float` | Y/Y | 0.15 |  [-] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
+
+**Paramter to consider losses (only for consider_losses = true):**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `consider_losses` | `Bool` | Y/Y | False | [-] | flag if losses should be taken into account |
+| `h_to_r` | `Float` | Y/Y | 2.0 | [-] | ratio of height to radius of the cylinder representing the buffer tank |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
+| `thermal_transmission_lid` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
+| `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | Path to the profile for the surrounding air temperature, for model_type `ideally_mixed` only. |
+| `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
+| `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | If given, sets the temperature of the surrounding air temperature to a constant value. |
+| `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of surrounding air temperature to the ambient air temperature of the global weather file. |
+
+Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+
 
 ### Seasonal thermal storage
 | | |
