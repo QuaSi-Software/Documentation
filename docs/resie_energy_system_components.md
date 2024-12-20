@@ -942,7 +942,7 @@ significantly on the physical properties of the soil and the minimum spacial ste
 
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
 
-$$\tau_{\text{max}} = \frac{\rho_{soil} \; c_{soil,\ unfr} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})^2}{4 \; \lambda_{soil}}$$
+$$\tau_{\text{max}} = \min \left( \frac{c_{soil,\ frozen}}{\lambda_{soil,\ frozen}},\frac{c_{soil,\ unfrozen}}{\lambda_{soil,\ unfrozen}} \right) \; \frac{\rho_{soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})^2}{4}$$
 
 By rearranging the equation of the energy balance from above, the new value for the temperature of each control volume can be 
 calculated for the current time step as
@@ -955,17 +955,20 @@ In addition, the lateral simulation boundaries are considered adiabatic, so the 
 At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
 For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
 
-$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
+$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
 where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long-wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
 
-$$\dot{q}_{\text{glob}} = (1 - r) \; E_{\text{glob}}$$
-with \(r\) as the reflectance of the earth's surface and \(E_{glob}\) as the global radiation read from a weather dataset;
+$$\dot{q}_{\text{glob}} = (1 - r) \; \dot{q}_{\text{solar,glob}}$$
+with \(r\) as the reflectance of the earth's surface and \dot{q}_{\text{solar,glob}} as the global horizontal solar radiation on the surface;
 
-$$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{amb}}^4 - T_{abs,i,1}^4)$$
-where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}\) is the Stefan-Boltzmann constant, and \(T_{abs}\) is the absolute temperature (in K);
+$$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{sky}}^4 - (T_{i,1} + 273.15)^4)$$
+with
+$$ T_{sky} = \left (\frac{\dot{q}_{\text{horizontal infrared radiation}}}{\sigma_{\text{Boltzmann}}} \right ) ^ {0.25} $$
+
+where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}\) is the Stefan-Boltzmann constant, \(T_{sky}\) the effective mean sky temperature (sky radiative temperature) in Kelvin, \(T_{i,1}\) the temperature of the surface soil element and \(\dot{q}_{\text{horizontal infrared radiation}}\) the horizontal infrared radiation intensity from the sky;
 
 $$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \; (T_{\text{amb}} - T_{i,1})$$
-with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T\) as the ambient air temperature.
+with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T_{amb}\) the ambient air temperature.
 
 Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid 
 is modelled in one node. Each of the five neighbouring nodes are set to \(\Delta x = \Delta y = D_o / 2\) while the two volumina at the 
@@ -1008,6 +1011,11 @@ The heat extraction or heat input capacity is related to the tube length of the 
 $$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \; R_p$$
 
 with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
+
+Optional, dynamic fluid properties for a 30 vol-% ethylene glycol mix, adapted from TRNSYS Type 710, are implemented using the following temperature-depended properties for the calculation of the dynamic viscosity \(\nu_{\text{fl}}\) and thermal conductivity of the fluid, \(\lambda_{fluid}\), both needed for the calculation of temperature-dependend Reynolds and Prandtl number:
+
+$$ \nu_{\text{fl}} = 0.0000017158 \, T_{\text{fl,m}}^2 - 0.0001579079 \, T_{\text{fl,m}} + 0.0048830621 $$
+$$ \lambda_{fluid} = 0.0010214286 \, T_{\text{fl,m}} + 0.447 $$
 
 #### Phase Change
 In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature, as shown in the following figure:
@@ -1065,6 +1073,7 @@ Symbol | Description | Unit
 \(Nu\)  | Nußelt number	   | [-]
 \(Pr\)  | Prandtl number	|
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
+\(\dot{q}_{\text{horizontal infrared radiation}}\) |  the horizontal infrared radiation intensity from the sky | [W / \(m^2\)]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m^2\)]
 \(\dot{q}_{\text{rad}}\)  |  long-wave radiation exchange with the ambient   | [W / \(m^2\)]
 \(\dot{q}_{\text{konv}}\)  | convective heat flux  | [W / \(m^2\)]
@@ -1078,6 +1087,7 @@ Symbol | Description | Unit
 \(T_{\text{fl,am}}\) | mean fluid temperature   | [°C]
 \(T_{\text{freezing upper limit}}\) | upper temperature limit of the freezing process | [°C]
 \(T_{\text{freezing lower limit}}\) | lower temperature limit of the freezing process | [°C]
+\(T_{sky} \) | effective mean sky temperature (sky radiative temperature) | [K]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
 

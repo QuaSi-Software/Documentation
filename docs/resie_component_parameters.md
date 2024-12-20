@@ -882,10 +882,15 @@ A model of a geothermal collector that can also be used to simulate a cold distr
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `model_type` | `String` | Y/Y | `simplified` | [-] | Type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
-| `temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient temperature (provide either this or temperature_profile_file_path) |
-| `temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient temperature (provide either this or temperature_from_global_file)  |
-| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global horizontal radiation (provide either this or global_solar_radiation_profile_file_path) |
-| `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global horizontal radiation (provide either this or global_solar_radiation_from_global_file)  |
+| `temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient temperature (provide either this or temperature_profile_file_path or constant_temperature) |
+| OR: `temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient temperature (provide either this or temperature_from_global_file or constant_temperature)  |
+| OR: `constant_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
+| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
+| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
+| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m^2] | constant value for global horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
+| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
+| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m^2] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
 | `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
 | `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
@@ -928,7 +933,7 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `use_dynamic_fluid_properties` | `Bool` | N/Y | true | [-] | flag if empirical temperature dependend calculation of the fluid Reynolds number adapted from TRNSYS Type 710 should be used (true), defaults to false|
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | true | [-] | flag if temperature dependend calculation of the fluids Reynolds number for a 30 Vol-% ethylene glycol mix from TRNSYS Type 710 should be used (true), defaults to false|
 | `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the caluclation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
 | `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
@@ -949,6 +954,7 @@ To perform this calculation in every timestep, the following input parameters ar
             "___GENERAL PARAMETER___": "",
             "temperature_from_global_file": "temp_ambient_air",
             "global_solar_radiation_from_global_file": "globHorIrr",
+            "infrared_sky_radiation_from_global_file": "longWaveIrr",
             "accuracy_mode": "rough",
             "regeneration": false,
             "max_output_power": 25,
