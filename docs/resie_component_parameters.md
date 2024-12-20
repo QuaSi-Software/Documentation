@@ -535,6 +535,41 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
 
+**Examplary input file definition for buffer tank**
+
+```JSON
+ "TST_BFT_TH_01": {
+            "type": "BufferTank",
+            "medium": "m_h_w_ht1",
+            "output_refs": [
+                "TST_DEM_01"
+            ],
+            "___GENERAL PARAMETER___": "",
+            "model_type": "ideally_stratified",
+            "capacity": 300000,
+            "rho_medium": 1000,
+            "cp_medium": 4.18,
+            "high_temperature": 80.0,
+            "low_temperature": 20.0,
+            "initial_load": 50,
+            "max_load_rate": 1.0,
+            "max_unload_rate": 1.0,
+            "___BALANCED MODEL ONLY___": "",
+            "switch_point": 0.25,
+            "___LOSSES___": "",
+            "consider_losses": true,
+            "h_to_r": 2,
+            "constant_ambient_temperature": 18,
+            "ground_temperature": 12,
+            "thermal_transmission_lid": 0.2,
+            "thermal_transmission_barrel": 0.2,
+            "thermal_transmission_bottom": 0.2
+        }
+}
+```
+
+
+
 ### Seasonal thermal storage
 | | |
 | --- | --- |
