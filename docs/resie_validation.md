@@ -70,3 +70,103 @@ The profile of the input (regeneratrion) and output (heating) energy of the prob
 
 Also, a simulation performed with different time steps has been compared, from 15 minutes to 4 hours, showing only slight and expected differences in the average fluid temperature, caused by the different time resolution.
 
+### Geothermal collector
+
+The implemented model of the geothermal collector is based on the TRNSYS Type 710[^Type710]. Therefore, a validation of the implementation was done using the same TRNSYS Type for different simulations, comparing the mean fluid temperature of the collector. Also, DELPHIN 6.1.6 was used to perform additional analogical simulations, also considering the moisture content and transport within the soil. DELPHIN was originally developed as simulation program for coupled heat, moisture and mass transport in capillary-porous building materials by the University Dresden[^DELPHIN]. 
+
+Also, measurement data of a geothermal collector were used to compare the behaviour of all three simulation models with reality. Although, the ground properties were not reliably known, and only one month of continuous data without corruptions were available, limiting the validity of the results. Additionally, ahead and during this month, a lot of rain occurred, leading to a very high moisture content in the soil.  
+
+First, the geothermal collector was simulated with all three simulations models for one year without any energy extraction to evaluate the behaviour of the finite element model without load. Here, difficulties in the determination of the initial conditions, especially the temperature distribution in the soil, occurred, leading to small deviations at the beginning of the simulation time. The models of ReSiE and TRNSYS show strong similarities, which is not surprising as the models are very similar. DELPHIN has slight deviations, which can be explained by the more detailed model that takes both moisture content and moisture transport into account.
+
+![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature with no energy demand](fig/241220_zero_energy_one_year.svg)
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. DELPHIN                   | 0.74                      |  1.91                     |
+| ReSiE vs. TRNSYS                    | 0.16                      |  1.18                     |
+
+
+Then, a realistic energy demand profile for heating and hot water of a 2.500 m^2 building with 85 % living and 15 % commercial was used to evaluate the dynamic behaviour of the models. Especially in summer, small deviations between ReSiE and TRNSYS are visible, but an overall congruency can be observed. In short term analysis, the model in ReSiE shows stronger gradients in the change in extraction power compared to TRNSYS, which may originates from the different model of the thermal transport from fluid to the pipe-surrounding soil. Overall, all three models show acceptable differences. 
+
+![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one year with energy profile as demand](fig/241220_profile_one_year.svg)
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. DELPHIN                   | 0.92                      |  4.87                     |
+| ReSiE vs. TRNSYS                    | 0.92                      |  2.12                     |
+
+![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one year with energy profile as demand, shown as daily avearge](fig/241220_profile_one_year_daily_average.svg)
+
+![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one week with energy profile as demand](fig/241220_profile_one_week.svg)
+
+As third, a constant energy demand of 55 kW was taken from the collector over the time of three years. Here, especially the freezing effects of the soil can be observed. While ReSie and TRNSYS are quite similar, with small deviations in the freezing process, likely due to a different discretization of the numerical grid, the DELPHIN model obviously does not account for the additional thermal energy in the melting and freezing process in this case. In summer, small deviations of ReSiE and TRNSYS can be observed, but they are in the range of less than one Kelvin.
+
+![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one year with energy profile as demand](fig/241220_55kW_three_years.svg)
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. DELPHIN                   | 1.23                      |  5.09                     |
+| ReSiE vs. TRNSYS                    | 0.31                      |  3.44                     |
+
+
+In the following, the simulation results compared to the measurement data of one month, November, are shown. The local weather was used from a nearby weather station for the simulations. Here, the initial temperature distribution and the physical properties of the soil were completely unknown, which limits the validity of the results, as some parameters had to be determined iteratively, meaning the simulation results were fitted to the measurement data. Nevertheless, after the parameter fit, the dynamic behaviour of the models was shown to be in agreement with each other and with the measurement data.
+
+![Validation of collector model with TRNSYS, DELPHIN and Measurement data: Average fluid temperature over one month](fig/241220_measurement_one_month.svg)
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. DELPHIN                   | 0.62                      |  2.34                     |
+| ReSiE vs. TRNSYS                    | 0.55                      |  2.13                     |
+| ReSiE vs. Measurements              | 0.37                      |  1.76                     |
+| DELPHIN vs. Measurements            | 0.45                      |  1.83                     |
+| TRNSYS vs. Measurements             | 0.49                      |  3.42                     |
+
+
+In ReSiE, the detailed model for the energy transport from fluid to soil were used, while the numerical mesh was of type "normal". All ambient data were read out of a weather file. The following parameters were used for the simulations of the comparison of ReSiE, TRNSYS and DELPHIN:
+
+| Variable                      | Value |
+| ----------------------------- | ----- |
+| accuracy_mode | "normal" |
+| phase_change_upper_boundary_temperature | -0.25 °C |
+| phase_change_lower_boundary_temperature | -1.0 °C |
+| number_of_pipes | 47 |
+| pipe_length | 93 m |
+| pipe_spacing | 1.02 m |
+| pipe_laying_depth | 2.0 m |
+| pipe_radius_outer | 0.02 m |
+| considered_soil_depth | 10.0 m |
+| soil_specific_heat_capacity | 850 J/(kgK) |
+| soil_specific_heat_capacity_frozen | 850 J/(kgK) |
+| soil_density | 1900 kg/m^3 |
+| soil_heat_conductivity | 2.4 W/(mK) |
+| soil_heat_conductivity_frozen | 2.9 W/(mK) |
+| soil_specific_enthalpy_of_fusion | 90000 J/K |
+| surface_convective_heat_transfer_coefficient | 14.7 W/(m^2 K) |
+| surface_reflection_factor | 0.25 |
+| surface_emissivity | 0.9 |
+| unloading_temperature_spread | 3.0 K |
+| start_temperature_fluid_and_pipe | 15.5 °C  |
+| undisturbed_ground_temperature | 9.0 °C  |
+| pipe_thickness | 0.0037 m |
+| pipe_heat_conductivity | 0.4 W/(mK) |
+| fluid_specific_heat_capacity | 3944 J/(kgK) |
+| fluid_heat_conductivity | 0.499 W/(mK) |
+| fluid_density | 1025 kg/m^3 |
+| fluid_kinematic_viscosity | 3.6e-6 m^2/s |
+| fluid_prantl_number | 30 |
+
+The parameters for the comparison with the measurement data were deviating as follows, due to extremely wet conditions, the beginning of the heating season and therefore warm soil, and the high volume flow through the collector:
+
+| Variable                      | Value |
+| ----------------------------- | ----- |
+| soil_specific_heat_capacity | 2100 J/(kgK) |
+| unloading_temperature_spread | 0.2 K |
+| undisturbed_ground_temperature | 11.0 °C |
+| start_temperature_fluid_and_pipe | 16.0 °C |
+        
+In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the normal simulations and 700 W/m²K for the measurement data was used.
+
+
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+
+[^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
