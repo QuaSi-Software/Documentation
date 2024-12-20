@@ -565,10 +565,7 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
             "thermal_transmission_barrel": 0.2,
             "thermal_transmission_bottom": 0.2
         }
-}
 ```
-
-
 
 ### Seasonal thermal storage
 | | |
