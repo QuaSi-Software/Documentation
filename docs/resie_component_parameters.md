@@ -895,8 +895,8 @@ A model of a geothermal collector that can also be used to simulate a cold distr
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
 | `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
 | `max_input_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum input power per collector area |
-| `fluid_min_output_temperature` | `Float` | N/Y | -5 | [°C] | minimum output temperature of the fluid for unloading, defaults to "Nothing", meaning no limit in the output temperature is applied. |
-| `fluid_max_input_temperature` | `Float` | N/Y | 60 | [°C] | maximum input temperature of the fluid for loading, defaults to "Nothing", meaning no limit in the input temperature is applied. |
+| `fluid_min_output_temperature` | `Float` | N/N | -5 | [°C] | minimum output temperature of the fluid for unloading; if not specified, no limit is applied for the output temperature |
+| `fluid_max_input_temperature` | `Float` | N/N | 60 | [°C] | maximum input temperature of the fluid for loading; if not specified, no limit is applied for the input temperature |
 | `phase_change_upper_boundary_temperature` | `Float` | Y/Y | -0.25 | [°C] | the upper boundary of the phase change temperature range |
 | `phase_change_lower_boundary_temperature` | `Float` | Y/Y | -1.0 | [°C] | the lower boundary of the phase change temperature range |
 | `number_of_pipes` | `Float` | Y/Y | 1 | [-] | the number of parallel collector pipes |
