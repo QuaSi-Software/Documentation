@@ -508,7 +508,7 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
-| `initial_load` | `Float` | Y/Y | 80.0 |  [%] [0:100] |the initial load state of the buffer tank, defaults to zero |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%] [0:100] |the initial load state of the buffer tank |
 | `max_load_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
 | `max_unload_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
 
@@ -527,10 +527,10 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | `thermal_transmission_barrel` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
 | `thermal_transmission_lid` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
 | `thermal_transmission_bottom` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
-| `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | Path to the profile for the surrounding air temperature, for model_type `ideally_mixed` only. |
-| `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
-| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | If given, sets the temperature of the surrounding air temperature to a constant value. |
-| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of surrounding air temperature to the ambient air temperature of the global weather file. |
+| `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
+| `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
+| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the temperature of the surrounding air temperature to a constant value |
+| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the temperature of surrounding air temperature to the ambient air temperature of the global weather file |
 
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
