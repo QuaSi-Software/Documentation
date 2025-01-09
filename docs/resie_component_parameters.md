@@ -883,7 +883,7 @@ The parameters characterising the soil and its moisture content, such as heat ca
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `model_type` | `String` | Y/Y | `simplified` | [-] | Type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
 | `temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
 | OR: `temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
 | OR: `constant_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
@@ -905,7 +905,7 @@ The parameters characterising the soil and its moisture content, such as heat ca
 | `pipe_length` | `Float` | Y/Y | 100 | [m] | the length of a single collector pipe |
 | `pipe_spacing` | `Float` | Y/Y | 0.5 | [m] | the spacing between the parallel collector pipes. For a single pipe, use a larger spacing depending on the soil conditions. Check the temporal evolution of the temperature distribution with additional plots in the io_settings. |
 | `pipe_laying_depth` | `Float` | Y/Y | 1.5 | [m] | the depth of the soil between the surface and the pipe |
-| `pipe_radius_outer` | `Float` | Y/Y | 0.016 | [m] | the outher radius of the pipe |
+| `pipe_radius_outer` | `Float` | Y/Y | 0.016 | [m] | the outer radius of the pipe |
 | `considered_soil_depth` | `Float` | Y/Y | 10.0 | [m] | the total depth of the simulated soil from the surface to undisturbed ground temperature |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 1000 | [J/(kgK)] | specific heat capacity of the soil in unfrozen state |
 | `soil_specific_heat_capacity_frozen` | `Float` | Y/Y | 900 | [J/(kgK)] | specific heat capacity of the soil in frozen state |
@@ -935,8 +935,8 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `use_dynamic_fluid_properties` | `Bool` | N/Y | false | [-] | flag if temperature dependend calculation of the fluids Reynolds number for a 30 Vol-% ethylene glycol mix from TRNSYS Type 710 should be used (true), defaults to false|
-| `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the caluclation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | false | [-] | flag if temperature dependent calculation of the fluid's Reynolds number for a 30 Vol-% ethylene glycol mix from TRNSYS Type 710 should be used (true), defaults to false|
+| `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the calculation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
 | `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of the fluid |

@@ -467,7 +467,7 @@ dispatch strategy | method of dispatching the units of the electrolyser to meet 
     * \(\kappa_{min,unit} = 0.25\)
     * \(N_{unit} = 4\)
 
-[^Stickel2024]: Matthias Walter Stickel "Technisches Monitoring & Betriebsoptimierung im Reallabor - Erzeugung von grünem Wasserstoff und Abwärmenutzung inmitten des Stadtquartiers" Poster presentation at 15. Energiewendebauen Projektetreffen (2024) Kassel, [Category D of the poster results](https://ewb.innoecos.com/Group/15.Treffen.Kassel/MediaGallery/Start/Index/66515)
+[^Stickel2024]: Matthias Walter Stickel: Technisches Monitoring & Betriebsoptimierung im Reallabor - Erzeugung von grünem Wasserstoff und Abwärmenutzung inmitten des Stadtquartiers, Poster presentation at 15. Energiewendebauen Projektetreffen (2024) Kassel, [Category D of the poster results](https://ewb.innoecos.com/Group/15.Treffen.Kassel/MediaGallery/Start/Index/66515)
 
 ## Combined heat and power plant (CHPP)
 Implements traits: [PLR-dependent efficiency](resie_transient_effects.md#part-load-ratio-dependent-efficiency)
@@ -866,19 +866,19 @@ t | current simulation time | \([s]\)
 
 
 #### Overview
-There are several types of geothermal heat collectors. The Model in ReSiE covers classic horizontal geothermal heat exchangers with a typical depth of 1-2 m below the surface, e.g. by a number of pipes laid parallel to each other. In addition to the physical properties of the soil, local weather conditions have a noticeable influence on the soil temperature due to the low installation depth below the earth's surface, e.g. compared to geothermal probes systems. When designing geothermal collectors, the aim is to achieve partial icing of the ground around the collector pipes during the heating season in order to utilize latently stored energy. However, the iced volume around the collector pipes must not be too large in order to prevent precipitation from seeping into deeper layers of the earth. VDI 4640-2 specifies design values for the area-related heat extraction capacity depending on the soil type and the climate zone.
+There are several types of geothermal heat collectors. The model in ReSiE covers classic horizontal geothermal heat exchangers with a typical depth of 1-2 m below the surface, e.g. by a number of pipes laid parallel to each other. In addition to the physical properties of the soil, local weather conditions have a noticable influence on the soil temperature due to the low installation depth below the earth's surface, e.g. compared to geothermal probe systems. When designing geothermal collectors, the aim is to achieve partial icing of the ground around the collector pipes during the heating season in order to utilize latently stored energy. However, the iced volume around the collector pipes must not be so large as to prevent precipitation from seeping into deeper layers of the earth. VDI 4640-2 specifies design values for the area-related heat extraction capacity depending on the soil type and the climate zone.
 
 
 #### Simulation domain and boundary conditions
 For modeling horizontal geothermal collectors, a numerical approach is chosen here, which discretizes the soil and calculates a two-dimensional temperature field at each time step. 
 
-In the figure below, a schematic sectional view of the two-dimensional simulation domain is shown. A symmetrical temperature distribution in positive and negative x-direction of the collector tube axis is assumed to save computing time. Furthermore, boundary effects and interaction between adjacent collector tubes are neglected. Therefore, the simulation range in the x-direction includes half the pipe spacing between two adjacent collector pipes including half a collector pipe, where the outer simulation boundaries are assumed to be adiabatic. In y-direction the depth of the simulation area is freely adjustable. Because the lower simulation boundary conditions are assumed to be constant, a sufficiently large distance between the simulation boundary and the collector pipe should be considered, to avoid the calculation results being too strongly influenced by the constant temperature. 
+In the figure below, a schematic sectional view of the two-dimensional simulation domain is shown. A symmetrical temperature distribution in positive and negative x-direction of the collector tube axis is assumed in order to save computing time. Furthermore, boundary effects and interaction between adjacent collector tubes are neglected. Therefore, the simulation range in the x-direction includes half the pipe spacing between two adjacent collector pipes including half a collector pipe, where the outer simulation boundaries are assumed to be adiabatic. In y-direction the depth of the simulation area is freely adjustable. Because the lower simulation boundary conditions are assumed to be constant, a sufficiently large distance between the simulation boundary and the collector pipe should be considered, to avoid the calculation results being too strongly influenced by the constant temperature. 
 
 The simulation area in z-direction is necessary exclusively for the later formation of control surfaces and volumes around the computational nodes for energy balancing and includes the pipe length.
 
 ![simulation domain geothermal heat collector](fig/231017_simulation_domain_geothermal_heat_collector.svg)
 
-Within the simulation domain, a computational grid is built up for the numerical calculation of the temperature field in each time step. The nodes in x-direction get the index "i" (horizontal), those in y-direction the index "j" (vertical). The smaller the spatial step size defined between computational nodes in the x- and y-directions, the finer the computational grid becomes, leading to more accurate temperature calculations. However, this is also associated with a significant increase in computing time. In this model, the spatial step sizes between the computational nodes are not equally spread, instead a non-uniform grid is used. Areas with high energy fluctuations, like the area around the collector pipe and the layers near the earth's surface as well as the lower boundary, are simulated with a finer mesh to be able to represent short-term energy gradients, while areas with low energy fluctuations are modelled with a wider mesh. This allows for a good balance of accuracy and computational speed. The overall accuracy can be adjusted by the minimal mesh width and the factor the mesh increases from node to node. The following presets are made, all using an expansion factor of 2.0, meaning the grid width is doubled from node to node until the maximum width is reached.
+Within the simulation domain, a computational grid is built for the numerical calculation of the temperature field in each time step. The nodes in x-direction get the index "i" (horizontal), those in y-direction the index "j" (vertical). The smaller the spatial step size defined between computational nodes in the x- and y-directions, the finer the computational grid becomes, leading to more accurate temperature calculations. However, this is also associated with a significant increase in computing time. In this model, the spatial step sizes between the computational nodes are not equally spread, instead a non-uniform grid is used. Areas with high energy fluctuations, like the area around the collector pipe and the layers near the earth's surface as well as the lower boundary, are simulated with a finer mesh to be able to represent short-term energy gradients, while areas with low energy fluctuations are modelled with a wider mesh. This allows for a good balance of accuracy and computational speed. The overall accuracy can be adjusted by the minimal mesh width and the expansion factor by which the mesh increases from node to node. The following presets are made, all using an expansion factor of 2.0, meaning the grid width is doubled from node to node until the maximum width is reached.
 
 | Accuracy Mode    | Minimum Mesh Width | Maximum Mesh Width  |
 |------------------|--------------------|---------------------|
@@ -908,8 +908,7 @@ The implemented solver uses explicit finite difference method for the central no
 In the context of this model, the soil is considered to be homogeneous with uniform and temporally constant physical properties. 
 However, an extension to include several earth layers in y-direction would be possible in a simple way by assigning appropriate 
 parameters to the computational nodes. Also, different soil properties like heat conductivity and heat capacity of frozen and 
-unfrozen soil are included. The basis of the temperature calculation is the energy balance in each control volume for each time 
-tep:
+unfrozen soil are included. The basis of the temperature calculation is the energy balance in each control volume for each time step:
 
 $$Q_{\text{in,out},i,j} = V_{i,j} \; \rho_{\text{soil}} \; c_{soil} \; (T_n - T_{n-1})_{i,j}$$
 
@@ -940,7 +939,7 @@ If the value of τ is chosen too large, numerical instabilities and thus complet
 According to the TRNSYS Type 710 Model (Hirsch, Hüsing & Rockendorf 2017)[^Type710], the maximum internal time step size depends 
 significantly on the physical properties of the soil and the minimum spacial step size and can be determined as follows:
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 $$\tau_{\text{max}} = \min \left( \frac{c_{soil,\ frozen}}{\lambda_{soil,\ frozen}},\frac{c_{soil,\ unfrozen}}{\lambda_{soil,\ unfrozen}} \right) \; \frac{\rho_{soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})^2}{4}$$
 
@@ -951,7 +950,7 @@ $$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \; c_{soil}(T_
 
 #### Boundary Conditions
 The control volumes around the computational nodes at the outer edges of the simulation area are calculated so that the respective control volumes do not extend beyond the simulation boundary.
-In addition, the lateral simulation boundaries are considered adiabatic, so the heat fluxes over the adiabatic control surface are set to zero when calculating the temperature.
+In addition, the lateral simulation boundaries are considered adiabatic, so the heat fluxes over the adiabatic control surfaces are set to zero when calculating the temperature.
 At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
 For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
 
@@ -972,8 +971,7 @@ with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the
 
 Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid 
 is modelled in one node. Each of the five neighbouring nodes are set to \(\Delta x = \Delta y = D_o / 2\) while the two volumina at the 
-mirror axis are cut in half. To each of the five nodes, 1/4, and 1/8 for the halved nodes, of the soil volume surrounding the pipe 
-is assigned as simplification, however, the temperature of the five nodes is averaged afterwards.
+mirror axis are cut in half. As simplification, to each of the five nodes 1/4 of the soil volume surrounding the pipe is assigned, and 1/8 for the halved nodes. However, the temperature of the five nodes is averaged afterwards.
 
 ![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
@@ -981,7 +979,7 @@ The temperature calculation in the nodes neighbouring the pipe differs from the 
 Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
 
 #### Heat Carrier Fluid
-The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail again. Here, additionally to the method for the calculation of the laminar Nußelt number for the determination of the convective heat transfer coefficient on the inside of the pipe \(\alpha_i \) introduced by Ramming and explained above, a method by Stephan[^Stephan1959] [^Waermeatlas] is implemented and can be chosen in the user input file:
+The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail. Additionally to the method for the calculation of the laminar Nußelt number for the determination of the convective heat transfer coefficient on the inside of the pipe \(\alpha_i \) introduced by Ramming and explained above, a method by Stephan[^Stephan1959] [^Waermeatlas] is implemented and can be chosen in the user input file:
 
 $$ Nu_\text{laminar, Stephan} = 3.66 + 
 \frac{
@@ -996,9 +994,9 @@ $$
 
 [^Waermeatlas]: VDI-Gesellschaft Verfahrenstechnik und Chemieingenieurwesen (2013): VDI-Wärmeatlas. Mit 320 Tabellen. 11., bearb. und erw. Aufl. Berlin, Heidelberg: Springer Vieweg.
 
-Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in Accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
+Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: “Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS,” BauSIM, Dresden, 2016.
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 $$ k = \left( \frac{D_o}{D_i \; \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\; D_o}{2 \; \lambda_p} + \frac{\Delta x_{min}}{2 \; \lambda_{soil}} \right)^{-1} $$
 
@@ -1012,13 +1010,13 @@ $$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}}
 
 with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
 
-Optional, dynamic fluid properties for a 30 vol-% ethylene glycol mix, adapted from TRNSYS Type 710, are implemented using the following temperature-depended properties for the calculation of the dynamic viscosity \(\nu_{\text{fl}}\) and thermal conductivity of the fluid, \(\lambda_{fluid}\), both needed for the calculation of temperature-dependend Reynolds and Prandtl number:
+Optional, dynamic fluid properties for a 30 vol-% ethylene glycol mix, adapted from TRNSYS Type 710, are implemented using the following temperature-dependent properties for the calculation of the dynamic viscosity \(\nu_{\text{fl}}\) and thermal conductivity of the fluid, \(\lambda_{fluid}\), both needed for the calculation of temperature-dependent Reynolds and Prandtl numbers:
 
 $$ \nu_{\text{fl}} = 0.0000017158 \, T_{\text{fl,m}}^2 - 0.0001579079 \, T_{\text{fl,m}} + 0.0048830621 $$
 $$ \lambda_{fluid} = 0.0010214286 \, T_{\text{fl,m}} + 0.447 $$
 
 #### Phase Change
-In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bounded, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature, as shown in the following figure:
+In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bound, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature, as shown in the following figure:
 
 ![Normal distribution of apparent heat capacity during freezing](fig/241028_soil_heat_capacity_freezing.svg)
 
@@ -1038,9 +1036,9 @@ $$ \Delta T_{lat} = T_{\text{freezing upper limit}} - T_{\text{freezing lower li
 
 $$ T_{lat} = \frac{T_{\text{freezing upper limit}} + T_{\text{freezing lower limit}} }{2} $$
 
-where \(T_{\text{freezing upper limit}} \) and \(T_{\text{freezing lower limit}} \) are the upper and lower temperature limit of the freezing process, \(T_{lat}\) the mid point between these upper and lower temperature limit and \(\Delta T_{lat}\) is the temperature difference between the upper and lower temperature limit. \(h_{lat}\) is the specific freezing (or fusion) enthalpy of the soil and \(c_{soil,\ unfr} \) and \(c_{soil,\ fr} \) are the specific heat capacity of the unfrozen and frozen soil. As \(c_{soil}(T)\) is used in the energy balances of every volume element, but also depends on the soil temperature, a solving algorithm is used to determine it's correct value as well as the correct temperature of each volume element in every time step.
+where \(T_{\text{freezing upper limit}} \) and \(T_{\text{freezing lower limit}} \) are the upper and lower temperature limit of the freezing process, \(T_{lat}\) the mid point between these upper and lower temperature limit and \(\Delta T_{lat}\) is the temperature difference between the upper and lower temperature limit. \(h_{lat}\) is the specific freezing (or fusion) enthalpy of the soil and \(c_{soil,\ unfr} \) and \(c_{soil,\ fr} \) are the specific heat capacity of the unfrozen and frozen soil. As \(c_{soil}(T)\) is used in the energy balances of every volume element, but also depends on the soil temperature, a solving algorithm is used to determine its correct value as well as the correct temperature of each volume element in every time step.
 
-As a result, the heat capacity significantly increases during the phase change, minimizing the temperature variation between time steps. This effect is illustrated in the following figure, where a constant energy demand is drawn from a soil volume element.
+As a result, the heat capacity significantly increases during the phase change, reducing the temperature variation between time steps. This effect is illustrated in the following figure, where a constant energy demand is drawn from a soil volume element.
 
 ![Temperature of a volument element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
 
@@ -1066,24 +1064,24 @@ Symbol | Description | Unit
 \(D_o \)  | outside diameter of the pipe   | [m]
 \(E_{glob}\)  | global solar radiation on horizontal surface | [W / \(m^2\)]
 \(h_{lat}\) | specific enthalpy of fusion of the soil| [J / kg]
-\(i\)  | Index for the node position in x-direction  | [-]
-\(j\)  | Index for the node position in y-direction  | [-]
+\(i\)  | index for the node position in x-direction  | [-]
+\(j\)  | index for the node position in y-direction  | [-]
 \(l_{\text{pipe}}\) |total length of a the pipe | [m] 
-\(n\)  | Index for the time step   | [-]
+\(n\)  | index for the time step   | [-]
 \(Nu\)  | Nußelt number	   | [-]
 \(Pr\)  | Prandtl number	|
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
-\(\dot{q}_{\text{horizontal infrared radiation}}\) |  the horizontal infrared radiation intensity from the sky | [W / \(m^2\)]
+\(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m^2\)]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m^2\)]
-\(\dot{q}_{\text{rad}}\)  |  long-wave radiation exchange with the ambient   | [W / \(m^2\)]
+\(\dot{q}_{\text{rad}}\)  |  long-wave radiation exchange with the environment   | [W / \(m^2\)]
 \(\dot{q}_{\text{konv}}\)  | convective heat flux  | [W / \(m^2\)]
 \(\dot{Q}\)  | heat extraction or injection rate   | [W]
 \(Q_{\text{in,out},i,j}\)  | heat energy supplied or released between two time steps   | [J]
 \(r\)  | reflectance of the earth's surface   | [-]
 \(R_e \)  | Reynolds number   | [-]
 \(R_p \)  | length-specific thermal pipe resistance   | [(m K) / W]
-\(T\)  | Temperature   | [°C]
-\(T_{abs}\)  | absolute Temperature   | [K]
+\(T\)  | temperature   | [°C]
+\(T_{abs}\)  | absolute temperature   | [K]
 \(T_{\text{fl,am}}\) | mean fluid temperature   | [°C]
 \(T_{\text{freezing upper limit}}\) | upper temperature limit of the freezing process | [°C]
 \(T_{\text{freezing lower limit}}\) | lower temperature limit of the freezing process | [°C]
