@@ -862,3 +862,135 @@ To perform this calculation in every timestep, the following input parameters ar
         "grout_heat_conductivity": 2
     }
 ```
+
+### Geothermal collector
+| | |
+| --- | --- |
+| **Type name** | `GeothermalHeatCollector`|
+| **File** | `energy_systems/heat_sources/geothermal_heat_collector.jl` |
+| **Available models** | `simplified` (default), `detailed` |
+| **System function** | `storage` |
+| **Medium** |  |
+| **Input media** | `m_heat_in`/`m_h_w_ht1` |
+| **Output media** | `m_heat_out`/`m_h_w_lt1` |
+| **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
+
+A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
+
+The parameters characterising the soil and its moisture content, such as heat capacity, density, thermal conductivity and enthalpy of fusion, as well as the parameters describing the boundary conditions on the ground surface, have a significant influence on the simulation results. Make sure that you select suitable values, e.g. from VDI 4640. The default values are not necessarily correct or consistent.
+
+**General parameter**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
+| `temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
+| OR: `temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
+| OR: `constant_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
+| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
+| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
+| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m^2] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
+| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
+| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m^2] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
+| `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
+| `max_input_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum input power per collector area |
+| `fluid_min_output_temperature` | `Float` | N/N | -5 | [°C] | minimum output temperature of the fluid for unloading; if not specified, no limit is applied for the output temperature |
+| `fluid_max_input_temperature` | `Float` | N/N | 60 | [°C] | maximum input temperature of the fluid for loading; if not specified, no limit is applied for the input temperature |
+| `phase_change_upper_boundary_temperature` | `Float` | Y/Y | -0.25 | [°C] | the upper boundary of the phase change temperature range |
+| `phase_change_lower_boundary_temperature` | `Float` | Y/Y | -1.0 | [°C] | the lower boundary of the phase change temperature range |
+| `number_of_pipes` | `Float` | Y/Y | 1 | [-] | the number of parallel collector pipes |
+| `pipe_length` | `Float` | Y/Y | 100 | [m] | the length of a single collector pipe |
+| `pipe_spacing` | `Float` | Y/Y | 0.5 | [m] | the spacing between the parallel collector pipes. For a single pipe, use a larger spacing depending on the soil conditions. Check the temporal evolution of the temperature distribution with additional plots in the io_settings. |
+| `pipe_laying_depth` | `Float` | Y/Y | 1.5 | [m] | the depth of the soil between the surface and the pipe |
+| `pipe_radius_outer` | `Float` | Y/Y | 0.016 | [m] | the outer radius of the pipe |
+| `considered_soil_depth` | `Float` | Y/Y | 10.0 | [m] | the total depth of the simulated soil from the surface to undisturbed ground temperature |
+| `soil_specific_heat_capacity` | `Float` | Y/Y | 1000 | [J/(kgK)] | specific heat capacity of the soil in unfrozen state |
+| `soil_specific_heat_capacity_frozen` | `Float` | Y/Y | 900 | [J/(kgK)] | specific heat capacity of the soil in frozen state |
+| `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | density of the soil |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of the soil in unfrozen state |
+| `soil_heat_conductivity_frozen` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of the soil in frozen state |
+| `soil_specific_enthalpy_of_fusion` | `Float` | Y/Y | 90000 | [J/kg] | specific enthalpy of fusion of soil |
+| `surface_convective_heat_transfer_coefficient` | `Float` | Y/Y | 14.7 | [W/(m^2 K)] | convective heat transfer on surface |
+| `surface_reflection_factor` | `Float` | Y/Y | 0.25 | [-] | reflection factor / albedo value of surface |
+| `surface_emissivity` | `Float` | Y/Y | 0.9 | [-] | emissivity of the surface |
+| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
+| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
+| `start_temperature_fluid_and_pipe` | `Float` | Y/Y | 15.5 | [°C] | starting temperature of fluid and soil near pipe |
+| `undisturbed_ground_temperature` | `Float` | Y/Y | 9 | [°C] | undisturbed ground temperature at the bottom of the simulation boundary |
+
+**Parameter for simple model only**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `pipe_soil_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance from fluid to pipe (constant for simple model) |
+
+**Model `detailed`:**
+
+The detailed model uses extended parameters to determine the thermal resistance from the fluid to the soil. For that, the Reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat transmission from pipe to soil is neglected.
+
+To perform this calculation in every timestep, the following input parameters are required, while the `pipe_soil_thermal_resistance` is not needed anymore:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | false | [-] | flag if temperature dependent calculation of the fluid's Reynolds number for a 30 Vol-% ethylene glycol mix from TRNSYS Type 710 should be used (true), defaults to false|
+| `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the calculation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
+| `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
+| `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
+| `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of the fluid |
+| `fluid_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of the fluid |
+| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of the fluid |
+| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of the fluid |
+| `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of the fluid |
+
+**Examplary input file definition for geothermal collector:**
+
+```JSON
+        "TST_GTC_01": {
+            "type": "GeothermalHeatCollector",
+            "m_heat_out": "m_h_w_lt1",
+            "output_refs": ["TST_DEM_01"],
+            "model_type": "detailed",
+            "___GENERAL PARAMETER___": "",
+            "temperature_from_global_file": "temp_ambient_air",
+            "global_solar_radiation_from_global_file": "globHorIrr",
+            "infrared_sky_radiation_from_global_file": "longWaveIrr",
+            "accuracy_mode": "rough",
+            "regeneration": false,
+            "max_output_power": 25,
+            "max_input_power": 25,
+            "phase_change_upper_boundary_temperature": -0.25,
+            "phase_change_lower_boundary_temperature": -1.0,
+            "number_of_pipes": 47,
+            "pipe_length": 93,
+            "pipe_spacing": 1.0,
+            "pipe_laying_depth": 2.0,
+            "pipe_radius_outer": 0.02,
+            "considered_soil_depth": 10.0,
+            "soil_specific_heat_capacity": 850,
+            "soil_specific_heat_capacity_frozen": 850,
+            "soil_density": 1900,
+            "soil_heat_conductivity": 2.4,
+            "soil_heat_conductivity_frozen": 2.9,
+            "soil_specific_enthalpy_of_fusion": 90000,
+            "surface_convective_heat_transfer_coefficient": 14.7,
+            "surface_reflection_factor": 0.25,
+            "surface_emissivity": 0.9,
+            "unloading_temperature_spread": 3.0,
+            "loading_temperature_spread": 3.0,
+            "start_temperature_fluid_and_pipe": 12.5,
+            "undisturbed_ground_temperature": 9.0,
+            "___SIMPLIFIED MODEL___": "",
+            "pipe_soil_thermal_resistance": 0.1,
+            "___DETAILED MODEL___": "",
+            "pipe_thickness": 0.0037,
+            "pipe_heat_conductivity": 0.4,
+            "fluid_specific_heat_capacity": 3944,
+            "fluid_heat_conductivity": 0.499,
+            "fluid_density": 1025,
+            "fluid_kinematic_viscosity": 3.6e-6,
+            "fluid_prantl_number": 30
+        }
+```
