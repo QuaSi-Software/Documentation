@@ -509,8 +509,8 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
 | `initial_load` | `Float` | Y/Y | 0.0 |  [%] [0:100] |the initial load state of the buffer tank |
-| `max_load_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
-| `max_unload_rate` | `Float` | N/Y | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
+| `max_load_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
+| `max_unload_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
 
 **Parameter for the "balanced" model:**
 
@@ -537,6 +537,22 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
 
 **Examplary input file definition for buffer tank**
 
+Minimal definition of a buffer tank in the input file:
+
+```JSON
+"TST_BFT_TH_01": {
+    "type": "BufferTank",
+    "medium": "m_h_w_ht1",
+    "output_refs": [
+        "TST_DEM_01"
+    ],
+    "model_type": "ideally_stratified",
+    "capacity": 10000
+}
+```
+
+Extended definition of a buffer tank in the input file:
+
 ```JSON
 "TST_BFT_TH_01": {
     "type": "BufferTank",
@@ -550,10 +566,10 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
     "rho_medium": 1000,
     "cp_medium": 4.18,
     "high_temperature": 80.0,
-    "low_temperature": 20.0,
+    "low_temperature": 15.0,
     "initial_load": 50,
     "max_load_rate": 1.0,
-    "max_unload_rate": 1.0,
+    "max_unload_rate": 1.5,
     "___BALANCED MODEL ONLY___": "",
     "switch_point": 0.25,
     "___LOSSES___": "",
