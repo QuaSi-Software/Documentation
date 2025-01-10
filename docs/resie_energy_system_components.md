@@ -1153,9 +1153,9 @@ The short-term energy storage is a simplified model of a cylindrical tank withou
 
 ![Switchpoint model](fig/241213_buffer_tank_switchpoint_model.svg)
 
-The three models are compared in the following figure, showing the output temperature during unloading at a constant unloading rate and without losses. 
+The three models are compared in the following figure, showing the output temperature during unloading at a constant unloading rate with and without losses. 
 
-![Unloading temperauture curve of differnet models of the buffer tank](fig/241213_comparison_buffertank_models.png)
+![Unloading temperature curve of different models of the buffer tank](fig/241213_comparison_buffertank_models.svg)
 
 Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included.
 This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simuation of the thermal stratification.
