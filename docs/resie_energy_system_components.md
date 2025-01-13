@@ -1144,7 +1144,7 @@ The general model of a compression chiller, including a part-load dependent and 
 Absorption/adsorption chiller are not implemented yet (ToDo).
 
 
-## Short-term thermal energy storage (STTES)
+## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)
 
 The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of the both models are available. Here, a switchpoint is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
@@ -1157,7 +1157,7 @@ The three models are compared in the following figure, showing the output temper
 
 ![Unloading temperature curve of different models of the buffer tank](fig/241213_comparison_buffertank_models.svg)
 
-Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included.
+Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included. When the buffer tank has reached its lower temperature, no losses are counted that would further discharge the storage tank below the specified lower temperature.
 This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simuation of the thermal stratification.
 
 ![Scetch of losses of STTES](fig/241212_STTES_losses.svg)
