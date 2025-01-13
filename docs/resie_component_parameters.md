@@ -524,9 +524,9 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | ----------- | ------- | --- | ------- | ---- | ----------- |
 | `consider_losses` | `Bool` | Y/Y | False | [-] | flag if losses should be taken into account |
 | `h_to_r` | `Float` | Y/Y | 2.0 | [-] | ratio of height to radius of the cylinder representing the buffer tank |
-| `thermal_transmission_barrel` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
-| `thermal_transmission_lid` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
-| `thermal_transmission_bottom` | `Float` | Y/Y | 0.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
+| `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
 | `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
 | `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
 | OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the temperature of the surrounding air temperature to a constant value |
@@ -577,9 +577,9 @@ Extended definition of a buffer tank in the input file:
     "h_to_r": 2,
     "constant_ambient_temperature": 18,
     "ground_temperature": 12,
-    "thermal_transmission_lid": 0.2,
-    "thermal_transmission_barrel": 0.2,
-    "thermal_transmission_bottom": 0.2
+    "thermal_transmission_lid": 1.0,
+    "thermal_transmission_barrel": 1.0,
+    "thermal_transmission_bottom": 1.0
 }
 ```
 
