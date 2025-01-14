@@ -508,7 +508,7 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 | `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
-| `initial_load` | `Float` | Y/Y | 0.0 |  [%] [0:100] |the initial load state of the buffer tank |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the buffer tank |
 | `max_load_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
 | `max_unload_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
 
@@ -516,7 +516,7 @@ the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, ar
 
 | Name        | Type    | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ------- | ---- | ----------- |
-| `switch_point` | `Float` | Y/Y | 0.15 |  [-] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
+| `switch_point` | `Float` | Y/Y | 0.15 |  [%/100] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
 
 **Parameter to consider losses (only for consider_losses = true):**
 
@@ -567,7 +567,7 @@ Extended definition of a buffer tank in the input file:
     "cp_medium": 4.18,
     "high_temperature": 80.0,
     "low_temperature": 15.0,
-    "initial_load": 50,
+    "initial_load": 0.5,
     "max_load_rate": 1.0,
     "max_unload_rate": 1.5,
     "___BALANCED MODEL ONLY___": "",
