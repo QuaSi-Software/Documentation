@@ -1147,7 +1147,7 @@ Absorption/adsorption chiller are not implemented yet (ToDo).
 ## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)
 
-The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of the both models are available. Here, a switchpoint is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
+The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of the both models is available. Here, a switchpoint is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
 
 ![Scetch of STTES](fig/221021_STTES_scetch.svg)
 
@@ -1158,6 +1158,7 @@ The three models are compared in the following figure, showing the output temper
 ![Unloading temperature curve of different models of the buffer tank](fig/241213_comparison_buffertank_models.svg)
 
 Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included. When the buffer tank has reached its lower temperature, no losses are counted that would further discharge the storage tank below the specified lower temperature.
+
 This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simuation of the thermal stratification.
 
 ![Scetch of losses of STTES](fig/241212_STTES_losses.svg)
@@ -1184,7 +1185,7 @@ For the ideally mixed model, the following temperature results in every time ste
 
 $$ T_{STTES,t} =  T_{STTES,cold} + x_{STTES,t} ( T_{STTES,hot} -  T_{STTES,cold}) $$
 
-The losses are modelled with basic thermal conductivity through the insulating material of the storge, differentiated into wall, lid and bottom. The outside temperature can either be the ambient temperature from the global weather file, a given temperature profile or a fixed temperature. The ground temperature for the heat conductivty through the bottom is assument to be constant. Thermal transmission resistances at the inner and outher surfaces are not considered. The thermal power of the losses can be calculated as
+The losses are modelled with basic thermal conductivity through the insulating material of the storge, differentiated into wall, lid and bottom. The outside temperature can either be the ambient temperature from the global weather file, a given temperature profile or a fixed temperature. The ground temperature for the heat conductivity through the bottom is assumed to be constant. Thermal transmission resistances at the inner and outher surfaces are not considered. The thermal power of the losses can be calculated as
 
 $$
 \dot{Q}_{STTES,losses} = U_{STTES,top}  * A_{STTES,top} * (T_{STTES,hot} - T_{STTES,ambient air}) + \\
@@ -1205,7 +1206,7 @@ and
 
 $$ A_{STTES,barrel}= 2 \pi \ r \ h \qquad \text{and} \qquad A_{STTES,top} = A_{STTES,bottom} = \pi \ r^2 $$
 
-For the ideally stratisfied model, \(\dot{Q}_{STTES,losses} \) leads to a reduction of the energy content of the storage by:
+For the ideally stratified model, \(\dot{Q}_{STTES,losses} \) leads to a reduction of the energy content of the storage by:
 
 $$ Q_{STTES,losses} = \dot{Q}_{STTES,losses} \ \ \Delta \ t $$
 

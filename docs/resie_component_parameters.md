@@ -491,11 +491,15 @@ Note that the storage has its high temperature only at a load of 100% and that c
 temperatures at a lower temperature. 
 
 The `balanced`model is a combination of the latter two models. Here, a `switch_point` is defined as the fraction of the
-load of the storage where the model switches from ideally stratified to ideally mixed.
+load of the storage where the model switches from ideally stratified (load above `switch_point`) to ideally mixed 
+(load less then `switch_point`). 
+
+See the chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more explanation on the different models.
 
 Independent of the model, the input temperature is always required at `high_temperature`.
 For the size of the buffer tank, either the `volume` or the `capacity` can be given. If a capacity is given and no losses are considered,
 the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
+Note that no losses are applied when the storage is completely empty, meaning at `low_temperature`.
 
 **General parameter:**
 
