@@ -1230,8 +1230,8 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(c_{max,load}\) | maximum charging rate (C-rate) of the STTES | [1/h]
 \(c_{max,unload}\) | maximum discharging rate (C-rate) of the STTES | [1/h]
-\(Q_{rated}\)  | rated thermal energy capacity of the STTES | [MWh]
-\(Q_{losses}\)  | losses of the STTES | [MWh]
+\(Q_{rated}\)  | rated thermal energy capacity of the STTES | [Wh]
+\(Q_{losses}\)  | losses of the STTES | [Wh]
 \(x_{start}\)  | thermal energy content of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
 \(V\)  | volume of the STTES | [m\(^3\)]
 \(r\)  | radius of the cylindrical STTES | [m]
@@ -1254,7 +1254,7 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\({Q}_{current}\)  | current amount of thermal energy stored in the STTES | [MWh]
+\({Q}_{current}\)  | current amount of thermal energy stored in the STTES | [Wh]
 \(x\)  | current charging state of the STTES   | [%]
 \(T_{t}\)  | current temperature of the STTES | [°C]
 
