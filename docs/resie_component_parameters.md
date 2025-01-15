@@ -488,15 +488,15 @@ Note that no gains into the cold layer are included in the model.
 The `ideally_mixed` model assumes a perfectly mixed storage, meaning the whole storage always has the same temperature 
 between `high_temperature` and `low_temperature`. Here, losses result in a decrease of temperature of the storage medium. 
 Note that the storage has its high temperature only at a load of 100% and that connected components may not accept 
-temperatures at a lower temperature. 
+heat at a lower temperature. 
 
-The `balanced`model is a combination of the latter two models. Here, a `switch_point` is defined as the fraction of the
+The `balanced` model is a combination of the former two models. Here, a `switch_point` is defined as the fraction of the
 load of the storage where the model switches from ideally stratified (load above `switch_point`) to ideally mixed 
 (load less then `switch_point`). 
 
 See the chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more explanation on the different models.
 
-Independent of the model, the input temperature is always required at `high_temperature`.
+Independent of the model, the input temperature is always required as `high_temperature`.
 For the size of the buffer tank, either the `volume` or the `capacity` can be given. If a capacity is given and no losses are considered,
 the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
 Note that no losses are applied when the storage is completely empty, meaning at `low_temperature`.
@@ -533,8 +533,8 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
 | `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
 | `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
-| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the temperature of the surrounding air temperature to a constant value |
-| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the temperature of surrounding air temperature to the ambient air temperature of the global weather file |
+| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
+| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the surrounding air temperature to the ambient air temperature of the global weather file |
 
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 

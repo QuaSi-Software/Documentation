@@ -1147,9 +1147,9 @@ Absorption/adsorption chiller are not implemented yet (ToDo).
 ## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)
 
-The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of the both models is available. Here, a switchpoint is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
+The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of both models is available. Here, a switch point is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
 
-![Scetch of STTES](fig/221021_STTES_scetch.svg)
+![Sketch of STTES](fig/221021_STTES_scetch.svg)
 
 ![Switchpoint model](fig/241213_buffer_tank_switchpoint_model.svg)
 
@@ -1157,11 +1157,11 @@ The three models are compared in the following figure, showing the output temper
 
 ![Unloading temperature curve of different models of the buffer tank](fig/241213_comparison_buffertank_models.svg)
 
-Energy losses are taken into account, but in the case of the ideally statified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambient. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included. When the buffer tank has reached its lower temperature, no losses are counted that would further discharge the storage tank below the specified lower temperature.
+Energy losses are taken into account, but in the case of the ideally stratified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambiance. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included. When the buffer tank has reached its lower temperature, no losses are counted that would further discharge the storage tank below the specified lower temperature.
 
-This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simuation of the thermal stratification.
+This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simulation of the thermal stratification.
 
-![Scetch of losses of STTES](fig/241212_STTES_losses.svg)
+![Sketch of losses of STTES](fig/241212_STTES_losses.svg)
 
 The rated thermal energy content \(Q_{rated}\) of the STTES can be calculated using the volume \(V\), the density \(\rho\), the specific thermal capacity of the medium in the storage \(cp\) and the temperature span within the STTES:
 $$ Q_{rated} = V \ \rho \ cp \ (T_{hot} - T_{cold}) $$
@@ -1185,7 +1185,7 @@ For the ideally mixed model, the following temperature results in every time ste
 
 $$ T_{t} =  T_{cold} + x_{t} ( T_{hot} -  T_{cold}) $$
 
-The losses are modelled with basic thermal conductivity through the insulating material of the storge, differentiated into wall, lid and bottom. The outside temperature can either be the ambient temperature from the global weather file, a given temperature profile or a fixed temperature. The ground temperature for the heat conductivity through the bottom is assumed to be constant. Thermal transmission resistances at the inner and outher surfaces are not considered. The thermal power of the losses can be calculated as
+The losses are modelled with basic thermal conductivity through the insulating material of the storage, differentiated into wall, lid and bottom. The outside temperature can either be the ambient temperature from the global weather file, a given temperature profile or a fixed temperature. The ground temperature for the heat conductivity through the bottom is assumed to be constant. Thermal transmission resistances at the inner and outer surfaces are not considered. The thermal power of the losses can be calculated as
 
 $$
 \dot{Q}_{losses} = U_{top}  * A_{top} * (T_{hot} - T_{ambient air}) + \\
@@ -1219,8 +1219,8 @@ $$ T_{afterloss} = T_{t} - \frac{Q_{losses}}{Q_{curent}} (T_{t} -  T_{cold}) $$
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{in}\) | thermal power input in the STTES | [W]
-\(\dot{Q}_{out}\) | thermal power output of the STTES | [W]
+\(\dot{Q}_{in}\) | thermal input power of the STTES | [W]
+\(\dot{Q}_{out}\) | thermal output power of the STTES | [W]
 \(\dot{m}_{in}\)  | current mass flow rate into the STTES | [kg/h]
 \(\dot{m}_{out}\)  | current mass flow rate out of the STTES | [kg/h]
 
@@ -1228,15 +1228,15 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(c_{max,load}\) | maximum charging rate (C-rate) of STTES | [1/h]
-\(c_{max,unload}\) | maximum discharging rate (C-rate) of STTES | [1/h]
+\(c_{max,load}\) | maximum charging rate (C-rate) of the STTES | [1/h]
+\(c_{max,unload}\) | maximum discharging rate (C-rate) of the STTES | [1/h]
 \(Q_{rated}\)  | rated thermal energy capacity of the STTES | [MWh]
 \(Q_{losses}\)  | losses of the STTES | [MWh]
 \(x_{start}\)  | thermal energy content of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
 \(V\)  | volume of the STTES | [m\(^3\)]
-\(r\)  | radius of the cylindical STTES | [m]
-\(h\)  | height of the cylindical STTES | [m]
-\(hr\)  | height to radius ratio (h/r) of the cylindical STTES | [-]
+\(r\)  | radius of the cylindrical STTES | [m]
+\(h\)  | height of the cylindrical STTES | [m]
+\(hr\)  | height to radius ratio (h/r) of the cylindrical STTES | [-]
 \(A_{barrel}\)  | surface area of the cylinder barrel | [m\(^2\)]
 \(A_{top}\)  | surface area of the cylinder top | [m\(^2\)]
 \(A_{bottom}\)  | surface area of the cylinder bottom | [m\(^2\)]
