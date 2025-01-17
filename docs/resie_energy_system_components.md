@@ -1144,63 +1144,119 @@ The general model of a compression chiller, including a part-load dependent and 
 Absorption/adsorption chiller are not implemented yet (ToDo).
 
 
-## Short-term thermal energy storage (STTES)
+## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)
 
-![Scetch of STTES](fig/221021_STTES_scetch.svg)
+The short-term energy storage is a simplified model of a cylindrical tank without a detailed simulation of different layers within the storage. It can be modelled either as ideally mixed, meaning the whole storage always has the same temperature, or as a ideally stratified storage with two adiabatically separated temperature layers, without any interaction between the two layers. Also, a combination of both models is available. Here, a switch point is defined as the percentage of the load of the storage where the model switches from ideally stratified to ideally mixed.
 
-The short-term energy storage is a simplified model without thermal losses to the ambient. It consists of two adiabatically separated temperature layers, represented as an ideally stratified storage without any interaction between the two layers. This model was chosen to keep the computational effort as small as possible. If a more complex model is needed, the seasonal thermal energy storage can be used that is including energy and exergetic losses.
+![Sketch of STTES](fig/221021_STTES_scetch.svg)
 
-The rated thermal energy content \(Q_{STTES,rated}\) of the STTES can be calculated using the volume \(V_{STTES}\), the density \(\rho_{STTES}\), the specific thermal capacity of the medium in the storage \(cp_{STTES}\) and the temperature span within the STTES:
-$$ Q_{STTES,rated} = V_{STTES} \ \rho_{STTES} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) $$
+![Switchpoint model](fig/241213_buffer_tank_switchpoint_model.svg)
 
-The amount of the total input (\(Q_{STTES,in,t}\)) and output energy (\(Q_{STTES,out,t}\)) in every timestep is defined as
-$$  Q_{STTES,in,t} = \dot{Q}_{STTES,in,t} \ \Delta t = \dot{m}_{STTES,in} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t $$
+The three models are compared in the following figure, showing the output temperature during unloading at a constant unloading rate with and without losses. 
+
+![Unloading temperature curve of different models of the buffer tank](fig/241213_comparison_buffertank_models.svg)
+
+Energy losses are taken into account, but in the case of the ideally stratified storage, only energy losses of the hot layer and no exergy losses are considered; the temperature of the upper layer remains the same, only the height of the hot layer is reduced due to losses to the ambiance. This is illustrated in the figure below. Also, possible energy gains into the cold layer are not included. When the buffer tank has reached its lower temperature, no losses are counted that would further discharge the storage tank below the specified lower temperature.
+
+This model was chosen to keep the computational effort and number of input parameters as small as possible. If a more complex model is required, the seasonal thermal energy storage can be used, that includes detailed simulation of the thermal stratification.
+
+![Sketch of losses of STTES](fig/241212_STTES_losses.svg)
+
+The rated thermal energy content \(Q_{rated}\) of the STTES can be calculated using the volume \(V\), the density \(\rho\), the specific thermal capacity of the medium in the storage \(cp\) and the temperature span within the STTES:
+$$ Q_{rated} = V \ \rho \ cp \ (T_{hot} - T_{cold}) $$
+
+The amount of the total input (\(Q_{in,t}\)) and output energy (\(Q_{out,t}\)) in every timestep is defined as
+$$  Q_{in,t} = \dot{Q}_{in,t} \ \Delta t = \dot{m}_{in} \ cp \ (T_{hot} - T_{cold}) \ \Delta t $$
 and
-$$  Q_{STTES,out,t} = \dot{Q}_{STTES,out,t} \ \Delta t = \dot{m}_{STTES,out} \ cp_{STTES} \ (T_{STTES,hot} - T_{STTES,cold}) \ \Delta t. $$
+$$  Q_{out,t} = \dot{Q}_{out,t} \ \Delta t = \dot{m}_{out} \ cp \ (T_{hot} - T_{cold}) \ \Delta t. $$
 
-The current charging state \(x_{STTES,t+1}\) can be calculated using the following equation and the charging state of the previous timestep (\(x_{STTES,t}\)) as well as the input and output energy
-$$ x_{STTES,t+1} = x_{STTES,t} + \frac{Q_{STTES,in,t} - Q_{STTES,out,t}}{Q_{STTES,rated}}   $$
+The current charging state \(x_{t+1}\) can be calculated using the following equation and the charging state of the previous timestep (\(x_{t}\)) as well as the input and output energy
+$$ x_{t+1} = x_{t} + \frac{Q_{in,t} - Q_{out,t}}{Q_{rated}}   $$
 
 leading to the total energy content in every timestep as
-$$ Q_{STTES,t} = Q_{STTES,rated} \ x_{STTES,t}. $$
+$$ Q_{current,t} = Q_{rated} \ x_{t}. $$
 
-The limits of the thermal power in- and output (\(\dot{Q}_{STTES,in}\) and \(\dot{Q}_{STTES,out}\)) due to the current energy content and maximum c-rate of the STTES are given as
-$$ \frac{Q_{STTES,rated} - {Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,in} \stackrel{!}{\leq}  c_{STTES,max,load} \ Q_{STTES,rated}  $$
-$$ \frac{{Q}_{STTES}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{STTES,out} \stackrel{!}{\leq}  c_{STTES,max,unload} \ Q_{STTES,rated}  $$
+The limits of the thermal power in- and output (\(\dot{Q}_{in}\) and \(\dot{Q}_{out}\)) due to the current energy content \(Q_{current}\) and maximum c-rate of the STTES are given as
+$$ \frac{Q_{rated} - {Q_{current}}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{in} \stackrel{!}{\leq}  c_{max,load} \ Q_{rated}  $$
+$$ \frac{{Q_{current}}}{\Delta \ t}  \stackrel{!}{\geq}   \dot{Q}_{out} \stackrel{!}{\leq}  c_{max,unload} \ Q_{rated}  $$
 
+For the ideally mixed model, the following temperature results in every time step:
+
+$$ T_{t} =  T_{cold} + x_{t} ( T_{hot} -  T_{cold}) $$
+
+The losses are modelled with basic thermal conductivity through the insulating material of the storage, differentiated into wall, lid and bottom. The outside temperature can either be the ambient temperature from the global weather file, a given temperature profile or a fixed temperature. The ground temperature for the heat conductivity through the bottom is assumed to be constant. Thermal transmission resistances at the inner and outer surfaces are not considered. The thermal power of the losses can be calculated as
+
+$$
+\dot{Q}_{losses} = U_{top}  * A_{top} * (T_{hot} - T_{ambient air}) + \\
+                   U_{barrel}  * A_{barrel} * (T_{hot} - T_{ambient air}) + \\
+                   U_{bottom}  * A_{bottom} * (T_{hot} - T_{ambient ground})
+$$
+
+The thermal losses into the ground are only condsidered for the model "ideally mixed".
+With the user-given ratio of height (\(h\)) to radius (\(r\)) of the cylinder (\(hr = \frac{h}{r}\); minimum A/V is reached with hr = 2) and the volume, all surfaces can be calculated:
+
+$$ V = \pi \ r^2 \ h $$
+
+leads to
+
+$$ r = \sqrt[3]{\frac{V}{hr \ \pi}} \qquad \text{and} \qquad h = hr \ r $$
+
+and
+
+$$ A_{barrel}= 2 \pi \ r \ h \qquad \text{and} \qquad A_{top} = A_{bottom} = \pi \ r^2 $$
+
+For the ideally stratified model, \(\dot{Q}_{losses} \) leads to a reduction of the energy content of the storage by:
+
+$$ Q_{losses} = \dot{Q}_{losses} \ \ \Delta \ t $$
+
+For the ideally mixed model, a linear reduction of the temperature results in the new temperature of the storage:
+
+$$ T_{afterloss} = T_{t} - \frac{Q_{losses}}{Q_{curent}} (T_{t} -  T_{cold}) $$
 
 
 **Inputs and Outputs of the STTES:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{STTES,in}\) | thermal power input in the STTES | [W]
-\(\dot{Q}_{STTES,out}\) | thermal power output of the STTES | [W]
-\(\dot{m}_{STTES,in}\)  | current mass flow rate into the STTES | [kg/h]
-\(\dot{m}_{STTES,out}\)  | current mass flow rate out of the STTES | [kg/h]
+\(\dot{Q}_{in}\) | thermal input power of the STTES | [W]
+\(\dot{Q}_{out}\) | thermal output power of the STTES | [W]
+\(\dot{m}_{in}\)  | current mass flow rate into the STTES | [kg/h]
+\(\dot{m}_{out}\)  | current mass flow rate out of the STTES | [kg/h]
 
 **Parameter of the STTES:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(c_{STTES,max,load}\) | maximum charging rate (C-rate) of STTES | [1/h]
-\(c_{STTES,max,unload}\) | maximum discharging rate (C-rate) of STTES | [1/h]
-\(Q_{STTES,rated}\)  | rated thermal energy capacity of the STTES | [MWh]
-\(x_{STTES,start}\)  | thermal energy contend of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
-\(V_{STTES}\)  | volume of the STTES | [m\(^3\)]
-\(\rho_{STTES}\)  | density of the heat carrier medium in the STTES | [kg/m\(^3\)]
-\(cp_{STTES}\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
-\(T_{STTES,hot}\)  | rated upper temperature of the STTES | [°C]
-\(T_{STTES,cold}\)  | rated lower temperature of the STTES | [°C]
+\(c_{max,load}\) | maximum charging rate (C-rate) of the STTES | [1/h]
+\(c_{max,unload}\) | maximum discharging rate (C-rate) of the STTES | [1/h]
+\(Q_{rated}\)  | rated thermal energy capacity of the STTES | [Wh]
+\(Q_{losses}\)  | losses of the STTES | [Wh]
+\(x_{start}\)  | thermal energy content of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
+\(V\)  | volume of the STTES | [m\(^3\)]
+\(r\)  | radius of the cylindrical STTES | [m]
+\(h\)  | height of the cylindrical STTES | [m]
+\(hr\)  | height to radius ratio (h/r) of the cylindrical STTES | [-]
+\(A_{barrel}\)  | surface area of the cylinder barrel | [m\(^2\)]
+\(A_{top}\)  | surface area of the cylinder top | [m\(^2\)]
+\(A_{bottom}\)  | surface area of the cylinder bottom | [m\(^2\)]
+\(\rho\)  | density of the heat carrier medium in the STTES | [kg/m\(^3\)]
+\(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
+\(T_{hot}\)  | rated upper temperature of the STTES | [°C]
+\(T_{cold}\)  | rated lower temperature of the STTES | [°C]
+\(T_{ambientair}\)  | ambient temperature of the air around the STTES | [°C]
+\(T_{ambientground}\)  | ground temperature below the STTES | [°C]
+\(U_{barrel}\)  | thermal transmission of the barrel of the STTES | [W/m\(^2\)K]
+\(U_{top}\)  | thermal transmission of the top of the STTES | [W/m\(^2\)K]
+\(U_{bottom}\)  | thermal transmission of the bottom of the STTES | [W/m\(^2\)K]
 
 **State variables of the STTES:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\({Q}_{STTES}\)  | current amount of thermal energy stored in the STTES | [MWh]
-\(x_{STTES}\)  | current charging state of the STTES   | [%]
-
+\({Q}_{current}\)  | current amount of thermal energy stored in the STTES | [Wh]
+\(x\)  | current charging state of the STTES   | [%]
+\(T_{t}\)  | current temperature of the STTES | [°C]
 
 ## Seasonal thermal energy storage (STES)
 Seasonal thermal energy storages can be used to shift thermal energy from the summer to the heating period in the winter. Due to the long storage period, energy losses to the environment and exergy losses within the storage must be taken into account. Therefore, a stratified thermal storage model is implemented that is described below.
@@ -1340,9 +1396,9 @@ Symbol | Description | Unit
 \(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m\(^3\)]
 \(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
 \(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m\(^2\)/s]
-\(U_{STES,lid}\)  | heat transfer coefficient of the STES' lid | [W/m\(^2\) K]
-\(U_{STES,wall}\)  | heat transfer coefficient of the STES' wall | [W/m\(^2\) K]
-\(U_{STES,bottom}\)  | heat transfer coefficient of the STES' bottom | [W/m\(^2\) K]
+\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m\(^2\) K]
+\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m\(^2\) K]
+\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m\(^2\) K]
 \(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
 \(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
 \(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]

@@ -471,30 +471,121 @@ A storage for electricity.
 | --- | --- |
 | **Type name** | `BufferTank`|
 | **File** | `energy_systems/storage/buffer_tank.jl` |
-| **Available models** | default: `simplified` |
+| **Available models** | `ideally_stratified`, `balanced`, `ideally_mixed` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
 
-A short-term storage for heat of thermal carrier fluids, typically water.
+A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
-**Model `simplified`:**
+Three model types are available. The model `ideally_stratified` assumes two adiabatically separated temperature layers, 
+the upper one with `high_temperature` and the lower one with `low_temperature`. 
+Here, possible losses are only energy losses affecting the amount of energy in the hot layer without reducing its temperature. 
+Note that no gains into the cold layer are included in the model.
 
-If the adaptive temperature calculation is activated, the temperatures for the input/output of the BT depends on the load state. If it is sufficiently full (depends on the `switch_point`), the BT can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+The `ideally_mixed` model assumes a perfectly mixed storage, meaning the whole storage always has the same temperature 
+between `high_temperature` and `low_temperature`. Here, losses result in a decrease of temperature of the storage medium. 
+Note that the storage has its high temperature only at a load of 100% and that connected components may not accept 
+heat at a lower temperature. 
 
-If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+The `balanced` model is a combination of the former two models. Here, a `switch_point` is defined as the fraction of the
+load of the storage where the model switches from ideally stratified (load above `switch_point`) to ideally mixed 
+(load less then `switch_point`). 
+
+See the chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more explanation on the different models.
+
+Independent of the model, the input temperature is always required as `high_temperature`.
+For the size of the buffer tank, either the `volume` or the `capacity` can be given. If a capacity is given and no losses are considered,
+the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
+Note that no losses are applied when the storage is completely empty, meaning at `low_temperature`.
+
+**General parameter:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `model_type` | `String` | Y/Y | "ideally_stratified" | [-] | type of the buffer tank model: `ideally_stratified`, `balanced`, `ideally_mixed` |
+| `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
+| OR: `volume` | `Float` | Y/N | 15.5 |  [\(m^3\)] | volume of the BT: Note that either volume or capacity should be given.  |
+| `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m^3\)] | density of the heat carrier medium |
+| `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the buffer tank |
+| `max_load_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
+| `max_unload_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
+
+**Parameter for the "balanced" model:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `switch_point` | `Float` | Y/Y | 0.15 |  [%/100] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
+
+**Parameter to consider losses (only for consider_losses = true):**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `consider_losses` | `Bool` | Y/Y | False | [-] | flag if losses should be taken into account |
+| `h_to_r` | `Float` | Y/Y | 2.0 | [-] | ratio of height to radius of the cylinder representing the buffer tank |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
+| `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
+| `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
+| `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
+| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
+| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the surrounding air temperature to the ambient air temperature of the global weather file |
+
+Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the BT. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the BT. |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
-| `switch_point` | `Float` | Y/Y | 0.15 | Partial load at which the adaptive output temperature calculation switches. |
-| `high_temperature` | `Temperature` | Y/Y | 75.0 | The high end of the adaptive in-/output temperature. |
-| `low_temperature` | `Temperature` | Y/Y | 20.0 | The low end of the adaptive in-/output temperature. |
+**Examplary input file definition for buffer tank**
+
+Minimal definition of a buffer tank in the input file:
+
+```JSON
+"TST_BFT_TH_01": {
+    "type": "BufferTank",
+    "medium": "m_h_w_ht1",
+    "output_refs": [
+        "TST_DEM_01"
+    ],
+    "model_type": "ideally_stratified",
+    "capacity": 10000
+}
+```
+
+Extended definition of a buffer tank in the input file:
+
+```JSON
+"TST_BFT_TH_01": {
+    "type": "BufferTank",
+    "medium": "m_h_w_ht1",
+    "output_refs": [
+        "TST_DEM_01"
+    ],
+    "___GENERAL PARAMETER___": "",
+    "model_type": "ideally_stratified",
+    "capacity": 300000,
+    "rho_medium": 1000,
+    "cp_medium": 4.18,
+    "high_temperature": 80.0,
+    "low_temperature": 15.0,
+    "initial_load": 0.5,
+    "max_load_rate": 1.0,
+    "max_unload_rate": 1.5,
+    "___BALANCED MODEL ONLY___": "",
+    "switch_point": 0.25,
+    "___LOSSES___": "",
+    "consider_losses": true,
+    "h_to_r": 2,
+    "constant_ambient_temperature": 18,
+    "ground_temperature": 12,
+    "thermal_transmission_lid": 1.0,
+    "thermal_transmission_barrel": 1.0,
+    "thermal_transmission_bottom": 1.0
+}
+```
 
 ### Seasonal thermal storage
 | | |
@@ -817,50 +908,50 @@ To perform this calculation in every timestep, the following input parameters ar
 **Examplary input file definition for geothermal probe:**
 
 ```JSON
-    "TST_GTP_01": {
-        "type": "GeothermalProbes",
-        "m_heat_out": "m_h_w_lt1",
-        "control_refs": [],
-        "output_refs": [
-            "TST_HP_01"
-        ],
-        "model_type": "detailed",
-        "___GENERAL PARAMETER___": "",
-        "max_input_power": 150,
-        "max_output_power": 150,
-        "regeneration": true,
-        "max_probe_temperature_loading": 45, 
-        "min_probe_temperature_unloading": 6,
-        "probe_depth": 150,
-        "borehole_diameter": 0.16,
-        "loading_temperature_spread": 4,
-        "unloading_temperature_spread": 1.5,
-        "soil_undisturbed_ground_temperature": 13,
-        "boreholewall_start_temperature": 13,
-        "___G-FUNCTION FROM LIBRARY___": "",
-        "probe_field_geometry": "rectangle",
-        "number_of_probes_x": 3, 
-        "number_of_probes_y": 12,
-        "probe_field_key_2": "",
-        "borehole_spacing": 8,
-        "soil_density": 1800,
-        "soil_specific_heat_capacity": 2400,
-        "soil_heat_conductivity": 1.6 ,  // also needed for detailed model        
-        "___SIMPLIFIED MODEL___": "",
-        "borehole_thermal_resistance": 0.1,
-        "___DETAILED MODEL___": "",
-        "probe_type": 2,
-        "pipe_diameter_outer": 0.032,
-        "pipe_diameter_inner": 0.0262,
-        "pipe_heat_conductivity": 0.42,
-        "shank_spacing": 0.1,
-        "fluid_specific_heat_capacity": 3795,
-        "fluid_density": 1052,
-        "fluid_kinematic_viscosity": 3.9e-6,
-        "fluid_heat_conductivity": 0.48,
-        "fluid_prandtl_number": 31.3,
-        "grout_heat_conductivity": 2
-    }
+"TST_GTP_01": {
+    "type": "GeothermalProbes",
+    "m_heat_out": "m_h_w_lt1",
+    "control_refs": [],
+    "output_refs": [
+        "TST_HP_01"
+    ],
+    "model_type": "detailed",
+    "___GENERAL PARAMETER___": "",
+    "max_input_power": 150,
+    "max_output_power": 150,
+    "regeneration": true,
+    "max_probe_temperature_loading": 45, 
+    "min_probe_temperature_unloading": 6,
+    "probe_depth": 150,
+    "borehole_diameter": 0.16,
+    "loading_temperature_spread": 4,
+    "unloading_temperature_spread": 1.5,
+    "soil_undisturbed_ground_temperature": 13,
+    "boreholewall_start_temperature": 13,
+    "___G-FUNCTION FROM LIBRARY___": "",
+    "probe_field_geometry": "rectangle",
+    "number_of_probes_x": 3, 
+    "number_of_probes_y": 12,
+    "probe_field_key_2": "",
+    "borehole_spacing": 8,
+    "soil_density": 1800,
+    "soil_specific_heat_capacity": 2400,
+    "soil_heat_conductivity": 1.6 ,  // also needed for detailed model        
+    "___SIMPLIFIED MODEL___": "",
+    "borehole_thermal_resistance": 0.1,
+    "___DETAILED MODEL___": "",
+    "probe_type": 2,
+    "pipe_diameter_outer": 0.032,
+    "pipe_diameter_inner": 0.0262,
+    "pipe_heat_conductivity": 0.42,
+    "shank_spacing": 0.1,
+    "fluid_specific_heat_capacity": 3795,
+    "fluid_density": 1052,
+    "fluid_kinematic_viscosity": 3.9e-6,
+    "fluid_heat_conductivity": 0.48,
+    "fluid_prandtl_number": 31.3,
+    "grout_heat_conductivity": 2
+}
 ```
 
 ### Geothermal collector
@@ -948,49 +1039,49 @@ To perform this calculation in every timestep, the following input parameters ar
 **Examplary input file definition for geothermal collector:**
 
 ```JSON
-        "TST_GTC_01": {
-            "type": "GeothermalHeatCollector",
-            "m_heat_out": "m_h_w_lt1",
-            "output_refs": ["TST_DEM_01"],
-            "model_type": "detailed",
-            "___GENERAL PARAMETER___": "",
-            "temperature_from_global_file": "temp_ambient_air",
-            "global_solar_radiation_from_global_file": "globHorIrr",
-            "infrared_sky_radiation_from_global_file": "longWaveIrr",
-            "accuracy_mode": "rough",
-            "regeneration": false,
-            "max_output_power": 25,
-            "max_input_power": 25,
-            "phase_change_upper_boundary_temperature": -0.25,
-            "phase_change_lower_boundary_temperature": -1.0,
-            "number_of_pipes": 47,
-            "pipe_length": 93,
-            "pipe_spacing": 1.0,
-            "pipe_laying_depth": 2.0,
-            "pipe_radius_outer": 0.02,
-            "considered_soil_depth": 10.0,
-            "soil_specific_heat_capacity": 850,
-            "soil_specific_heat_capacity_frozen": 850,
-            "soil_density": 1900,
-            "soil_heat_conductivity": 2.4,
-            "soil_heat_conductivity_frozen": 2.9,
-            "soil_specific_enthalpy_of_fusion": 90000,
-            "surface_convective_heat_transfer_coefficient": 14.7,
-            "surface_reflection_factor": 0.25,
-            "surface_emissivity": 0.9,
-            "unloading_temperature_spread": 3.0,
-            "loading_temperature_spread": 3.0,
-            "start_temperature_fluid_and_pipe": 12.5,
-            "undisturbed_ground_temperature": 9.0,
-            "___SIMPLIFIED MODEL___": "",
-            "pipe_soil_thermal_resistance": 0.1,
-            "___DETAILED MODEL___": "",
-            "pipe_thickness": 0.0037,
-            "pipe_heat_conductivity": 0.4,
-            "fluid_specific_heat_capacity": 3944,
-            "fluid_heat_conductivity": 0.499,
-            "fluid_density": 1025,
-            "fluid_kinematic_viscosity": 3.6e-6,
-            "fluid_prantl_number": 30
-        }
+"TST_GTC_01": {
+    "type": "GeothermalHeatCollector",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": ["TST_DEM_01"],
+    "model_type": "detailed",
+    "___GENERAL PARAMETER___": "",
+    "temperature_from_global_file": "temp_ambient_air",
+    "global_solar_radiation_from_global_file": "globHorIrr",
+    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "accuracy_mode": "rough",
+    "regeneration": false,
+    "max_output_power": 25,
+    "max_input_power": 25,
+    "phase_change_upper_boundary_temperature": -0.25,
+    "phase_change_lower_boundary_temperature": -1.0,
+    "number_of_pipes": 47,
+    "pipe_length": 93,
+    "pipe_spacing": 1.0,
+    "pipe_laying_depth": 2.0,
+    "pipe_radius_outer": 0.02,
+    "considered_soil_depth": 10.0,
+    "soil_specific_heat_capacity": 850,
+    "soil_specific_heat_capacity_frozen": 850,
+    "soil_density": 1900,
+    "soil_heat_conductivity": 2.4,
+    "soil_heat_conductivity_frozen": 2.9,
+    "soil_specific_enthalpy_of_fusion": 90000,
+    "surface_convective_heat_transfer_coefficient": 14.7,
+    "surface_reflection_factor": 0.25,
+    "surface_emissivity": 0.9,
+    "unloading_temperature_spread": 3.0,
+    "loading_temperature_spread": 3.0,
+    "start_temperature_fluid_and_pipe": 12.5,
+    "undisturbed_ground_temperature": 9.0,
+    "___SIMPLIFIED MODEL___": "",
+    "pipe_soil_thermal_resistance": 0.1,
+    "___DETAILED MODEL___": "",
+    "pipe_thickness": 0.0037,
+    "pipe_heat_conductivity": 0.4,
+    "fluid_specific_heat_capacity": 3944,
+    "fluid_heat_conductivity": 0.499,
+    "fluid_density": 1025,
+    "fluid_kinematic_viscosity": 3.6e-6,
+    "fluid_prantl_number": 30
+}
 ```
