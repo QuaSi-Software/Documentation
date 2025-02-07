@@ -29,13 +29,17 @@ The general system chart of a heat pump with the denotation of the in- and outpu
 
 ![General System chart of a heat pump](fig/221018_HeatPump_system_chart.svg)
 
-The energy balance at the heat pump is built up from the incoming electricity \(P_{el}\), the incoming heat at a low temperature level \(T_{source,in}\) and the outgoing heat flow at a higher temperature level \(T_{sink,out}\). 
+The energy balance at the heat pump is built up from the incoming electricity \(P_{el}\), the incoming heat at a low temperature level \(T_{source,in}\) and the outgoing heat flow at a higher temperature level \(T_{sink,out}\).
 
 The energy balance of the heat pump model is shown in the following figure:
 
 ![Energy flow of heat pump](fig/221006_HeatPump_Energyflow.svg)
  
-Using the electrical power \(P_{el,in}\), an energy flow \(\dot{Q}_{in}\) with temperature \(T_{source,in}\) is transformed to the energy flow \(\dot{Q}_{out}\) with temperature \(T_{sink,out}\). The efficiency of the heat pump is defined by the coefficient of performance (COP). The COP determines the electrical power \(P_{el}\) required to raise the temperature of a mass flow from the lower temperature level \(T_{source,in}\) to \(T_{sink,out}\): 
+Using the electrical power \(P_{el,in}\), an energy flow \(\dot{Q}_{in}\) with temperature \(T_{source,in}\) is transformed to the energy flow \(\dot{Q}_{out}\) with temperature \(T_{sink,out}\).
+The thermal energy losses \(\dot{Q}_{th,loss}\) and the losses in the power electronics \(P_{el,loss}\) are not taken into account in the actual heat pump model described below, as this would complicate the model even further. 
+Instead, the energy losses are considered outside of the actual heat pump model and are therefore not part of the energy balance equation. The consideration of losses is described in more detail below.
+
+The efficiency of the heat pump is defined by the coefficient of performance (COP). The COP determines the electrical power \(P_{el}\) required to raise the temperature of a mass flow from the lower temperature level \(T_{source,in}\) to \(T_{sink,out}\): 
 
 $$ COP = \frac{\dot{Q}_{out}}{P_{el}} \quad  \leq \quad COP_{Carnot} = \frac{T_{sink,out}[K]}{T_{sink,out}-T_{source,in} } $$
 
@@ -46,12 +50,6 @@ The COP is always smaller than the maximum possible Carnot coefficient of perfor
 The energy balance (or power balance) of the heat pump can be drawn up on the basis of the latter figure and on the ratio between supplied and dissipated heat power, expressed as the COP:
 
 $$\dot{Q}_{out} = \frac{COP}{COP -1} \ \dot{Q}_{in} \mathrm{\quad with \quad} \dot{Q}_{out} = \dot{Q}_{in} + P_{el} $$
-
-The power of the heat pump's electric supply, including the losses of the power electronics, is given as: 
-
-$$P_{el,supply} = \frac{P_{el}}{\eta_{PS}}$$
-
-However, as the efficiency of a heat pump becomes quite complicated to calculate and is often determined from data sheets or measurements, the efficiency of the power supply by itself is difficult to determine. Thus it is not considered separately from the other factors and not included in the model within ReSiE as a separate factor.
 
 While ReSiE deals in energy values and energy flow (power), if required the following equation can be used to determine other variables of the heat input or output:
 
@@ -119,7 +117,26 @@ For ReSiE the first two were chosen as available methods, with the Carnot method
 When the source temperature is equal or higher than the requested sink temperature, a heat pump does not have to go through the thermodynamic cycle and can instead carry the heat from the source to the sink acting like a heat exchanger. In real systems this still requires some electricity to run the pumps and the sensors. To model this, a constant, relatively high \(COP_{bypass}\) is chosen to approximate the work the pumps have to perform.
 
 ##### Losses
-All effects that are considered in the heat pump model and that could be interpreted as a loss of usable energy are modelled by reducing the efficiency of the heat pump. In addition the efficiency curves are often given by measurements or data sheets, which cannot infer losses as a seperate quantity. It is therefore difficult to definitely calculate the losses incurred by the operation of the heat pump. Instead the heat pump will require more electricity input compared to a model without these losses, but will not track losses as an output.
+Losses in a heat pump can be considered either as efficiency losses, which lead to a reduction in the COP and thus an
+increase in the electrical energy input, or as actual energy losses that affect the energy balance of the entire model, 
+such as heat losses due to radiation or heat losses in the power electronics. Efficiency losses that affect the COP, 
+e.g. due to partial load operation or high output temperatures, are discussed in the other sections. 
+Actual energy losses are not directly included in the heat pump model, but can be taken into account by means of a "wrap-around". 
+Both electrical (\(P_{el,loss}\)) and thermal energy losses (\(\dot{Q}_{th,loss}\)) can be applied as fractions of the 
+current electrical and thermal energy demand of the heat pump at each time step, which leads to an increase in energy 
+demand that cannot be utilised as useful thermal energy:
+
+$$P_{el,supply} = P_{el} + P_{el,loss} = \frac{P_{el}}{\eta_{el}}$$
+
+$$\dot{Q}_{in,supply} = \dot{Q}_{in} + \dot{Q}_{th,loss} = \frac{\dot{Q}_{in}}{\eta_{th}}$$
+
+When modelling, attention must be paid to which effects are already taken into account in a provided COP curve and 
+which must be additionally mapped via the "wrap-around" for electricity and heat demand using the efficiencies 
+\(\eta_{el}\) and \(\eta_{th}\).
+
+Note that \(\eta_{th}\) should rather be seen as a fictitious efficiency that covers all heat losses of the heat pump 
+in relation to the thermal energy input in every time step. When using measured data, it represents the energy that is 
+missing in the energy balance when measuring the thermal input, electrical input and thermal output energy. 
 
 #### Maximum and minimum thermal output power
 
@@ -306,9 +323,13 @@ Because the first pass is calculated with full power for each slice and the algo
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{in}\) | heat flow supplied to the HP (heat source) | [W]
+\(\dot{Q}_{in,supply}\) | heat flow supplied to the HP (heat source, including thermal losses) | [W]
+\(\dot{Q}_{in}\) | heat flow supplied to the HP (heat source, directly into the heat pump excluding losses) | [W]
 \(\dot{Q}_{out}\) | heat flow leaving the HP (heat sink) | [W]
-\(P_{el}\) | electric power demand of the HP | [W]
+\(P_{el,supply}\) | electric power demand of the HP (including losses from the power electronics) | [W]
+\(P_{el}\) | electric power demand of the HP (directly into the heat pump, excluding losses) | [W]
+\(\dot{Q}_{th,loss}\) | thermal energy losses | [W]
+\(P_{el,loss}\) | electrical energy losses | [W]
 \(T_{sink,out}\) | condenser outlet temperature | [°C]
 \(T_{source,in}\) | evaporator inlet temperature | [°C]
 \(COP\) | calculated COP | [-]
@@ -328,7 +349,8 @@ Symbol | Description | Unit
 \(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control | [-]
 \(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled | [-]
 \(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air-sourced heat pumps only) | [-]
-
+\(\eta_{el}\) | efficiency of the power electronics | [-]
+\(\eta_{th}\) | efficiency factor representing possible thermal energy losses with respect to the thermal input power | [-]
 
 ## Chiller
 Various technologies exist to provide cooling power on a scale of buildings or for industrial processes. All of them function similar to [heat pumps](resie_energy_system_components.md#heat-pump-hp) in that they transfer heat from one end of a thermodynamic cycle to the other. The difference is that for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\).
