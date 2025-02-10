@@ -493,7 +493,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `output_temperature` | `Temperature` | N/N | 65.0 | [°C] |  If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
 | `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] |  If true, enables the optimisation of slice dispatch. |
 | `optimal_plr` | `Float` | N/N | 0.45 | [-] |  The PLR at which efficiency is highest. Only used for slice dispatch optimisation. |
-| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [psc] |  The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
+| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] |  The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
 
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP and fixed output temperature**
