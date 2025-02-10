@@ -78,8 +78,8 @@ Used by heat pumps and similar components to calculate the COP depending on inpu
 These refer to the temperature-dependent part.
 
 * `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
-* `carnot`: Calculates the COP as fraction of the Carnot-COP. E.g. `carnot:0.4`.
-* `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal variables values are interpreted as the inclusive boundaries of the field. Variables values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
+* `carnot`: Calculates the COP as fraction of the Carnot-COP with the reduction factor given after the `:`, e.g. `carnot:0.4`.
+* `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal values are interpreted as the inclusive boundaries of the field. Values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
 
 An example of a field definition with additional line breaks and spaces added for clarity:
 ```
@@ -89,7 +89,7 @@ An example of a field definition with additional line breaks and spaces added fo
 10,15,15,10, 7;
 20,15,15,15,11"
 ```
-The first row are the grid points along the \(T_{sink,out}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 30 °C with a spacing of 10 K. The first column are the grid points along the \(T_{source,in}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 20 °C with a spacing of 10 K. The support values are the COP (at \(\kappa = 1\)), for example a value of 10 for \(T_{source,in} = 10, \ T_{sink,out} = 20\).
+The first row are the grid points along the \(T_{sink,out}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 30 °C with a spacing of 10 K. The first column are the grid points along the \(T_{source,in}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 20 °C with a spacing of 10 K. The support values are the COP (at maximum PLR \(\kappa = 1\)), for example a value of 10 for \(T_{source,in} = 10, \ T_{sink,out} = 20\).
 
 #### Power functions
 Used by heat pumps and similar components to calculate the minimum and maximum power available, depending on temperature values, as fraction of the nominal power. Return values should therefore be in \([0,1]\).
@@ -110,6 +110,34 @@ Some parameters specify behaviour of multiple modules on the same component as w
 | **aggregation_plr_limit** | How the upper PLR limit is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
 | **aggregation_charge** | How the charging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
 | **aggregation_discharge** | How the discharging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+
+The aggregation defined in `aggregation_plr_limit` applies to the control modules `storage_driven` and `profile_limited` as they both use the PLR limit callback `upper_plr_limit`.
+
+A definition of a control module with its control parameter can be done for example like this:
+
+```JSON
+"TST_TH_HP_01": {
+    ...
+    "control_parameters": {
+        "aggregation_plr_limit": "max"
+    },
+    "control_modules": [
+        {
+            "name": "storage_driven",
+            "high_threshold": 0.95,
+            "low_threshold": 0.3,
+            "storage_uac": "TST_TH_BFT_01"
+        },
+         {
+            "name": "storage_driven",
+            "high_threshold": 0.99,
+            "low_threshold": 0.5,
+            "storage_uac": "TST_TH_BFT_02"
+        }
+    ],
+    ...
+}
+```
 
 #### Economical discharge
 Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
@@ -152,6 +180,8 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 
 #### Temperature sorting
 Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` steps are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+
+**Note:** This will overwrite the order defined in the bus!
 
 This module is implemented for the following component types: `HeatPump`
 
@@ -450,20 +480,20 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
-| `cop_function` | `String` | Y/Y | `carnot:0.4:const:1.0` | See [description of function definitions](#cop-functions). The function for the the dynamic COP with the temperature-dependent part in the first function and the PLR-dependent part in the second.
-| `bypass_cop` | `Float` | Y/Y | 15.0 | A constant COP value used for bypass operation. |
-| `max_power_function` | `String` | Y/Y | `const:1.0` | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
-| `min_power_function` | `String` | Y/Y | `const:0.2` | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
-| `consider_icing` | `Bool` | N/Y | false | If true, enables the calculation of icing losses. |
-| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | Parameters for the icing losses model. |
-| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperatures and uses a constant one. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperatures and uses a constant one. |
-| `optimise_slice_dispatch` | `Bool` | N/Y | false | If true, enables the optimisation of slice dispatch. |
-| `optimal_plr` | `Float` | N/N | 0.45 | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. |
-| `nr_optimisation_passes` | `UInt` | N/Y | 10 | The number of passes the optimisation algorithm performs. Note that this heavily impacts performance. |
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
+| `cop_function` | `String` | Y/Y | `carnot:0.4:const:1.0` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP with the temperature-dependent part in the first function and the PLR-dependent part in the second.
+| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] |  A constant COP value used for bypass operation. |
+| `max_power_function` | `String` | Y/Y | `const:1.0` | [-] |  See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] |  See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `consider_icing` | `Bool` | N/Y | false | [-] |  If true, enables the calculation of icing losses. |
+| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] |  Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
+| `input_temperature` | `Temperature` | N/N | 20.0 | [°C] |  If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | [°C] |  If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
+| `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] |  If true, enables the optimisation of slice dispatch. |
+| `optimal_plr` | `Float` | N/N | 0.45 | [-] |  The PLR at which efficiency is highest. Only used for slice dispatch optimisation. |
+| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [psc] |  The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
 
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP and fixed output temperature**
