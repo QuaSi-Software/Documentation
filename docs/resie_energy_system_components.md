@@ -18,7 +18,7 @@ Components:
 
 - Energy flows into a component are positive, energy flows out of a component are negative
 - Components are single units like a heat pump, a buffer tank, a battery or a photovoltaic power plant while energy systems are interconnected components
-- The maximum power that a component can consume or produce is called the nominal power or design power or rated power. This is typically defined by one of the inputs or outputs of the component, for example as the electric power draw of an electrolyser or the heat production of a gas boiler.
+- Unlike in reality, where the ‘nominal power’ or ‘design power’ or ‘rated power’ of a component is not necessarily the maximum power that the component can deliver or requires, the ‘power’ parameter of a component here in ReSiE always refers to the maximum power that a component can deliver or requires. This is typically defined by one of the inputs or outputs of the component, e.g. by the electrical power consumption of an electrolyser or the heat production of a gas boiler.
 - The fraction of utilised power divided by nominal power at a given point in time is called the part load ratio (PLR), or operation point, or power fraction, and can be signified with \(\kappa\) for the sake of brevity
 
 ## Heat pump (HP)
@@ -140,7 +140,7 @@ missing in the energy balance when measuring the thermal input, electrical input
 
 #### Maximum and minimum thermal output power
 
-With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump can be modeled independently, but also in relation to the source and sink temperatures. The power is defined as the thermal output of the heat pump. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump is defined as the highest maximum power value over all possible temperature values and at \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of temperature values. For the model it is important that \(\dot{Q}_{out} \leq \dot{Q}_{nominal}\) in all cases.
+With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump is modeled independently, but in relation to the source and sink temperatures. In general, power of the heat pump is understood as the thermal output of the heat pump here. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump, user-provided via the input file, is defined as the highest maximum thermal output power value over all possible temperature values and at the part load ratio with the best efficiency \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of input/output temperature values. For the model instead, it is important that \(\dot{Q}_{out} \leq \dot{Q}_{nominal}\) in all cases.
 
 Comparing available data of many different heat pumps from Stiebel-Eltron[^Stiebel-EltronTool], specifically those with air as the source medium, three important observations can be made:
 
@@ -148,12 +148,12 @@ Comparing available data of many different heat pumps from Stiebel-Eltron[^Stieb
 * The maximum and minimum power values vary a lot across the possible source and sink temperatures
 * The differences between heat pump systems necessitates that the curves, if this information is available, can be given as input to the simulation for improved accuracy compared to averaged curves
 
-The curves are used in the calculation of maximum and minimum power and should return values in \([0,1]\):
+In the simulation, the maximum and minimum power are calculated based on \(\dot{Q}_{nominal}\) multiplied with a reduction factor as a function of the source and sink temperature, \(f_{max}(T_{source,in},T_{sink,out})\). This reduction curve has to be normalized and should return values in \([0,1]\):
 
 $$ \dot{Q}_{out,max} = f_{max}(T_{source,in},T_{sink,out}) \cdot \dot{Q}_{nominal}$$
 $$ \dot{Q}_{out,min} = f_{min}(T_{source,in},T_{sink,out}) \cdot \dot{Q}_{nominal}$$
 
-If no specific curves are known for the heat pump, a model based on biquadratic polynomials is described in TRNSYS Type 401 and can be used as a best guess:
+If no specific curves are known for the heat pump, a model based on biquadratic polynomials is described in TRNSYS Type 401 and can be used as a best guess. Note that this must be normalised before it is entered into the model:
 
 $$ \dot{Q}_{out,max} = c_{q1} + c_{q2} \ \bar{T}_{source,in} + c_{q3} \ \bar{T}_{sink,out}  + c_{q4} \ \bar{T}_{source,in} \ \bar{T}_{sink,out} \\
 + \ c_{q5} \ \bar{T}_{source,in}^2  + c_{q6} \ \bar{T}_{sink,out}^2  $$
@@ -167,7 +167,7 @@ Note that this does not include a formulation for minimum power, which is assume
 
 #### Part load efficiency
 
-The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR). The COP can be corrected using a part load factor (PLF) that is dependent of the PLR:
+The COP of the modeled heat pump depends not only on the temperatures of the sink and the source but also on the current part load ratio (PLR) \(\kappa\). The COP can be corrected using a part load factor (PLF) that is dependent of the PLR:
 
 \(COP(\kappa) = COP(1.0) \cdot PLF(\kappa) \)
 
@@ -208,15 +208,19 @@ For on-off heat pumps, \(a = 1\) and \(\kappa_{opt} = 1\).
 
 **Note:** If this formulation is chosen, for the moment it is required to enter it as a range of support values with linear interpolation between. A future update might implement this formulation directly.
 
+**Note 2:** In order to make use of the part load function of an inverter-driven heat pump, the optimization of the PLR has to be activated in the slicing algorithm.
+
 ##### Calculating energies from the part-load-dependent efficiency
-As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function on the PLR through numerical inversion in a pre-processing step. However because of reasons described in [the section on the slicing algorithm](resie_energy_system_components.md#slicing-algorithm), this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to worse performance for heat pumps with exactly one source and exactly one sink as compared to the theoretical case. A future update might address this problem.
+As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function of the PLR through numerical inversion in a pre-processing step. However because of reasons described in [the section on the slicing algorithm](resie_energy_system_components.md#slicing-algorithm), this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to worse performance for heat pumps with exactly one source and exactly one sink as compared to the theoretical case. A future update might address this problem.
 
 [^Socal2021]: Socal, Laurent (2021): Heat pumps: lost in standards, *REHVA Journal August 2021*.
 [^Filliard2009]: Filliard, Bruno; Guiavarch, Alain; Peuportier, Bruno (2009): Performance evaluation of an air-to-air heat pump coupled with temperate air-sources integrated into a dwelling. *Eleventh International Building Simulation Conference 2009*, S. 2266–73, Glasgow.
 [^Lachance2021]:Lachance, Alex; Tamasauskas, Justin; Breton, Stéphanie; Prud’homme, Solange (2021): Simulation based assessment on representativeness of a new performance rating procedure for cold climate air source heat pumps. *E3S Web Conf. 246, S. 6004.* doi: [10.1051/e3sconf/202124606004](https://doi.org/10.1051/e3sconf/202124606004).
 
 ##### Cycling losses, start-up ramps and cooldown
-The general effect of energy system components experiencing reduced output power and/or efficiency during a starting phase of operation is described in [this section](resie_transient_effects.md#part-load-ratio-dependent-efficiency). This effect is also observed for heat pumps and described in the literature. At the moment this effect is not included in the model and not implemented. This will be included in a future update as it is a vital part of a detailed operational simulation.
+The general effect of energy system components experiencing reduced output power and/or efficiency during a starting phase of operation is described in [this section](resie_transient_effects.md#part-load-ratio-dependent-efficiency). This effect is also observed for heat pumps and described in the literature. At the moment this effect is not included in the model and not implemented. This will be included in a future update as it is a vital part of a detailed operational simulation. 
+
+The cycling losses of an alternating heat pump are covered by the part-load-dependent efficiency functions. 
 
 #### Icing-losses of heat pumps with air as source medium
 
@@ -308,7 +312,7 @@ end
 This function is not concerned with the power at which the heat pump can operate for the given slice and does not decide the PLR. The inputs to the function are available energies (or to be supplied for the heat output), temperatures and the PLR. They are specific to the slice in question.
 
 #### Part load operation and optimisation of PLR
-Given the slicing algorithm and the function `energies_for_one_slice` as described above, it is then the question of how much power is available for each slice and at which PLR each slice is performed. The minimum and maximum power for each slice depends only temperatures, however the PLR does affect the COP.
+Given the slicing algorithm and the function `energies_for_one_slice` as described above, it is then the question of how much power is available for each slice and at which PLR each slice is performed. The minimum and maximum power for each slice depends only on temperatures, however the PLR does affect the COP.
 
 As a first pass the slicing algorithm is run with full power for each slice and the calculation stops when the power fraction concerning the energy sums over all slices reaches the maximum power fraction. Usually this is `1.0`, however this might be limited by [control modules](resie_operation_control.md#control-modules). Because the maximum power of each slices varies, so does how much time each slice takes to produce the calculated amount of energy of that slice.
 
@@ -340,9 +344,11 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\dot{Q}_{nominal}\) | nominal thermal energy output of heat pump |  [W]
+\(\dot{Q}_{nominal}\) | nominal (= maximum!) thermal energy output of heat pump |  [W]
 \(\dot{Q}_{out,max}(T_{source,in}, T_{sink,out})\) | function for maximum thermal heat output at given temperatures | [W]
 \(\dot{Q}_{out,min}(T_{source,in}, T_{sink,out})\) | function for minimum thermal heat output at given temperatures | [W]
+\(f_{max}(T_{source,in},T_{sink,out})\) | function applied to \(\dot{Q}_{nominal}\) to calcualate  \(\dot{Q}_{out,max}\) | [-] [0:1]
+\(f_{min}(T_{source,in},T_{sink,out})\) | function applied to \(\dot{Q}_{nominal}\)  to calcualate  \(\dot{Q}_{out,min}\) | [-] [0:1]
 \(COP_{dynamic}(T_{source,in}, T_{sink,out}, \kappa)\) | function for COP depending on \(T_{source,in}\), \(T_{sink,out}\) and \(\kappa\) | [-]
 \(COP_{constant}\) | constant COP, if given overrides dynamic COP and bypass calculation | [-]
 \(COP_{bypass}\) | COP during bypass operation | [-]
