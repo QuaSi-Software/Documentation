@@ -143,8 +143,8 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -170,8 +170,8 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the output to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -217,8 +217,8 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `constant_demand` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -251,8 +251,8 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `constant_supply` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -276,8 +276,8 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `is_source` | `Boolean` | Y/Y | `True` | If true, the grid connection acts as a source. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -532,7 +532,7 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
 | `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
 | `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
-| `ambient_temperature_profile_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
+| `ambient_temperature_profile_file_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
 | OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
 | OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the surrounding air temperature to the ambient air temperature of the global weather file |
 
@@ -641,8 +641,8 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 | `temperature_reduction_model` | `String` | Y/Y | `none` | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
 | `min_source_in_temperature` | `Float` | N/N | -10.0 | Minimum source input temperature. |
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
@@ -975,9 +975,9 @@ The parameters characterising the soil and its moisture content, such as heat ca
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `model_type` | `String` | Y/Y | `simplified` | [-] | type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
-| `temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
-| OR: `temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
-| OR: `constant_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
+| `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
+| OR: `ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
+| OR: `constant_ambient_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
 | `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
 | OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
 | OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m^2] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
