@@ -1045,7 +1045,7 @@ To perform this calculation in every timestep, the following input parameters ar
     "output_refs": ["TST_DEM_01"],
     "model_type": "detailed",
     "___GENERAL PARAMETER___": "",
-    "temperature_from_global_file": "temp_ambient_air",
+    "ambient_temperature_from_global_file": "temp_ambient_air",
     "global_solar_radiation_from_global_file": "globHorIrr",
     "infrared_sky_radiation_from_global_file": "longWaveIrr",
     "accuracy_mode": "rough",
