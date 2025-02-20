@@ -484,34 +484,39 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `MixingTemperature_Input`, `MixingTemperature_Output` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `Losses` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
-| `cop_function` | `String` | Y/Y | `carnot:0.4:const:1.0` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP with the temperature-dependent part in the first function and the PLR-dependent part in the second.
-| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] |  A constant COP value used for bypass operation. |
-| `max_power_function` | `String` | Y/Y | `const:1.0` | [-] |  See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
-| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] |  See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
-| `consider_icing` | `Bool` | N/Y | false | [-] |  If true, enables the calculation of icing losses. |
-| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] |  Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
-| `input_temperature` | `Temperature` | N/N | 20.0 | [°C] |  If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | [°C] |  If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
-| `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] |  If true, enables the optimisation of slice dispatch. |
-| `optimal_plr` | `Float` | N/N | 0.45 | [-] |  The PLR at which efficiency is highest. Only used for slice dispatch optimisation. |
-| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] |  The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
+| `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
+| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. |
+| `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. |
+| `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
+| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
+| `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
+| `power_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate losses on the side of the power electronics. If no losses should be considered, set this to `1.0`. |
+| `heat_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate heat losses that do not result in additional heat output, i.e. radiative heat losses. If no losses should be considered, set this to `1.0`. |
+| `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] | If true, enables the optimisation of slice dispatch. This is in particular relevant for modelling inverter-driven heat pumps. |
+| `optimal_plr` | `Float` | N/N | 0.45 | [-] | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. If optimisation is activated and no value is given for this parameter, the given PLF function is numerically analysed for the optimal PLR. |
+| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] | The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
 
 #### Exemplary input file definition for HeatPump
-**Simple heat pump with constant COP and fixed output temperature**
+**Simple heat pump with constant COP, fixed output temperature and no losses**
 ```json
 "TST_TH_HP_01": {
     "type": "HeatPump",
     "output_refs": ["TST_TH_BUS_01"],
     "power_th": 12000,
     "cop_function": "const:3.0",
-    "output_temperature": 70.0
+    "output_temperature": 70.0,
+    "power_losses_factor": 1.0,
+    "heat_losses_factor": 1.0
 }
 ```
 
@@ -521,9 +526,10 @@ Elevates supplied low temperature heat to a higher temperature with input electr
     "type": "HeatPump",
     "output_refs": ["TST_TH_BUS_01"],
     "power_th": 20000,
-    "cop_function": "field:0,45,55,65,75,85,95,105;0,3.79,3.26,2.87,2.57,2.34,2.15,1.99;10,4.59,3.79,3.26,2.87,2.57,2.34,2.15;20,5.93,4.59,3.79,3.26,2.87,2.57,2.34;30,8.74,5.93,4.59,3.79,3.26,2.87,2.57;40,20.15,8.74,5.93,4.59,3.79,3.26,2.87;50,20.15,20.15,8.74,5.93,4.59,3.79,3.26;60,20.15,20.15,20.15,8.74,5.93,4.59,3.79;70,20.15,20.15,20.15,20.15,8.74,5.93,4.59;80,20.15,20.15,20.15,20.15,20.15,8.74,5.93;90,20.15,20.15,20.15,20.15,20.15,20.15,8.74;100,20.15,20.15,20.15,20.15,20.15,20.15,20.15:poly:0.4,0.6",
+    "cop_function": "field:0,45,55,65,75,85,95,105;0,3.79,3.26,2.87,2.57,2.34,2.15,1.99;10,4.59,3.79,3.26,2.87,2.57,2.34,2.15;20,5.93,4.59,3.79,3.26,2.87,2.57,2.34;30,8.74,5.93,4.59,3.79,3.26,2.87,2.57;40,20.15,8.74,5.93,4.59,3.79,3.26,2.87;50,20.15,20.15,8.74,5.93,4.59,3.79,3.26;60,20.15,20.15,20.15,8.74,5.93,4.59,3.79;70,20.15,20.15,20.15,20.15,8.74,5.93,4.59;80,20.15,20.15,20.15,20.15,20.15,8.74,5.93;90,20.15,20.15,20.15,20.15,20.15,20.15,8.74;100,20.15,20.15,20.15,20.15,20.15,20.15,20.15",
     "max_power_function": "poly-2:0.6625,0.0008929,-0.001",
     "min_power_function": "poly-2:0.5125,0.0001786,-0.001",
+    "plf_function": "poly:0.4,0.6",
     "bypass_cop": 20.15,
     "consider_icing": true
 }
