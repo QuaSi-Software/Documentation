@@ -51,7 +51,7 @@ Similarly, components can be configured to be dis-/allowed to draw energy from s
 ### Function definitions
 Various components, particularly transformers, require an input of functions to determine efficiency, available power and other variables. The definition of a function in the project file is a string and should look like `function_prototype:values` with `function_prototype` refering to one of the implemented function prototypes (see specific sub-sections below) and `values` being data required to parameterise the prototype. Various function prototypes are implemented for different purposes.
 
-In general `:` is used as seperator between prototype and values and `,` as seperator for numbers with `.` as decimal point. Some component parameters take in two functions, which are concatenated with `:` again. For example `poly:0.1,2.4:const:0.7`.
+In general `:` is used as seperator between prototype and values and `,` as seperator for numbers with `.` as decimal point and no thousands seperator.
 
 #### Efficiency functions
 Used to determine an efficiency factor of how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping \(\kappa \in [0,1]\) to an efficiency factor.
@@ -65,20 +65,28 @@ For the configuration of components a selected number of different cases are imp
 * `const`: Takes one number and uses it as a constant efficiency factor. E.g. `const:0.9`.
 * `poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
 * `pwlin`: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
+* `offset_lin`: Takes one number and uses as the slope of a linear function with an offset of its complement (in regards to 1.0). E.g. `offset_lin:0.5` means \(e(x)=1.0-0.5*(1.0-x)\)
+* `logarithmic`: Takes two numbers and uses them as the coefficients of a quasi-logarithmic function. E.g. `logarithmic:0.5,0.3` means \(e(x)=\frac{0.5x}{0.3x+(1-0.3)}\)
+* `inv_poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. The inverse of the polynomial, multiplied with the PLR, is used as the efficiency function. E.g. `inv_poly:0.5,2.0,0.1` means \(e(x)=\frac{x}{0.5x²+2x+0.1}\)
+* `exp`: Takes three numbers and uses them as the coefficients of an exponential function. E.g. `exp:0.1,0.2,0.3` means \(e(x)=0.1+0.2*exp(0.3x)\)
+* `unified_plf`: Takes four numbers and uses them as the coefficients of a composite function of a logarithmic and linear function as described in the documentation on the [unified formulation for PLR-dependent efficiencies of heat pumps](resie_energy_system_components.md#part-load-efficiency). The first two numbers are the optimal PLR and the PLF at that PLR. The third number is a scaling factor for the logarithmic part and the fourth number is the PLF at PLR=1.0.
 
 **Discretization**
 
 Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance. In particular if a piece-wise linear interpolation is used it makes sense to use the same number of discretization steps so that the support values overlap for both the efficiency function and its inverse.
 
+**PLF functions**
+
+The calculation of some components, such as heat pumps, makes use of the part load factor (PLF), which is multiplied after an efficiency factor has been calculated from some other formulation and which represents the behaviour dependent on \(\kappa\). For parsing, these work the same as the efficiency functions, however they may not make use of the numerical approximation of the inverse function.
+
 #### COP functions
-Used by heat pumps and similar components to calculate the COP depending on input/output temperatures and the PLR. Instead of a single three-dimensional function the input is composed of a two-dimensional function for the temperature part and [an efficiency function](#efficiency-functions) for a PLF part. This assumes that the PLF function is independent of the temperatures, as described [in the model](resie_energy_system_components.md#part-load-efficiency). A possible input: `carnot:0.4:poly:0.5,0.4`
+Used by heat pumps and similar components to calculate the COP depending on input/output temperatures. The implemented function prototypes are two-dimensional functions that return the COP without considering additional modifications such as a PLF function or icing losses. The temperatures are assumed to be given in °C.
 
 **Implemented function prototypes**
 
-These refer to the temperature-dependent part.
-
 * `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
-* `carnot`: Calculates the COP as fraction of the Carnot-COP with the reduction factor given after the `:`, e.g. `carnot:0.4`.
+* `carnot`: Calculates the COP as fraction of the Carnot-COP with a given reduction factor, which is between `0.4` and `0.45` for typical heat pumps. E.g. `carnot:0.4` means \(COP = 0.4 \cdot \frac{273.15 + T_{out}}{T_{out} - T_{in}}\).
+* `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 * `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal values are interpreted as the inclusive boundaries of the field. Values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
 
 An example of a field definition with additional line breaks and spaces added for clarity:
@@ -97,7 +105,7 @@ Used by heat pumps and similar components to calculate the minimum and maximum p
 **Implemented function prototypes**
 
 * `const`: Takes one number and uses it as a constant fraction. E.g. `const:1.0`.
-* `poly-2`: A 2D-polynomial of order two. Takes a list of nine values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ y^2 + c_6 \ xy + c_7 \ x^2y + c_8 \ xy^2 + c_9 \ x^2y^2\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0`.
+* `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 
 
 ### Control modules
