@@ -39,6 +39,7 @@ nav:
   - 'ReSiE: Simulation engine':
       - 'Installation and usage': 'resie_installation.md'
       - 'Input file format': 'resie_input_file_format.md'
+      - 'Time, time zones and weather files': 'resie_time_definition.md'
       - 'Logging': 'resie_logging.md'
       - 'Component parameters': 'resie_component_parameters.md'
   - 'ReSiE: Simulation model':

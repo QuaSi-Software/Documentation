@@ -21,6 +21,7 @@
 | DC           | Direct Current                                                              |
 | DHW          | Domestic Hot Water                                                          |
 | DWD          | German weather service (Deutscher Wetterdienst)                             |
+| DST          | Daylight Saving Time                                                        |
 | EED          | Energy Earth Designer (software)                                            |
 | EER          | Energy Efficiency Ratio                                                     |
 | EPW          | Energy Plus Weather                                                         |
@@ -37,6 +38,7 @@
 | HP           | Heat Pump                                                                   |
 | HR           | Heat recovery                                                               |
 | HVAC         | Heating, Ventilation and Air Conditioning                                   |
+| IANA         | Internet Assigned Numbers Authority                                         |
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
 | JSON         | JavaScript Object Notation [data format]                                    |

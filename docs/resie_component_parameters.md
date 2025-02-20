@@ -224,8 +224,8 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -250,8 +250,8 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the output to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -295,8 +295,8 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `constant_demand` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -328,8 +328,8 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `constant_supply` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -352,8 +352,8 @@ If parameter `is_source` is true, acts as a `bounded_source` with only one outpu
 | ----------- | ------- | --- | ------------------------ | ------------------------ |
 | `is_source` | `Boolean` | Y/Y | `True` | If true, the grid connection acts as a source. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -579,27 +579,121 @@ A storage for electricity.
 | --- | --- |
 | **Type name** | `BufferTank`|
 | **File** | `energy_systems/storage/buffer_tank.jl` |
+| **Available models** | `ideally_stratified`, `balanced`, `ideally_mixed` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
 
-A short-term storage for heat of thermal carrier fluids, typically water.
+A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
-If the adaptive temperature calculation is activated, the temperatures for the input/output of the BT depends on the load state. If it is sufficiently full (depends on the `switch_point`), the BT can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+Three model types are available. The model `ideally_stratified` assumes two adiabatically separated temperature layers, 
+the upper one with `high_temperature` and the lower one with `low_temperature`. 
+Here, possible losses are only energy losses affecting the amount of energy in the hot layer without reducing its temperature. 
+Note that no gains into the cold layer are included in the model.
 
-If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+The `ideally_mixed` model assumes a perfectly mixed storage, meaning the whole storage always has the same temperature 
+between `high_temperature` and `low_temperature`. Here, losses result in a decrease of temperature of the storage medium. 
+Note that the storage has its high temperature only at a load of 100% and that connected components may not accept 
+heat at a lower temperature. 
+
+The `balanced` model is a combination of the former two models. Here, a `switch_point` is defined as the fraction of the
+load of the storage where the model switches from ideally stratified (load above `switch_point`) to ideally mixed 
+(load less then `switch_point`). 
+
+See the chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more explanation on the different models.
+
+Independent of the model, the input temperature is always required as `high_temperature`.
+For the size of the buffer tank, either the `volume` or the `capacity` can be given. If a capacity is given and no losses are considered,
+the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
+Note that no losses are applied when the storage is completely empty, meaning at `low_temperature`.
+
+**General parameter:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `model_type` | `String` | Y/Y | "ideally_stratified" | [-] | type of the buffer tank model: `ideally_stratified`, `balanced`, `ideally_mixed` |
+| `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
+| OR: `volume` | `Float` | Y/N | 15.5 |  [\(m^3\)] | volume of the BT: Note that either volume or capacity should be given.  |
+| `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m^3\)] | density of the heat carrier medium |
+| `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
+| `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
+| `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the buffer tank |
+| `max_load_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum load rate of the buffer tank related to the capacity |
+| `max_unload_rate` | `Float` | N/N | 1.5 |  [1/h] | the maximum unload rate of the buffer tank related to the capacity |
+
+**Parameter for the "balanced" model:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `switch_point` | `Float` | Y/Y | 0.15 |  [%/100] [0:1] | load state at which the model switches from `ideally_stratified` to `ideally_mixed` (only for model type `balanced`)  |
+
+**Parameter to consider losses (only for consider_losses = true):**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `consider_losses` | `Bool` | Y/Y | False | [-] | flag if losses should be taken into account |
+| `h_to_r` | `Float` | Y/Y | 2.0 | [-] | ratio of height to radius of the cylinder representing the buffer tank |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
+| `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
+| `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
+| `ambient_temperature_profile_file_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
+| OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
+| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the surrounding air temperature to the ambient air temperature of the global weather file |
+
+Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the BT. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the BT. |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
-| `switch_point` | `Float` | Y/Y | 0.15 | Partial load at which the adaptive output temperature calculation switches. |
-| `high_temperature` | `Temperature` | Y/Y | 75.0 | The high end of the adaptive in-/output temperature. |
-| `low_temperature` | `Temperature` | Y/Y | 20.0 | The low end of the adaptive in-/output temperature. |
+**Examplary input file definition for buffer tank**
+
+Minimal definition of a buffer tank in the input file:
+
+```JSON
+"TST_BFT_TH_01": {
+    "type": "BufferTank",
+    "medium": "m_h_w_ht1",
+    "output_refs": [
+        "TST_DEM_01"
+    ],
+    "model_type": "ideally_stratified",
+    "capacity": 10000
+}
+```
+
+Extended definition of a buffer tank in the input file:
+
+```JSON
+"TST_BFT_TH_01": {
+    "type": "BufferTank",
+    "medium": "m_h_w_ht1",
+    "output_refs": [
+        "TST_DEM_01"
+    ],
+    "___GENERAL PARAMETER___": "",
+    "model_type": "ideally_stratified",
+    "capacity": 300000,
+    "rho_medium": 1000,
+    "cp_medium": 4.18,
+    "high_temperature": 80.0,
+    "low_temperature": 15.0,
+    "initial_load": 0.5,
+    "max_load_rate": 1.0,
+    "max_unload_rate": 1.5,
+    "___BALANCED MODEL ONLY___": "",
+    "switch_point": 0.25,
+    "___LOSSES___": "",
+    "consider_losses": true,
+    "h_to_r": 2,
+    "constant_ambient_temperature": 18,
+    "ground_temperature": 12,
+    "thermal_transmission_lid": 1.0,
+    "thermal_transmission_barrel": 1.0,
+    "thermal_transmission_bottom": 1.0
+}
+```
 
 ### Seasonal thermal storage
 | | |
@@ -651,8 +745,8 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
 | `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 | `temperature_reduction_model` | `String` | Y/Y | `none` | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
 | `min_source_in_temperature` | `Float` | N/N | -10.0 | Minimum source input temperature. |
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
@@ -687,7 +781,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `fluid_reynolds_number` |
+| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `current_input_temperature`, `fluid_reynolds_number` |
 
 A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 
@@ -695,9 +789,9 @@ A model of a geothermal probe field or a single geothermal probe. Two models are
 
 The geothermal probe is modeled using precalculated g-functions. The model needs quite many input parameters. Especially the soil properties, including the undisturbed ground temperature, have a significant effect on the results. Therefore is it crucial to know the soil conditions at the investigated site. 
 
-The g-function is taken from the library provided within the repository. There are different configurations available: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration. Each of them can be specified by the number of probes in x and y direction (note that the number of probes defined for x has to be less or equal the number of probes defined for y). Some of the configurations, like zoned rectangles, require an additional key, that is specified in the documentation of the library in detail, available [here](https://gdr.openei.org/files/1325/LibraryOverview_v11.1%20(1).pdf) within the publication [doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
+The g-function can be either imported from a text file or can be taken from the library provided within the repository. There are different configurations available: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration. Each of them can be specified by the number of probes in x and y direction (note that the number of probes defined for x has to be less or equal the number of probes defined for y). Some of the configurations, like zoned rectangles, require an additional key, that is specified in the documentation of the library in detail, available [here](https://gdr.openei.org/files/1325/LibraryOverview_v11.1%20(1).pdf) within the publication [doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
-A short overview is given in the following. Note that not all configurations are available. Check the documentation linked above or the included text files that contain all possible key combinations for the different probe field configurations.
+A short overview of the included configurations is given in the following. Note that not all configurations are available. Check the documentation linked above or the included text files that contain all possible key combinations for the different probe field configurations. To import a g-function from another source, see the description below.
 
 **rectangle**  
 Here, only `number_of_probes_x` and `number_of_probes_y` are required. They define the number of rows in x and y direction, while y >= x. The rectangle that is defined with these two parameters is filled completely with probes.
@@ -816,29 +910,81 @@ number_of_probes_x = 3
 number_of_probes_y = 5  
 key_2 = ""  
 
+**Import g-function from txt-file**
+
+A custom g-function for a specific probe field with specific soil conditions can be calculated e.g. using the python package [pygfunction
+](https://github.com/MassimoCimmino/pygfunction) and imported as a text file to ReSiE.
+
+The file needs to have the following structure (without the notes):
+
+```txt
+comment1                // comments can be given without limitation
+number_of_probes: 42    // required variable
+***                     // start of data has to be specified with three stars
+-8.84569; 1.07147
+-7.90838; 1.38002
+-7.24323; 1.65958
+-6.68104; 1.99430
+-6.16948; 2.28428
+-5.68586; 2.62013
+-5.21865; 2.90993
+-4.76141; 3.01677
+...
+```
+
+The first column has to hold the normalized logarithmic time, \(ln(\text{real time} [s] / t_S)\) with 
+\(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m^2/s]})\) as the steady-state time defined by Eskilson.
+
+The second column, separatey by a semicolon, holds the g-function values.
+Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/custom_g-function_geothermal_probe.txt).
+
+If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
+
+**General parameter**
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `model_type` | `String` | Y/Y | `simplified` | [-] | Type of probe model: "simplified" with constant or "detailed" with calculated thermal borehole resistance in every time step. |
+| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
+| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `max_probe_temperature_loading` | `Float` | N/N | 50 | [°C] | maximum temperature allowed for regeneration |
+| `min_probe_temperature_unloading` | `Float` | N/N | 6 | [°C] | minimum temperature allowed for unloading |
+| `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
+| `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
+| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
+| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
+| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
+| `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
+| `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+
+**Parameter for simple model only**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
+
+
+**Parameter to get g-function from the included library**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `probe_field_geometry` | `String` | Y/Y | `rectangle` | [-] | type of probe field geometry, can be one of: rectangle, open_rectangle, zoned_rectangle, U_configurations, lopsided_U_configuration, C_configuration, L_configuration |
 | `number_of_probes_x` | `Int` | Y/Y | 1 | [-] | number of probes in x direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
 | `number_of_probes_y` | `Int` | Y/Y | 1 | [-] | number of probes in y direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
 | `probe_field_key_2` | `String` | Y/Y | "" | [-] | key2 of g-function library. Can also be "" if none is needed. The value depends on the chosen library type. |
-| `probe_depth` | `Float` | Y/Y | 150 | [m] | depth (or length) of a single geothermal probe. Has to be between 24 m and 384 m. |
 | `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
-| `borehole_diameter` | `Float` | Y/Y | 0.15 | [m] | borehole diameter |
-| `borehole_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance of borehole (constant, if not calculated from other parameters in every time step!) |
-| `loading_temperature` | `Temperature` | N/Y | nothing | [°C] | nominal high temperature for loading geothermal probe storage, can also be set from other end of interface |
-| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
-| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
-| `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
-| `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
-| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 | `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
-| `max_input_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum input power per probe meter |
-| `max_output_power` | `Float` | Y/Y | 50 | [W/m_probe] | maximum output power per probe meter |
-| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
+
+
+**Externally importing g-function from a file**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `g_function_file_path` | `String` | Y/N | "path/to/file.txt" | [-] | absolute or relative path to a txt file containing an externally calculated g-function |
+
 
 **Model `detailed`:**
 
@@ -859,6 +1005,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
 
 **Exemplary input file definition for GeothermalProbe:**
@@ -873,23 +1020,26 @@ To perform this calculation in every timestep, the following input parameters ar
     ],
     "model_type": "detailed",
     "___GENERAL PARAMETER___": "",
-    "max_output_power": 150,
     "max_input_power": 150,
+    "max_output_power": 150,
     "regeneration": true,
+    "max_probe_temperature_loading": 45, 
+    "min_probe_temperature_unloading": 6,
+    "probe_depth": 150,
+    "borehole_diameter": 0.16,
+    "loading_temperature_spread": 4,
+    "unloading_temperature_spread": 1.5,
     "soil_undisturbed_ground_temperature": 13,
-    "soil_heat_conductivity": 1.6 ,
-    "soil_density": 1800,
-    "soil_specific_heat_capacity": 2400,
+    "boreholewall_start_temperature": 13,
+    "___G-FUNCTION FROM LIBRARY___": "",
     "probe_field_geometry": "rectangle",
-    "number_of_probes_x": 3,
+    "number_of_probes_x": 3, 
     "number_of_probes_y": 12,
     "probe_field_key_2": "",
     "borehole_spacing": 8,
-    "probe_depth": 150,
-    "borehole_diameter": 0.16,
-    "boreholewall_start_temperature": 13,
-    "unloading_temperature_spread": 1.5,
-    "loading_temperature_spread": 4,
+    "soil_density": 1800,
+    "soil_specific_heat_capacity": 2400,
+    "soil_heat_conductivity": 1.6 ,  // also needed for detailed model        
     "___SIMPLIFIED MODEL___": "",
     "borehole_thermal_resistance": 0.1,
     "___DETAILED MODEL___": "",
@@ -904,5 +1054,137 @@ To perform this calculation in every timestep, the following input parameters ar
     "fluid_heat_conductivity": 0.48,
     "fluid_prandtl_number": 31.3,
     "grout_heat_conductivity": 2
+}
+```
+
+### Geothermal collector
+| | |
+| --- | --- |
+| **Type name** | `GeothermalHeatCollector`|
+| **File** | `energy_systems/heat_sources/geothermal_heat_collector.jl` |
+| **Available models** | `simplified` (default), `detailed` |
+| **System function** | `storage` |
+| **Medium** |  |
+| **Input media** | `m_heat_in`/`m_h_w_ht1` |
+| **Output media** | `m_heat_out`/`m_h_w_lt1` |
+| **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
+
+A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
+
+The parameters characterising the soil and its moisture content, such as heat capacity, density, thermal conductivity and enthalpy of fusion, as well as the parameters describing the boundary conditions on the ground surface, have a significant influence on the simulation results. Make sure that you select suitable values, e.g. from VDI 4640. The default values are not necessarily correct or consistent.
+
+**General parameter**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
+| `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
+| OR: `ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
+| OR: `constant_ambient_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
+| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
+| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
+| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m^2] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
+| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
+| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m^2] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
+| `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
+| `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
+| `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
+| `max_input_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum input power per collector area |
+| `fluid_min_output_temperature` | `Float` | N/N | -5 | [°C] | minimum output temperature of the fluid for unloading; if not specified, no limit is applied for the output temperature |
+| `fluid_max_input_temperature` | `Float` | N/N | 60 | [°C] | maximum input temperature of the fluid for loading; if not specified, no limit is applied for the input temperature |
+| `phase_change_upper_boundary_temperature` | `Float` | Y/Y | -0.25 | [°C] | the upper boundary of the phase change temperature range |
+| `phase_change_lower_boundary_temperature` | `Float` | Y/Y | -1.0 | [°C] | the lower boundary of the phase change temperature range |
+| `number_of_pipes` | `Float` | Y/Y | 1 | [-] | the number of parallel collector pipes |
+| `pipe_length` | `Float` | Y/Y | 100 | [m] | the length of a single collector pipe |
+| `pipe_spacing` | `Float` | Y/Y | 0.5 | [m] | the spacing between the parallel collector pipes. For a single pipe, use a larger spacing depending on the soil conditions. Check the temporal evolution of the temperature distribution with additional plots in the io_settings. |
+| `pipe_laying_depth` | `Float` | Y/Y | 1.5 | [m] | the depth of the soil between the surface and the pipe |
+| `pipe_radius_outer` | `Float` | Y/Y | 0.016 | [m] | the outer radius of the pipe |
+| `considered_soil_depth` | `Float` | Y/Y | 10.0 | [m] | the total depth of the simulated soil from the surface to undisturbed ground temperature |
+| `soil_specific_heat_capacity` | `Float` | Y/Y | 1000 | [J/(kgK)] | specific heat capacity of the soil in unfrozen state |
+| `soil_specific_heat_capacity_frozen` | `Float` | Y/Y | 900 | [J/(kgK)] | specific heat capacity of the soil in frozen state |
+| `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | density of the soil |
+| `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of the soil in unfrozen state |
+| `soil_heat_conductivity_frozen` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of the soil in frozen state |
+| `soil_specific_enthalpy_of_fusion` | `Float` | Y/Y | 90000 | [J/kg] | specific enthalpy of fusion of soil |
+| `surface_convective_heat_transfer_coefficient` | `Float` | Y/Y | 14.7 | [W/(m^2 K)] | convective heat transfer on surface |
+| `surface_reflection_factor` | `Float` | Y/Y | 0.25 | [-] | reflection factor / albedo value of surface |
+| `surface_emissivity` | `Float` | Y/Y | 0.9 | [-] | emissivity of the surface |
+| `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
+| `loading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during loading |
+| `start_temperature_fluid_and_pipe` | `Float` | Y/Y | 15.5 | [°C] | starting temperature of fluid and soil near pipe |
+| `undisturbed_ground_temperature` | `Float` | Y/Y | 9 | [°C] | undisturbed ground temperature at the bottom of the simulation boundary |
+
+**Parameter for simple model only**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `pipe_soil_thermal_resistance` | `Float` | Y/Y | 0.1 | [(Km)/W] | thermal resistance from fluid to pipe (constant for simple model) |
+
+**Model `detailed`:**
+
+The detailed model uses extended parameters to determine the thermal resistance from the fluid to the soil. For that, the Reynolds number is calculated in every timestep to determine the heat transmission from fluid to the pipe. The heat transmission from pipe to soil is neglected.
+
+To perform this calculation in every timestep, the following input parameters are required, while the `pipe_soil_thermal_resistance` is not needed anymore:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `use_dynamic_fluid_properties` | `Bool` | N/Y | false | [-] | flag if temperature dependent calculation of the fluid's Reynolds number for a 30 Vol-% ethylene glycol mix from TRNSYS Type 710 should be used (true), defaults to false|
+| `nusselt_approach` | `String` | N/Y | "Stephan" | [-] | approach used for the calculation of the Nußelt number, can be one of: Stephan, Ramming, defaults to "Stephan" |
+| `pipe_thickness` | `Float` | Y/Y | 0.003 | [m] | thickness of the pipe |
+| `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
+| `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of the fluid |
+| `fluid_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of the fluid |
+| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of the fluid |
+| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of the fluid |
+| `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of the fluid |
+
+**Examplary input file definition for geothermal collector:**
+
+```JSON
+"TST_GTC_01": {
+    "type": "GeothermalHeatCollector",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": ["TST_DEM_01"],
+    "model_type": "detailed",
+    "___GENERAL PARAMETER___": "",
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "global_solar_radiation_from_global_file": "globHorIrr",
+    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "accuracy_mode": "rough",
+    "regeneration": false,
+    "max_output_power": 25,
+    "max_input_power": 25,
+    "phase_change_upper_boundary_temperature": -0.25,
+    "phase_change_lower_boundary_temperature": -1.0,
+    "number_of_pipes": 47,
+    "pipe_length": 93,
+    "pipe_spacing": 1.0,
+    "pipe_laying_depth": 2.0,
+    "pipe_radius_outer": 0.02,
+    "considered_soil_depth": 10.0,
+    "soil_specific_heat_capacity": 850,
+    "soil_specific_heat_capacity_frozen": 850,
+    "soil_density": 1900,
+    "soil_heat_conductivity": 2.4,
+    "soil_heat_conductivity_frozen": 2.9,
+    "soil_specific_enthalpy_of_fusion": 90000,
+    "surface_convective_heat_transfer_coefficient": 14.7,
+    "surface_reflection_factor": 0.25,
+    "surface_emissivity": 0.9,
+    "unloading_temperature_spread": 3.0,
+    "loading_temperature_spread": 3.0,
+    "start_temperature_fluid_and_pipe": 12.5,
+    "undisturbed_ground_temperature": 9.0,
+    "___SIMPLIFIED MODEL___": "",
+    "pipe_soil_thermal_resistance": 0.1,
+    "___DETAILED MODEL___": "",
+    "pipe_thickness": 0.0037,
+    "pipe_heat_conductivity": 0.4,
+    "fluid_specific_heat_capacity": 3944,
+    "fluid_heat_conductivity": 0.499,
+    "fluid_density": 1025,
+    "fluid_kinematic_viscosity": 3.6e-6,
+    "fluid_prantl_number": 30
 }
 ```

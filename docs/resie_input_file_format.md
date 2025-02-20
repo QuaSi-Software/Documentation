@@ -44,11 +44,13 @@ The overall structure of the project file is split into three general sections a
     "sankey_plot_file": "./output/output_sankey.html",
     "sankey_plot": "default",
     "csv_output_file": "./output/out.csv",
+    "csv_time_unit": "hours",
     "csv_output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
     },
     "output_plot_file": "./output/output_plot.html",
+    "output_plot_time_unit": "date",
 	"output_plot": {
 		"1": {
 			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"]},
@@ -62,15 +64,17 @@ The overall structure of the project file is split into three general sections a
 ```
 
 * `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
+* `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): If true, ReSiE will create additional plots of components, if available (currently only available for geothermal probe). Defaults to `false`.
 * `auxiliary_plots_path` (`String`): (Optional) File path to where the additional plots will be saved. Defaults to `./output/`.
-* `auxiliary_plots_formats` (`Arrax{String}`): Array of file formats that should be created. Can be one or multiple of `["html", "pdf", "png", "ps", "svg"]`.
+* `auxiliary_plots_formats` (`Array{String}`): Array of file formats that should be created. Can be one or multiple of `["html", "pdf", "png", "ps", "svg"]`. Defaults to [".png"].
 * `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details.
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
+* `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 
 ### Output specification (Sankey)
@@ -139,19 +143,27 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
 ## Simulation parameters
 ```json
 "simulation_parameters": {
-    "start": 0,
-    "end": 604800,
-    "time_step_seconds": 900,
+    "start": "01.01.2024 00:00",
+    "end": "31.12.2024 23:00",
+    "start_end_unit": "dd.mm.yyyy HH:MM",
+    "time_step": 60,
+    "time_step_unit": "minutes",
     "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "latitude": 48.755749,
+    "longitude": 9.190182, 
 },
 ```
 
-* `start` (`Integer`): Start time of the simulation in seconds.
-* `end` (`Integer`): End time (inclusive) of the simulation in seconds.
-* `time_step_seconds` (`Integer`): Time step in seconds.
-* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required)
+* `start` (`String`): Start time of the simulation as datetime format.
+* `end` (`String`): End time (inclusive) of the simulation as datetime format, will be rounded down to the nearest multiple of time_step.
+* `start_end_unit` (`String`): Datetime format specifier for start and end time.
+* `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
+* `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
+* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
+* `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 
-**A note on time:** The simulation engine works entirely with timestamps relative to an arbitrary reference point. It is up to the user to choose these so that the simulation works well with the given inputs. The reference point can be the same as with the unix timestamp (1970-01-01 00:00:00) or it can be any number whatsoever as long as it is used consistently. The most important point is that the profiles used in the simulation match the reference point being used in the simulation parameters.
+**A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
 ## Components
 
@@ -246,33 +258,76 @@ Example of a generated order of operation:
 ]
 ```
 
-
 ## Profile file format
 
-As discussed earlier, time series data is separated into its own file format so as to not clutter the project file and turn it unreadable. This profile file format resembles a `CSV` format with a few additions.
+As discussed earlier, time series data is separated into its own file format so as to not clutter the project file and turn it unreadable. This profile file format resembles a `CSV` format with a few additions. Parameters and meta information are provided by adding a `#` to the start of a line.
 
+Three different ways of defining a profile can be chosen by the parameter `time_definition`: 
+
+- `startdate_timestepsize`: Data only along with a specified startdate and time step width
 ```csv
-# time_step;900
-# is_power;false
-0;0.05
-900;0.15
-1800;0.1
-...
+    # time_definition: 		     startdate_timestepsize
+    # profile_start_date: 	     01.01.2020 00:00
+    # profile_start_date_format: dd.mm.yyyy HH:MM
+    # profile_time_step_seconds: 900
+    # data_type:                 extensive
+    0.881964197
+    0.929535186
+    ...
+``` 
+- `startdate_timestamp`: A given timestamp (first coloumn) with a custom unit along with the data (second column) and a startdate
+```csv
+    # time_definition: 			 startdate_timestamp
+    # profile_start_date: 		 01.01.2020 00:00:00
+    # profile_start_date_format: dd.mm.yyyy HH:MM:SS
+    # timestamp_format: 		 seconds 
+    # data_type:                 intensive
+    0;     0.881964197
+    900;   0.929535186
+    ...
+```
+- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column), optionaly with a time zone if DST are included. The `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! Note that leap days will be filtered out in order to be consistent with weather files.
+```csv
+    # time_definition: 	datestamp
+    # timestamp_format: dd.mm.yyyy HH:MM 
+    # time_zone: 		Europe/Berlin
+    # data_type:        extensive
+    01.01.2020 00:00;	0.881964197
+    01.01.2020 01:00;	0.929535186
+    ...
 ```
 
-### Metadata
+### Metadata and profile parameters
 
-Instead of a header row, there is a block of metadata describing important information on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name;value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information.
+Ahead of the data, a block of metadata describes important information and parameters on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name:value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information. Just make sure that the lines start with a `#`.
 
-* `time_step` (`Integer`): The time step, in seconds, used by the time series.
-* `is_power` (`Boolean`): If true, the data is considered to be power values as an average over the timespan each time step covers. If false, the data is considered as the work done over the time step. Values that don't fit into a power/work pattern, like temperatures or operation states,  **must** be listed as `is_power;true`, as this means the values are not modified and read as-is.
+* `data_type` (`String`, required): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Intensive_and_extensive_properties) on intensive and extensive properties for more information.
+* `time_definition` (`String`, required): Specifies the kind of the definition of the timestamp, see above for details. Has to be one of `startdate_timestepsize`, `startdate_timestamp`, `datestamp`.
+* `profile_start_date` (`DateTime`): The date of the first datapoint of the profile (only for `startdate_timestepsize` or `startdate_timestamp`)
+* `profile_start_date_format` (`String`): The datetime format for the `profile_start_date` (only for `startdate_timestepsize` or `startdate_timestamp`).
+* `profile_time_step_seconds` (`Integer`): The profile time step in seconds. Only required for `startdate_timestepsize`, but can be given for other time_definitions as well (if not given, the timestep will be detected from the data).
+* `timestamp_format` (`String`): The format specifier for the datetime index (only for `startdate_timestamp` or `datestamp`). Can be `seconds`, `minutes`, `hours` or a custom datetime format. See table below for details on the datetime formatter.
+* `time_zone` (`String`): A timezone in [IANA format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that applies for the datetime index. Must only be given if daylight saving is included in the `datestamp`. Only for `datestamp`.
+* `time_shift_seconds` (`Integer`, optional): Specifies the number of seconds by which to shift the timestamps of a profile. A positive value shifts the timestamps forward in time, meaning a specific value will align with an earlier time step. Conversely, a negative value shifts the timestamps backward, aligning a specific value with a later time step. If the timestamps do not align with the simulation timestep after the shift, the values will be linearly interpolated. This can be useful, for example, if a profile does not align with the convention that values represent the timespan following the given time step. If this results in a missing value at the beginning or end of a profile, the last or first value is duplicated. Attention: The linear interpolation may lead to a different sum and mean of the converted profile compared to the original one!
+* `use_linear_segmentation` (`Bool`, optional): A flag that specifies whether to use linear interpolation (`true`) or step interpolation (`false`) to fill values for a given profile at intermediate timesteps during segmentation. Defaults to `false`. Attention: Linear interpolation may lead to a different sum and mean of the converted profile compared to the original one! If you want to maintain the integral of a profile exactly, use step interpolation!
+
+The format specifier for a custom datetime format can be composed from the table below, that holds a selection of the possible format types that are defined by the Julia *Dates* module:
+  
+| Code | Examples	| Comment                                    |
+|------|------------|--------------------------------------------|
+| y    | 6	        | Numeric year with a fixed width            |
+| Y    | 1996	    | Numeric year with a minimum width          |
+| m    | 1, 12	    | Numeric month with a minimum width         |
+| u    | Jan	    | Month name shortened to 3-chars            |
+| U    | January	| Full month name                            |
+| d    | 1, 31	    | Day of the month with a minimum width      |
+| H    | 0, 23	    | Hour (24-hour clock) with a minimum width  |
+| M    | 0, 59	    | Minute with a minimum width                |
+| S    | 0, 59	    | Second with a minimum width                |
+| s    | 000, 500	| Millisecond with a minimum width of 3      |
+
+For example, a date is given as `24.12.2024 00:00`, the corresponding datetime format would be `dd.mm.yyyy HH:MM`. Or, `Dec/24/2024 000000` could be read in with the format specifier `u/dd/yyyy HHMMSS`
 
 ### Time series data
 
-Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`. The number value should use a point `.` as the decimal separator. The timestamp should be listed as seconds relative to the reference point used throughout the simulation.
-
-### Time step width
-
-ReSiE automatically converts the time series data of the profiles to the time step of the simulation, specified at `simulation_parameters": "time_step_seconds":`. Aggregation as well as segmentation of intensive (`is_power;true` for e.g. temperatures) and extensive values (`is_power;false` for e.g. energies) can be performed. Segmentation of intensive values is done using linear interpolation between the original time steps. During segmentation of extensive values instead, ReSiE divides the original value evenly among the smaller intervals. This means, each smaller time segment within a larger one receives the same value, effectively spreading the original value evenly over the time it covers. With extensive aggregation, the sum of the original values that compose the new time step is calculated, while with intensive values, the mean of the original values is taken to obtain the corresponding value of the new profile.
-
-Please note that currently only exact dividers or multiples of the time steps of the simulation and the profiles can be handled by the algorithm (e.g. 60 min --> 15 min or 15 min --> 30 min). Otherwise an error will arise, like for 15 min --> 6 min or 15 min --> 20 min.
+Following the metadata block, the time series data is listed with one `timestamp` and `value` pair per line, separated by semicolon `;`, or only a value per line, depending on the `time_definition`. The number value should use a point `.` as the decimal separator. If a datestamp is given as timestamp, note that leap days will be filtered out. If the datestamp includes daylight savings, a timezone has to be specified to ensure correct internal handling. Currently, only profiles with an equidistant time step width are supported.
