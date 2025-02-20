@@ -171,11 +171,7 @@ The COP of the modeled heat pump depends not only on the temperatures of the sin
 
 \(COP(\kappa) = COP(1.0) \cdot PLF(\kappa) \)
 
-The PLF curve is an input to the simulation and can be one of the following methods:
-
-* A constant value
-* A polynomial of any order
-* Linear interpolation between equidistant support values 
+The PLF curve is an input to the simulation and can be configured by a variety of function prototypes. This is described in more detail in the [corresponding section on function definitions](resie_component_parameters.md#efficiency-functions).
 
 The literature provides different examples for the correlation of the COP to the PLR (see section "Overview" for literature examples). This relation is non-linear as shown for example in the following figure given the part-load-dependent COP of an inverter-driven ENRGI-Heatpump at different temperature levels (Source: Enrgi[^2]).
 
@@ -201,14 +197,12 @@ PLF(\kappa) =
 a \ \frac{\kappa}{c \ \kappa + 1 - c}  & \text{ for } \kappa < \kappa_{opt} \\
 \frac{PLF(1.0) - PLF_{opt}}{1-\kappa_{opt}} \ (\kappa  - \kappa_{opt} ) + PLF_{opt}   & \text{ for } \kappa >= \kappa_{opt} 
 \end{cases} \\
-\text{ with } a = \frac{PLF_{opt}}{\kappa_{opt}} \left ( c \ (\kappa_{opt}-1)+1  \right )
+\text{ with } a = \frac{PLF_{opt}}{\kappa_{opt}} \left ( c \ (\kappa_{opt}-1)+1  \right ) \text{ and } 0 < c < 1
 $$
  
 For on-off heat pumps, \(a = 1\) and \(\kappa_{opt} = 1\).
 
-**Note:** If this formulation is chosen, for the moment it is required to enter it as a range of support values with linear interpolation between. A future update might implement this formulation directly.
-
-**Note 2:** In order to make use of the part load function of an inverter-driven heat pump, the optimization of the PLR has to be activated in the slicing algorithm.
+**Note:** In order to make full use of the part load function of an inverter-driven heat pump, the optimization of slice dispatch has to be activated in the input parameters. Without optimization the calculation assumes \(\kappa = 1\), which leads to a worse performance of the heat pump than would be expected.
 
 ##### Calculating energies from the part-load-dependent efficiency
 As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function of the PLR through numerical inversion in a pre-processing step. However because of reasons described in [the section on the slicing algorithm](resie_energy_system_components.md#slicing-algorithm), this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to worse performance for heat pumps with exactly one source and exactly one sink as compared to the theoretical case. A future update might address this problem.
@@ -288,7 +282,8 @@ begin
     else if (T_source_in >= T_sink_out) then
         COP = COP_bypass()
     else
-        COP = COP_dynamic(T_source_in, T_sink_out, kappa)
+        COP = COP_dynamic(T_source_in, T_sink_out)
+        COP = COP * PLF(kappa)
         COP = COP * (1 - icing_losses(T_source_in) / 100)
     end
 
@@ -318,7 +313,7 @@ As a first pass the slicing algorithm is run with full power for each slice and 
 
 Because the first pass is calculated with full power for each slice and the algorithm stops if the maximum power fraction has been reached, it is guaranteed that the heat pump can fulfill the slices as they have been calculated within the frame of the timestep. However if there is time "left over", it could be the case that recalculating the slices with lower \(\kappa\) for some or all slices leads to an improvement in the efficiency while still observing the power limitations. This leads to an optimisation problem if \(\kappa_{opt} < 1\), for example for inverter heat pumps (see [this section](resie_energy_system_components.md#part-load-efficiency)).
 
-**Note:** At time of writing a proof-of-concept optimisation option has been implemented, however it leads to a hefty step down in performance and does not work very well in approaching the global optimum. It is recommended to only use it for detailed simulations of a heat pump when poor performance is not an issue.
+**Note:** At time of writing a proof-of-concept optimisation option has been implemented, however it has poor performance and does not work very well in approaching the global optimum. It is recommended to only use it for detailed simulations of an inverter-driven heat pump when poor performance is not an issue.
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
@@ -337,8 +332,11 @@ Symbol | Description | Unit
 \(T_{sink,out}\) | condenser outlet temperature | [°C]
 \(T_{source,in}\) | evaporator inlet temperature | [°C]
 \(COP\) | calculated COP | [-]
+\(COP_{effective}\) | calculated COP including losses of the power electronics | [-]
 \(T_{in,mixed}\) | weighted-mean of chosen input temperatures | [°C]
 \(T_{out,mixed}\) | weighted-mean of chosen output temperatures | [°C]
+\(\kappa_{avg}\) | weighted-mean of the \(\kappa\) of each slice | [-]
+\(t_{active}\) | activation time factor as fraction of the simulation time step, during which the heat pump was active | [-]
 
 **Parameters of the Heat Pump:** 
 
@@ -349,11 +347,12 @@ Symbol | Description | Unit
 \(\dot{Q}_{out,min}(T_{source,in}, T_{sink,out})\) | function for minimum thermal heat output at given temperatures | [W]
 \(f_{max}(T_{source,in},T_{sink,out})\) | function applied to \(\dot{Q}_{nominal}\) to calcualate  \(\dot{Q}_{out,max}\) | [-] [0:1]
 \(f_{min}(T_{source,in},T_{sink,out})\) | function applied to \(\dot{Q}_{nominal}\)  to calcualate  \(\dot{Q}_{out,min}\) | [-] [0:1]
-\(COP_{dynamic}(T_{source,in}, T_{sink,out}, \kappa)\) | function for COP depending on \(T_{source,in}\), \(T_{sink,out}\) and \(\kappa\) | [-]
+\(COP_{dynamic}(T_{source,in}, T_{sink,out})\) | function for COP depending on \(T_{source,in}\) and \(T_{sink,out}\) | [-]
 \(COP_{constant}\) | constant COP, if given overrides dynamic COP and bypass calculation | [-]
 \(COP_{bypass}\) | COP during bypass operation | [-]
-\(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control | [-]
-\(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled | [-]
+\(PLF(\kappa)\) | function used to modify the COP depending on \(\kappa\)
+\(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control modules | [-]
+\(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled. If not given, it will be numerically calculated based on the given PLF function. | [-]
 \(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air-sourced heat pumps only) | [-]
 \(\eta_{el}\) | efficiency of the power electronics | [-]
 \(\eta_{th}\) | efficiency factor representing possible thermal energy losses with respect to the thermal input power | [-]
