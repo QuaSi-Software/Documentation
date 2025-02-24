@@ -74,7 +74,7 @@ For a **time shift** to align profile timestamps with the simulation timestamps 
 
 If some timestamps are missing at the beginning or end of the profile during the conversion process, and these are needed to compute the first or last value of the new profile, the values from the original profile are duplicated to fill in the gaps. In this case, an info log message is generated.
 
-**Note**: Linear interpolation for time shifts and segmentation may smoothen the original profile, potentially changing the total sum/mean of the profile. If preserving the original sum/mean is crucial, use stepwise interpolation instead and no time shift. The difference is illustrated in the figures below. The first shows the different integral of the linear and stepwise segmentation methods, the second the smoothing effect of a time shift.
+**Note**: Linear interpolation for time shifts and segmentation may smoothen the original profile, potentially changing the total sum/mean of the profile. If preserving the original sum/mean is crucial, use stepwise interpolation instead and no time shift. The difference is illustrated in the figures below. The first shows the different integral of the `linear_classic` and `stepwise` segmentation methods, the second the smoothing effect of a time shift.
 
 <center>![Profile segmentaton methods](fig/240905_profile_segmentation_methods_comparison.jpg)</center>
 
