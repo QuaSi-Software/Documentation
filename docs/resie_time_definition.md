@@ -45,7 +45,28 @@ In general, to ensure accurate simulation results, users must adhere to the foll
 
 ReSiE automatically adjusts the time series data of profiles to match the simulation time step specified in `"simulation_parameters": "time_step"` and ensures that the profile's timestamps are aligned with the `"simulation_parameters": "start"`. The tool supports both aggregation and segmentation for intensive (e.g., temperatures) and extensive values (e.g., energies). Please note that currently only exact dividers or multiples of the time steps of the simulation and the profiles can be handled by the algorithm (e.g. 60 min --> 15 min or 15 min --> 30 min). Otherwise an error will arise, like for 15 min --> 6 min or 15 min --> 20 min.
 
-**Segmentation** can be performed using either linear interpolation or step interpolation. Linear interpolation estimates intermediate values by drawing a straight line between the original time steps. Step interpolation, on the other hand, distributes the original value evenly across the smaller intervals. Both methods handle intensive and extensive appropriately.
+**Segmentation** can be performed using several different methods:
+
+- `"stepwise"` means, the value given at a timestamp is distributed evenly or copied across the new smaller timestamps. 
+- `"linear_classic"` interpolates the given values from the original timestamps linearly to the new timestamps, using the
+   values and the correspinding given timestamps indicating the begin of the covered timespan as basis.
+- `"linear_time_preserving"` interpolates the data by first shifting the data by half the original 
+time step to make the values be measured at the time indicated. After the linear interpolation to a 
+finer time step, the data is shifted back by 1/2 a time step to meet the required definition 
+of the values representing the following time step. This should be used for time-critic data as it satisfies the original 
+definition of time. But, this method will cut peaks and valleys in the data more than the classic interpolation.
+- `"linear_solar_radiation"` interpolation uses a method described in the paper by McDowell et. al[^McDowell2018].
+It is an interpolation with a correction factor to keep the sum of the interpolated values equal to the sum of the
+original values **in every hour** and at the same time to predict a realistic course of the radiation between the given hourly values.
+It also cuts radiation before sunrise and after sunset. This is also used in TRNSYS 18, but the methods can shows "wavy" curves 
+as result and can only be used for the segmentation of hourly data.
+
+[^McDowell2018]: T. McDowell, S. Letellier-Duchesne, M. Kummert (2018): "A New Method for Determining Sub-hourly Solar Radiation from Hourly Data" 
+
+All  methods handle intensive and extensive values appropriately. The following figure compares the four methods to illustrate their results
+when segmentating hourly data (light grey) to a 15 minute timestep. Note that each dot at a given time represents the sum/mean of the upcoming time step:
+
+<center>![Profile segmentaton methods](fig/250224_segmentation_algorithms.svg)</center>
 
 For **aggregation**, ReSiE sums the original values to compute the new time step for extensive data, while it calculates the mean of the original values for intensive data to generate the corresponding value in the new profile.
 
@@ -53,7 +74,7 @@ For a **time shift** to align profile timestamps with the simulation timestamps 
 
 If some timestamps are missing at the beginning or end of the profile during the conversion process, and these are needed to compute the first or last value of the new profile, the values from the original profile are duplicated to fill in the gaps. In this case, an info log message is generated.
 
-**Note**: Linear interpolation for time shifts and segmentation may smoothen the original profile, potentially changing the total sum/mean of the profile. If preserving the original sum/mean is crucial, use step interpolation instead and no time shift. The difference is illustrated in the figures below. The first shows the different integral of the linear and stepwise segmentation methods, the second the smoothing effect of a time shift.
+**Note**: Linear interpolation for time shifts and segmentation may smoothen the original profile, potentially changing the total sum/mean of the profile. If preserving the original sum/mean is crucial, use stepwise interpolation instead and no time shift. The difference is illustrated in the figures below. The first shows the different integral of the linear and stepwise segmentation methods, the second the smoothing effect of a time shift.
 
 <center>![Profile segmentaton methods](fig/240905_profile_segmentation_methods_comparison.jpg)</center>
 

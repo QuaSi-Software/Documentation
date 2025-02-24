@@ -49,6 +49,7 @@ The overall structure of the project file is split into three general sections a
         "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
         ...
     },
+    "csv_output_weather": true,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
 	"output_plot": {
@@ -59,13 +60,15 @@ The overall structure of the project file is split into three general sections a
 			"scale_factor": 0.001
 		},
 		...
-	}
+	},
+    "plot_weather_data": true,
 },
 ```
 
 * `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
 * `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
+* `csv_output_weather` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is exported to the CSV file. Defaults to `false`.
 * `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): If true, ReSiE will create additional plots of components, if available (currently only available for geothermal probe). Defaults to `false`.
@@ -76,6 +79,8 @@ The overall structure of the project file is split into three general sections a
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
 * `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
+* `plot_weather_data` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is plotted to the line plot. Defaults to `false`.
+
 
 ### Output specification (Sankey)
 
@@ -113,6 +118,8 @@ The keys of this map must correspond exactly to the UAC of the components define
 
 The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `Losses`, which represents the total energy losses, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
 
+To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
+
 ### Output specification (interactive .html plot)
 
 The output values of each component can be plotted in an interactive HTML-based line plot. `output_plot` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all"```, all possible output channels of all components will be plotted in the line plot, while for ```"nothing"``` no plot will be created. Note that for ```"output_plot": "all"```, the unit of each output is not specified as well as there is no `scale_factor` as for custon defined outputs. 
@@ -138,6 +145,8 @@ To define a custom plot, use the following syntax:
 ```
 The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
+To plot the weather data read in from a provided weather file to the interactive HTML plot, the flag `plot_weather_data` in the `io_settings` can be set to `true`. Here, no scaling or other settings can yet be made.
+
 The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
 ## Simulation parameters
@@ -149,6 +158,8 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
     "time_step": 60,
     "time_step_unit": "minutes",
     "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "weather_interpolation_type_general": "stepwise",
+    "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
     "longitude": 9.190182, 
 },
@@ -160,6 +171,8 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
 * `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
 * `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
 * `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
+* `weather_interpolation_type_general` (`String`): (Optional) Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `weather_interpolation_type_solar` (`String`): (Optional) Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
 * `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 
@@ -309,7 +322,7 @@ Ahead of the data, a block of metadata describes important information and param
 * `timestamp_format` (`String`): The format specifier for the datetime index (only for `startdate_timestamp` or `datestamp`). Can be `seconds`, `minutes`, `hours` or a custom datetime format. See table below for details on the datetime formatter.
 * `time_zone` (`String`): A timezone in [IANA format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that applies for the datetime index. Must only be given if daylight saving is included in the `datestamp`. Only for `datestamp`.
 * `time_shift_seconds` (`Integer`, optional): Specifies the number of seconds by which to shift the timestamps of a profile. A positive value shifts the timestamps forward in time, meaning a specific value will align with an earlier time step. Conversely, a negative value shifts the timestamps backward, aligning a specific value with a later time step. If the timestamps do not align with the simulation timestep after the shift, the values will be linearly interpolated. This can be useful, for example, if a profile does not align with the convention that values represent the timespan following the given time step. If this results in a missing value at the beginning or end of a profile, the last or first value is duplicated. Attention: The linear interpolation may lead to a different sum and mean of the converted profile compared to the original one!
-* `use_linear_segmentation` (`Bool`, optional): A flag that specifies whether to use linear interpolation (`true`) or step interpolation (`false`) to fill values for a given profile at intermediate timesteps during segmentation. Defaults to `false`. Attention: Linear interpolation may lead to a different sum and mean of the converted profile compared to the original one! If you want to maintain the integral of a profile exactly, use step interpolation!
+* `interpolation_type` (`String`, optional): Specifies the interpolation type for profile segmentation. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "stepwise". Attention: Classic and time_preserving linear interpolation may lead to a different sum and mean of the converted profile in every time step compared to the original one! If you want to maintain the integral of a profile exactly, use step interpolation! A description and comparison of the different methods is given in [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
 
 The format specifier for a custom datetime format can be composed from the table below, that holds a selection of the possible format types that are defined by the Julia *Dates* module:
   
