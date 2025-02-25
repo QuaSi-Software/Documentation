@@ -162,6 +162,7 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
     "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
     "longitude": 9.190182, 
+    "time_zone": 1.0
 },
 ```
 
@@ -175,6 +176,7 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
 * `weather_interpolation_type_solar` (`String`): (Optional) Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
 * `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `time_zone` (`Float`): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
