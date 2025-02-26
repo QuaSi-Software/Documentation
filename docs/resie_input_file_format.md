@@ -145,7 +145,7 @@ To define a custom plot, use the following syntax:
 ```
 The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
 
-To plot the weather data read in from a provided weather file to the interactive HTML plot, the flag `plot_weather_data` in the `io_settings` can be set to `true`. Here, no scaling or other settings can yet be made.
+To plot the weather data read in from a provided weather file to the interactive HTML plot, the flag `plot_weather_data` in the `io_settings` can be set to `true`. Here, no scaling or other settings can be made yet.
 
 The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 

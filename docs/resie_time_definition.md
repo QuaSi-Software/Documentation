@@ -49,21 +49,21 @@ ReSiE automatically adjusts the time series data of profiles to match the simula
 
 - `"stepwise"` means, the value given at a timestamp is distributed evenly or copied across the new smaller timestamps. 
 - `"linear_classic"` interpolates the given values from the original timestamps linearly to the new timestamps, using the
-   values and the correspinding given timestamps indicating the begin of the covered timespan as basis.
+   values and the corresponding given timestamps, indicating the begin of the covered timespan, as basis.
 - `"linear_time_preserving"` interpolates the data by first shifting the data by half the original 
 time step to make the values be measured at the time indicated. After the linear interpolation to a 
 finer time step, the data is shifted back by 1/2 a time step to meet the required definition 
-of the values representing the following time step. This should be used for time-critic data as it satisfies the original 
-definition of time. But, this method will cut peaks and valleys in the data more than the classic interpolation.
+of the values representing the following time step. This should be used for time-critical data as it satisfies the original 
+definition of time. But, this method will strengthen peaks and drops in the data more than the classic interpolation.
 - `"linear_solar_radiation"` interpolation uses a method described in the paper by McDowell et. al[^McDowell2018].
 It is an interpolation with a correction factor to keep the sum of the interpolated values equal to the sum of the
 original values **in every hour** and at the same time to predict a realistic course of the radiation between the given hourly values.
-It also cuts radiation before sunrise and after sunset. This is also used in TRNSYS 18, but the methods can shows "wavy" curves 
+It also cuts radiation before sunrise and after sunset. This is also used in TRNSYS 18, but the method can show "wavy" curves 
 as result and can only be used for the segmentation of hourly data.
 
 [^McDowell2018]: T. McDowell, S. Letellier-Duchesne, M. Kummert (2018): "A New Method for Determining Sub-hourly Solar Radiation from Hourly Data" 
 
-All  methods handle intensive and extensive values appropriately. The following figure compares the four methods to illustrate their results
+All methods handle intensive and extensive values appropriately. The following figure compares the four methods to illustrate their results
 when segmentating hourly data (light grey) to a 15 minute timestep. Note that each dot at a given time represents the sum/mean of the upcoming time step:
 
 <center>![Profile segmentaton methods](fig/250224_segmentation_algorithms.svg)</center>
