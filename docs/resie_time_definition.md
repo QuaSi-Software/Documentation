@@ -54,7 +54,7 @@ ReSiE automatically adjusts the time series data of profiles to match the simula
 time step to make the values be measured at the time indicated. After the linear interpolation to a 
 finer time step, the data is shifted back by 1/2 a time step to meet the required definition 
 of the values representing the following time step. This should be used for time-critical data as it satisfies the original 
-definition of time. But, this method will strengthen peaks and drops in the data more than the classic interpolation.
+definition of time. But, this method will reduce the amplitude of peaks and drops in the data more than the classic interpolation.
 - `"linear_solar_radiation"` interpolation uses a method described in the paper by McDowell et. al[^McDowell2018].
 It is an interpolation with a correction factor to keep the sum of the interpolated values equal to the sum of the
 original values **in every hour** and at the same time to predict a realistic course of the radiation between the given hourly values.
