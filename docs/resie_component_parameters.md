@@ -7,16 +7,13 @@ The description of each component type includes a block with a number of attribu
 | --- | --- |
 | **Type name** | `BoundedSink`|
 | **File** | `energy_systems/general/bounded_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
 | **Tracked values** | `IN`, `Max_Energy`, `Losses` |
 
-The available models listed are subtypes to the implementation of a component, which each work slightly differently and might use different parameters. An example is the difference between a condensing gas boiler and a traditional one. **Note: At the moment there is no argument for the model, as each component currently only has one implemented model. In the future this will be extended to include a default model (when no argument is provided) and additional optional models.**
-
-Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name:value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium second, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
+Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name`/`value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
 The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values.
 
@@ -51,22 +48,65 @@ This would result in the output of the source not being used to fill storages. T
 
 Similarly, components can be configured to be dis-/allowed to draw energy from storages with the corresponding `unload_storages medium` parameter. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
-### Efficiency functions
-Various components, particularly transformers, require an efficiency function to determine how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping a part-load ratio on [0,1] to an efficiency factor.
+### Function definitions
+Various components, particularly transformers, require an input of functions to determine efficiency, available power and other variables. The definition of a function in the project file is a string and should look like `function_prototype:values` with `function_prototype` refering to one of the implemented function prototypes (see specific sub-sections below) and `values` being data required to parameterise the prototype. Various function prototypes are implemented for different purposes.
+
+In general `:` is used as seperator between prototype and values and `,` as seperator for numbers with `.` as decimal point and no thousands seperator.
+
+#### Efficiency functions
+Used to determine an efficiency factor of how much energy is produced from a given input and vice-versa. This is described in more detail in [the chapter on general effects and traits](resie_transient_effects.md#part-load-ratio-dependent-efficiency). In the simplest case this can be a constant factor, such as a 1:1 ratio, however in the mathematical models of the components this can be almost any continuous function mapping \(\kappa \in [0,1]\) to an efficiency factor.
 
 Because the efficiency must always be defined in relation on input or output of the component, the functionality supports this interface being defined as linear. This means that the amount of energy on this interface is strictly linear to the PLR multiplied with the design power. The other interfaces of the component are then calculated with efficiencies relative to this linear interface. Example: A fuel boiler defined with linear heat output would have a constant efficiency of 1.0 on the heat output and a different efficiency on the fuel input. If the conversion from fuel to heat is 90% efficient, this results in an efficiency factor of 1.1 on the fuel input.
 
 For the configuration of components a selected number of different cases are implemented. If a function is known, but cannot be precisely modelled using one of these parameterised functions, it is possible to use a piece-wise linear approximation, which is also useful to model data-driven functions.
 
-The definition of an efficiency function in the project file, for example a parameter `efficiency_heat_out`, should look like this: `<function_model>:<list_of_numbers>` with `function_model` being a string (see below) and `list_of_numbers` being a comma-seperated list of numbers with a period as decimal seperator and no thousands-seperator. The meaning of the numbers depends on the function model.
+**Implemented function prototypes**
 
-Three different function models are implemented:
+* `const`: Takes one number and uses it as a constant efficiency factor. E.g. `const:0.9`.
+* `poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
+* `pwlin`: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
+* `offset_lin`: Takes one number and uses as the slope of a linear function with an offset of its complement (in regards to 1.0). E.g. `offset_lin:0.5` means \(e(x)=1.0-0.5*(1.0-x)\)
+* `logarithmic`: Takes two numbers and uses them as the coefficients of a quasi-logarithmic function. E.g. `logarithmic:0.5,0.3` means \(e(x)=\frac{0.5x}{0.3x+(1-0.3)}\)
+* `inv_poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. The inverse of the polynomial, multiplied with the PLR, is used as the efficiency function. E.g. `inv_poly:0.5,2.0,0.1` means \(e(x)=\frac{x}{0.5x²+2x+0.1}\)
+* `exp`: Takes three numbers and uses them as the coefficients of an exponential function. E.g. `exp:0.1,0.2,0.3` means \(e(x)=0.1+0.2*exp(0.3x)\)
+* `unified_plf`: Takes four numbers and uses them as the coefficients of a composite function of a logarithmic and linear function as described in the documentation on the [unified formulation for PLR-dependent efficiencies of heat pumps](resie_energy_system_components.md#part-load-efficiency). The first two numbers are the optimal PLR and the PLF at that PLR. The third number is a scaling factor for the logarithmic part and the fourth number is the PLF at PLR=1.0.
 
-* const: Takes one number and uses it as a constant efficiency factor. E.g. `const:0.9`.
-* poly: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. E.g. `poly:0.5,2.0,0.1` means \(e(x) = 0.5x^2 + 2x + 0.1\)
-* pwlin: A piece-wise linear interpolation. Takes a list of numbers and uses them as support values for an even distribution of linear sections on the interval [0,1]. The PLR-values (on the x axis) are implicit with a step size equal to the inverse of the length of support values minus 1. The first and last support values are used as the values for a PLR of 0.0 and 1.0 respectively. E.g. `pwlin:0.6,0.8,0.9` means two sections of step size 0.5 with a value of `e(0.0)==0.6`, `e(0.5)==0.8`, `e(1.0)=0.9` and linear interpolation inbetween.
+**Discretization**
 
 Because not all functions are (easily) invertible a numerical approximation of the inverse function is precalculated during initialisation. The size of the discretization step can be controlled with the parameter `nr_discretization_steps`, which has a default value of 30 steps. It should not often be necessary to use a different value, but this can be beneficial to balance accuracy vs. performance. In particular if a piece-wise linear interpolation is used it makes sense to use the same number of discretization steps so that the support values overlap for both the efficiency function and its inverse.
+
+**PLF functions**
+
+The calculation of some components, such as heat pumps, makes use of the part load factor (PLF), which is multiplied after an efficiency factor has been calculated from some other formulation and which represents the behaviour dependent on \(\kappa\). For parsing, these work the same as the efficiency functions, however they may not make use of the numerical approximation of the inverse function.
+
+#### COP functions
+Used by heat pumps and similar components to calculate the COP depending on input/output temperatures. The implemented function prototypes are two-dimensional functions that return the COP without considering additional modifications such as a PLF function or icing losses. The temperatures are assumed to be given in °C.
+
+**Implemented function prototypes**
+
+* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
+* `carnot`: Calculates the COP as fraction of the Carnot-COP with a given reduction factor, which is between `0.4` and `0.45` for typical heat pumps. E.g. `carnot:0.4` means \(COP = 0.4 \cdot \frac{273.15 + T_{out}}{T_{out} - T_{in}}\).
+* `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
+* `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal values are interpreted as the inclusive boundaries of the field. Values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
+
+An example of a field definition with additional line breaks and spaces added for clarity:
+```
+"field:
+ 0, 0,10,20,30;
+ 0,15, 9, 6, 4;
+10,15,15,10, 7;
+20,15,15,15,11"
+```
+The first row are the grid points along the \(T_{sink,out}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 30 °C with a spacing of 10 K. The first column are the grid points along the \(T_{source,in}\) dimension, with the first value being ignored. The points cover a range from 0 °C to 20 °C with a spacing of 10 K. The support values are the COP (at maximum PLR \(\kappa = 1\)), for example a value of 10 for \(T_{source,in} = 10, \ T_{sink,out} = 20\).
+
+#### Power functions
+Used by heat pumps and similar components to calculate the minimum and maximum power available, depending on temperature values, as fraction of the nominal power. Return values should therefore be in \([0,1]\).
+
+**Implemented function prototypes**
+
+* `const`: Takes one number and uses it as a constant fraction. E.g. `const:1.0`.
+* `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
+
 
 ### Control modules
 For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
@@ -78,6 +118,34 @@ Some parameters specify behaviour of multiple modules on the same component as w
 | **aggregation_plr_limit** | How the upper PLR limit is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
 | **aggregation_charge** | How the charging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
 | **aggregation_discharge** | How the discharging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+
+The aggregation defined in `aggregation_plr_limit` applies to the control modules `storage_driven` and `profile_limited` as they both use the PLR limit callback `upper_plr_limit`.
+
+A definition of a control module with its control parameter can be done for example like this:
+
+```JSON
+"TST_TH_HP_01": {
+    ...
+    "control_parameters": {
+        "aggregation_plr_limit": "max"
+    },
+    "control_modules": [
+        {
+            "name": "storage_driven",
+            "high_threshold": 0.95,
+            "low_threshold": 0.3,
+            "storage_uac": "TST_TH_BFT_01"
+        },
+         {
+            "name": "storage_driven",
+            "high_threshold": 0.99,
+            "low_threshold": 0.5,
+            "storage_uac": "TST_TH_BFT_02"
+        }
+    ],
+    ...
+}
+```
 
 #### Economical discharge
 Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
@@ -118,6 +186,20 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **min_run_time** | Minimum run time for the "on" state. Absolute value in seconds. Defaults to `1800`.
 | **storage_uac** | The UAC of the storage component linked to the module.
 
+#### Temperature sorting
+Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` steps are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+
+**Note:** This will overwrite the order defined in the bus!
+
+This module is implemented for the following component types: `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `temperature_sorting` |
+| **input_temps** | Sets if the inputs are sorted by minimum or maximum temperature. Should be `max` (default) or `min`.
+| **input_order** | Sets the direction in which the inputs are sorted. Should be `asc`, `none` or `desc` (default). A value of `none` means no reordering is performed.
+| **output_temps** | Sets if the outputs are sorted by minimum or maximum temperature. Should be `max` or `min` (default).
+| **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default), `none` or `desc`. A value of `none` means no reordering is performed.
 
 ## Boundary and connection components
 
@@ -126,7 +208,6 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | --- | --- |
 | **Type name** | `BoundedSink`|
 | **File** | `energy_systems/general/bounded_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -153,7 +234,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `BoundedSupply`|
 | **File** | `energy_systems/general/bounded_supply.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -180,7 +260,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `Bus`|
 | **File** | `energy_systems/connections/bus.jl` |
-| **Available models** | `default` |
 | **System function** | `bus` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -200,7 +279,6 @@ Note that the tracked value `Transfer->UAC` refers to an output value that corre
 | --- | --- |
 | **Type name** | `FixedSink`|
 | **File** | `energy_systems/general/fixed_sink.jl` |
-| **Available models** | `default` |
 | **System function** | `fixed_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -234,7 +312,6 @@ Alias to `FixedSink`.
 | --- | --- |
 | **Type name** | `FixedSupply`|
 | **File** | `energy_systems/general/fixed_supply.jl` |
-| **Available models** | `default` |
 | **System function** | `fixed_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** |  |
@@ -261,7 +338,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `GridConnection`|
 | **File** | `energy_systems/connections/grid_connection.jl` |
-| **Available models** | `default` |
 | **System function** | `bounded_source`, `bounded_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -288,7 +364,6 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `PVPlant`|
 | **File** | `energy_systems/electric_producers/pv_plant.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `fixed_source` |
 | **Medium** | |
 | **Input media** | |
@@ -311,7 +386,6 @@ The energy it produces in each time step must be given as a profile, but can be 
 | --- | --- |
 | **Type name** | `CHPP`|
 | **File** | `energy_systems/electric_producers/chpp.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
@@ -337,7 +411,6 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | --- | --- |
 | **Type name** | `Electrolyser`|
 | **File** | `energy_systems/others/electrolyser.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
@@ -380,7 +453,6 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | --- | --- |
 | **Type name** | `FuelBoiler`|
 | **File** | `energy_systems/heat_producers/fuel_boiler.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
@@ -408,23 +480,61 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | --- | --- |
 | **Type name** | `HeatPump`|
 | **File** | `energy_systems/heat_producers/heat_pump.jl` |
-| **Available models** | default: `carnot` |
 | **System function** | `transformer` |
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `Losses`, `MixingTemperature_Input`, `MixingTemperature_Output` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `Losses` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_th` | `Float` | Y/N | 4000.0 | The thermal design power at the heating output. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power_th that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `constant_cop` | `Float` | N/N | 3.0 | If given, ignores the dynamic COP calculation and uses a constant value. |
-| `input_temperature` | `Temperature` | N/N | 20.0 | If given, ignores the supplied temperature and uses a constant one. |
-| `output_temperature` | `Temperature` | N/N | 65.0 | If given, ignores the requested temperature and uses a constant one. |
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
+| `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
+| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. |
+| `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. |
+| `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
+| `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
+| `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
+| `output_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
+| `power_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate losses on the side of the power electronics. If no losses should be considered, set this to `1.0`. |
+| `heat_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate heat losses that do not result in additional heat output, i.e. radiative heat losses. If no losses should be considered, set this to `1.0`. |
+| `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] | If true, enables the optimisation of slice dispatch. This is in particular relevant for modelling inverter-driven heat pumps. |
+| `optimal_plr` | `Float` | N/N | 0.45 | [-] | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. If optimisation is activated and no value is given for this parameter, the given PLF function is numerically analysed for the optimal PLR. |
+| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] | The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
+
+#### Exemplary input file definition for HeatPump
+**Simple heat pump with constant COP, fixed output temperature and no losses**
+```json
+"TST_TH_HP_01": {
+    "type": "HeatPump",
+    "output_refs": ["TST_TH_BUS_01"],
+    "power_th": 12000,
+    "cop_function": "const:3.0",
+    "output_temperature": 70.0,
+    "power_losses_factor": 1.0,
+    "heat_losses_factor": 1.0
+}
+```
+
+**Air-sourced heat pump with dynamic COP and variable power from data sheets**
+```json
+"TST_TH_HP_01": {
+    "type": "HeatPump",
+    "output_refs": ["TST_TH_BUS_01"],
+    "power_th": 20000,
+    "cop_function": "field:0,45,55,65,75,85,95,105;0,3.79,3.26,2.87,2.57,2.34,2.15,1.99;10,4.59,3.79,3.26,2.87,2.57,2.34,2.15;20,5.93,4.59,3.79,3.26,2.87,2.57,2.34;30,8.74,5.93,4.59,3.79,3.26,2.87,2.57;40,20.15,8.74,5.93,4.59,3.79,3.26,2.87;50,20.15,20.15,8.74,5.93,4.59,3.79,3.26;60,20.15,20.15,20.15,8.74,5.93,4.59,3.79;70,20.15,20.15,20.15,20.15,8.74,5.93,4.59;80,20.15,20.15,20.15,20.15,20.15,8.74,5.93;90,20.15,20.15,20.15,20.15,20.15,20.15,8.74;100,20.15,20.15,20.15,20.15,20.15,20.15,20.15",
+    "max_power_function": "poly-2:0.6625,0.0008929,-0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
+    "min_power_function": "poly-2:0.5125,0.0001786,-0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
+    "plf_function": "poly:0.4,0.6",
+    "bypass_cop": 20.15,
+    "consider_icing": true
+}
+```
+
 
 ## Storage
 
@@ -433,7 +543,6 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | --- | --- |
 | **Type name** | `Storage`|
 | **File** | `energy_systems/general/storage.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
@@ -452,7 +561,6 @@ A generic implementation for energy storage technologies.
 | --- | --- |
 | **Type name** | `Battery`|
 | **File** | `energy_systems/storage/battery.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
@@ -592,7 +700,6 @@ Extended definition of a buffer tank in the input file:
 | --- | --- |
 | **Type name** | `SeasonalThermalStorage`|
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
-| **Available models** | default: `simplified` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
@@ -600,8 +707,6 @@ Extended definition of a buffer tank in the input file:
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
-
-**Model `simplified`:**
 
 If the adaptive temperature calculation is activated, the temperatures for the input/output of the STES depends on the load state. If it is sufficiently full (depends on the `switch_point`), the STES can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
 
@@ -624,7 +729,6 @@ If the adaptive temperature calculation is deactivated, always assumes the `high
 | --- | --- |
 | **Type name** | `GenericHeatSource`|
 | **File** | `energy_systems/heat_sources/generic_heat_source.jl` |
-| **Available models** | `simplified` (default) |
 | **System function** | `bounded_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -648,7 +752,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
 | `minimal_reduction` | `Float` | N/Y | 2.0 | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
 
-**Examplary input file definition**
+**Exemplary input file definition for GenericHeatSource**
 
 ```JSON
 "TST_SRC_01": {
@@ -673,7 +777,6 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | --- | --- |
 | **Type name** | `GeothermalProbes`|
 | **File** | `energy_systems/heat_sources/geothermal_probes.jl` |
-| **Available models** | `simplified` (default), `detailed` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
@@ -905,7 +1008,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
 
-**Examplary input file definition for geothermal probe:**
+**Exemplary input file definition for GeothermalProbe:**
 
 ```JSON
 "TST_GTP_01": {
