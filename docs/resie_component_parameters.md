@@ -197,9 +197,9 @@ This module is implemented for the following component types: `HeatPump`
 | --- | --- |
 | **name** | Name of the module. Fixed value of `temperature_sorting` |
 | **input_temps** | Sets if the inputs are sorted by minimum or maximum temperature. Should be `max` (default) or `min`.
-| **input_order** | Sets the direction in which the inputs are sorted. Should be `asc` or `desc` (default).
+| **input_order** | Sets the direction in which the inputs are sorted. Should be `asc`, `none` or `desc` (default). A value of `none` means no reordering is performed.
 | **output_temps** | Sets if the outputs are sorted by minimum or maximum temperature. Should be `max` or `min` (default).
-| **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default) or `desc`.
+| **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default), `none` or `desc`. A value of `none` means no reordering is performed.
 
 ## Boundary and connection components
 
