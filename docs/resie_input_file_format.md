@@ -62,6 +62,7 @@ The overall structure of the project file is split into three general sections a
 		...
 	},
     "plot_weather_data": true,
+    "step_info_interval": 500
 },
 ```
 
@@ -80,6 +81,7 @@ The overall structure of the project file is split into three general sections a
 * `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 * `plot_weather_data` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is plotted to the line plot. Defaults to `false`.
+* `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 
 
 ### Output specification (Sankey)
