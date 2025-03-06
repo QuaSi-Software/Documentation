@@ -72,6 +72,6 @@
 *[PB]:      Parallel Branch
 *[DST]:     Daylight Saving Time
 *[IANA]:    Internet Assigned Numbers Authority
-
+*[CLI]:     Command-line interface
 
 

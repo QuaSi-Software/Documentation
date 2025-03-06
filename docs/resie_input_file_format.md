@@ -62,6 +62,7 @@ The overall structure of the project file is split into three general sections a
 		...
 	},
     "plot_weather_data": true,
+    "step_info_interval": 500
 },
 ```
 
@@ -80,6 +81,7 @@ The overall structure of the project file is split into three general sections a
 * `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 * `plot_weather_data` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is plotted to the line plot. Defaults to `false`.
+* `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 
 
 ### Output specification (Sankey)
@@ -89,13 +91,17 @@ The energy system and the energy flows between its components can be displayed i
 In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
 
-Below is an example of a custom color list for an energy system with three different media (plus "Losses"):
+Below is an example of a custom color list for an energy system with common media (plus "Losses"):
 ```json
  "sankey_plot": {
-    "m_h_w_lt1": "indianred1",
-    "m_h_w_ht1": "red",
-    "m_e_ac_230v": "orange",
-    "Losses": "black"
+    "m_h_w_lt1": "red",
+    "m_h_w_lt2": "red",
+    "m_h_w_ht1": "darkred",
+    "m_e_ac_230v": "darkgoldenrod1",
+    "m_c_g_natgas": "purple3",
+    "m_c_g_h2": "green3",
+    "m_c_g_o2": "firebrick1",
+    "Losses": "grey40"
 }
 ```					
 
