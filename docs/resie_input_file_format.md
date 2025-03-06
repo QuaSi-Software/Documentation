@@ -91,13 +91,17 @@ The energy system and the energy flows between its components can be displayed i
 In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
 
-Below is an example of a custom color list for an energy system with three different media (plus "Losses"):
+Below is an example of a custom color list for an energy system with common media (plus "Losses"):
 ```json
  "sankey_plot": {
-    "m_h_w_lt1": "indianred1",
-    "m_h_w_ht1": "red",
-    "m_e_ac_230v": "orange",
-    "Losses": "black"
+    "m_h_w_lt1": "red",
+    "m_h_w_lt2": "red",
+    "m_h_w_ht1": "darkred",
+    "m_e_ac_230v": "darkgoldenrod1",
+    "m_c_g_natgas": "purple3",
+    "m_c_g_h2": "green3",
+    "m_c_g_o2": "firebrick1",
+    "Losses": "grey40"
 }
 ```					
 
