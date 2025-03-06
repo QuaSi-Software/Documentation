@@ -16,6 +16,7 @@
 | CC           | Compression Chiller                                                         |
 | CDT          | Cool-Down Time                                                              |
 | CHPP         | Combined Heat and Power Plant                                               |
+| CLI          | Command-line interface                                                      |
 | COP          | Coefficient of Performance                                                  |
 | CSV          | Comma-Separated Values [data format]                                        |
 | DC           | Direct Current                                                              |
