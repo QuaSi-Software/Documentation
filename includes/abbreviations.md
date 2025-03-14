@@ -73,6 +73,6 @@
 *[DHW]:     Domestic Hot Water
 *[DST]:     Daylight Saving Time
 *[IANA]:    Internet Assigned Numbers Authority
-
+*[CLI]:     Command-line interface
 
 

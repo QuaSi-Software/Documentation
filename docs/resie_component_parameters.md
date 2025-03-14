@@ -506,6 +506,8 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `optimal_plr` | `Float` | N/N | 0.45 | [-] | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. If optimisation is activated and no value is given for this parameter, the given PLF function is numerically analysed for the optimal PLR. |
 | `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] | The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
 
+**Note: The optimisation algorithm used for optimising the slice dispatch leads to significantly worse performance, does not always find converge to the optimum and is known to lead to energy balance issues in certain cases. This will hopefully be addressed in future updates.**
+
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP, fixed output temperature and no losses**
 ```json
