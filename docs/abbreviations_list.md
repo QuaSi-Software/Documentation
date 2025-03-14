@@ -19,6 +19,7 @@
 | COP          | Coefficient of Performance                                                  |
 | CSV          | Comma-Separated Values [data format]                                        |
 | DC           | Direct Current                                                              |
+| DHW          | Domestic Hot Water                                                          |
 | DWD          | German weather service (Deutscher Wetterdienst)                             |
 | DST          | Daylight Saving Time                                                        |
 | EED          | Energy Earth Designer (software)                                            |
