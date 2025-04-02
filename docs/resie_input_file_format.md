@@ -307,11 +307,30 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     900;   0.929535186
     ...
 ```
-- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column), optionaly with a time zone if DST are included. The `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! Note that leap days will be filtered out in order to be consistent with weather files.
+- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! If the time series includes DST, the `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Any offset in the timestamp (e.g. 01.01.2020 01:00+01:00) is ignored, the specified `time_zone` is only used to calculate the local standard time, but does not move profiles from different time zones to a common one! Note that leap days will be filtered out in order to be consistent with weather files. The example below shows how to enter data with DST.
 ```csv
     # time_definition: 	datestamp
     # timestamp_format: dd.mm.yyyy HH:MM 
     # time_zone: 		Europe/Berlin
+    # data_type:        extensive
+    01.01.2020 00:00;	0.881964197
+    01.01.2020 01:00;	0.929535186
+    ...
+    29.03.2020 00:00;   0.389765722
+    29.03.2020 01:00;   0.690234794
+    29.03.2020 03:00;   0.280226908
+    29.03.2020 04:00;   0.581270682
+    ...
+    25.10.2020 01:00;   0.351233194
+    25.10.2020 02:00;   0.914702712
+    25.10.2020 02:00;   0.384478124
+    25.10.2020 03:00;   0.987093575
+    ...
+```
+and in local standard time (without DST) without a `time_zone`:
+```csv
+    # time_definition: 	datestamp
+    # timestamp_format: dd.mm.yyyy HH:MM 
     # data_type:        extensive
     01.01.2020 00:00;	0.881964197
     01.01.2020 01:00;	0.929535186
