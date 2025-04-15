@@ -1,9 +1,9 @@
-# Validation
+# Validation of energy system components
 
 In this section, the validation of single components of ReSiE is described. A validation of further detailed components and of whole energy systems will follow.
 
-## Components
-### Geothermal probe
+
+## Geothermal probe
 
 The implementation of the model of the geothermal probes, as described in the [corresponding chapter](resie_energy_system_components.md#geothermal-probes), has been validated against measurement data and the commercial, widely used software Energy Earth Designer (EED) that uses a similar approach with g-functions as the model in ReSiE does. 
 As measurement data, the project "GEW" in Gelsenkirchen, Germany was used. The monitoring project is described in detail in the publication Bockelmann2021[^Bockelmann2021]. Here, a probe field with 36 probes is investigated, including regeneration of the geothermal probe field using a reversible heat pump. For the validation presented here, the energies into and out of the probe field of the year 2014 were taken as inputs in EED and ReSiE, and the resulting average fluid temperature within the probe field was compared.
@@ -70,7 +70,8 @@ The profile of the input (regeneratrion) and output (heating) energy of the prob
 
 Also, a simulation performed with different time steps has been compared, from 15 minutes to 4 hours, showing only slight and expected differences in the average fluid temperature, caused by the different time resolution.
 
-### Geothermal collector
+
+## Geothermal collector
 
 The implemented model of the geothermal collector is based on the TRNSYS Type 710[^Type710]. Therefore, a validation of the implementation was done using the same TRNSYS Type for different simulations, comparing the mean fluid temperature of the collector. DELPHIN 6.1.6 was used to perform additional analogous simulations, which also considers the moisture content and transport within the soil. DELPHIN was originally developed as simulation program for coupled heat, moisture and mass transport in capillary-porous building materials by the University of Dresden[^DELPHIN]. 
 
