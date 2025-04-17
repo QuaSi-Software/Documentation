@@ -1,0 +1,70 @@
+{
+    "io_settings": {
+        "csv_output_file": "./output/resie_out.csv",
+        "auxiliary_info": true,
+        "auxiliary_info_file": "./output/auxiliary_info.md",
+        "sankey_plot": "default",
+        "sankey_plot_file": "./output/sankey_plot.html",
+        "csv_time_unit": "date",
+        "csv_output_keys": "all",
+        "output_plot": "all",
+        "output_plot_file": "./output/output_plot.html"
+    },
+    "simulation_parameters": {
+        "start": "15.11.2022 00:00:00",
+        "end": "31.03.2025 20:45:00",
+        "start_end_unit": "dd.mm.yyyy HH:MM:SS",
+        "time_step": 900,
+        "time_step_unit": "seconds",
+        "latitude": 0.0,
+        "longitude": 0.0
+    },
+    "components": {
+        "TST_DEM_01": {
+            "type": "Demand",
+            "output_refs": [],
+            "medium": "m_h_w_ht1",
+            "energy_profile_file_path": "./heat_demand.prf",
+            "temperature_profile_file_path": "./heat_demand_temp.prf",
+            "scale": 1.0
+        },
+        "TST_SRC_01": {
+            "type": "GenericHeatSource",
+            "output_refs": [
+                "TST_HP_01"
+            ],
+            "medium": "m_h_w_lt1",
+            "constant_power": 250000.0,
+            "temperature_profile_file_path": "./heat_source_temp.prf",
+            "scale": 1.0,
+            "temperature_reduction_model": "none"
+        },
+        "TST_GRI_01": {
+            "type": "GridConnection",
+            "output_refs": [
+                "TST_HP_01"
+            ],
+            "medium": "m_e_ac_230v",
+            "is_source": true
+        },
+        "TST_HP_01": {
+            "type": "HeatPump",
+            "output_refs": [
+                "TST_DEM_01"
+            ],
+            "power_th": 223000.0,
+            "__cop_function": "carnot:0.432237730752",
+            "cop_function": "carnot:0.38",
+            "plf_function": "logarithmic:1.0,0.8",
+            "bypass_cop": 15.0,
+            "min_power_function": "const:0.0",
+            "max_power_function": "const:1.0",
+            "heat_losses_factor": 0.97,
+            "power_losses_factor": 0.98,
+            "constant_loss_power": 500.0,
+            "optimise_slice_dispatch": false,
+            "optimal_plr": 0.5,
+            "nr_optimisation_passes": 10
+        }
+    }
+}
