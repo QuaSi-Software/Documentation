@@ -168,6 +168,56 @@ The parameters for the comparison with the measurement data were deviating as fo
 In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the normal simulations and 700 W/m²K for the measurement data was used.
 
 
+## Heat pump
+
+Due to the variations in heat pump technology and the heat sources supplying them, multiple data sets of different energy system have been included for validation of the model. A Jupyter notebook has been developed to perform the same analyses for all data sets, which is included in the documentation and can be found [here](data/validation_heat_pump/validation.ipynb). The notebook reads in the measurement data, applies manual corrections, performs data restructuring and then runs the analyses to produce charts. Some manual analysis was also done to find parameters best matching the measured energy systems, as not all required information was available. This is described in more detail for the individual data sets.
+
+In general the workflow follows these steps:
+
+1. Read in time series of energy values for the heat input, heat output and electricity consumed, as well as the condenser output and evaporator input temperatures.
+2. Create profiles for the simulation from the measurements, including heat output and the temperatures.
+3. Run the simulation with these profiles and parameters for the heat pump model informed by the modelled energy system.
+4. After comparing the simulated summed energy usage with the measured values, parameters with high uncertainty are adjusted and the simulation is rerun. This is repeated until the summed values match measurements to a satisfactory degree. This is a necessarily manual process because the parameter space for optimisation is large, therefore computationally expensive, and because informed decisions by the modeler are preferable over fully automatic optimisation.
+5. With the simulated time series of the determined fit, further analyses are performed.
+
+Each case also has its own criteria for detecting anomalies, that are overwritten with manual corrections, usually as linear interpolation between preceeding and following values. The reasons for the anomalies typically include:
+
+1. Temporary wrong reporting of meter values, where either old values or zero values are reported. This can happen due to technical malfunctions and is exceedingly difficult to avoid. As the meter electronics are very reliable and the wrong values result from the monitoring process, these values can usually be fixed from inference of the correct values following the anomalies.
+2. Missing data due to technical malfunctions in the monitoring process. Depending on how much data was lost, this can be infered from following values or has to be interpolated.
+3. Temporary wrong temperature data. The wrong values typically fall outside the expected temperature range of the sensor entirely and are thus easy to detect, for example a hot water temperature sensor reporting a temperature of 0 °C. It is more difficult to detect values that are presumably wrong, but still fall inside the expected range, such as an air temperature sensor reporting 0 °C during a summer day.
+
+These manual corrections necessarily alter the results of the validation and should generally be avoided. However, the comparison with simulation results requires a continuous data set, therefore removing the anomalous data values from the data set is not possible. As each data value influences the overall result only to a small degree, a small number of corrections relative to the size of the data set does not alter the result of the validation to a large degree.
+
+### Case 1: District heating / electrolyser cooling
+
+In the district project CITATION NEEDED, an electrolyser plant produces hydrogen, oxygen and usable heat. While the heat output of the electrolyser stacks is utilised directly in the heating and DHW networks, a significant amount of waste heat is also produced from cooling the power electronics, gas compressors and other equipment. A water-water inverter-driven 210 kW heat pump with heat medium R513A is used to make this waste heat, with a typical temperature range from 9 to 14 °C as evaporator input temperature, available for the heating and DHW networks with a typical temperature range from 45 to 60 °C as condenser output temperature.
+
+The measurements are from the time period from 2022-11-15 to 2025-03-31. Some corrections were required for meters temporarily reporting incorrect values and missing data, which is typical for such measurements and has a low occurence rate of 0.23 %. Of note is that measurements of the entirety of the day of 2023-11-23 are missing, which have been corrected as constant usage to linearly interpolate between the preceeding and following known meter values. Because the simulation does not support leap days, the day of 2024-02-29 has been removed prior to creating the profiles used in the simulation.
+
+|  | Electricity [MWh] | Heat input [MWh] | Heat output [MWh] | Losses [MWh]
+| --------- | --- | --- | --- | --- |
+| Raw measurements | 188.86 | 321.59 | 527.63 | - |
+| Without leap day | 188.56 | 321.04 | 526.74 | - |
+| Adjusted heat input | 188.56 | 338.18 | 526.74 | - |
+| Simulated | 190.31 | 361.25 | 526.72 | 24.838 |
+| Difference | +0.93 % | +6.8 % | -0.004 % | - |
+
+The table above show the values summed up over the entire time period. Of note is that in the measurements the electricity and heat inputs do not sum up to the produced heat output, with a difference of -17.14 MWh or -5.33 %. Due to losses occuring within the heat pump, it would be expected that the sum of the inputs is slightly larger than the output, but the opposite is the case here. It is generally the case that meters measuring heat transport are inherently inaccurate. Given that both the heat input and heat output meters must be assumed inaccurate, one possible explanation is that the heat input is undercounting and the heat output is overcounting. As the heat output values are used as the exact demand values for the simulation and the electricity input meter can assumed to be very accurate, the unknown margin of the energy balance equation falls entirely on the heat input. For the comparison between measurement and simulation data of the overall sums, the missing margin of 17.14 MWh has beed added to the heat input to serve as a lower bound of the unknown real value.
+
+For the simulation model of the heat pump, a COP matrix from CITATION NEEDED has been used with a scalar multiplier of 0.65. This scaling factor is the primary parameter adjusted by manual analysis to find a fit. Other parameters were mostly informed by available manufacturer information. Of note is a constant power loss of 500 W, which was observed in the measurements during periods of no operation. The full set of parameters can be found in the accompanying file `resie_input.json` for this case. With the determined fit, the electricity input sum differs by +0.93 % and the heat input sum by +6.8 % compared to the adjusted heat input.
+
+![Validation of heat pump model, case 1: COP analysis of measurements vs simulation data](fig/validation_heat_pump/case_1_cop_analysis.png)
+
+The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original timestep of 15 minutes and for aggregated values of 60 minutes. From measurements in the original timestep, not much can be infered. In the aggregated case a clearer picture emerges, as the inverse relation between COP and temperature difference is visible in the shape and density of the point cloud. Visually comparing the aggregated measurement data with the simulation data, a reasonable match can be observed. In all four plots only data points that are active and have an absolute residual of less than 0.5 were used, where "active" refers to having both non-zero electricity input and non-zero heat output, and the absolute residual is defined as \(\left| \frac{Q_{heat,in} + E_{el,in}}{Q_{heat,out}} - 1 \right|\).
+
+![Validation of heat pump model, case 1: Measurements vs simulation data aggregated to daily values for the full period](fig/validation_heat_pump/case_1_daily_data_full_period.png)
+
+This figure compares measurement against simulation data based on values aggregated to one day for the full period. Because the effect of meter values increasing in discrete steps compared to the actual consumption/production is lessened for aggregated values, comparing full days is expected to show a good match. Indeed, the electricity input matches closely, which can largely be attributed to it being the deciding factor in finding a parameter fit. The heat input shows the simulation data being consistently equal or higher than the measurement. Similarly the simulated COP is mostly equal or higher than the measured one, but there are some periods where the measured COP is higher, for example during July of 2023. However the measured heat input does not exceed the simulated one, which would be expected with a higher COP. It is possible that these periods contribute to the missing heat input in the overall sums.
+
+![Validation of heat pump model, case 1: Measurements vs simulation data aggregated to hourly values for one month](fig/validation_heat_pump/case_1_hourly_data_one_month.png)
+
+In this figure the same comparisons as above are repeated for values aggregated to one hour for a period of about one month from 2013-11-06 to 2013-12-07. This time range was chosen because it contains both periods of high and low production as well the day of 2023-11-23, which was interpolated due to missing measurements and is clearly visible in the analysis. The simulated electricity input again shows a good match with measurements. In contrast, the measured heat input displays heavy pulsing, probably due to the discrete nature of meters. The simulated COP and heat input show a more averaged behaviour compared to the measurements.
+
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 [^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
