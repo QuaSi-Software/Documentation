@@ -66,8 +66,13 @@
 *[TMY]:     Typical Meteorological Year
 *[TRY]:     Test Reference Year
 *[VS Code]: Visual Studio Code
-
-
-
+*[EED]:     Energy Earth Designer (software)
+*[MB]:      Middle Bus
+*[MT]:      Middle Transformer
+*[PB]:      Parallel Branch
+*[DHW]:     Domestic Hot Water
+*[DST]:     Daylight Saving Time
+*[IANA]:    Internet Assigned Numbers Authority
+*[CLI]:     Command-line interface
 
 

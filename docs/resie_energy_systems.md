@@ -1,6 +1,6 @@
 # Energy systems
 
-In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban strict of two buildings is shown in the figure below.
+In the simulation model technical equipment units are connected to each other to form a network of components across which the use of energy is balanced. The specific way the components are connected is named energy system. In the following any change in how the components are connected is considered to result in a similar but different energy system. An example of a multi-sector energy system for an urban district of two buildings is shown in the figure below.
 
 ![A multi-sector example energy system](fig/example_energy_system.svg)
 
@@ -41,46 +41,38 @@ All energy handled by the simulation model exists in the form of some medium tha
 
 For example, alternating current of a certain voltage can be converted to a different voltage or to direct current. The actual energy carried by this current is not simply a scalar value but depends on how the current is used to perform work. For the simulation model this exact simplification has been done, which results in different energy media for different currents, each of which carries a scalar amount of energy. For other physical media (especially water) similar simplifications are used.
 
-The following lists which media are currently implemented as default and what they represent.
+Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components like heat pumps. This is implemented as temperatures being communicated between components as separate values alongside supplied or requested energies. This differs from a full hydraulic/thermodynamic simulation where the temperature determines the energy.
 
-**Note:** Temperatures of fluids are crucial for a correct simulation even in this simplified model due to how they are utilized to carry energy and how they affect the efficiency and performance of energy system components. Currently, this is implemented in a simplified way where temperatures are handed over between components together with the supplied or requested energies. This does not allow to simulate the temperature change in a district heating grid due to energy mismatch of supply and demand! This may change with later versions of ReSiE. Currently, if different temperatures are present at one bus, always the highest temperature will be set as bus temperature which can lead to inefficient operation of connected components like a HP.
+Because of temperatures being separated from the medium, media cannot be categorized by temperatures neatly. Instead regimes are used, which mostly refer to the nominal temperature. This helps to distinguish between low and high temperature heat inputs/ouputs even if the actual temperatures in each time step vary and might even be the same. Similar considerations can be made for properties like pressure or voltage.
 
-### Electricity
-* `m_e_ac_230v`: Household electricity at 230 V AC and 50/60 Hz.
+The name of the media used in the code of ReSiE and for defaults follows a scheme based on segments seperated by underscores, for example `m_c_g_natgas` for natural gas. The first segment is always `m`, which has technical reasons and helps distinguish media names from other similar variables. The second segment represents the type of energy the medium carries and the third segment is a subcategory of this which roughly describes the physical medium carrying the energy. The fourth segment distinguishes similar media as subtypes and must be unique within the category.
 
-### Chemicals - Gasses
-* `m_c_g_natgas`: A natural gas mix available through the public gas grid.
-* `m_c_g_h2`: Pure hydrogen gas.
-* `m_c_g_o2`: Pure oxygen gas.
+The following table presents a possible categorisation of media using the three segments and a number of default media names used by various implemented components as well as future models. This is not intended to be a complete categorisation of all forms of energy.
 
-### Heat - Low temperature water
-Different low temperature regimes:
+| Energy type | Medium category | Subtypes |
+| ----------- | --------------- | -------------------------------------------------------- |
+| `e`: electrical | `ac`: AC | `230v`: Household electricity at 230 V AC and 50/60 Hz. |
+| `c`: chemical | `g`: gasses | `natgas`: A natural gas mix available through the public gas grid. |
+|  |  | `h2`: Pure hydrogen gas. |
+|  |  | `o2`: Pure oxygen gas.[^1] |
+|  | `s`: solids | `chips`: Wood chips or pellets. |
+|  | `l`: liquids | `oil`: Heavy oil used in oil boilers. |
+| `h`: heat | `w`: water | `lt1`: First low temperature regime. |
+|  |  | `ht1`: First high temperature regime. |
+| `p`: pressure | `a`: air with<br>atmospheric<br>composition | `p1`: First pressure regime of gaseous air. |
 
-* `m_h_w_lt1`
-* `m_h_w_lt2`
-* `m_h_w_lt3`
-* `m_h_w_lt4`
-* `m_h_w_lt5`
-
-### Heat - High temperature water
-Different high temperature regimes:
-
-* `m_h_w_ht1`
-* `m_h_w_ht2`
-* `m_h_w_ht3`
-* `m_h_w_ht4`
-* `m_h_w_ht5`
+[^1]: Note that oxygen is not typically considered an energy carrier. At the moment no commodity transport model is implemented in ReSiE, which is why oxygen is listed as an energy carrier for the use in electrolysers. This will be addressed in future versions of ReSiE.
 
 ### User definable media names
-The names of all media can also be user-defined. Therefore, the name of each medium of each in- and output of all components can be declared in the input file. Alternatively, only a few default media names can be overwritten by user-defined media names. They have to match exactly the medium name of the interconnected component.
+The names of all media can also be user-defined. The name of any medium of any in- and output of all components can be declared in the input file. This does not change the requirement that the names of media connected via direct input-output or via busses have to match each other.
 
-For busses, grids, demands, storages (except seasonal thermal energy storage), the medium name of each component can be given with the specifier `medium` (`String`) in the input file. For transformers and seasonal thermal energy storages, user-definable media names of each in- and output can be given using the specifier `m_heat_in`, `m_heat_out`, `m_gas_in`, `m_h2_out`, `m_o2_out`, `m_el_in` or `m_el_out` depending on the inputs and outputs of a transformer.
+For some components such as busses, grid connections, demands and some storages, the medium name of each component can be given with the specifier `medium` (`String`). For others, such as transformers and storages with temperature differentials, user-definable media names of each in- and output can be given using certain specifiers such as `m_heat_in` or `m_el_out`. The exact specifiers can be found in the [specification of parameters](resie_component_parameters.md) for each component.
 
 ## Interfaces
 
-When writing the implementation of components a problem has emerged in the functionality handling the processing[^1] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
+When writing the implementation of components a problem has emerged in the functionality handling the processing[^2] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
 
-[^1]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
+[^2]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
 <center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
 
@@ -102,8 +94,119 @@ Currently, ReSiE is based on the following units:
 
 Values provided in the project input file or in profiles should have these units and the plots created directly from ReSiE has to be labeled accordingly (while offering the change of scale by a scale factor - but then the unit displayed in the plots has to specified respectively in the input file). 
 
-Theoretically, all provided values can also be scaled by any order of magnitude, e.g. into [kW] and [kWh]. But keep in mind that this has to be done uniformly in every input value and profile and that the naming of the outputs has to be adjusted accordingly! 
+**Note:** While some components would work the same given different units, e.g. [kW] and [kJ] for power and energy values in profiles, other components require specific units for some of their parameters, which have to match the units of the other parameters and profiles. Currently there is no mechanism to automatically convert between units, therefore it is not advised to use any other units.
 
-**Output units:**
+### Output units
 
-Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW. 
+Note that all energy-related output values requested in the input file to plot or to write to the `output.csv` file are returned as energies and not as power! For example, if all inputs are given in [W] and [Wh], the output value of the heat delivered by a heat pump is given as energy in [Wh] delivered within the current time step. If the simulation time step is set to `15min`, an output of 100 kWh equals a thermal power of 400 kW.
+
+## Component chains
+
+A "chain" refers to multiple components of the same type being connected to each other. As only transformer, busses and storages can have both an input and an output, only these three types can form chains. There is some special consideration for such component chains, which is discussed here. Although the word chain suggests a linear connection, a chain can be any connected sub-graph of the entire energy system with multiple branches. However such complex chains are rare in practise as they serve little purpose.
+
+### Transformer chains
+
+With multiple transformers in a chain there arises a problem in calculating the energy each transformer can process, as this depends on the energy the others can process. This is the main purpose behind the `potential` operation, which only exists for transformers and serves as a preprocessing step within each time step to handle interdependencies between multiple transformers. For a linear chain of transformers, this is relatively straightforward. For transformer chains with multiple interconnections between busses and transformers, the determination of the correct sequence of the `potential` and `process` steps quickly leads to a complex non-trivial problem. The interdependence of the transformers requires a sophisticated calculation sequence that also takes into account the priorities of the individual components. This can be simplified by the presence of grids on busses, which ensure that the mutual dependencies of transformers are interrupted. The following section attempts to describe the algorithm used in ReSiE. This algorithm is not perfect and cannot determine a useful calculation order for every possible energy system. However, a variety of energy systems have been successfully tested. In [a later section](resie_energy_systems.md#energy-systems-that-can-cause-problems-when-automatically-determining-the-order-of-operation), a (non-exhaustive) list of known energy systems or constellations that cause problems in the automatic determination of the calculation sequence is described. 
+
+Important terms and definitions:
+
+- Chain: For the purpose of the following algorithms a chain is defined [as described above](resie_energy_systems.md#component-chains), with the addition that the chain can contain both busses and transformers. Because bus chains [have their own handling](resie_energy_systems.md#bus-chains) and are merged in a preprocessing step, we can assume that a bus is not connected to another bus. Chains can be interrupted by several things:
+    - Storages, as there is no bypass directly through a storage. Storages cannot communicate information from their input to their output interface (and vice versa) within one time step.
+    - The connection matrix of a bus denies the connection from an input to an output component.
+    - A component inputting into a bus is connected to a grid outputting out of the bus, taking the connection matrix into account. This means that the input component does not depend on the following transformers, as it can always transfer energy in the grid, and there is no limitation at this interface.
+    - A component outputting out of a bus is connected to a grid inputting into the bus, taking the connection matrix into account. This means that the output component does not depend on the previous transformers, as it can always get energy from the grid, and there is no limitation at this interface.
+
+- Directions: When speaking of "first", "last", "forward" or "backward/reverse", always the direction of energy flow is meant, from source to sink.
+
+- A component can "see" another component if it is either directly connected or both are connected to the same bus in a way that energy could be moved between the components. This means that one component has to be an input to the bus and the other an output.
+
+- Middle Transformer (MT): A middle transformer is defined as a transformer with two or more input interfaces and/or two or more output interfaces, with each "seeing" at least one other transformer.
+
+<center>![Middle transformer definition example](fig/240708_transformer_chain_ooo_middle_transformer.svg)</center>
+
+- Middle Bus (MB): A middle bus is defined as a bus with two or more input interfaces and/or two or more output interfaces, with each "seeing" at least one other transformer.
+
+<center>![Middle bus definition example](fig/240708_transformer_chain_ooo_middle_bus.svg)</center>
+
+- Parallel Branches (PB): Parallel branches are defined as branches that offer more than one way between two busses, with each way containing at least one other transformer under consideration of the direction of the energy flow.
+
+<center>![Palallel branches definition example](fig/240708_transformer_chain_ooo_parallels.svg)</center>
+
+
+#### Algorithm for linear chains
+
+For a linear chain of transformers, meaning that there are no busses or transformers with more than one input or more than one output with each "seeing" more than one other transformer, the following method is used to determine the order of operation:
+
+1. The first transformer in a chain calculates its energy potentials assuming that any input or output that has not been determined yet is infinite.
+2. This repeats for the other transformers going to the end of the chain.
+3. The transformer at the end now performs the `process` step, which is possible as now the whole energy system is specified in regards to energy potentials.
+4. This repeats for the other transformers going to the front of the chain, however each transformer recalculates its own potentials because the inputs will have changed from the previous assumed-as-infinite values.
+
+This back-and-forth approach works as it communicates the non-infinite demands and supplies from non-transformers across the chain and then recalculates with the correct `process` values once all potentials are specified.
+
+
+#### Algorithm for complex chains
+
+The following method is used to determine the order of operation. First, all PBs in the current energy system are determined. Then, the following steps are performed and called recursively while considering the already checked components to avoid double-counting, starting with the whole energy system as the current components:
+
+1. Determine all MTs in the current components and take the first one (meaning no other MT is in the inputs of the chosen MT). If there is no MT, skip the next step.
+2. Determine the single branches of the MT that start or end at the MT and check them for interdependencies with each other under consideration of the effects described in the pulletpoint "Chains" above. Also, the way through the MT is not considered here. If there are any interdependencies (see figure below for an example), the order of the branches for the calculation is adjusted to ensure that the dependencies are calculated first. The default order is to start with the longest branch that contains the most number of transformers. If there are logical loops, they are detected and removed, which may lead to an incorrect order of operation. Then, the components (transformers and busses) of each branch are taken and the function is called recursively. The branches start to do their potential from "outside", meaning each branch starts at the point furthest from the MT (input branches are calculated forward, output branches backward). After all branches have finished, the MT does its potential. During the process, the MT does its process first, then the branches do their process starting from the "inside" with the components near the MT (input branches are calculated backwards, output branches forward).
+3. Determine all MBs in the current components and take the first one (meaning no other MB is in the inputs (forward or indeterminite order) or in its outputs (reverse order) of the chosen MB). If there is no MB, skip the next step.
+4. Determine the single branches of the MB that start or end at the MB and check them for interdependencies which each other, considering possible interruptions of the chain. Also, the way through the MB is not considered here. If some branches are part of a PB, then they are merged together into one branch. If branches have interdependencies (see figure below for an example), the order of the branches is adjusted accordingly to calculate the dependencies first, but only at potential step, as during process, the input/output order of the bus has to match the order of operation! The default order depends on the direction of calculation, if the current components should be calculated forward (which is also default at the first function call), first the input branches and then the output branches are given recursively to the function as current components. If they should be calculated backward, the output branches come first. Also, the input/output order specified in the bus is considered. If there are logical loops, they are detected and removed, which may lead to an incorrect order of operation. 
+5. If no MB or MT can be found in the current components, the process or potential of the components is determined by their order in the energy system. The direction is set by the current direction, which defaults to forward (potential step) and backward (process step). If one of the components is part of a parallel branch, this is detected and the parallels are handled separately: 
+Depending on the output order of the MB (input order is not considered here, but logically they should be the same!), each of the parallel branches performs its potentials in both ways (forward and backward) to ensure that possible limitations reach both ends of the chain before continuing with the next branch of the parallel branches.
+
+Further aspects:
+
+- If an MB is connected to another MB, the first MB holds the rear MB in one of its output branches. When determining the correct calculation order of the branches of the rear MB, the connection branch between the two MBs has to perform its potentials after all of the other branches of the rear MB if the calculation is backward. 
+- In some cases, components can be considered multiple times if they are part of multiple branches at one MB or MT! Therefore, after the order has been determined, only the first appearance of the process is considered and all other process steps of the same component are deleted from the order of operation. For potential steps, this is not done as in some cases, components have to have multiple potential steps. If one component has its potential and right afterwards its process step, the potential step is deleted as it is effectively the same at this point. This is repeated until there are no more changes in the order of operation. 
+
+Interdependencies occur when there are allowed connections between two branches of an MB or an MT, e.g:
+
+<center>![Interdependencies beween branches example](fig/240708_transformer_chain_ooo_branch_interdependencies.svg)</center>
+
+
+#### Energy Systems that can cause problems when automatically determining the order of operation
+
+There are some energy systems that cause problems when determining the order of operation with the above algorithm. If a simulation gives an unexpected result, this may be due to an incorrect calculation order. It can then help to use the order output in auxiliary_info as the basis for a custom-defined `order_of_operation` in the input file that can map the energy system correctly by adjusting the order (or adding/deleting) of `potential` and `process` steps of the transformers (see [this section](resie_input_file_format.md#order-of-operation)). If calculation time does not matter much, it may be possible to achieve an optimal calculation result by adding further potential steps. The following lists a non-exhaustive collection of these problematic constellations:
+
+-   A middle bus or middle transformer that is part of a parallel branch may cause problems for the automated generation of the order of operation. Although, it should be possible to simulate these energy systems with a custom order.
+  
+<center>![Middle Transformer in parallels](fig/240708_transformer_chain_ooo_problematic_systems_MT_in_parallel.svg)</center>
+
+-   Logical loops, e.g. if a CHPP is directly connected to the same heat pump both on the electric and the thermal side. The optimal operational state of the two components could only be determined with an iterative solving or with setting up and solving a single equation, but not with the stepwise approach of ReSiE.
+   
+<center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MTs.svg)</center>
+
+- Energy systems without a connection to any grid (insular system) may not find an optimal solution at the point where the storages are empty! Adding a grid in the simulation can help to find a suitable order of operation and an appropriate solution of the simulation. The grid input/output can then be seen as necessary energy balancing required to operate the insular system in a stable manner.
+- Energy systems with multiple middle busses with heat sources of different temperatures in the rear MB used by a heat pump can cause problems in the calculation. The branches of the rear MB should be calculated forward to make sure that the rear heat pump knows the available energy and the temperatures. However, due to the interconnected nature of these middle buses, the rear MB is calculated in reverse in order to allow information to propagate to the first MB. Unfortunately, this order can lead to balance errors. These errors occur because the rear heat pump, which operates based on different COP, doesn't have prior knowledge of the available energy during its potential step. It assumes that it will receive all the necessary energy at the temperature prioritized as the highest input. A custom order can help to solve this.
+<center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MBs.svg)</center>
+
+
+
+### Bus chains
+
+Because busses are both used as an abstraction over the actual hydraulical and electrical network of an energy system, as well as the component for distributing energy in a sub-network of the energy system, it often makes sense from a modelling perspective to have multiple busses of the same medium connected to each other, forming a chain. For example an energy system of a district might provide heat in a central bus that outputs to other busses in each building, which have local heat storages and other components.
+
+Given that energy can only flow in one direction in such a chain, the entire chain can be replaced by a single bus, which has all non-bus inputs and outputs as its own inputs and outputs. This is called a proxy bus, with the original busses being called the principals. These proxy busses are created for every bus chain within the preprocessing of ReSiE in order to facilitate easier calculation for the computation of energy flow and distribution via busses. For the simulation outputs, these proxy busses are then converted back to the original pricipal busses. During the construction of the proxy bus, the energy flow matrices of the principals, as well as the direction of energy flow between busses is taken into consideration to determine which inputs of the proxy bus can provide energy for which outputs and in which order this is happening.
+
+**Note:** This mechanism of a proxy bus only works if there are no loops between the busses. This produces a modelling challenge as it would be convenient to model a district heating network as multiple busses that request and provide heat to/from each other. It is currently an open question how to best address this problem and we hope to improve this in future versions of ReSiE.
+
+<center>![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
+
+Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</center>
+
+
+## Bus and interface functionalities with temperature layers
+
+The general purpose and functionality of interfaces in a simple one-to-one connection between two components have already been described above. However, when multiple interfaces connect several components using a bus as an intermediate distributor, the system becomes more complex. Interfaces must not only transfer information about demands and sources but also convey the maximum energy determined during the transformer's potential step and the actual energy during the process step.
+
+The complexity increases further when heat pumps are involved, as interfaces must handle different temperature levels simultaneously. This is somewhat contrary to the general definition of media, which typically represent one temperature per time step. For example, consider a heat pump connected to two sources with different supply temperatures and two demands, each with different demand temperatures as shown in the figure below. Since a heat pump cannot send two temperatures simultaneously via an interface, the model abstracts this operation by splitting it within a time step. For instance, within a 15-minute time step, the heat pump might provide a high temperature for hot water for 5 minutes and a low temperature for underfloor heating for 10 minutes. At the same time, it can draw energy from two sources at different temperatures, resulting in various COPs based on the composition of the individual input and output layers. This results in an average mixing temperature over the current time step for the input and output interfaces based on the current distribution of energy flows and their temperatures.
+
+<center>![Temperature layer of heat pump with multiple sources and demands](fig/240730_temperature_layer.svg)</center>
+
+During the potential step, the maximum required and available energies at the respective temperatures are calculated and written to the interface. The interface then forwards this information to the bus, which stores the information and allocates the energy to other components. The method can also be used to override the priorities on the bus, which are set to a constant ordering for the entire simulation. This allows the heat pump to determine during its potential and process steps from which source it draws energy in the current time step, regardless of the priorities on the bus.
+
+If there are other transformers in the list of sources or sinks that have not yet been calculated at the time of the heat pump's potential step, the heat pump might lack complete information for its calculations. This is shown in the modified example from above in the figure below. While the temperatures are written during the control step and non-transformer components also write their maximum energy in this step, the energies of transformers are only calculated later during the potential or process step. To address this, a mechanism allows the heat pump to determine how much energy it could supply or take for each temperature, regardless of the current energy distribution to other inputs or outputs. The bus handles any excess energy by linearly reducing the theoretically maximum possible energy at other temperatures proportionally when energy is called up at one temperature. This ensures a closed-loop step-by-step calculation, even with incomplete information. Full information (energies and temperatures) must be available at least for the input or output, which should be ensured by the algorithm determining the order of operations.
+
+<center>![Temperature layer of heat pump with multiple sources and demands with other transformer](fig/240730_temperature_layer_transformer.svg)</center>

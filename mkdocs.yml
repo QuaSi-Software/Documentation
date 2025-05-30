@@ -39,14 +39,16 @@ nav:
   - 'ReSiE: Simulation engine':
       - 'Installation and usage': 'resie_installation.md'
       - 'Input file format': 'resie_input_file_format.md'
+      - 'Time, time zones and weather files': 'resie_time_definition.md'
+      - 'Logging': 'resie_logging.md'
+      - 'Component parameters': 'resie_component_parameters.md'
   - 'ReSiE: Simulation model':
       - 'Fundamentals': 'resie_fundamentals.md'
       - 'Energy systems': 'resie_energy_systems.md'
-      - 'Types of energy system components': 'resie_types_components.md'
       - 'Operation and control': 'resie_operation_control.md'
-  - 'ReSiE: Technical description': 
-      - Main components: 'resie_description_components.md'
-      - General effects: 'resie_transient_effects.md'
+      - 'Energy system components': 'resie_energy_system_components.md'
+      - 'General effects & traits': 'resie_transient_effects.md'
+      - 'Validation': 'resie_validation.md'
   - 'ReSiE: Examples':
       - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - 'GenSim: Generic Building Simulation':

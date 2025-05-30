@@ -1,101 +1,83 @@
 # Operation and control
 
-An important part of what makes ReSiE's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
+An important part of what makes ReSiE's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components and feed/return lines. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
 
-## Control behavior
+## The control step
+Because the general calculation of energies of components might require information from other components in the energy system, particularly information that cannot be communicated across interfaces between directly connected components, it has proven beneficial to introduce a simulation step in which some information is determined and communicated before the operation of components is calculated in the `potential` and `process` steps. This step is also used to fetch information that is given as input or can otherwise be determined without any information from components.
 
-The calculations for control have been decoupled from those of energy processing, so that processing can work as a function depending on the result of the control. In the simplest case, control turns components on and off, but the implementation of various components might take many more cases into account. The latter already is arbitrarily complex[^1], so the former must be as well.
+## General mechanisms of control
+Each component is assigned a controller that handles general mechanisms of control and updates any [control modules](resie_operation_control.md#control-modules) that might be attached to the component.
 
-[^1]: In the sense that each component can perform any number and kind of calculations using the current state of the simulation that the component has access to.
+### Storage un-/loading flags
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `control_parameters` entry of the component parameter specification (compare [component specification](resie_component_parameters.md#storage-un-loading)). Similarly, components can be configured to be dis-/allowed to draw energy from storages. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
-To facilitate this, all component implementations have access to a controller, that has access to information defined by its operational strategy and provides state information to the processing functionality.
+### Consideration of interfaces for the potential step
+Transformer components perform fairly complex calculations of their operation in the `potential` step (which is repeated in the `process` step). As part of this calculation they check how much energy is available on each of their input/output interfaces. Due to this complexity it is in rare cases necessary to specify that a particular input/output shouldn't be taken into account. This can be controlled with parameters in the `control_parameters` entry of the component configuration.
+
+```json
+{
+    "uac": "TST_CHPP_01",
+    "type": "CHPP",
+    ...
+    "control_parameters": {
+        ...  
+        "consider_m_el_out" : false,
+    },
+}
+```
+
+In the example above a CHPP is configured to not consider its electricity output for the calculations and assume the requested energy to be infinite. Any input/output not explicitly set to `false` will be considered.
+
+## Control modules
+
+More specialised behaviour is modeled as control modules, that can be assigned to components. The modules have predefined callbacks during specific parts of a timestep and the return values of the callbacks are aggregated across all relevant modules of the component. Because the callbacks are hardcoded into the code of a component, some modules can only be assigned to certain component types, that make use of the callbacks. **Note:** At the moment it is possible to assign any module to any component, but mismatching modules will have no effect. This may be improved in a future update.
+
+The currently implemented callbacks are:
+
+* `upper_plr_limit`: Sets the upper limit of the PLR to a given value. "Upper" in this case means that the PLR is calculated to not exceed this value, but it may be lower due to the exact circumstances of available energies on the inputs and outputs of a component. For example a module might set the limit to 75%, however the component is limited by available input energy and can only be operated at 50%. This callback is implemented for transformers.
+* `charge_is_allowed`: Allows the charging of a battery.
+* `discharge_is_allowed`: Allows the discharging of a battery.
+* `reorder_inputs`: Reorders a list of input energy exchanges used in steps `potential` and `process`.
+* `reorder_outputs`: Reorders a list of output energy exchanges used in steps `potential` and `process`.
+
+**Note:** The callbacks `reorder_inputs` and `reorder_outputs` are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
+
+The following describes the currently implemented control modules. The required parameters are described in the [component specification chapter](resie_component_parameters.md#control-modules).
+
+* `economical_discharge`: Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
+* `profile_limited`: Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of lower values.
+* `storage_loading`: Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
+* `temperature_sorting`: Controls a component, that can handle multiple inputs or outputs with different temperatures, so that the inputs/outputs are sorted by the temperatures they provide/request. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 
 ## State machines
 
-State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
+Some control modules make use of state machines in their calculation. State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
 
-<center>![Example of a state machine with two states](fig/example_state_machine.png)</center>
+<center>![Example of a state machine with two states](fig/240718_example_state_machine.svg)</center>
 
-The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions. When the state machine is checked to advance its state[^2] and the expression of a transition evaluates as true, it is followed to the new state.
+The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions as compared to symbols in the input alphabet in the common definition. When the state machine is checked to advance its state and the expression of a transition evaluates as true, it is followed to the new state.
 
 One addition to the common concept of a state machine is that the implementation in ReSiE keeps track of how many steps a state machine was in the current state.
 
-[^2]: Usually this happens once a simulation step for each state machine, but in the general definition of a state machine this is not time-dependant and works on "turns".
-
 ### Conditions
 
-The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. However the code handling them must define which information it requires for evaluation. In particular a condition must define to which components it needs access. As the specific components are not defined before the project is loaded, these requirements affect the type and possibly the medium of the components, e.g. a condition might ask for "a grid connection of medium m_e_ac_230v" or "a PV plant". It can also provide customizable parameters with default values.
+The conditions used in evaluating the boolean expressions of transitions are arbitrarily complex and as such depend on the implementation. The information they require for evaluation is defined in the parameters of the control module making use of the state machine. Apart from scalar parameter values such as thresholds, the conditions might require being linked to other components so current values can be requested from them.
 
-The example above uses four different conditions:
+The example above uses three different conditions:
 
-* `BT >= X%`: Checks if a linked buffer tank is above X% capacity.
-* `BT < X%`: Checks if a linked buffer tank is below X% capacity.
-* `Min. run time`: Checks if the component the state machine controls has been in the current state for longer or equal than its minimum run time.
-* `Overfill`: Checks if the remaining empty capacity of a linked buffer tank is less than the minimum partial load of the component the state machine controls.[^3]
-
-[^3]: Rather, this is its intended use. As of now there remains an issue with its implementation.
+* `tank load >= 90%`: Checks if the load of the linked buffer tank is above 90% of its capacity.
+* `tank load < 30%`: Checks if the load of the linked buffer tank is below 30% of its capacity.
+* `run time >= min. run time`: Checks if the state machine has been in the current state for longer than the defined minimum run time.
 
 ### Truth table
 
 The transitions for each state are defined using a truth table over the conditions involved, resulting in a new state (which may result in the current state again). This has the advantage that is covers every possible case implicitly, but also has the disadvantage that this might result in large truth tables for state machines with many conditions.
 
-<center>![Example of a truth table with three conditions](fig/example_truth_table.png)</center>
+| **tank load >= 90%** | **Min. run time** | **New state** |
+| --- | --- | --- |
+| true | true | Off |
+| false | true | Fill tank |
+| true | false | Fill tank |
+| false | false | Fill tank |
 
-The example above shows the truth table used for the state "Fill tank", which has three conditions. Cases where the `Overfill` condition is true always lead to the `Off` state, regardless of the values of the other conditions.
-
-## Strategies
-
-Instead of requiring the user to manually specify a state machine, it is desired to provide a number of predefined operational strategies that can be selected. Apart from simplifying the user input, this also makes it easier to enable processing behavior that depends on the chosen strategy, but not necessarily the current state of the controller as it may not need a state machine for control calculations.
-
-For the given example above this would be best described as a storage-driven strategy as a component with this strategy would try to fill the linked storage component when it gets too low. The required linked components and parameter values are carried over from the state machine constructed by the strategy to the required user input as illustrated in the following:
-
-<center>![Example of the storage-driven operational strategy](fig/example_storage_driven_strategy.png)</center>
-
-This leads to the required user input in the project file:
-
-```json
-"TST_01_HZG_01_CHP": {
-    "type": "CHPP",
-    "control_refs": ["TST_01_HZG_01_BFT"],
-    "output_refs": [
-        "TST_01_HZG_01_BUS",
-        "TST_01_ELT_01_BUS"
-    ],
-    "strategy": {
-        "name": "storage_driven",
-        "high_threshold": 0.9,
-        "low_threshold": 0.2
-    },
-    "power": 12500
-},
-```
-
-A CHPP is operated by this `storage-driven` strategy, which requires two parameters `high_threshold` and `low_threshold` as well as a linked buffer tank, which is added in the `control_refs` of the CHPP. The user does not need to know about the implementation of this strategy, only about the meaning of its parameters.
-
-Another use of operational strategies is controlling the processing code without the use of a state machine. For example a demand-driven strategy requires only that any component is linked, with no specification as to which. This in turn is done so that determining the order of execution of simulation steps places the linked component before the controlled component. Otherwise the controlled component might try to meet a demand that has not been calculated yet.
-
-For the predefined `demand_driven`, `supply_driven` and `storage_driven` control strategies, optional parameter flags can be set in the input file. Their default value is always `true` if the parameter is not given in the input file.
-
-```json
-    "strategy": {
-        "name": "demand_driven",    // required
-        "load_storages" : true,     // optional     
-        "unload_storages" : true,   // optional 
-        "operation_profile_path": "path/to/profile.prf",  // optional 
-        "m_el_in" : true,           // optional    
-        "m_el_out" : true,          // optional    
-        "m_gas_in" : true,          // optional    
-        "m_h2_out" : true,          // optional    
-        "m_o2_out" : true,          // optional    
-        "m_heat_out" : true,        // optional    
-        "m_heat_in" : true          // optional    
-        },
-```
-
-Each entry starting with an `m` (for medium) defines an input or output of the defined component. Obviously, a component has only a selection of the full list of inputs and outputs given above. If an input or output is set to false within the control strategy, the limitation of energy demand or supply on this interface is ignored when the current operation state of the component is determined. Note that this can lead to unexpected balance errors within the simulation! However, if users want more control over the operational strategy, these flags can be used to define complex rules for the operation of each component.
-
-If the other two entries, `load_storages` or `unload_storages`, are set to false, the specified component is not allowed to load or unload <u>any</u> storage in the energy system. While the control matrix of each bus can only handle storages connected to the specified bus, this parameter allows to deny or allow system-wide storage loading or unloading for each component. Note that these rules are intersecting with the control matrix of a bus and storage-loading has to be allowed at both the control matrix and by the flag `load_storages`. If one of these rules is set to false, the loading is not allowed. 
-
-Using the `storage_driven` control strategy, `load_storages` and `unload_storages` can also be set to `false`, although this is usually not very useful.
-
-The `operation_profile_path` entry within the `strategy`-Struct can be used to specify a path as a string to a `*.prf` file containing a timestamp and values between 0 and 1 for each time step. They serve as an additional operation limitation for the transformer and can be used e.g. to operate a transformer only at times with a high share of renewable energy in the public power grid.
+The example above shows the truth table used for the state "Fill tank", which has two conditions. The state machine will stay in the current state until both conditions are true, in which case the new state will be "Off".

@@ -2,9 +2,9 @@
 
 The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to ReSiE, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
-The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of units to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
+The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of components to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
 
-[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or units that process a certain amount energy regardless of demand.
+[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or components that process a certain amount energy regardless of demand.
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
@@ -48,7 +48,7 @@ The third domain are demands, which encompass any kind of system or process that
 
 ## Energy system components
 
-As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transferring energy. In the implementation the equipment is abstracted to a single unit even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
+As mentioned earlier, a component of an energy system is any kind technical equipment that deals with transforming, transporting or transferring energy. In the implementation the equipment is abstracted to a single component even if in reality the equipment is spread out in space and consists of numerous individual parts. For some components this matches nicely with commonly used terminology. For example a "gas boiler" includes all pipes, valves and other parts required to make it work.
 
 For other equipment this is not the case. For example an electrolyser requires several components before and after the electrolysis step, such as water purification and hydrogen postprocessing. However given that these components are not used for anything else, they are included in the energy system component model under the label of "electrolyser".
 
@@ -56,7 +56,7 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other units.
+* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components.
 * `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
@@ -70,21 +70,21 @@ This classification is used by the simulation engine to reason about the order i
 The simulation follows a fairly basic structure:
 
 ```pseudocode
-units = load_components()
-order = order_of_operations(units)
+components = load_components()
+order = order_of_operations(components)
 for time = t_start to t_end {
     ...
 }
 ```
 
-First the components are loaded and initialized from the input project file. Then the order of operations is determined. The units and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
+First the components are loaded and initialized from the input project file. Then the order of operations is determined. The components and the order are given to a loop over each time step, which performs calculations and writes the output. The output is written in each time step, as opposed to only being collected and written later on, so that aborting a simulation results in partial output.
 
 ### Main loop over time
 ```pseudocode
 for time = t_start to t_end {
-    perform_steps(units, order)
-    check_balances(units)
-    write_output(units)
+    perform_steps(components, order)
+    check_balances(components)
+    write_output(components)
     advance_simulation()
 }
 ```
@@ -97,14 +97,16 @@ The simulation steps for each component are:
 
 * `Reset`: Reset values for the next time step.
 * `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, if these are already known at this point.
-* `Potential`: Calculates the potential energy that can be supplied or consumed by a transformer. Used when transformers are directly connected to each other as pre-processing step. No energy is processed in this step.
+* `Potential`: Calculates the potential energy that can be processed by a transformer. This is necessary when several transformers are connected directly or through busses, as this might lead to multiple solutions of how to operate the transformers. No energy is processed in this step.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
-* `Distribute`: For bus components, distribute the energy balances on each connected interface and check the overall balance on the bus.
+* `Distribute`: For bus components, distribute energy supplied and requested by each connected component and calculate the energy transfered between connected busses.
 
 ### Determining order of operations
 
-For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
+For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. **Note:** In the following "order of operations" and "order of operation" is used as they describe the same concept albeit with slightly different meaning.
+
+Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
@@ -117,18 +119,17 @@ For each component of the energy system some or all of the simulation steps are 
     6. `Load`: `Storage`
     7. `Process`:  `Bounded source`, `Bounded sink` 
     8. `Distribute`: `Bus`
+2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is also technically not a rearrangement, as it happens during establishing the base order.
+4. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
+5. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
 
-    <!-- The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:  -->
-    <!-- ![Illustration of the base order of operation](fig/230515_base_OoO.svg)  -->
-    <!-- [^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy    systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series* **under review** -->
-
-1. Reorder the `Process` and `Potential` operations of each component connected to a bus so that it matches the bus' input priorities.
-2. Reorder the `Distribute` operation of all busses so that any chain of busses connected to each other have the "sink" busses before the "source" busses while also considering the output priorities of two or more sink busses connected to the same source bus.
-3. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
+The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:
+![Illustration of the base order of operation](fig/230515_base_OoO.svg)
+[^Ott2023]: Ott E.; Steinacker H.; Stickel M.; Kley C.; Fisch M. N. (2023): Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, *J. Phys.: Conf. Series*
 
 All rearrangement steps are carried out one after the other, which means that the last rearrangement step carried out has the highest priority and can contradict the previously carried out rearrangements. In this case, the reordering rules of the previous reorderings are ignored and overwritten.
 
-If the simulation parameter `dump_info` is used, the generated order of operations is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom order of operations that can be imported via the project input file. See section on the [project file format](resie_input_file_format.md) for details.
+If the simulation parameter `auxiliary_info` is used, the generated order of operations is written to the info file. This can be very useful to check for errors produced by an incorrect order. It can also be used as a template to define a custom order of operations that can be imported via the project input file. See section on the [project file format](resie_input_file_format.md) for details.
 
 #### Cycles and feedback loops
 

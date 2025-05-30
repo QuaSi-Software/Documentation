@@ -23,7 +23,7 @@ Now, QuaSi is understood to be a collection of the following simulation tools:
         ![GenSim Logo](img/230505_GenSim.jpg){ width="300" }
     </figure>
 
-- **SoDeLe** (acronym for "Solar simulation as easy as can be", in German "Solarsimulation denkbar leicht"), an easy-to-use tool to calculate energy profiles from photovoltaic systems with different orientations and different PV modules, based on python-pvlib
+- **SoDeLe** (acronym for "Solar simulation as easy as can be", in German "Solarsimulation denkbar leicht"), an easy-to-use tool to calculate energy profiles from photovoltaic systems with different orientations and different PV modules, based on python-pvlib ([GitHub Repository](https://github.com/QuaSi-Software/SoDeLe))
   
     <figure markdown>
         ![SoDeLe Logo](img/230505_SoDeLe.jpg){ width="300" }

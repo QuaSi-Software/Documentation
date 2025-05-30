@@ -16,10 +16,14 @@
 | CC           | Compression Chiller                                                         |
 | CDT          | Cool-Down Time                                                              |
 | CHPP         | Combined Heat and Power Plant                                               |
+| CLI          | Command-line interface                                                      |
 | COP          | Coefficient of Performance                                                  |
 | CSV          | Comma-Separated Values [data format]                                        |
 | DC           | Direct Current                                                              |
+| DHW          | Domestic Hot Water                                                          |
 | DWD          | German weather service (Deutscher Wetterdienst)                             |
+| DST          | Daylight Saving Time                                                        |
+| EED          | Energy Earth Designer (software)                                            |
 | EER          | Energy Efficiency Ratio                                                     |
 | EPW          | Energy Plus Weather                                                         |
 | ER           | Electric Heating Rod                                                        |
@@ -35,15 +39,20 @@
 | HP           | Heat Pump                                                                   |
 | HR           | Heat recovery                                                               |
 | HVAC         | Heating, Ventilation and Air Conditioning                                   |
+| IANA         | Internet Assigned Numbers Authority                                         |
 | ID           | Identifier                                                                  |
 | IS           | Ice Storage                                                                 |
 | JSON         | JavaScript Object Notation [data format]                                    |
 | K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
+| LMTD         | Logarithmic mean temperature difference                                     |
+| MB           | Middle Bus                                                                  |
 | MOT          | Minimum Operation Time                                                      |
+| MT           | Middle Transformer                                                          |
 | NCV          | Net Calorific Value, also known as Lower Heating Value (LHV)                |
 | NFA          | Net floor area (NRF) of a building                                          |
 | OH           | Oil Heating                                                                 |
+| PB           | Parallel Branch                                                             |
 | PLF          | Part Load Factor                                                            |
 | PLR          | Part Load Ratio                                                             |
 | PTES         | Pit Thermal Energy Storage                                                  |
