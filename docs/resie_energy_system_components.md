@@ -985,7 +985,7 @@ At the lowest computational nodes, the temperature is defined as constant before
 For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
 
 $$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
-where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long-wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
+where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
 
 $$\dot{q}_{\text{glob}} = (1 - r) \; \dot{q}_{\text{solar,glob}}$$
 with \(r\) as the reflectance of the earth's surface and \dot{q}_{\text{solar,glob}} as the global horizontal solar radiation on the surface;
@@ -1103,7 +1103,7 @@ Symbol | Description | Unit
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
 \(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m^2\)]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m^2\)]
-\(\dot{q}_{\text{rad}}\)  |  long-wave radiation exchange with the environment   | [W / \(m^2\)]
+\(\dot{q}_{\text{rad}}\)  |  long wave radiation exchange with the environment   | [W / \(m^2\)]
 \(\dot{q}_{\text{konv}}\)  | convective heat flux  | [W / \(m^2\)]
 \(\dot{Q}\)  | heat extraction or injection rate   | [W]
 \(Q_{\text{in,out},i,j}\)  | heat energy supplied or released between two time steps   | [J]
@@ -1119,6 +1119,71 @@ Symbol | Description | Unit
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m^3\)]
 
+
+### Solarthermal collector
+A solarthermal collector uses the energy from the sun to provide heat. Different collectors can be used, usually depending on the usecase and needed temperature. For all collector types the same simulation model is used.Typical types of colletors are:
+- flat plate collector
+- evacuated tube collector
+- WISC (wind and infrared sensitive collector)
+- PVT collector (photovoltaic thermal hybrid solar collector)
+
+#### General model of solarthermal collector
+The model is based on the quasi dynamic model from DIN EN ISO 9806:2017[^ISO9806], which describes the extracted thermal power as:
+
+$$
+\begin{split} 
+\dot{Q} = & A_{\text{G}}(\eta_{\text{0,b}}K_{\text{b}}(\theta_{\text{L}},\theta_{\text{T}})G_{\text{b}} + 
+\eta_{\text{0,b}}K_{\text{d}}G_{\text{d}} -
+a_{\text{1}}(\vartheta_{\text{m}} - \vartheta_{\text{a}}) -
+a_{\text{2}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^2 -
+a_{\text{3}}u'(\vartheta_{\text{m}} - \vartheta_{\text{a}}) \\
+& + a_{\text{4}}(E_{\text{L}} - \sigma_{\text{Boltz}} T_{\text{a}}^4) - 
+a_{\text{5}}\frac{d\vartheta_{\text{m}}}{dt} -
+a_{\text{6}}u'G - 
+a_{\text{7}}u'(E_{\text{L}} - \sigma_{\text{Boltz}} T_{\text{a}}^4) -
+a_{\text{8}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^4),
+\end{split}
+$$
+
+where the variables are defined as 
+Symbol | Description | Unit
+-------- | -------- | --------
+$A_{\text{G}}$ | gross collector area | m<sup>2</sup>
+$\eta_{\text{0,b}}$ | zero-loss efficiency at $(\vartheta_{\text{m}} - \vartheta_{\text{a}})=0$K based on the beam solar irradience $G_{\text{b}}$ | -
+$K_{\text{b}}$ | incidence angle modifier (IAM) for beam irradiance | -
+$\theta_{\text{L}}$ | longitudal incidence angle | °
+$\theta_{\text{T}}$ | transversal incidence angle | °
+$G_{\text{b}}$ | beam solar irradience | W/m<sup>2</sup>
+$K_{\text{d}}$ | incidence angle modifier (IAM) for diffuse irradiance | -
+$G_{\text{d}}$ | diffuse solar irradience | W/m<sup>2</sup>
+$\vartheta_{\text{m}}$ | mean fluid temperature | °C
+$\vartheta_{\text{a}}$ | ambient air temperature | °C
+$u'$ | reduced wind speed (u - 3 m/s) with u = surrounding wind speed | m/s
+$E_{\text{L}}$ | long wave irradiance (λ > 3 μm) | W/m<sup>2</sup>
+$\sigma_{\text{Boltz}}$ | Boltzmann constant | W/(m<sup>2</sup>K<sup>4</sup>)
+$T_{\text{a}}$ | absolut ambient air temperature | K
+$\frac{d\vartheta_{\text{m}}}{dt}$ | change of mean fluid temperture over time | K/s
+$a_{\text{1}}$ | heat loss coefficient | W/(m<sup>2</sup>K)<s>
+$a_{\text{2}}$ | temperature dependence of the heat loss coefficient W/(m<sup>2</sup>K<sup>2</sup>)
+$a_{\text{3}}$ | wind speed dependence of the heat loss coefficient | J/(m<sup>3</sup>K)
+$a_{\text{4}}$ | sky temperature dependence of long wave radiation exchange | -
+$a_{\text{5}}$ | effective thermal capacity | J/(m<sup>2</sup>K)
+$a_{\text{6}}$ | wind speed dependence of the zero loss efficiency | s/m
+$a_{\text{7}}$ | wind speed dependence of long wave radiation exchange | W/(m<sup>2</sup>K<sup>4</sup>)
+$a_{\text{8}}$ | radiation losses | W/(m<sup>2</sup>K<sup>4</sup>)
+
+The values for the parameters $a_{\text{1}}$ to $a_{\text{8}}$ and $\eta_{\text{0,b}}$, $K_{\text{b}}$, $K_{\text{d}}$ are available from thermal testing procedures. Sources for such documents are the solar keymark database[^SolarKeymark] or the ICC-SRCC database[^ICC-SRCC]. If only parameters of an older norm (e.g. EN ISO 9806:2017) are available, they can be put in place of the corresponding a parameters with all unknown values set to 0.
+Most other variable can be aquired through weather data. Since the wind speed $u$ is usually given at a height of 10 m an assumption must be made to by which factor the wind speed differs at the choosen location.
+
+The model strongly depends on the mean fluid temperature. Since ReSie doesn't model fluid dynamics, a way must be found to derive the mean fluid temperature from other parameters. Since components don't have a return temperature that can be used as an inlet temperature for the solar collector, we will use the needed or demanded temperature of the components connected to the solarthermal collector as a target temperature for the collector output. To be able to calculate the mean fluid temperature the user has to set either a fixed flow rate $\dot{v}$ or a fixed temperature difference over the collector $\Delta T$. The non-fixed value is then a variable that is calculated in each time step.
+
+#### Limits of the simulation model
+Describe limits depending on the actual implemented model (Transformer or bounded source) (ToDo) 
+
+
+[^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
+[^SolarKeymark]: Solar Keymark, https://solarkeymark.eu/database/
+[^ICC-SRCC]: SOLAR RATING & CERTIFICATION CORPORATION (ICC-SRCC™), https://secure.solar-rating.org//Certification/Ratings/RatingsSummaryPage.aspx?type=1
 
 ## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)

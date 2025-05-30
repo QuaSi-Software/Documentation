@@ -1190,3 +1190,36 @@ To perform this calculation in every timestep, the following input parameters ar
     "fluid_prantl_number": 30
 }
 ```
+
+
+### Solarthermal collector
+| | |
+| --- | --- |
+| **Type name** | `SolarthermalCollector`|
+| **File** | `energy_systems/heat_sources/solarthermal_collector.jl` |
+| **Available models** | `default` |
+| **System function** | `bounded_source` |
+| **Medium** | `medium`/`None` |
+| **Input media** | |
+| **Output media** | `None`/`auto` |
+| **Tracked values** | `OUT`, `Temperature`, `Max_Energy`,`Average_Temperature` `Ambient_Temperature`, `Used_Energy`, `direct_solar_irradiance`, `delta_T`, `spec_flow_rate` |
+
+Solarthermal collector producing heat depending on weather conditions.
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ---|--------------------- | ------------------------ |
+| `ambient_temperature_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_amb_temp.prf` |  | Path to the ambient temperature profile. |
+| `beam_solar_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_beam_irr.prf` |  | Path to the horizontal beam irradiance profile. |
+| `diffuse_solar_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_diffuse_irr.prf` |  | Path to the diffuse irradiance profile. |
+| `long_wave_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_long_wave_irr.prf` |  | Path to the long-wave irradiance profile. |
+| `wind_speed_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_wind_speed.prf` |  | Path to the wind speed profile. |
+| `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
+| `tilt_angle` | `Float` | Y/N | 45 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
+| `azimut_angle` | `Float` | Y/N | 90 | ° | Azimut angle or orientation of the collector beetween 0 and 90° with 0°=south, 90°=east/west. Other angles are not considered, since the incidence angle modifier values are not measured for values outside of [0°;90°C] |
+| `eta_0_b` | `Float` | Y/N | 0.734 | zero-loss efficiency at $(\vartheta_{\text{m}} - \vartheta_{\text{a}})=0$K based on the beam solar irradience $G_{\text{b}}$ |
+| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifer values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
+| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudal incidence angle modifer values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
+| `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance |
+| `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. |
+| `delta_T` | `Float` | N/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
+| `spec_flow_rate` | `Float` | N/N | 2.0e-5 | m³/s | Constant flow rate in collector. Either delta_T or spec_flow_rate has to be defined. |
