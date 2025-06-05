@@ -167,6 +167,10 @@ The parameters for the comparison with the measurement data were deviating as fo
         
 In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the normal simulations and 700 W/m²K for the measurement data was used.
 
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+
+[^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
+
 
 ## Heat pump
 
@@ -218,6 +222,66 @@ This figure compares measurement against simulation data based on values aggrega
 
 In this figure the same comparisons as above are repeated for values aggregated to one hour for a period of about one month from 2013-11-06 to 2013-12-07. This time range was chosen because it contains both periods of high and low production as well the day of 2023-11-23, which was interpolated due to missing measurements and is clearly visible in the analysis. The simulated electricity input again shows a good match with measurements. In contrast, the measured heat input displays heavy pulsing, probably due to the discrete nature of meters. The simulated COP and heat input show a more averaged behaviour compared to the measurements.
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+### Case 2: Multi-family home heating and DHW
 
-[^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
+In the second case measurements were taken from a multi-family home, which is supplied with domestic hot water and heat for underfloor heating by an air-sourced 26 kW on-off heat pump with heat medium R407C. No measurements for the heat energy input are available and the air temperature at the building location is also unknown, which is why the closest weather station (in Konstanz, Germany) has been used as proxy for the heat source temperature values. The measurements were preprocessed for another scientific project and require no corrections. The temperature of the mixed DHW and heating demand has a typical range from 35 °C to 60 °C. The measurements are in the time frame from 2019-02-19 to 2022-01-31. Because the simulation does not support leap days, the day of 2020-02-29 has been removed prior to creating the profiles used in the simulation.
+
+**COP field data**
+
+The COP of the heat pump is described in detail in the manufacturer's documentation [^StiebelEltronWPL] and has been inter- and extrapolated to field data with source temperatures from -20 °C to 40 °C in steps of 5 K and sink temperatures from 15 °C to 70 °C in steps of 5 K. Of note is that the vast majority of measurements fall within the range interpolated between support values, with only few values falling in the extrapolated range. These values typically occur when the heat pump starts in a cold state after prolonged inactivity. The following image shows a visual representation of the interpolated field and the support values from the documentation.
+
+![Validation of heat pump model, case 2: COP field data inter- and extrapolated from support values](fig/validation_heat_pump/case_2_cop_field.png)
+
+It is assumed the documentation describes the COP for the steady-state operation of the heat pump at full power at the listed temperatures, however this assumption could be wrong. It it also assumed that the COP values do not include losses due to icing of the air-liquid heat exchanger. De-icing the heat exchanger is a seperate operation mode of the heat pump during which it does not produce heat. The reduction of the COP due to icing only occurs in the model, not during real operation.
+
+**Power curve and PLF function**
+
+The documentation also describes the power curve for the thermal output power of the heat pump depending on air and demand temperatures. The influence of the demand temperature is negligible, while the source temperature is the main driver of the power curve. While the curve in the documentation shows slight non-linear behaviour, given the uncertainties it can be reasonably linearly approximated as \(\dot{Q}_{th,out} = \dot{Q}_{th,max} \cdot (0.0105769 \cdot T_{source,in} + 0.576923) \). The documentation lists \(\dot{Q}_{th,max}\) as 26 kW, however using this in the simulation leads to a significant fraction of unmet demand. This is likely caused by the measurements being based on meter values with an minimum accuracy of 1.0 kWh. Therefore the demand values in the measurements can differ up to 1.0 kWh from the actual demand during a timestep.
+
+Furthermore, the temperature values and thus the output power of the heat pump vary over a timestep and are not as constant as the simulation assumes. In addition the source temperature values were taken from a weather station, not a temperature sensor at the evaporator inlet, further increasing the inaccuracy of the calculate thermal output power. To compensate for both effects \(\dot{Q}_{th,max}\) has been assumed as 32 kW for the simulation. This results in an unmet demand of 740 kWh (0.28 %) over the entire timeframe.
+
+Because the heat pump is modelled as on-off control, based on the documentation, the simulation requires choosing a PLF function to model the cycling losses incurred by the heat pump repeatedly switching on and off when the demand is less than the full available power. This is not a real technical effect and is a model assumption, therefore there is no data in the documentation to serve as a basis. An attempt to determine a PLF function from measurements was done and is described in the following. In the results section for case 2 the limitations of this approach are described.
+
+![Validation of heat pump model, case 2: Scatter plot of ratio of COP over theoretical COP vs PLR](fig/validation_heat_pump/case_2_plf_analysis.png)
+
+The figure above shows a scatter plot of measurement data with the power-adjusted PLR values on one axis and the ratio of the COP over theoretical COP on the other. The power-adjusted PLR has been calculated by dividing the heat demand over the maximum heat output depending on the current temperatures (affecting the maximum power). The theoretical COP is the COP calculated by the field values also depending on the current temperatures. A linear relation between the two values can be clearly observed for PLR values above 0.4 and upwards. The following PLF function has been determined as a fit and is shown as a red line in the figure:
+
+$$
+ PLF(\kappa) = \begin{cases}
+		0.55 &\text{for } \kappa \leq 0.4\ \\[5pt]
+	    \kappa + 0.15 &\text{for } \kappa \gt 0.4\ \\
+	\end{cases} \\
+$$
+
+The constant part for \(\kappa \leq 0.4\) has been chosen for two reasons. The first is that the linear relation of the upper part is much less supported by values in this region, making an extension of the line downwards questionable. The other reason is that low values in the PLF lead to many instances of implausibly low COP values (of less than 1.0) during simulation, which indicates the linear relation being a poor fit for this region.
+
+**Results**
+
+This section discusses the results of a manually determined parameter fit. The full parameter set can be found in the file `resie_input.json` for case 2. Apart from the already discussed COP field, power curve and PLF function, other significant parameters include a constant 260 W electricity loss and enabling the calculation of icing losses with default parameters. Of note is that the COP field has been uniformly multiplied with a scaling factor of `1.2`.
+
+![Validation of heat pump model, case 2: Scatter plot of COP vs temperature difference for both measurements and simulation in both 15 min and 60 min time steps](fig/validation_heat_pump/case_2_cop_analysis.png)
+
+The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original timestep of 15 minutes and for aggregated values of 60 minutes. In all four plots only active data values were used. All four plots clearly show the expected behaviour, in that a higher temperature difference leads to a lower COP. Banding effects are visible in both measurements and simulation data for the 15 minute timestep. One known cause of this is the heat demand being measured in discrete values, leading to discrete PLR values and reduction through the PLF. When the PLF is simulated as being constant, the banding in the simulation data is reduced significantly. Another possible cause is the condenser outlet temperatures being clustered around two typical ranges, one for the underfloor heating demand and one for the DHW demand, while the air temperature varies independently of that. This leads to banding when the varying air temperature values trace two different paths over the COP field data for the relatively constant output temperatures. Overall, a visual comparison of the measurements and simulation data suggests a reasonable match between them.
+
+|  | Electricity [MWh] | Heat input [MWh] | Heat output [MWh] | Losses [MWh]
+| --------- | --- | --- | --- | --- |
+| Raw measurements | 92.49 | - | 266.56 | - |
+| Without leap day | 92.37 | - | 266.24 | - |
+| Simulated | 90.62 | 193.80 | 265.50 | 18.92 |
+| Difference | -1.89 % | - | -0.28 % | - |
+
+The table above lists the sum of energies over the entire time frame. For reasons mentioned in the section on the power curve there is an unmet demand of 740 kWh or 0.28 %. The electricity input is 1.89 % lower than in the measurements. This number can be reduced close to zero by fine-tuning the scaling factor for the COP field data, which was not done as it provides no additional information on the validity of the model. This becomes much clearer when the data sets are compared time-resolved, as described in the following.
+
+![Validation of heat pump model, case 2: Line plot of simulation vs. measurement data of COP and produced/consumed energies aggregated to daily data for the full time frame](fig/validation_heat_pump/case_2_daily_data_full_period.png)
+
+The figure above shows measurements vs. simulation data for the COP and electricity input over the full time frame aggregated to daily values. For both measurements and simulation the COP values are higher in winter than in summer, which can be explained by the higher demand temperatures in summer, due to only supplying DHW, more than offsetting the gain in the COP due to higher air temperatures. The COP lines match in general behaviour of daily fluctuations, however also show the simulation data consistently being overestiamted in winter and underestimated in summer. This can be seen more clearly in the following figures, which highlight a week in August of 2021 and a week in December of 2021.
+
+![Validation of heat pump model, case 2: Line plot of simulation vs. measurement data of COP and produced/consumed energies aggregated to hourly data for a week in August of 2021](fig/validation_heat_pump/case_2_hourly_data_one_week_summer.png)
+
+![Validation of heat pump model, case 2: Line plot of simulation vs. measurement data of COP and produced/consumed energies aggregated to hourly data for a week in December of 2021](fig/validation_heat_pump/case_2_hourly_data_one_week_winter.png)
+
+The overestimation in winter and underestimation in summer can be seen very clearly in the hourly data. In winter the heat pump is running constantly at a high PLR, while in summer it is running intermittently at a low to medium PLR. These are two scenarios where the PLF function ought to increase the accuracy of the model, yet this is not the case.
+
+When the simulation is performed with a COP scaling factor of 1.0 and a constant PLF function of 1.0, the simulation data matches very closely in winter and is underestimating in summer. This would suggest that the real heat pump does not suffer decreased efficiency in part load operation, yet the analysis done in the corresponding section above strongly suggests that the PLF function should be modelled as such. The reasons for this discrepancy remain unclear and could be a combination of effects caused by uncertainties and inaccuracies in the measurements or it could indicate a weakness in the heat pump model concerning the PLF function. Further work in this regard is welcome.
+
+[^StiebelEltronWPL]: STIEBEL ELTRON: Bedienung und Installation für Luft-Wasser-Wärmepumpen WPL 13-23 E/cool, Hersteller-Dokumentation STIEBEL ELTRON, Stand 9147.
