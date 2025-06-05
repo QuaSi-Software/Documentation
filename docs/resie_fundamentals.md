@@ -33,6 +33,8 @@ While the conservation of energy is upheld, this does not mean that losses canno
 
 Due to the difficulty of generalizing the impact of these losses, they are not generally included in the energy flow model. Instead, the implementation of components that typically incur significant losses take this into account with imperfect conversion of energy. These losses are considered outside the system boundary and ignored. It is possible to track these for further analysis outside the simulation, e.g. as internal heating load for a thermal simulation of technical equipment and the surrounding room.
 
+Within the implementation of components, losses are currently handled as positive values, but for the output, **losses to the ambient are defined as negative and gains from the ambient as positive values**.
+
 ## Domain and boundaries
 
 Due to the generalized nature of the energy system used by ReSiE, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in ReSiE is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.

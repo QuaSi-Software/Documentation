@@ -11,11 +11,11 @@ The description of each component type includes a block with a number of attribu
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy`, `Losses` |
+| **Tracked values** | `IN`, `Max_Energy`, `LossesGains` |
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name`/`value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
-The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values.
+The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values. To track the energy losses or gains of a component to or from the ambient, the `LossesGains` attribute can be requested. Losses are returned as negative values, while gains are defined as positive values. This attribute name applies to most components, although some components may never have gains, e.g. a gas boiler.
 
 The description further lists which arguments the implementation takes. Let's take a look at an example:
 
@@ -390,7 +390,7 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
 A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electricity.
 
@@ -415,7 +415,7 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_ht_out`/`m_h_w_ht1`, `m_heat_lt_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN`, `OUT`, `Losses`, `Losses_heat`, `Losses_hydrogen` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains`, `Losses_heat`, `Losses_hydrogen` |
 
 Implementation of an electrolyser splitting pute water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -457,7 +457,7 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
 A boiler that transforms chemical fuel into heat.
 
@@ -484,7 +484,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `LossesGains` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
@@ -549,7 +549,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
 
 A generic implementation for energy storage technologies.
 
@@ -567,7 +567,7 @@ A generic implementation for energy storage technologies.
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
 
 A storage for electricity.
 
@@ -586,7 +586,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp` |
 
 A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
@@ -706,7 +706,7 @@ Extended definition of a buffer tank in the input file:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
 
 A long-term storage for heat stored in a stratified artificial aquifer.
 
