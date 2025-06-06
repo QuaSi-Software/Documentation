@@ -951,7 +951,7 @@ The first column has to hold the normalized logarithmic time, \(ln(\text{real ti
 \(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m^2/s]})\) as the steady-state time defined by Eskilson.
 
 The second column, separatey by a semicolon, holds the g-function values.
-Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/custom_g-function_geothermal_probe.txt).
+Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/validation_geothermal_probe/custom_g-function_geothermal_probe.txt).
 
 If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
 
