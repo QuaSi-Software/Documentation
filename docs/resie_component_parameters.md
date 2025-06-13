@@ -511,7 +511,7 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `nr_optimisation_passes` | `UInt` | N/Y | 20 | [-] | The number of iterations the optimisation algorithm performs before stopping and using the best result as optimum. |
-| `fudge_factor` | `float` | N/Y | 1.001 | [-] | A factor used in the slicing algorithm to slightly overestimate the available power of the heat pump. Using a value slightly larger than 1.0 seems to relax the optimisation and lead to more stable results, but introduces a mostly negligible error. |
+| `fudge_factor` | `float` | N/Y | 1.001 | [-] | A factor used in the slicing algorithm to slightly overestimate the available power of the heat pump. Using a value slightly larger than 1.0 helps with meeting demands exactly when optimisation is used as the PLR is chosen based on the result of the optimisation but can only approximate the exact value. This introduces a small error when operation is limited by inputs and unlimited by outputs. |
 | `eval_factor_heat` | `float` | N/Y | 5.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to meeting heat demands. |
 | `eval_factor_time` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to using the whole time step. Only for model type `on-off`. |
 | `eval_factor_elec` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to reducing electricity input. Only for model type `inverter`. |
