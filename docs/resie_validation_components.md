@@ -206,7 +206,16 @@ The measurements are from the time period from 2022-11-15 to 2025-03-31. Some co
 | Simulated | 192.08 | 359.46 | 526.72 | 24.820 |
 | Difference | +1.87 % | +6.29 % | -0.004 % | - |
 
-The table above show the values summed up over the entire time period. Of note is that in the measurements the electricity and heat inputs do not sum up to the produced heat output, with a difference of -17.14 MWh or -5.33 %. Due to losses occuring within the heat pump, it would be expected that the sum of the inputs is slightly larger than the output, but the opposite is the case here. It is generally the case that meters measuring heat transport are inherently inaccurate. Given that both the heat input and heat output meters must be assumed inaccurate, one possible explanation is that the heat input is undercounting and the heat output is overcounting. As the heat output values are used as the exact demand values for the simulation and the electricity input meter can assumed to be very accurate, the unknown margin of the energy balance equation falls entirely on the heat input. For the comparison between measurement and simulation data of the overall sums, the missing margin of 17.14 MWh has beed added to the heat input to serve as a lower bound of the unknown real value.
+|  | Electricity | Heat input
+| --------- | --- | --- |
+| CV(RMSE) 15 min | 16.084 | 188.57 |
+| NMBE 15 min | 1.8637 % | 11.959 % |
+| CV(RMSE) 60 min | 0.70621 | 1.2587 |
+| NMBE 60 min | 1.8709 % | 11.967 % |
+
+The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity and heat input in both the original and aggregated timestep.
+
+Of note is that in the measurements the electricity and heat inputs do not sum up to the produced heat output, with a difference of -17.14 MWh or -5.33 %. Due to losses occuring within the heat pump, it would be expected that the sum of the inputs is slightly larger than the output, but the opposite is the case here. It is generally the case that meters measuring heat transport are inherently inaccurate. Given that both the heat input and heat output meters must be assumed inaccurate, one possible explanation is that the heat input is undercounting and the heat output is overcounting. As the heat output values are used as the exact demand values for the simulation and the electricity input meter can assumed to be very accurate, the unknown margin of the energy balance equation falls entirely on the heat input. For the comparison between measurement and simulation data of the overall sums, the missing margin of 17.14 MWh has beed added to the heat input to serve as a lower bound of the unknown real value.
 
 The COP data for the real heat pump is not known. For the simulation model data from a comparable water-water heat pump has been taken from [an online tool for manufacturer data](https://www.stiebel-eltron.com/toolbox/waermepumpe/) and multiplied with a scaling factor of `0.65`. This scaling factor is the primary parameter adjusted by manual analysis to find a fit. Other parameters were mostly informed by available manufacturer information[^Combitherm]. Of note is a constant power loss of 500 W, which was observed in the measurements during periods of no operation. The full set of parameters can be found in the [file `resie_input.json`](data/validation_heat_pump/case%201/resie_input.json) for this case. With the determined fit, the electricity input sum differs by +1.87 % and the heat input sum by +6.29 % compared to the adjusted heat input.
 
@@ -270,7 +279,18 @@ The figure above shows the values of COP over temperature difference for both me
 | Simulated | 90.62 | 193.80 | 265.50 | 18.92 |
 | Difference | -1.89 % | - | -0.28 % | - |
 
-The table above lists the sum of energies over the entire time frame. For reasons mentioned in the section on the power curve there is an unmet demand of 740 kWh or 0.28 %. The electricity input is 1.89 % lower than in the measurements. This number can be reduced close to zero by fine-tuning the scaling factor for the COP field data, which was not done as it provides no additional information on the validity of the model. This becomes much clearer when the data sets are compared time-resolved, as described in the following.
+|  | Electricity | Heat output
+| --------- | --- | --- |
+| CV(RMSE) 15 min | 1.8170e-1 | 1.8757e-2 |
+| NMBE 15 min | -1.8938 % | -0.27117 % |
+| CV(RMSE) 60 min | 1.1390e-1 | 9.8077e-3 |
+| NMBE 60 min | -1.8938 % | -0.27117 % |
+| CV(RMSE) 1 d | 7.7609e-2 | 4.6876e-3 |
+| NMBE 1 d | -1.8938 % | -0.27117 % |
+
+The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity input and heat output in timesteps of 15 minutes, 60 minutes and one day.
+
+For reasons mentioned in the section on the power curve there is an unmet demand of 740 kWh or 0.28 %. The electricity input is 1.89 % lower than in the measurements. This number can be reduced close to zero by fine-tuning the scaling factor for the COP field data, which was not done as it provides no additional information on the validity of the model. This becomes much clearer when the data sets are compared time-resolved, as described in the following.
 
 ![Validation of heat pump model, case 2: Line plot of simulation vs. measurement data of COP and produced/consumed energies aggregated to daily data for the full time frame](fig/validation_heat_pump/case_2_daily_data_full_period.png)
 
