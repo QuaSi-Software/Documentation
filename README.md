@@ -28,7 +28,12 @@ It is advised to use a virtual environment to separate the requirements of proje
 ### 3. Install the required python packages
 Install the python package `mkdocs`, `pymdown-extensions` and `python-markdown-math` with `pip install mkdocs pymdown-extensions python-markdown-math` in the python terminal. They are required to build the documentation locally.
 
-### 4. Run the generation of the documentation
+### 4. Install and configure Jupyter (optional)
+If you want to make use of some of the Jupyter notebooks shipped with the documentation, you will need to install Jupyter. This can be done similarly to the step above with `pip install jupyterlab`. Further information can be found [here](https://jupyter.org/try-jupyter/lab/).
+
+If you also want to develop the notebooks, you will need to configure the local repository of the documentation to enable a filter that removes the output of cells before adding the file to a commit. This can be done with `git config filter.strip-notebook-output.clean 'jupyter nbconvert --ClearOutputPreprocessor.enabled=True --to=notebook --stdin --stdout --log-level=ERROR'`.
+
+### 5. Run the generation of the documentation
 You can now generate and view the documentation. By running `mkdocs serve` from the python terminal within the local folder of the cloned repository (`cd /path/to/local/documentation`), a local web server is started that hosts the documentation on [http://localhost:8000](http://localhost:8000). This process runs continuously and should detect when changes are made to the documentation source files and restart automatically. If not, you can add the command `mkdocs serve -watch /path/to/markdown/file` with the absolute path to the file(s) that should be checked for changes continuously. You can also quit the process with `ctrl+c` and start it again in order to generate the HTML-files again.
 
 ## Contributions

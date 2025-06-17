@@ -11,3 +11,6 @@ venv_docu/
 
 # windows thumbnails
 docs/fig/Thumbs.db
+
+# ignore everything in data directory unless explicitly added
+docs/data/*
