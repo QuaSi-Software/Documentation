@@ -490,23 +490,33 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `model_type` | `String` | Y/Y | `simplified` | [-] | The model type of the heat pump. Must be one of: `simplified`, `inverter`, `on-off` |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
 | `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
 | `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. |
 | `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
 | `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
-| `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. |
+| `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. For model type `simplified` this must be a constant value and for model types `inverter` and `on-off` this must not be a constant value. |
+| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is given and the calculated usage fraction is below this threshold, the heat pump will not run and set used energies to zero. Please note that his fraction is calculated relative to the energies the HP could produce in each slice, not the design power. |
 | `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
 | `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
 | `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
 | `output_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, the output temperatures at the heat pump output are ignored and the provided constant one is used. |
 | `power_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate losses on the side of the power electronics. If no losses should be considered, set this to `1.0`. |
 | `heat_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate heat losses that do not result in additional heat output, i.e. radiative heat losses. If no losses should be considered, set this to `1.0`. |
-| `optimise_slice_dispatch` | `Bool` | N/Y | false | [-] | If true, enables the optimisation of slice dispatch. This is in particular relevant for modelling inverter-driven heat pumps. |
-| `optimal_plr` | `Float` | N/N | 0.45 | [-] | The PLR at which efficiency is highest. Only used for slice dispatch optimisation. If optimisation is activated and no value is given for this parameter, the given PLF function is numerically analysed for the optimal PLR. |
-| `nr_optimisation_passes` | `UInt` | N/Y | 10 | [-] | The number of passes the optimisation algorithm performs if optimise_slice_dispatch is true. Note that this heavily impacts performance. |
+| `constant_loss_power` | `float` | N/N | 200 | [W] | A constant power draw of electricity even when the heat pump is not running. |
 
-**Note: The optimisation algorithm used for optimising the slice dispatch leads to significantly worse performance, does not always find converge to the optimum and is known to lead to energy balance issues in certain cases. This will hopefully be addressed in future updates.**
+For model types `inverter` and `on-off` an optimisation is performed, which can be configured with the following parameters if default values are unsatisfactory. Be aware that changing these can impact both correctness and performance.
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `nr_optimisation_passes` | `UInt` | N/Y | 20 | [-] | The number of iterations the optimisation algorithm performs before stopping and using the best result as optimum. |
+| `fudge_factor` | `float` | N/Y | 1.001 | [-] | A factor used in the slicing algorithm to slightly overestimate the available power of the heat pump. Using a value slightly larger than 1.0 helps with meeting demands exactly when optimisation is used as the PLR is chosen based on the result of the optimisation but can only approximate the exact value. This introduces a small error when operation is limited by inputs and unlimited by outputs. |
+| `eval_factor_heat` | `float` | N/Y | 5.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to meeting heat demands. |
+| `eval_factor_time` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to using the whole time step. Only for model type `on-off`. |
+| `eval_factor_elec` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to reducing electricity input. Only for model type `inverter`. |
+| `x_abstol` | `float` | N/Y | 0.01 | [-] | Absolute tolerance of PLR values during optimisation. |
+| `f_abstol` | `float` | N/Y | 0.001 | [-] | Absolute tolerance of `evaluate()` return values during optimisation. |
 
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP, fixed output temperature and no losses**
@@ -514,6 +524,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 "TST_TH_HP_01": {
     "type": "HeatPump",
     "output_refs": ["TST_TH_BUS_01"],
+    "model_type": "simplified",
     "power_th": 12000,
     "cop_function": "const:3.0",
     "output_temperature": 70.0,
@@ -527,13 +538,15 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 "TST_TH_HP_01": {
     "type": "HeatPump",
     "output_refs": ["TST_TH_BUS_01"],
+    "model_type": "on-off",
     "power_th": 20000,
     "cop_function": "field:0,45,55,65,75,85,95,105;0,3.79,3.26,2.87,2.57,2.34,2.15,1.99;10,4.59,3.79,3.26,2.87,2.57,2.34,2.15;20,5.93,4.59,3.79,3.26,2.87,2.57,2.34;30,8.74,5.93,4.59,3.79,3.26,2.87,2.57;40,20.15,8.74,5.93,4.59,3.79,3.26,2.87;50,20.15,20.15,8.74,5.93,4.59,3.79,3.26;60,20.15,20.15,20.15,8.74,5.93,4.59,3.79;70,20.15,20.15,20.15,20.15,8.74,5.93,4.59;80,20.15,20.15,20.15,20.15,20.15,8.74,5.93;90,20.15,20.15,20.15,20.15,20.15,20.15,8.74;100,20.15,20.15,20.15,20.15,20.15,20.15,20.15",
     "max_power_function": "poly-2:0.6625,0.0008929,-0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
     "min_power_function": "poly-2:0.5125,0.0001786,-0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
     "plf_function": "poly:0.4,0.6",
     "bypass_cop": 20.15,
-    "consider_icing": true
+    "consider_icing": true,
+    "constant_loss_power": 200
 }
 ```
 
@@ -938,7 +951,7 @@ The first column has to hold the normalized logarithmic time, \(ln(\text{real ti
 \(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m^2/s]})\) as the steady-state time defined by Eskilson.
 
 The second column, separatey by a semicolon, holds the g-function values.
-Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/custom_g-function_geothermal_probe.txt).
+Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/validation_geothermal_probe/custom_g-function_geothermal_probe.txt).
 
 If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
 
