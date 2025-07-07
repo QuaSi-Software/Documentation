@@ -138,6 +138,12 @@ Note that \(\eta_{th}\) should rather be seen as a fictitious efficiency that co
 in relation to the thermal energy input in every time step. When using measured data, it represents the energy that is 
 missing in the energy balance when measuring the thermal input, electrical input and thermal output energy. 
 
+In measurement data a certain constant electrical demand can often be observed when the heat pump is not running, which is likely caused by eletronic components that are always running or in stand-by mode. This can be approximated by a constant electric power loss term \(P_{el,loss,constant}\) that is always applied and effectively reduces the available electric energy or, if electricity is not the limiting factor, an additional electric demand from the heat pump. Considering this additional loss term results in:
+
+$$P_{el,supply} = P_{el} + P_{el,loss} + P_{el,loss,constant}$$
+
+$$P_{el} = (P_{el,supply} - P_{el,loss,constant}) \cdot \eta_{el} $$
+
 #### Maximum and minimum thermal output power
 
 With the COP of the heat pump determined by one of the methods described in the previous section, the maximum and minimum power of the heat pump is modeled independently, but in relation to the source and sink temperatures. In general, power of the heat pump is understood as the thermal output of the heat pump here. In the following the nominal power \(\dot{Q}_{nominal}\) of the heat pump, user-provided via the input file, is defined as the highest maximum thermal output power value over all possible temperature values and at the part load ratio with the best efficiency \(\kappa_{opt}\). This is different than in real systems, where the nominal power is defined at a particular pair of input/output temperature values. For the model instead, it is important that \(\dot{Q}_{out} \leq \dot{Q}_{nominal}\) in all cases.
@@ -201,8 +207,6 @@ a \ \frac{\kappa}{c \ \kappa + 1 - c}  & \text{ for } \kappa < \kappa_{opt} \\
 $$
  
 For on-off heat pumps, \(a = 1\) and \(\kappa_{opt} = 1\).
-
-**Note:** In order to make full use of the part load function of an inverter-driven heat pump, the optimization of slice dispatch has to be activated in the input parameters. Without optimization the calculation assumes \(\kappa = 1\), which leads to a worse performance of the heat pump than would be expected.
 
 ##### Calculating energies from the part-load-dependent efficiency
 As described in the [corresponding section](resie_transient_effects.md#part-load-ratio-dependent-efficiency), it is possible to calculate the input and output energies from the efficiency as function of the PLR through numerical inversion in a pre-processing step. However because of reasons described in [the section on the slicing algorithm](resie_energy_system_components.md#slicing-algorithm), this does not work if there are multiple sources or multiple sinks to be considered. In addition, several multidimensional functions for various effects would have to be considered, which increases the complexity a lot. Therefore this is not implemented, which leads to worse performance for heat pumps with exactly one source and exactly one sink as compared to the theoretical case. A future update might address this problem.
@@ -309,11 +313,13 @@ This function is not concerned with the power at which the heat pump can operate
 #### Part load operation and optimisation of PLR
 Given the slicing algorithm and the function `energies_for_one_slice` as described above, it is then the question of how much power is available for each slice and at which PLR each slice is performed. The minimum and maximum power for each slice depends only on temperatures, however the PLR does affect the COP.
 
-As a first pass the slicing algorithm is run with full power for each slice and the calculation stops when the power fraction concerning the energy sums over all slices reaches the maximum power fraction. Usually this is `1.0`, however this might be limited by [control modules](resie_operation_control.md#control-modules). Because the maximum power of each slices varies, so does how much time each slice takes to produce the calculated amount of energy of that slice.
+Three different approaches to solve this problem are implemented, controlled by the `model_type` parameter:
 
-Because the first pass is calculated with full power for each slice and the algorithm stops if the maximum power fraction has been reached, it is guaranteed that the heat pump can fulfill the slices as they have been calculated within the frame of the timestep. However if there is time "left over", it could be the case that recalculating the slices with lower \(\kappa\) for some or all slices leads to an improvement in the efficiency while still observing the power limitations. This leads to an optimisation problem if \(\kappa_{opt} < 1\), for example for inverter heat pumps (see [this section](resie_energy_system_components.md#part-load-efficiency)).
+* For the `simplified` model, the PLR is set to `1.0` for all possible slices and the slicing algorithm is performed once to get a result. This offers good performance and can be used if the PLF function is constant.
+* For `on-off` heat pumps, the PLRs are initially set to a value determined from the demands in that time step. Then an optimisation of the PLR values is performed to find values that meet demands and try to make the time spent on each slice sum up to the time step. This captures the cycling losses of a on-off heat pump using the PLF function, which is strictly less than `1.0`.
+* This works similarly for `inverter` heat pumps, which also optimise PLR values, however the objective function is chosen to prefer lower electricity input, to capture the increased efficiency of the heat pump when running close to the optimal PLR.
 
-**Note:** At time of writing a proof-of-concept optimisation option has been implemented, however it has poor performance and does not work very well in approaching the global optimum. It is recommended to only use it for detailed simulations of an inverter-driven heat pump when poor performance is not an issue.
+In the latter two cases the optimisation is required for accurate calculation, but incurs a fairly large performance penalty. It can be configured to use fewer iterations, however no clever configuration can avoid this penalty and it might be better to use the simplified model when performance is important, then switch to a detailed calculation once a specific solution is identified.
 
 [^Wetter1996]: Wetter M., Afjei T.: TRNSYS Type 401 - Kompressionswärmepumpe inklusive Frost- und Taktverluste. Modellbeschreibung und Implementation in TRNSYS (1996). Zentralschweizerisches Technikum Luzern, Ingenieurschule HTL. URL: [https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf](https://trnsys.de/static/05dea6f31c3fc32b8db8db01927509ce/ts_type_401_de.pdf)
 
@@ -352,10 +358,10 @@ Symbol | Description | Unit
 \(COP_{bypass}\) | COP during bypass operation | [-]
 \(PLF(\kappa)\) | function used to modify the COP depending on \(\kappa\)
 \(\kappa_{max}\) | maximum PLR, usually 1.0, but might differ depending on control modules | [-]
-\(\kappa_{opt}\) | PLR at which efficiency is highest, if optimisation is enabled. If not given, it will be numerically calculated based on the given PLF function. | [-]
 \(c_{ice,A} \ : \ c_{ice,E}\) | five coefficients for curve with icing losses according to TRNSYS Type 401 (air-sourced heat pumps only) | [-]
 \(\eta_{el}\) | efficiency of the power electronics | [-]
 \(\eta_{th}\) | efficiency factor representing possible thermal energy losses with respect to the thermal input power | [-]
+\(P_{el,loss,constant}\) | constant loss of electricity input, even when the heat pump is not running | [W]
 
 ## Chiller
 Various technologies exist to provide cooling power on a scale of buildings or for industrial processes. All of them function similar to [heat pumps](resie_energy_system_components.md#heat-pump-hp) in that they transfer heat from one end of a thermodynamic cycle to the other. The difference is that for a chiller the useful energy is not \(\dot{Q}_{out}\) but \(\dot{Q}_{in}\).

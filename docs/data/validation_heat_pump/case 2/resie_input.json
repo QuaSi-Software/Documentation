@@ -1,0 +1,70 @@
+{
+    "io_settings": {
+        "csv_output_file": "./output/resie_out.csv",
+        "auxiliary_info": true,
+        "auxiliary_info_file": "./output/auxiliary_info.md",
+        "sankey_plot": "default",
+        "sankey_plot_file": "./output/sankey_plot.html",
+        "csv_time_unit": "date",
+        "csv_output_keys": "all",
+        "output_plot": "all",
+        "output_plot_file": "./output/output_plot.html"
+    },
+    "simulation_parameters": {
+        "start": "19.02.2019 13:15:00",
+        "_start": "31.08.2017 23:00:00",
+        "end": "31.01.2022 22:45:00",
+        "_end": "15.09.2017 00:00:00",
+        "start_end_unit": "dd.mm.yyyy HH:MM:SS",
+        "time_step": 900,
+        "time_step_unit": "seconds",
+        "latitude": 0.0,
+        "longitude": 0.0
+    },
+    "components": {
+        "TST_DEM_01": {
+            "type": "Demand",
+            "output_refs": [],
+            "medium": "m_h_w_ht1",
+            "energy_profile_file_path": "./heat_demand.prf",
+            "temperature_profile_file_path": "./heat_demand_temp.prf",
+            "scale": 1.0
+        },
+        "TST_SRC_01": {
+            "type": "GenericHeatSource",
+            "output_refs": [
+                "TST_HP_01"
+            ],
+            "medium": "m_h_w_lt1",
+            "constant_power": 250000.0,
+            "temperature_profile_file_path": "./heat_source_temp.prf",
+            "scale": 1.0,
+            "temperature_reduction_model": "none"
+        },
+        "TST_GRI_01": {
+            "type": "GridConnection",
+            "output_refs": [
+                "TST_HP_01"
+            ],
+            "medium": "m_e_ac_230v",
+            "is_source": true
+        },
+        "TST_HP_01": {
+            "type": "HeatPump",
+            "output_refs": [
+                "TST_DEM_01"
+            ],
+            "power_th": 32000.0,
+            "model_type": "on-off",
+            "cop_function": "field:0,15.0,20.0,25.0,30.0,35.0,40.0,45.0,50.0,55.0,60.0,65.0,70.0;-20.0,3.4849,3.2496,3.0327,2.8316,2.6450,2.4879,2.3364,2.1850,2.0149,1.8400,1.6631,1.4781;-15.0,3.9654,3.7196,3.4972,3.2991,3.1050,2.8750,2.6369,2.4150,2.2454,2.0700,1.8801,1.6749;-10.0,4.4315,4.1614,3.9095,3.6773,3.4500,3.1890,2.9332,2.7025,2.4949,2.3000,2.0692,1.8406;-5.0,4.8837,4.5776,4.2748,3.9759,3.6800,3.4240,3.1771,2.9325,2.6695,2.4150,2.1864,1.9702;0.0,5.3328,4.9933,4.6437,4.2875,3.9675,3.6586,3.3847,3.1050,2.8072,2.5300,2.3062,2.1039;5.0,5.7864,5.4276,5.0614,4.6761,4.2550,3.9737,3.6636,3.3350,3.0553,2.7600,2.5207,2.2813;10.0,6.2397,5.8666,5.4965,5.1655,4.8875,4.3833,3.9740,3.6800,3.3557,3.1050,2.7670,2.4611;15.0,6.6847,6.2907,5.8755,5.4128,4.8875,4.5344,4.1183,3.6800,3.3978,3.1050,2.8512,2.5843;20.0,7.1185,6.7118,6.2845,5.8395,5.4050,4.9155,4.4543,4.0250,3.6166,3.2775,2.9676,2.7027;25.0,7.5333,7.1203,6.6957,6.2640,5.8075,5.3195,4.8369,4.3700,3.8833,3.4500,3.1243,2.8606;30.0,7.9175,7.4909,7.0476,6.5833,6.0950,5.5896,5.0886,4.6000,4.1171,3.6800,3.3568,3.0805;35.0,8.2661,7.8197,7.3502,6.8520,6.3250,5.7893,5.2592,4.7725,4.3691,4.0250,3.6707,3.3468;40.0,8.5820,8.1150,7.6230,7.1030,6.5550,5.9848,5.4301,4.9450,4.5742,4.2550,3.9260,3.5958",
+            "plf_function": "pwlin:0.55,0.55,0.55,0.75,0.95,1.15",
+            "bypass_cop": 8.0,
+            "min_power_function": "const:0.0",
+            "max_power_function": "poly-2:0.576923,0.0105769,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
+            "heat_losses_factor": 0.95,
+            "power_losses_factor": 0.97,
+            "constant_loss_power": 260.0,
+            "consider_icing_losses": true
+        }
+    }
+}
