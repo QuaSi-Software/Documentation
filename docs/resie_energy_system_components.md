@@ -185,7 +185,7 @@ The part-load behavior depends also on the type of the heat pump (on-off or inve
 
 Taking the correction factor curve from the figure above for inverter heat pumps, the maximum part load factor is reached at 50 % part load with an increase of the COP by about 10%. Contrary, in Toffanin2019[^Toffanin2019], the part load factor is assumed to be much higher, reaching its maximum at 25 % part load ratio with a part load factor of 2.1 (efficiency increase of 110 %). These discrepancies illustrate the wide range of literature data and the difficulty in finding a general part load curve. In Lachance2021[^Lachance2021], several part load curves are compared.
 
-A unified formulation for on-off and inverter heat pumps can be derived from descriptions in the literature. The PLF curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the PLF calculation in DIN EN 14825 for water-based on-off heatpumps, differing from the cited paper according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as linear. The definition of these curve can be done entering the coefficient \(c\) and the coordinates of the two points highlighted in the figure below. Here, \(c\) is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
+A unified formulation for on-off and inverter heat pumps can be derived from descriptions in the literature. The PLF curve for inverter-driven heat pumps is based on Blervaque2015[^Blervaque2015] and Filliard2009[^Filliard2009]. There, the curve is defined in two separate sections. The section below the point of maximum efficiency is a function according to the PLF calculation in DIN EN 14825 for water-based on-off heat pumps, differing from the cited paper according to Fuentes2019[^Fuentes2019]. The section above the point of the maximum efficiency is approximated as linear. The definition of these curve can be done entering the coefficient \(c\) and the coordinates of the two points highlighted in the figure below. Here, \(c\) is chosen as 0.95 and \(a\) is used to stretch the curve to meet the intersection point with the straight line.
 
 ![Input curve for part load efficiency of inverter heat pump](fig/230119_PartLoadPowerCurve_input.JPG)
 
@@ -697,7 +697,7 @@ Symbol | Description | Unit
 -------- | -------- | --------
 \(\dot{Q}_{out}\) | thermal power output | [W]
 \(T_{source,in}\) | temperature of the input side | [°C]
-\(T_{source,in}\) | temperature of the output side | [°C]
+\(T_{sink,out}\) | temperature of the output side | [°C]
 
 **Parameters:**
 
@@ -859,7 +859,7 @@ $$ \alpha_i = \frac{\lambda_{fluid} \; Nu}{D_i} $$
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\alpha_{i}\) |heat transfer coefficient inside the tube| \([\frac{W}{m^2 K}]\)
+\(\alpha_{i}\) |heat transfer coefficient inside the tube| \([\frac{W}{m² K}]\)
 \(\lambda_{soil}\) | thermal conductivity of soil | \([\frac{W}{mK}]\)
 \(\lambda_{filling}\) | thermal conductivity of the backfill material | \([\frac{W}{mK}]\)
 \(\lambda_{fluid}\) | thermal conductivity of fluid | \([\frac{W}{mK}]\)
@@ -868,7 +868,7 @@ Symbol | Description | Unit
 \(\rho_{\text{fl}}\) |density of the fluid | \([\frac{kg}{m^{3}}]\)
 \(\rho_{\text{soil}}\) |density of the soil | \([\frac{kg}{m^{3}}]\)
 \(\sigma_{\text{fl}}\)  | spread between fluid inlet and outlet temperature | \([K]\)
-\(a_{soil}\)  | thermal diffusivity of the soil  | \([\frac{m^2}{s}]\) 
+\(a_{soil}\)  | thermal diffusivity of the soil  | \([\frac{m²}{s}]\) 
 \(c_{\text{fl}}\)  |fluid velocity | \([\frac{m}{s}]\)
 \(c_{\text{p,fl}}\)  | specific heat capacity of the fluid | \([\frac{J}{kg K}]\)
 \(c_{\text{p,soil}}\)  | specific heat capacity of the soil | \([\frac{J}{kg K}]\)
@@ -1078,21 +1078,21 @@ The volume element has a mass of 1000 kg and is cooled down from 5 to -5 °C. Th
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(\alpha_{i}\) | convective heat transfer coefficient on the inside of the pipe  | [W / \((m^2 K)\)] 
-\(\alpha_{\text{konv}}\) | convective heat transfer coefficient  | [W/  \((m^2 K)\)] 
+\(\alpha_{i}\) | convective heat transfer coefficient on the inside of the pipe  | [W / \((m² K)\)] 
+\(\alpha_{\text{konv}}\) | convective heat transfer coefficient  | [W/  \((m² K)\)] 
 \(\Delta x, \Delta y,\Delta z,\)  | step widths in x, y, and z direction  | [m] 
 \(\epsilon\)  | emissivity of the surface  | [-] 
 \(\lambda_{soil}\)  | thermal conductivity of the soil  | [W / (m K)] 
-\(\rho_{soil}\)  | density of the soil   | [kg / \(m^3\)] 
-\(\sigma_{\text{Boltzmann}}\) | Stefan-Boltzmann constant | [W / \((m^2 K^4)\)] 
+\(\rho_{soil}\)  | density of the soil   | [kg / \(m³\)] 
+\(\sigma_{\text{Boltzmann}}\) | Stefan-Boltzmann constant | [W / \((m² K^4)\)] 
 \(\tau\)  |  internal time step size  | [s] 
-\(A\)  | contact area between two adjacent control volumes  | [\(m^2\)]
+\(A\)  | contact area between two adjacent control volumes  | [\(m²\)]
 \(c_{soil}(T)\)  | specific heat capacity of the soil, depends on the temperature  | [J / (kg K)]
 \(c_{soil,\ fr}\)  | specific heat capacity of the frozen soil   | [J / (kg K)]
 \(c_{soil,\ unfr}\) | specific heat capacity of the unfrozen soil   | [J / (kg K)]
 \(D_i \)  | inside diameter of the pipe   | [m]
 \(D_o \)  | outside diameter of the pipe   | [m]
-\(E_{glob}\)  | global solar radiation on horizontal surface | [W / \(m^2\)]
+\(E_{glob}\)  | global solar radiation on horizontal surface | [W / \(m²\)]
 \(h_{lat}\) | specific enthalpy of fusion of the soil| [J / kg]
 \(i\)  | index for the node position in x-direction  | [-]
 \(j\)  | index for the node position in y-direction  | [-]
@@ -1101,10 +1101,10 @@ Symbol | Description | Unit
 \(Nu\)  | Nußelt number	   | [-]
 \(Pr\)  | Prandtl number	|
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
-\(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m^2\)]
-\(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m^2\)]
-\(\dot{q}_{\text{rad}}\)  |  long wave radiation exchange with the environment   | [W / \(m^2\)]
-\(\dot{q}_{\text{konv}}\)  | convective heat flux  | [W / \(m^2\)]
+\(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m²\)]
+\(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m²\)]
+\(\dot{q}_{\text{rad}}\)  |  long wave radiation exchange with the environment   | [W / \(m²\)]
+\(\dot{q}_{\text{konv}}\)  | convective heat flux  | [W / \(m²\)]
 \(\dot{Q}\)  | heat extraction or injection rate   | [W]
 \(Q_{\text{in,out},i,j}\)  | heat energy supplied or released between two time steps   | [J]
 \(r\)  | reflectance of the earth's surface   | [-]
@@ -1117,11 +1117,11 @@ Symbol | Description | Unit
 \(T_{\text{freezing lower limit}}\) | lower temperature limit of the freezing process | [°C]
 \(T_{sky} \) | effective mean sky temperature (sky radiative temperature) | [K]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
-\(V_{i,j}\)  | control volume   | [\(m^3\)]
+\(V_{i,j}\)  | control volume   | [\(m³\)]
 
 
 ### Solarthermal collector
-A solarthermal collector uses the energy from the sun to provide heat. Different collectors can be used, usually depending on the usecase and needed temperature. For all collector types the same simulation model is used.Typical types of colletors are:
+A solarthermal collector uses the energy from the sun to provide heat. Different collectors can be used, usually depending on the use case and needed temperature. For all collector types the same simulation model is used. Typical types of collectors are:
 - flat plate collector
 - evacuated tube collector
 - WISC (wind and infrared sensitive collector)
@@ -1132,7 +1132,7 @@ The model is based on the quasi dynamic model from DIN EN ISO 9806:2017[^ISO9806
 
 $$
 \begin{split} 
-\dot{Q} = & A_{\text{G}}(\eta_{\text{0,b}}K_{\text{b}}(\theta_{\text{L}},\theta_{\text{T}})G_{\text{b}} + 
+\dot{Q} = A_{\text{G}} & (\eta_{\text{0,b}}K_{\text{b}}(\theta_{\text{L}},\theta_{\text{T}})G_{\text{b}} + 
 \eta_{\text{0,b}}K_{\text{d}}G_{\text{d}} -
 a_{\text{1}}(\vartheta_{\text{m}} - \vartheta_{\text{a}}) -
 a_{\text{2}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^2 -
@@ -1146,44 +1146,126 @@ a_{\text{8}}(\vartheta_{\text{m}} - \vartheta_{\text{a}})^4),
 $$
 
 where the variables are defined as 
+
 Symbol | Description | Unit
 -------- | -------- | --------
-$A_{\text{G}}$ | gross collector area | m<sup>2</sup>
-$\eta_{\text{0,b}}$ | zero-loss efficiency at $(\vartheta_{\text{m}} - \vartheta_{\text{a}})=0$K based on the beam solar irradience $G_{\text{b}}$ | -
-$K_{\text{b}}$ | incidence angle modifier (IAM) for beam irradiance | -
-$\theta_{\text{L}}$ | longitudal incidence angle | °
-$\theta_{\text{T}}$ | transversal incidence angle | °
-$G_{\text{b}}$ | beam solar irradience | W/m<sup>2</sup>
-$K_{\text{d}}$ | incidence angle modifier (IAM) for diffuse irradiance | -
-$G_{\text{d}}$ | diffuse solar irradience | W/m<sup>2</sup>
-$\vartheta_{\text{m}}$ | mean fluid temperature | °C
-$\vartheta_{\text{a}}$ | ambient air temperature | °C
-$u'$ | reduced wind speed (u - 3 m/s) with u = surrounding wind speed | m/s
-$E_{\text{L}}$ | long wave irradiance (λ > 3 μm) | W/m<sup>2</sup>
-$\sigma_{\text{Boltz}}$ | Boltzmann constant | W/(m<sup>2</sup>K<sup>4</sup>)
-$T_{\text{a}}$ | absolut ambient air temperature | K
-$\frac{d\vartheta_{\text{m}}}{dt}$ | change of mean fluid temperture over time | K/s
-$a_{\text{1}}$ | heat loss coefficient | W/(m<sup>2</sup>K)<s>
-$a_{\text{2}}$ | temperature dependence of the heat loss coefficient W/(m<sup>2</sup>K<sup>2</sup>)
-$a_{\text{3}}$ | wind speed dependence of the heat loss coefficient | J/(m<sup>3</sup>K)
-$a_{\text{4}}$ | sky temperature dependence of long wave radiation exchange | -
-$a_{\text{5}}$ | effective thermal capacity | J/(m<sup>2</sup>K)
-$a_{\text{6}}$ | wind speed dependence of the zero loss efficiency | s/m
-$a_{\text{7}}$ | wind speed dependence of long wave radiation exchange | W/(m<sup>2</sup>K<sup>4</sup>)
-$a_{\text{8}}$ | radiation losses | W/(m<sup>2</sup>K<sup>4</sup>)
+\(A_{\text{G}}\) | gross collector area | m<sup>2</sup>
+\(\eta_{\text{0,b}}\) | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) | -
+\(K_{\text{b}}\) | incidence angle modifier (IAM) for beam irradiance | -
+\(\theta_{\text{L}}\) | longitudinal incidence angle | °
+\(\theta_{\text{T}}\) | transversal incidence angle | °
+\(G_{\text{b}}\) | beam solar irradiance | W/m<sup>2</sup>
+\(K_{\text{d}}\) | incidence angle modifier (IAM) for diffuse irradiance | -
+\(G_{\text{d}}\) | diffuse solar irradiance | W/m<sup>2</sup>
+\(\vartheta_{\text{m}}\) | mean fluid temperature | °C
+\(\vartheta_{\text{a}}\) | ambient air temperature | °C
+\(u'\) | reduced wind speed (u - 3 m/s) with u = surrounding wind speed | m/s
+\(E_{\text{L}}\) | long wave irradiance (λ > 3 μm) | W/m<sup>2</sup>
+\(\sigma_{\text{Boltz}}\) | Boltzmann constant | W/(m<sup>2</sup>K<sup>4</sup>)
+\(T_{\text{a}}\) | absolute ambient air temperature | K
+\(\frac{d\vartheta_{\text{m}}}{dt}\) | change of mean fluid temperature over time | K/s
+\(a_{\text{1}}\) | heat loss coefficient | W/(m<sup>2</sup>K)<s>
+\(a_{\text{2}}\) | temperature dependence of the heat loss coefficient W/(m<sup>2</sup>K<sup>2</sup>)
+\(a_{\text{3}}\) | wind speed dependence of the heat loss coefficient | J/(m<sup>3</sup>K)
+\(a_{\text{4}}\) | sky temperature dependence of long wave radiation exchange | -
+\(a_{\text{5}}\) | effective thermal capacity | J/(m<sup>2</sup>K)
+\(a_{\text{6}}\) | wind speed dependence of the zero loss efficiency | s/m
+\(a_{\text{7}}\) | wind speed dependence of long wave radiation exchange | W/(m<sup>2</sup>K<sup>4</sup>)
+\(a_{\text{8}}\) | radiation losses | W/(m<sup>2</sup>K<sup>4</sup>)
 
-The values for the parameters $a_{\text{1}}$ to $a_{\text{8}}$ and $\eta_{\text{0,b}}$, $K_{\text{b}}$, $K_{\text{d}}$ are available from thermal testing procedures. Sources for such documents are the solar keymark database[^SolarKeymark] or the ICC-SRCC database[^ICC-SRCC]. If only parameters of an older norm (e.g. EN ISO 9806:2017) are available, they can be put in place of the corresponding a parameters with all unknown values set to 0.
-Most other variable can be aquired through weather data. Since the wind speed $u$ is usually given at a height of 10 m an assumption must be made to by which factor the wind speed differs at the choosen location.
+The values for the parameters \(a_{\text{1}}\) to \(a_{\text{8}}\) and \(\eta_{\text{0,b}}\), \(K_{\text{b}}\), \(K_{\text{d}}\) are available from thermal testing procedures. Sources for such documents are the solar keymark database[^SolarKeymark] or the ICC-SRCC database[^ICC-SRCC]. If only parameters of an older norm (e.g. EN ISO 9806:2013) are available, they can be put in place of the corresponding a parameters with all unknown values set to 0 or for WISC collectors conversion formulas can be used[^SolarKeymarkAnnexP1].
+Most other variables can be acquired through weather data. Since the wind speed \(u\) is usually given at a height of 10 m an assumption must be made to by which factor the wind speed differs at the chosen location.
 
-The model strongly depends on the mean fluid temperature. Since ReSie doesn't model fluid dynamics, a way must be found to derive the mean fluid temperature from other parameters. Since components don't have a return temperature that can be used as an inlet temperature for the solar collector, we will use the needed or demanded temperature of the components connected to the solarthermal collector as a target temperature for the collector output. To be able to calculate the mean fluid temperature the user has to set either a fixed flow rate $\dot{v}$ or a fixed temperature difference over the collector $\Delta T$. The non-fixed value is then a variable that is calculated in each time step.
-
-#### Limits of the simulation model
-Describe limits depending on the actual implemented model (Transformer or bounded source) (ToDo) 
+The model strongly depends on the mean fluid temperature. Since ReSie doesn't model fluid dynamics, a way must be found to derive the mean fluid temperature from other parameters. Since components don't have a return temperature that can be used as an inlet temperature for the solar collector, we will use the needed or demanded temperature of the components connected to the output of the solarthermal collector as a target temperature for the collector output. To be able to calculate the mean fluid temperature the user has to set either a fixed flow rate \(\dot{v}\) or a fixed temperature difference over the collector \(\Delta T\). The other non-fixed value is then a variable that is calculated in each time step.
 
 
 [^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
 [^SolarKeymark]: Solar Keymark, https://solarkeymark.eu/database/
 [^ICC-SRCC]: SOLAR RATING & CERTIFICATION CORPORATION (ICC-SRCC™), https://secure.solar-rating.org//Certification/Ratings/RatingsSummaryPage.aspx?type=1
+[^SolarKeymarkAnnexP1]: Solar Keymark. "Annex P1 Collectors EN 12975 General: R6/ Edition 2023-05-12." Technical documentation. Zugriff am: 12. Juni 2024. [Online.] Verfügbar: https://solarkeymark.eu/the-network/certification-scheme-rules/
+
+
+#### Solar irradiance
+To get the irradiance on the collector plane the beam horizontal irradiance \(G_{\text{b,hor}}\) and diffuse horizontal irradiance \(G_{\text{d,hor}}\) from the weather data must be converted. For both conversions the incidence angle \(\theta\) and therefore the position of the sun in the sky is needed. For calculation of the sun position Algorithm 5 from [^GrenaFiveNewAlg] is used, as an good compromise between calculation speed and accuracy. To get the best estimation of the sun position over a timestep the middle of the timestep is used with consideration of the sunrise and sunset. The output is the sun zenith \(\Theta_s\) and sun azimuth \(\Phi_s\) which can be used to calculate the angle of incidence on the collector with  
+
+$$ \Theta = arccos(cos(\beta)cos(\Theta_s) + sin(\beta)sin(\Theta_s)cos(\Phi_s - \gamma)). $$
+
+The beam irradiance on the collector plane is then calculated with 
+
+$$ G_b = G_{b,hor} \frac{cos(\Theta)}{cos(\Theta_s)}. $$
+
+The diffuse irradiance on the collector plane is approximated as
+
+$$ G_d = G_{d,ground} +  G_{d,sky}, $$
+
+where the reflected diffuse irradiance from the ground is 
+
+$$ G_{d,ground} = r (G_{b,hor} + G_{d,hor}) \frac{1-cos(\beta)}{2}, $$
+
+with \(r\) being the reflectance of the ground around the collector which can be approximated by the albedo of the ground.
+To calculate the diffuse irradiance on the collector plane from the sky the Hay model is used[^HayModel] with the formula
+
+
+$$ G_{d,sky} = G_{d,hor} (1-A) \frac{1-cos(\beta)}{2} + A \frac{cos(\Theta)}{sin(\Theta_s)}, $$
+
+
+where \(A\) is the anisotropy index which is calculated with
+
+$$ A = \frac{G_{b,hor}}{cos(\Theta_s) G_{ext,n}}. $$
+
+The calculation of the extraterrestrial normal irradiance \(G_{ext,n}\) is based on [^SpencerExt] with the current solar constant of \(G_{SC}=1361 \frac{W}{m²}\). The formula is
+ 
+$$
+\begin{split} 
+G_{ext,n} = G_{SC} & (1.000110 + 0.034221 \cdot cos(\Gamma) + 0.001280 \cdot sin(\Gamma) \\
+                   & + 0.000719 \cdot cos(2 \cdot \Gamma) + 0.000077 \cdot sin(2 \cdot \Gamma)), 
+\end{split}
+$$
+
+where the day angle \(\Gamma\) is defined as
+
+$$ \Gamma = 2\pi \frac{n_{day} - 1}{365}. $$
+
+**Inputs and Outputs of the solarthermal collector:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(\dot{Q}_{out}\) | Thermal power output | W
+\(\vartheta_{out}\) | Collector output temperature | °C
+\(\vartheta_m\) | Mean collector temperature | °C
+\(\Delta T\) | Temperature difference between input and output | K
+\(\dot{v}\) | Collector flow rate | m³/s
+\(G_{dni}\) | Direct normal irradiance | W/m²
+\(G_b\) |  Beam solar irradiance on the collector plan | W/m²
+\(G_d\) |  Diffuse solar irradiance on the collector plan | W/m²
+
+**Parameters of the solarthermal collector:**
+
+Symbol | Description | Unit
+-------- | -------- | --------
+\(A_{gross}\) | collector gross area | m²
+\(\beta\) | tilt angle of the collector | °
+\(\gamma\) | azimuth angle of the collector with west positive | °
+\(r\) | Reflectance of the ground around the collector |
+\(\eta_{\text{0,b}}\) | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) | -
+\(\boldsymbol{K_{b,t}}\) | Vector of transversal incidence angle modifiers for beam irradiance from <br> 0° to 80° in 10° steps | -
+\(\boldsymbol{K_{b,l}}\) | Vector of longitudinal incidence angle modifiers for beam irradiance from <br> 0° to 80° in 10° steps | -
+\(K_{d}\) | Incidence angle modifier for diffuse irradiance | -
+\(\boldsymbol{a_n}\) | Vector of collector parameters for 1 <= n <= 8 | -
+\(c_{v}\) | Volumetric heat capacity of the collector fluid | J/(K*m³)
+\(f_{wind}\) | Factor for wind speed reduction | -
+
+
+
+[^GrenaFiveNewAlg]: R. Grena, "Five new algorithms for the computation of sun position from 2010 to 2110," Solar Energy, vol. 86, no. 5, pp. 1323–1337, 2012, doi: 10.1016/j.solener.2012.01.024.
+[^HayModel]: J. E. Hay, "Calculation of monthly mean solar radiation for horizontal and inclined surfaces," Solar Energy, vol. 23, no. 4, pp. 301–307, 1979, doi: 10.1016/0038-092X(79)90123-3.
+[^SpencerExt]: J. W. Spencer, "Fourier series representation of the sun," Search, vol. 2, p. 172, 1971.
+
+
+#### Limits of the simulation model
+Describe limits depending on the actual implemented model (Transformer or bounded source) (ToDo) 
+
+
 
 ## Short-term thermal energy storage (STTES / BufferTank)
 ![Energy flow of STTES](fig/221028_STTES.svg)
@@ -1274,22 +1356,22 @@ Symbol | Description | Unit
 \(Q_{rated}\)  | rated thermal energy capacity of the STTES | [Wh]
 \(Q_{losses}\)  | losses of the STTES | [Wh]
 \(x_{start}\)  | thermal energy content of the STTES at the beginning of the simulation in relation to \(Q_{STTES,rated}\)  | [%]
-\(V\)  | volume of the STTES | [m\(^3\)]
+\(V\)  | volume of the STTES | [m³]
 \(r\)  | radius of the cylindrical STTES | [m]
 \(h\)  | height of the cylindrical STTES | [m]
 \(hr\)  | height to radius ratio (h/r) of the cylindrical STTES | [-]
-\(A_{barrel}\)  | surface area of the cylinder barrel | [m\(^2\)]
-\(A_{top}\)  | surface area of the cylinder top | [m\(^2\)]
-\(A_{bottom}\)  | surface area of the cylinder bottom | [m\(^2\)]
-\(\rho\)  | density of the heat carrier medium in the STTES | [kg/m\(^3\)]
+\(A_{barrel}\)  | surface area of the cylinder barrel | [m²]
+\(A_{top}\)  | surface area of the cylinder top | [m²]
+\(A_{bottom}\)  | surface area of the cylinder bottom | [m²]
+\(\rho\)  | density of the heat carrier medium in the STTES | [kg/m³]
 \(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
 \(T_{hot}\)  | rated upper temperature of the STTES | [°C]
 \(T_{cold}\)  | rated lower temperature of the STTES | [°C]
 \(T_{ambientair}\)  | ambient temperature of the air around the STTES | [°C]
 \(T_{ambientground}\)  | ground temperature below the STTES | [°C]
-\(U_{barrel}\)  | thermal transmission of the barrel of the STTES | [W/m\(^2\)K]
-\(U_{top}\)  | thermal transmission of the top of the STTES | [W/m\(^2\)K]
-\(U_{bottom}\)  | thermal transmission of the bottom of the STTES | [W/m\(^2\)K]
+\(U_{barrel}\)  | thermal transmission of the barrel of the STTES | [W/m²K]
+\(U_{top}\)  | thermal transmission of the top of the STTES | [W/m²K]
+\(U_{bottom}\)  | thermal transmission of the bottom of the STTES | [W/m²K]
 
 **State variables of the STTES:**
 
@@ -1431,15 +1513,15 @@ Symbol | Description | Unit
 \(T_{STES,cold}\)  | rated lower temperature of the STES | [°C]
 \(c_{STES,max,load}\) | maximum charging rate (C-rate) of STES | [1/h]
 \(c_{STES,max,unload}\) | maximum discharging rate (C-rate) of STES | [1/h]
-\(V_{STES}\)  | volume of the STES | [m\(^3\)]
+\(V_{STES}\)  | volume of the STES | [m³]
 \(\alpha_{STES,slope}\)  | slope angle of the wall of the STES with respect to the horizon | [°]
 \(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
-\(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m\(^3\)]
+\(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m³]
 \(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
-\(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m\(^2\)/s]
-\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m\(^2\) K]
-\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m\(^2\) K]
-\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m\(^2\) K]
+\(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m²/s]
+\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m² K]
+\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m² K]
+\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m² K]
 \(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
 \(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
 \(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]
@@ -1472,7 +1554,7 @@ Ice storages are not implemented yet (ToDo).
 
 Hydrogen fuel cells are not implemented yet (ToDo).
 
-## Photovoltaik (PV)
+## Photovoltaic (PV)
 ![Energy flow of photovoltaic](fig/221028_PV.svg)
 
 For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into ReSiE. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC inverters are taken from the SAM model[^SAM-Model] and integrated into pvlib.

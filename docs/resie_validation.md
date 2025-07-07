@@ -12,7 +12,7 @@ As measurement data, the project "GEW" in Gelsenkirchen, Germany was used. The m
 
 The 36 probes of the irregular shaped probe field were approximated using a rectangle shape with 3 x 12 probes with a distance of 8 m each in ReSiE, as there are no double-row L-configurations available as they are in EED, which would fit best to the original shape of the probe field. The g-function for this probe field was taken from the open source library by Spitler and Cook[^Spitler,Cook]. The thermal properties of the soil are known from a thermal response test at the site. 
 
-[^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu:  G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
+[^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu: G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
 The results showed a high sensibility to the soil parameters and the thermal borehole resistance (or the parameters required to calculate it). The different probe field configuration in EED, a double L-configuration, compared to a rectangle in ReSiE, has almost no effect on the results.
 The undisturbed ground temperature and also the temperature spread, that is assumed for the energy loading and unloading of the probe field, are also quite sensitive to the resulting average fluid temperature in the detailed model in ReSiE, as this directly affects the velocity of the fluid in the pipes and therefore the thermal resistance of the borehole. In the case study investigated, the power of the regeneration was much higher than the power of heat extraction, and therefore the temperature spread of loading had to be adjusted to meet the reality. The maximal output and input power was set very high to not limit the external energy sink and source into and out of the probe field. The thermal borehole resistance was calculated with the detailed model in ReSiE, but the simplified model with a constant thermal borehole resistance of \(0.1~W/(Km)\) shows also very good results in the comparison given the highly reduced amount of required input parameters.
@@ -50,15 +50,15 @@ The input parameter of the simulation above is given in the following table. The
 | effective thermal resistance [(Km)/W]   | 0.1 / calculated | calculated | ?         |
 | soil undisturbed ground temperature [°C]| **13**        | **13**    | 12            |
 | soil heat conductivity [W/(Km)]         | 1.6           | 1.6       | 1.6 (from thermal response test) |
-| soil density [kg/m^3]                   | 1800          | 1800      | ? (clay and silt) |
+| soil density [kg/m³]                   | 1800          | 1800      | ? (clay and silt) |
 | soil specific heat capacity [J/(kgK)]   | 2400          | 2400      | 2400          |
-| ground heat capacity [MJ/(m^3/K)]       | -             | 4.32      | ?             |        
+| ground heat capacity [MJ/(m³/K)]       | -             | 4.32      | ?             |        
 | pipe diameter outer [m]                 | 0.032         | 0.032     | 0.0320        |
 | pipe diameter inner [m]                 | 0.0262        | 0.0262    | 0.0262        |
 | pipe heat conductivity [W/(Km)]         | 0.42          | 0.42      | ?             |
 | fluid specific heat capacity [J/(kgK)]  | 3795          | 3795      | 3795          |
-| fluid density [kg/m^3]                  | 1052          | 1052      | 1052          |
-| fluid kinematic viscosity [m^2/s]       | 3.9e-6        | -         | ?             |
+| fluid density [kg/m³]                  | 1052          | 1052      | 1052          |
+| fluid kinematic viscosity [m²/s]       | 3.9e-6        | -         | ?             |
 | fluid dynamic viscosity [Kg/(ms)]       | -             | 4.103e-3  | ?             |
 | fluid heat conductivity [W/(Km)]        | 0.48          | 0.48      | 0.48          |
 | fluid prandtl number [-]                | 31.3          | ?         | 31.3          |
@@ -86,7 +86,7 @@ First, the geothermal collector was simulated with all three simulations models 
 | ReSiE vs. TRNSYS                    | 0.16                      |  1.18                     |
 
 
-Then, a realistic energy demand profile for heating and hot water of a 2.500 m^2 building with 85 % living and 15 % commercial usage was used to evaluate the dynamic behaviour of the models. Especially in summer, small deviations between ReSiE and TRNSYS are visible, but an overall congruency can be observed. In short term analysis, the model in ReSiE shows stronger gradients in the change in extraction power compared to TRNSYS, which may originate from the different model of the thermal transport from fluid to the pipe-surrounding soil. Overall, all three models show acceptable differences. 
+Then, a realistic energy demand profile for heating and hot water of a 2.500 m² building with 85 % living and 15 % commercial usage was used to evaluate the dynamic behaviour of the models. Especially in summer, small deviations between ReSiE and TRNSYS are visible, but an overall congruency can be observed. In short term analysis, the model in ReSiE shows stronger gradients in the change in extraction power compared to TRNSYS, which may originate from the different model of the thermal transport from fluid to the pipe-surrounding soil. Overall, all three models show acceptable differences. 
 
 ![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one year with energy profile as demand](fig/241220_profile_one_year.svg)
 
@@ -137,11 +137,11 @@ In ReSiE the detailed model for the energy transport from fluid to soil was used
 | considered_soil_depth | 10.0 m |
 | soil_specific_heat_capacity | 850 J/(kgK) |
 | soil_specific_heat_capacity_frozen | 850 J/(kgK) |
-| soil_density | 1900 kg/m^3 |
+| soil_density | 1900 kg/m³ |
 | soil_heat_conductivity | 2.4 W/(mK) |
 | soil_heat_conductivity_frozen | 2.9 W/(mK) |
 | soil_specific_enthalpy_of_fusion | 90000 J/K |
-| surface_convective_heat_transfer_coefficient | 14.7 W/(m^2 K) |
+| surface_convective_heat_transfer_coefficient | 14.7 W/(m² K) |
 | surface_reflection_factor | 0.25 |
 | surface_emissivity | 0.9 |
 | unloading_temperature_spread | 3.0 K |
@@ -151,8 +151,8 @@ In ReSiE the detailed model for the energy transport from fluid to soil was used
 | pipe_heat_conductivity | 0.4 W/(mK) |
 | fluid_specific_heat_capacity | 3944 J/(kgK) |
 | fluid_heat_conductivity | 0.499 W/(mK) |
-| fluid_density | 1025 kg/m^3 |
-| fluid_kinematic_viscosity | 3.6e-6 m^2/s |
+| fluid_density | 1025 kg/m³ |
+| fluid_kinematic_viscosity | 3.6e-6 m²/s |
 | fluid_prantl_number | 30 |
 
 The parameters for the comparison with the measurement data were deviating as follows, due to extremely wet conditions, the beginning of the heating season and therefore warm soil, and the high volume flow through the collector:
@@ -170,3 +170,16 @@ In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the norma
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 [^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
+
+
+### Solarthermal collector
+
+To validate the model for solarthermal collector and the solar irradiance calculations, it is compared to TRNSYS as well as measurement data. 
+In the first analysis the focus is on the direct comparison between ReSiE and TRNSYS that both use the same model internally while using different approaches when it comes to the solar irradiance calculations. The goal is to show the general viability of the implemented model.
+In the second chapter ReSiE and TRNSYS are compared against measurement data from a real project with weather data from the closest weather station. To goal of this part is to show how well the models of ReSiE and TRNSYS are in predicting real time performance under imperfect data availability. 
+
+#### Validation against TRNSYS 18
+
+
+#### Validation against measurement data
+

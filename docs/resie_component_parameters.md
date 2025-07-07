@@ -617,8 +617,8 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | ----------- | ------- | --- | ------- | ---- | ----------- |
 | `model_type` | `String` | Y/Y | "ideally_stratified" | [-] | type of the buffer tank model: `ideally_stratified`, `balanced`, `ideally_mixed` |
 | `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
-| OR: `volume` | `Float` | Y/N | 15.5 |  [\(m^3\)] | volume of the BT: Note that either volume or capacity should be given.  |
-| `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m^3\)] | density of the heat carrier medium |
+| OR: `volume` | `Float` | Y/N | 15.5 |  [\(m³\)] | volume of the BT: Note that either volume or capacity should be given.  |
+| `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m³\)] | density of the heat carrier medium |
 | `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
@@ -638,9 +638,9 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | ----------- | ------- | --- | ------- | ---- | ----------- |
 | `consider_losses` | `Bool` | Y/Y | False | [-] | flag if losses should be taken into account |
 | `h_to_r` | `Float` | Y/Y | 2.0 | [-] | ratio of height to radius of the cylinder representing the buffer tank |
-| `thermal_transmission_barrel` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the barrel of the buffer tank |
-| `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the lid of the buffer tank |
-| `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m\(^2\)K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 1.2 | [W/(m²K)] | thermal transmission coefficient of the barrel of the buffer tank |
+| `thermal_transmission_lid` | `Float` | Y/Y | 1.2 | [W/(m²K)] | thermal transmission coefficient of the lid of the buffer tank |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 1.2 | [W/(m²K)] | thermal transmission coefficient of the bottom of the buffer tank, for model_type `ideally_mixed` only. |
 | `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
 | `ambient_temperature_profile_file_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
 | OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
@@ -649,7 +649,7 @@ Note that no losses are applied when the storage is completely empty, meaning at
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
 
-**Examplary input file definition for buffer tank**
+**Exemplary input file definition for buffer tank**
 
 Minimal definition of a buffer tank in the input file:
 
@@ -935,7 +935,7 @@ number_of_probes: 42    // required variable
 ```
 
 The first column has to hold the normalized logarithmic time, \(ln(\text{real time} [s] / t_S)\) with 
-\(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m^2/s]})\) as the steady-state time defined by Eskilson.
+\(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m²/s]})\) as the steady-state time defined by Eskilson.
 
 The second column, separatey by a semicolon, holds the g-function values.
 Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/custom_g-function_geothermal_probe.txt).
@@ -976,7 +976,7 @@ If a `g_function_file_path` is specified, the following parameters are not used 
 | `number_of_probes_y` | `Int` | Y/Y | 1 | [-] | number of probes in y direction, corresponds to value of g-function library. Note that number_of_probes_x <= number_of_probes_y! |
 | `probe_field_key_2` | `String` | Y/Y | "" | [-] | key2 of g-function library. Can also be "" if none is needed. The value depends on the chosen library type. |
 | `borehole_spacing` | `Float` | Y/Y | 5 | [m] | distance between boreholes in the field, assumed to be constant. Set average spacing.  |
-| `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | soil density |
+| `soil_density` | `Float` | Y/Y | 2000 | [kg/m³] | soil density |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 2400 | [J/(kgK)] | soil specific heat capacity |
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
@@ -985,7 +985,7 @@ If a `g_function_file_path` is specified, the following parameters are not used 
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `g_function_file_path` | `String` | Y/N | "path/to/file.txt" | [-] | absolute or relative path to a txt file containing an externally calculated g-function |
+| `g_function_file_path` | `String` | Y/N | `path/to/file.txt` | [-] | absolute or relative path to a txt file containing an externally calculated g-function |
 
 
 **Model `detailed`:**
@@ -1002,8 +1002,8 @@ To perform this calculation in every timestep, the following input parameters ar
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(Km)] | heat conductivity of inner pipes |
 | `shank_spacing` | `Float` | Y/Y | 0.1 | [m] | distance between inner pipes in borehole, diagonal through borehole center. required for calculation of thermal borehole resistance. |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of brine at 0 °C (25 % glycol 75 % water)  |
-| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of brine at 0 °C (25 % glycol 75 % water) |
-| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of brine at 0 °C (25 % glycol 75 % water)  |
+| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m³] | density of brine at 0 °C (25 % glycol 75 % water) |
+| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m²/s] | kinematic viscosity of brine at 0 °C (25 % glycol 75 % water)  |
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.5 | [W/(Km)] | heat conductivity of brine at 0 °C (25 % glycol 75 % water) |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of brine at 0 °C (25 % glycol 75 % water)  |
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
@@ -1083,16 +1083,16 @@ The parameters characterising the soil and its moisture content, such as heat ca
 | `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
 | OR: `ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
 | OR: `constant_ambient_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
-| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
-| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
-| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m^2] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
-| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
-| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m^2] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
-| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m^2] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
+| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m²] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
+| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
+| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m²] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
+| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m²] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
+| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m²] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
 | `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
-| `max_output_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum output power per collector area |
-| `max_input_power` | `Float` | Y/Y | 20 | [W/m^2] | maximum input power per collector area |
+| `max_output_power` | `Float` | Y/Y | 20 | [W/m²] | maximum output power per collector area |
+| `max_input_power` | `Float` | Y/Y | 20 | [W/m²] | maximum input power per collector area |
 | `fluid_min_output_temperature` | `Float` | N/N | -5 | [°C] | minimum output temperature of the fluid for unloading; if not specified, no limit is applied for the output temperature |
 | `fluid_max_input_temperature` | `Float` | N/N | 60 | [°C] | maximum input temperature of the fluid for loading; if not specified, no limit is applied for the input temperature |
 | `phase_change_upper_boundary_temperature` | `Float` | Y/Y | -0.25 | [°C] | the upper boundary of the phase change temperature range |
@@ -1105,11 +1105,11 @@ The parameters characterising the soil and its moisture content, such as heat ca
 | `considered_soil_depth` | `Float` | Y/Y | 10.0 | [m] | the total depth of the simulated soil from the surface to undisturbed ground temperature |
 | `soil_specific_heat_capacity` | `Float` | Y/Y | 1000 | [J/(kgK)] | specific heat capacity of the soil in unfrozen state |
 | `soil_specific_heat_capacity_frozen` | `Float` | Y/Y | 900 | [J/(kgK)] | specific heat capacity of the soil in frozen state |
-| `soil_density` | `Float` | Y/Y | 2000 | [kg/m^3] | density of the soil |
+| `soil_density` | `Float` | Y/Y | 2000 | [kg/m³] | density of the soil |
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of the soil in unfrozen state |
 | `soil_heat_conductivity_frozen` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of the soil in frozen state |
 | `soil_specific_enthalpy_of_fusion` | `Float` | Y/Y | 90000 | [J/kg] | specific enthalpy of fusion of soil |
-| `surface_convective_heat_transfer_coefficient` | `Float` | Y/Y | 14.7 | [W/(m^2 K)] | convective heat transfer on surface |
+| `surface_convective_heat_transfer_coefficient` | `Float` | Y/Y | 14.7 | [W/(m² K)] | convective heat transfer on surface |
 | `surface_reflection_factor` | `Float` | Y/Y | 0.25 | [-] | reflection factor / albedo value of surface |
 | `surface_emissivity` | `Float` | Y/Y | 0.9 | [-] | emissivity of the surface |
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
@@ -1137,11 +1137,11 @@ To perform this calculation in every timestep, the following input parameters ar
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of pipe |
 | `fluid_specific_heat_capacity` | `Float` | Y/Y | 3800 | [J/(kgK)] | specific heat capacity of the fluid |
 | `fluid_heat_conductivity` | `Float` | Y/Y | 0.4 | [W/(Km)] | heat conductivity of the fluid |
-| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m^3] | density of the fluid |
-| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m^2/s] | kinematic viscosity of the fluid |
+| `fluid_density` | `Float` | Y/Y | 1045 | [kg/m³] | density of the fluid |
+| `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m²/s] | kinematic viscosity of the fluid |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of the fluid |
 
-**Examplary input file definition for geothermal collector:**
+**Exemplary input file definition for geothermal collector:**
 
 ```JSON
 "TST_GTC_01": {
@@ -1199,27 +1199,74 @@ To perform this calculation in every timestep, the following input parameters ar
 | **File** | `energy_systems/heat_sources/solarthermal_collector.jl` |
 | **Available models** | `default` |
 | **System function** | `bounded_source` |
-| **Medium** | `medium`/`None` |
+| **Medium** | |
 | **Input media** | |
-| **Output media** | `None`/`auto` |
-| **Tracked values** | `OUT`, `Temperature`, `Max_Energy`,`Average_Temperature` `Ambient_Temperature`, `Used_Energy`, `direct_solar_irradiance`, `delta_T`, `spec_flow_rate` |
+| **Output media** | `m_heat_out`/`m_h_w_ht1` |
+| **Tracked values** | `OUT`, `Temperature`, `Max_Energy`,`Average_Temperature` , `Used_Energy`, `direct_solar_irradiance`, `delta_T`, `spec_flow_rate` |
 
 Solarthermal collector producing heat depending on weather conditions.
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ---|--------------------- | ------------------------ |
-| `ambient_temperature_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_amb_temp.prf` |  | Path to the ambient temperature profile. |
-| `beam_solar_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_beam_irr.prf` |  | Path to the horizontal beam irradiance profile. |
-| `diffuse_solar_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_diffuse_irr.prf` |  | Path to the diffuse irradiance profile. |
-| `long_wave_irradiance_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_long_wave_irr.prf` |  | Path to the long-wave irradiance profile. |
-| `wind_speed_profile_file_path` | `String` | Y/N | `./profiles/tests/weather_wind_speed.prf` |  | Path to the wind speed profile. |
+| `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | W/m² | profile for ambient dry bulb temperature (provide either this or ambient_temperature_profile_file_path or constant_temperature) |
+| OR:`ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for ambient dry bulb temperature (provide either this or ambient_temperature_from_global_file or constant_temperature) |
+| OR:`constant_ambient_temperature` | `Float` | Y/N | 10.0 | W/m² | constant value for ambient dry bulb temperature (provide either this or ambient_temperature_from_global_file or ambient_temperature_profile_file_path) |
+| `beam_solar_radiation_from_global_file` | `String` | Y/N | `beamHorIrr` | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_profile_file_path or constant_beam_solar_radiation) |
+| OR:`beam_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_from_global_file or constant_beam_solar_radiation) |
+| OR:`constant_beam_solar_radiation` | `Float` | Y/N | 850.0 | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_from_global_file or beam_solar_radiation_profile_file_path) |
+| `diffuse_solar_radiation_from_global_file` | `String` | Y/N | `difHorIrr` | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_profile_file_path or constant_diffuse_solar_radiation) |
+| OR:`diffuse_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_from_global_file or constant_diffuse_solar_radiation) |
+| OR:`constant_diffuse_solar_radiation` | `Float` | Y/N | 150.0 | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_from_global_file or diffuse_solar_radiation_profile_file_path) |
+| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR:`infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation) |
+| OR:`constant_infrared_sky_radiation` | `Float` | Y/N | 350.0 | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path) |
+| `wind_speed_from_global_file` | `String` | Y/N | `wind_speed` | m/s | profile for wind speed (provide either this or wind_speed_file_path or constant_wind_speed) |
+| OR:`wind_speed_file_path` | `String` | Y/N | `path/to/file` | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or constant_wind_speed) |
+| OR:`constant_wind_speed` | `Float` | Y/N | 5.2 | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or wind_speed_file_path) |
 | `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
-| `tilt_angle` | `Float` | Y/N | 45 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
-| `azimut_angle` | `Float` | Y/N | 90 | ° | Azimut angle or orientation of the collector beetween 0 and 90° with 0°=south, 90°=east/west. Other angles are not considered, since the incidence angle modifier values are not measured for values outside of [0°;90°C] |
-| `eta_0_b` | `Float` | Y/N | 0.734 | zero-loss efficiency at $(\vartheta_{\text{m}} - \vartheta_{\text{a}})=0$K based on the beam solar irradience $G_{\text{b}}$ |
-| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifer values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
-| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudal incidence angle modifer values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
+| `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
+| `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between 0 and 90° with 0°=south, 90°=east/west. Other angles are not considered, since the incidence angle modifier values are not measured for values outside of [0°;90°C] |
+| `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Gross area of the solarthermal collector |
+| `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) |
+| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
+| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
 | `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance |
 | `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. |
-| `delta_T` | `Float` | N/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
-| `spec_flow_rate` | `Float` | N/N | 2.0e-5 | m³/s | Constant flow rate in collector. Either delta_T or spec_flow_rate has to be defined. |
+| `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | J/(m³K) | Volumetric heat capacity of the fluid in the collector. |
+| `wind_speed_reduction` | `Float` | Y/Y | 0.5 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
+| `delta_T` | `Float` | Y/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
+| OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | m³/s | Constant flow rate in collector. Either delta_T or spec_flow_rate has to be defined. |
+| `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s | Minimal spec_flow_rate to start producing energy; used together with delta_T |
+| OR:`delta_T_min` | `Float` | N/Y | 2.0 | K | Minimal delta_T to start producing energy; used together with spec_flow_rate |
+
+**Exemplary input file definition for solarthermal collector:**
+
+```JSON
+"TST_GTC_01": {
+    "type": "SolarthermalCollector",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": ["TST_DEM_01"],
+
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "beam_solar_radiation_from_global_file": "beamHorIrr",
+    "diffuse_solar_radiation_from_global_file": "difHorIrr",
+    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "wind_speed_from_global_file": "wind_speed",
+
+    "collector_gross_area": 46.8,
+    "tilt_angle": 30,
+    "azimuth_angle": 0,
+    "ground_reflectance":0.4,
+
+    "eta_0_b": 0.734,
+    "K_b_t_array":[1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00],
+    "K_b_l_array":[1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00],
+    "K_d": 0.97,
+    "a_params": [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0],
+
+    "vol_heat_capacity": 3921470,
+    "wind_speed_reduction": 1,
+    "delta_t": 4,
+    "spec_flow_rate_min": 3.0E-08
+}
+```
