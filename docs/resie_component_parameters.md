@@ -201,6 +201,53 @@ This module is implemented for the following component types: `HeatPump`
 | **output_temps** | Sets if the outputs are sorted by minimum or maximum temperature. Should be `max` or `min` (default).
 | **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default), `none` or `desc`. A value of `none` means no reordering is performed.
 
+#### Negotiate temperature
+This control module offers several methods for negotiating the temperature for the energy transfer between two components. It can be understood as control logic for the pump that transfers the carrier medium of thermal energy from a source component to a target component.
+It is used for components where the possible amount of energy that can be drawn or delivered in the current time step depends on the temperature at which the energy is supplied or requested. Currently, this are the `GeothermalProbes`, `SolarthermalCollector` and `SeasonalThermalStorage`.
+
+Several methods are available:
+
+* `constant_temperature`: This sets the energy transfer between target and source to a constant temperature. Here, `constant_output_temperature` has to be given as well as parameter of the control module. 
+* `upper`: This sets the temperature to the highest possible value, taking into account the temperature limits of both components in the current time step.
+* `lower`: This sets the temperature to the lowest possible value, taking into account the temperature limits of both components in the current time step.
+*  `mean`: This sets the temperature to the mean between the lower and upper temperature limit of the intersecting temperature range of source and target component.
+*  `optimize`: Optimize uses two functions provided by the source and the target component to find the intersecting temperature that maximizes the energy transfer in the current time step. Note that this requires a lot of computing power. The tolerances for the solving algorithm can be adjusted (see table below).
+
+Normally, `mean` is a good compromise between computational effort and accuracy. But, `optimize` will result in higher energy transfer, assuming an optimal pump control algorithm. 
+
+With setting the parameter `limit_max_output_energy_to_avoid_pulsing` to `true`, another algorithm can be activated that helps preventing the components to pulse, meaning turing energy flow on and off every time step. If activated, the source limits its energy output to ensure that in the following timestep, the same temperature can be reached as in the current time step. In the `GeothermalProbes`, this can lead to unexpected results, e.g. energy will never start if in the probe the initial boreholewall temperature and the undisturbed ground temperature are set close to each other while at the same time the maximum energy output limit is set to a high value. 
+
+This module is implemented for the following component types:
+
+- Sources: `GeothermalProbes`, `SolarthermalCollector`
+- Targets: `SeasonalThermalStorage`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `negotiate_temperature` |
+| **target_uac** | The UAC of the linked target component (SeasonalThermalStorage). Required. |
+| **temperature_mode** | Can be one of `constant_temperature`, `optimize`, `mean`, `upper`, `lower`. Defaults to `mean`. |
+| **limit_max_output_energy_to_avoid_pulsing** |  Bool to indicate if pulsing should be avoided (not for `temperature_mode` = `optimize`). Defaults to `false`. See additional notes above. |
+| **constant_output_temperature** | Temperature for `temperature_mode` =  `constant_temperature`. Defaults to `nothing`. |
+| **optim_temperature_rel_tol** |  Relative tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize`. Defaults to `1e-5`.  Looser relative tolerance could be `1e-3`|
+| **optim_temperature_abs_tol** | Absolute tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize` . Defaults to `0.001`. Looser absolute tolerance could be `0.1` |
+
+
+#### Limit cooling input temperature
+This control module is specially implemented for the combination of an electrolyser with a seasonal thermal energy storage. Here, the electrolyser can use the storage to cool down its high temperature excessive heat. But, at some point, the lowest layer of the storage (equals the return flow into the electrolyser) will reach a temperature that is too high to allow the electrolyser to cool down as required. To handle this, a limit temperature in this control module can be specified, which will disable the energy flow from electrolyser to the seasonal thermal energy storage when the lowest layer of the storage has reaches the provided `temperature_limit`.
+
+This module is implemented for the following component types:
+
+- Sources: `Electrolyser`
+- Targets: `SeasonalThermalStorage`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `limit_cooling_input_temperature`  |
+| **target_uac** |  The UAC of the linked target component (SeasonalThermalStorage). Required. |
+| **temperature_limit** |  The temperature limit for the return flow (input in the output interface of source) that will disable energy transfer between source and target if exceeded. Required. |
+
+
 ## Boundary and connection components
 
 ### General bounded sink
