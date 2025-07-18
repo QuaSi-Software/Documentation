@@ -39,8 +39,10 @@ The currently implemented callbacks are:
 * `discharge_is_allowed`: Allows the discharging of a battery.
 * `reorder_inputs`: Reorders a list of input energy exchanges used in steps `potential` and `process`.
 * `reorder_outputs`: Reorders a list of output energy exchanges used in steps `potential` and `process`.
+* `determine_temperature_and_energy`: Callback for `negotiate_temperature`. Only checks if a control modules exists that handle the temperature between two components.
+* `cooling_input_temperature_exceeded`: Callback for `limit_cooling_input_temperature`. Checks if a control module exists that interrupts energy flow due to exceeded return flow temperature limit.
 
-**Note:** The callbacks `reorder_inputs` and `reorder_outputs` are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
+**Note:** The callbacks `reorder_inputs`, `reorder_outputs`, `determine_temperature_and_energy` and `cooling_input_temperature_exceeded`  are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
 
 The following describes the currently implemented control modules. The required parameters are described in the [component specification chapter](resie_component_parameters.md#control-modules).
 
