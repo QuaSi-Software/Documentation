@@ -84,7 +84,7 @@ Used by heat pumps and similar components to calculate the COP depending on inpu
 
 **Implemented function prototypes**
 
-* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
+* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`. The constant COP is used for all temperatures, also in bypass mode!
 * `carnot`: Calculates the COP as fraction of the Carnot-COP with a given reduction factor, which is between `0.4` and `0.45` for typical heat pumps. E.g. `carnot:0.4` means \(COP = 0.4 \cdot \frac{273.15 + T_{out}}{T_{out} - T_{in}}\).
 * `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 * `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal values are interpreted as the inclusive boundaries of the field. Values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
@@ -540,11 +540,11 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `model_type` | `String` | Y/Y | `simplified` | [-] | The model type of the heat pump. Must be one of: `simplified`, `inverter`, `on-off` |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
 | `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
-| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. |
+| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. Note: If a constant COP is given, the bypass_cop is ignored! |
 | `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
 | `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
 | `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. For model type `simplified` this must be a constant value and for model types `inverter` and `on-off` this must not be a constant value. |
-| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is given and the calculated usage fraction is below this threshold, the heat pump will not run and set used energies to zero. Please note that his fraction is calculated relative to the energies the HP could produce in each slice, not the design power. |
+| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is set and the actual usage fraction falls below it, the heat pump won’t run. The usage fraction is based on how much energy the pump could produce during each slice (given the temperatures in this slice), not on its design power. These slice values are then combined into a total usage fraction that is compared to the given `min_usage_fraction`. |
 | `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
 | `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
 | `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
@@ -564,6 +564,14 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | `eval_factor_elec` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to reducing electricity input. Only for model type `inverter`. |
 | `x_abstol` | `float` | N/Y | 0.01 | [-] | Absolute tolerance of PLR values during optimisation. |
 | `f_abstol` | `float` | N/Y | 0.001 | [-] | Absolute tolerance of `evaluate()` return values during optimisation. |
+
+**Bypass:**
+
+If the heat pump is operated in bypass mode (input temperature is higher than the requested output temperature), the output temperature is limited to the requested temperature, in other words, the input temperature is cooled down to the requested output temperature or the specified `output_temperature` of the heat pump. The energy required during bypass operation can be specified with the `bypass_cop` parameter, that is used in bypass mode (not for a constant COP, here always the constant COP is used!). If a cool-down is not wanted, the heat pump has to be connected in parallel and not in series, meaning that the energy system provides an actual bypass around the heat pump. Note that this may lead to an incorrect determination of the order of operation and may require manual adjustment (see:  [Order of operation](resie_input_file_format.md#order-of-operation))!
+
+**Temperatures:**
+
+The heat pump model implemented can serve different temperature layers in the input and output during one timestep. If a heat pump is connected to multiple sources and multiple sinks, each source serves a sink until one of them is satisfied, then the next one is used. So several different COPs are used *within one timestep* and aggregated to one total COP in the timestep. See [this Chapter](resie_energy_system_components.md#steps-to-perform-in-the-simulation-model-of-the-heat-pump) for details.
 
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP, fixed output temperature and no losses**
