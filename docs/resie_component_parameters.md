@@ -1027,6 +1027,7 @@ If a `g_function_file_path` is specified, the following parameters are not used 
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
 | `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
 | `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+| `limit_max_output_energy_to_avoid_pulsing` | `Bool` | Y/Y | false | [-] | Bool that specifies whether an attempt should be made to avoid pulsing when calculating the output energy in a time step. See section "Control" below for more information! |
 
 **Parameter for simple model only**
 
@@ -1077,6 +1078,11 @@ To perform this calculation in every timestep, the following input parameters ar
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
+**Control**
+
+The geothermal probe provides internal control methods. The parameter `limit_max_output_energy_to_avoid_pulsing` can be used to activate an algorithm that tries to prevent pulsing (if set to `true`). Here, a kind of *variable-speed fluid pump* is imitated and the output energy is limited to provide the current temperature also in the next timestep. Note that in certain cases, this can lead to no energy being drawn from the geothermal probe at all. If the parameter is set to `false`, the maximum energy in the current time step is set to the `max_output_power` if the temperatures allow an energy extraction. This represents  kind of an *on-off fluid pump* and requires less computational effort.
+Note: If the control module `negotiate_temperature` is active, this parameter will be overwritten by the control module! 
+
 
 **Exemplary input file definition for GeothermalProbe:**
 
@@ -1101,6 +1107,7 @@ To perform this calculation in every timestep, the following input parameters ar
     "unloading_temperature_spread": 1.5,
     "soil_undisturbed_ground_temperature": 13,
     "boreholewall_start_temperature": 13,
+    "limit_max_output_energy_to_avoid_pulsing": false,
     "___G-FUNCTION FROM LIBRARY___": "",
     "probe_field_geometry": "rectangle",
     "number_of_probes_x": 3, 
