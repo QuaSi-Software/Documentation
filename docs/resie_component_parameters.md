@@ -791,8 +791,8 @@ The seasonal thermal storage is a multi-layer water storage, either as pit (trun
 | `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | The upper temperature of the STES, equals the highest temperature for loading. |
 | `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C]  | The lower temperature of the STES, equals the assumed return flow temperature during unloading. Note that the temperature may become lower due to thermal losses to the ambient. |
 | `shape` | `String` | Y/Y | `quadratic` | [-] | The shape of the cross-section of the STES. Can either be `round` for cylinder/truncated cone or `quadratic` for tank or truncated quadratic pyramid (pit). |
-| `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
-| `sidewall_angle` | `Float` | Y/Y | 60.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
+| `hr_ratio` | `Float` | Y/Y | 0.8 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
+| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
 | `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m^3] | The density of the storage medium (typically water). |
 | `cp_medium` | `Float` | Y/Y | 4.186 | [kJ/(kgK)] | The specific thermal capacity of the storage medium (typically water). |
 | `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
