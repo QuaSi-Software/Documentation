@@ -1438,12 +1438,11 @@ Symbol | Description | Unit
 
 ### Borehole thermal energy storage (BTES)
 
-Borehole thermal energy storages are not implemented yet (ToDo).
+See [Geothermal Probes](#geothermal-probes).
 
 ### Aquifer thermal energy storage (ATES)
 
-Aquifer thermal energy storages are not implemented yet (ToDo).
-
+Aquifer thermal energy storages are not implemented yet.
 
 ## Ice storage (IS)
 
