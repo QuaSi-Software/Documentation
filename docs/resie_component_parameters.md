@@ -12,18 +12,21 @@ The description of each component type includes a block with a number of attribu
 | **Input media** | `None`/`auto` |
 | **Output media** | |
 | **Tracked values** | `IN`, `Max_Energy`, `LossesGains` |
+| **Auxiliary Plots** | None  |
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name`/`value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
 The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values. To track the energy losses or gains of a component to or from the ambient, the `LossesGains` attribute can be requested. Losses are returned as negative values, while gains are defined as positive values. This attribute name applies to most components, although some components may never have gains, e.g. a gas boiler.
 
+The `Auxiliary Plots` list plots the component can create before or after the simulation if `auxiliary_plots` is set to `true` in the `io_settings`. Only given if the component provides any auxiliary plots.
+
 The description further lists which arguments the implementation takes. Let's take a look at an example:
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a constant value. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | [-] | Path to the max power profile. |
+| `efficiency` | `Float` | Y/Y | 0.8 | [-] | Ratio of output over input energies. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the heat output to a constant value. |
 
 The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
 
@@ -774,23 +777,70 @@ Extended definition of a buffer tank in the input file:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`  |
+| **Auxiliary Plots** | 3D-Model of the geometry, Cross-sectional drawing, temperature distribution over time  |
 
-A long-term storage for heat stored in a stratified artificial aquifer.
+The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape. The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
 
-If the adaptive temperature calculation is activated, the temperatures for the input/output of the STES depends on the load state. If it is sufficiently full (depends on the `switch_point`), the STES can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `volume` | `Float` | Y/N | 12000.0 | [m^3] | The overall volume of the STES. |
+| `initial_load` | `Float` | Y/Y | 0.0 | [%/100] | The initial load of the STES, given in the range from [0.0 - 1.0]. Note that the temperature distribution will be set to an equal temperature in all layers at the beginning of the simulation.  |
+| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | The upper temperature of the STES, equals the highest temperature for loading. |
+| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C]  | The lower temperature of the STES, equals the assumed return flow temperature during unloading. Note that the temperature may become lower due to thermal losses to the ambient. |
+| `shape` | `String` | Y/Y | `quadratic` | [-] | The shape of the cross-section of the STES. Can either be `round` for cylinder/truncated cone or `quadratic` for tank or truncated quadratic pyramid (pit). |
+| `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
+| `sidewall_angle` | `Float` | Y/Y | 60.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
+| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m^3] | The density of the storage medium (typically water). |
+| `cp_medium` | `Float` | Y/Y | 4.186 | [kJ/(kgK)] | The specific thermal capacity of the storage medium (typically water). |
+| `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
+| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | The number of thermal layers in the STES model. |
+| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | The number of thermal layers that are above the ground, meaning their losses are to the ambient air and not to the ground. |
+| `max_load_rate` | `Float` | N/N | 0.001 | [1/h] | The maximum loading rate, given as capacity per hour, also known as C-rate. |
+| `max_unload_rate` | `Float` | N/N | 0.001 | [1/h] | The maximum unloading rate, given as capacity per hour, also known as C-rate. |
+| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m^2K)] | The thermal transmission through the lid of the STES`, always into the air. |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the barrel of the STES, into the air or into the ground, depending on `number_of_layer_above_ground`. |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the bottom of the STES, always into the ground. |
+| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
+| OR: `constant_ambient_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding air temperature to a constant value. |
+| OR: `ambient_temperature_from_global_file` | `String` | Y/N | ` temp_ambient_air` | [-] | If given, sets the surrounding air temperature to the ambient air temperature of the global weather file. |
+| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ground_temperature.prf` | [°C] | Path to the profile for the surrounding ground temperature. |
+| OR: `constant_ground_temperature` | `Float` | Y/N | 9.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
 
-If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the STES. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the STES. |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
-| `switch_point` | `Float` | Y/Y | 0.25 | Partial load at which the adaptive output temperature calculation switches. |
-| `high_temperature` | `Temperature` | Y/Y | 90.0 | The high end of the adaptive in-/output temperature. |
-| `low_temperature` | `Temperature` | Y/Y | 15.0 | The low end of the adaptive in-/output temperature. |
+**Exemplary input file definition for SeasonalThermalStorage**
 
+```JSON
+"TST_STES_01": {
+    "type": "SeasonalThermalStorage",
+    "m_heat_in": "m_h_w_ht1",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": [
+        "TST_HP_01"
+    ],
+    "volume": 3000,
+    "initial_load": 0.2,
+    "high_temperature": 95,
+    "low_temperature": 10,
+    "shape": "round",
+    "hr_ratio": 1.5,
+    "sidewall_angle": 60,
+    "rho_medium": 1000,
+    "cp_medium": 4.18,
+    "diffusion_coefficient": 0.000000143,
+    "number_of_layer_total": 25,
+    "number_of_layer_above_ground": 1,
+    "max_load_rate": 0.01,
+    "max_unload_rate": 0.01,
+    "thermal_transmission_lid": 0.25,
+    "thermal_transmission_barrel": 0.375,
+    "thermal_transmission_bottom": 0.375,
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "constant_ground_temperature": 9.0,
+}
+```
 
 ## Heat sources and sinks
 
@@ -852,6 +902,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_max_output_temperature`, `current_min_input_temperature`, `fluid_reynolds_number` |
+| **Auxiliary Plots** | G-function values for probe field, Geometry/layout of probe field  |
 
 A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 
@@ -1145,6 +1196,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
+| **Auxiliary Plots** | Simulation mesh of the model, Interactive temperature distribution over time  |
 
 A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
 
