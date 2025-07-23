@@ -782,7 +782,11 @@ Extended definition of a buffer tank in the input file:
 
 A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
 
-The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape. The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
+The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, as shown in the following figure:
+
+![Possible geometries for STES](fig/250722_STES_geometries.jpg)
+
+ The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
