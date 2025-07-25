@@ -777,7 +777,7 @@ Extended definition of a buffer tank in the input file:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`  |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower`  |
 | **Auxiliary Plots** | 3D-Model of the geometry, Cross-sectional drawing, temperature distribution over time  |
 
 A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
@@ -802,8 +802,10 @@ The seasonal thermal storage is a multi-layer water storage, either as pit (trun
 | `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
 | `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | The number of thermal layers in the STES model. |
 | `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | The number of thermal layers that are above the ground, meaning their losses are to the ambient air and not to the ground. |
-| `max_load_rate` | `Float` | N/N | 0.001 | [1/h] | The maximum loading rate, given as capacity per hour, also known as C-rate. |
-| `max_unload_rate` | `Float` | N/N | 0.001 | [1/h] | The maximum unloading rate, given as capacity per hour, also known as C-rate. |
+| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related loading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
+| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related unloading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
+| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related loading rate, given as mass per hour **per input interface** related to the total mass in the STES. |
+| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related unloading rate, given as **total** mass per hour related to the total mass in the STES. |
 | `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m^2K)] | The thermal transmission through the lid of the STES`, always into the air. |
 | `thermal_transmission_barrel` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the barrel of the STES, into the air or into the ground, depending on `number_of_layer_above_ground`. |
 | `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the bottom of the STES, always into the ground. |
@@ -838,8 +840,10 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
     "diffusion_coefficient": 0.000000143,
     "number_of_layer_total": 25,
     "number_of_layer_above_ground": 1,
-    "max_load_rate": 0.01,
-    "max_unload_rate": 0.01,
+    "max_load_rate_energy": 0.01,
+    "max_unload_rate_energy": 0.01,
+    "max_load_rate_mass": 0.04,
+    "max_unload_rate_mass": 0.04,
     "thermal_transmission_lid": 0.25,
     "thermal_transmission_barrel": 0.375,
     "thermal_transmission_bottom": 0.375,
