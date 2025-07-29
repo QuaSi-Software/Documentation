@@ -788,6 +788,8 @@ The seasonal thermal storage is a multi-layer water storage, either as pit (trun
 
  The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
 
+ Important: Currently, the energy exchange with the ground is implemented in a simplified way. The ground does not have a thermal capacity in this model, instead a constant ground temperature is assumed! This can lead to wrong results! A ground temperature profile (e.g. monthly) could be used to mitigate this effect. With a soil temperature of constant 10 °C throughout the year, the losses are significantly too high.
+
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `volume` | `Float` | Y/N | 12000.0 | [m^3] | The overall volume of the STES. |
@@ -813,7 +815,7 @@ The seasonal thermal storage is a multi-layer water storage, either as pit (trun
 | OR: `constant_ambient_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding air temperature to a constant value. |
 | OR: `ambient_temperature_from_global_file` | `String` | Y/N | ` temp_ambient_air` | [-] | If given, sets the surrounding air temperature to the ambient air temperature of the global weather file. |
 | `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ground_temperature.prf` | [°C] | Path to the profile for the surrounding ground temperature. |
-| OR: `constant_ground_temperature` | `Float` | Y/N | 9.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
+| OR: `constant_ground_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
 
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
@@ -848,7 +850,7 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
     "thermal_transmission_barrel": 0.375,
     "thermal_transmission_bottom": 0.375,
     "ambient_temperature_from_global_file": "temp_ambient_air",
-    "constant_ground_temperature": 9.0,
+    "constant_ground_temperature": 18.0,
 }
 ```
 
