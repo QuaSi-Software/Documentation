@@ -366,7 +366,7 @@ As seen in the figure, the energy and the temperature are quite close to each ot
 | ReSiE vs. TRNSYS 25% layer                    |        0.54              |              1.43        |     
 | ReSiE vs. TRNSYS bottom layer              |         0.50              |               1.57         |     
 
-The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE will may be extended in the future to better represent the ground-coupling thermal effects.
+The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE will may be extended in the future to better represent the ground-coupling thermal effects. To deal with this, a temperature profile for the ground can be used as input, e.g. with monthly ground temperatures.
 
 ![Discharging STES during 5 years, underground](fig/250728_STES_TRNSYS_in_ground_realistic.svg)
 

@@ -220,6 +220,8 @@ Normally, `mean` is a good compromise between computational effort and accuracy.
 
 With setting the parameter `limit_max_output_energy_to_avoid_pulsing` to `true`, another algorithm can be activated that helps preventing the components to pulse, meaning turing energy flow on and off every time step. If activated, the source limits its energy output to ensure that in the following timestep, the same temperature can be reached as in the current time step. In the `GeothermalProbes`, this can lead to unexpected results, e.g. energy will never start if in the probe the initial boreholewall temperature and the undisturbed ground temperature are set close to each other while at the same time the maximum energy output limit is set to a high value. 
 
+Additionally, the source can be controlled by a hysteresis on the maximum output temperature of the source in the current time step. Use the flag `use_hysteresis` to activate this feature and provide both the turn-on-temperature `hysteresis_temp_on` and the turn-off-temperature `hysteresis_temp_off`. Typically, the turn-off-temperature is lower than the turn-on-temperature. This feature acts as an additional turn-of switch for all `temperature_mode`.
+
 This module is implemented for the following component types:
 
 - Sources: `GeothermalProbes`, `SolarthermalCollector`
@@ -231,6 +233,9 @@ This module is implemented for the following component types:
 | **target_uac** | The UAC of the linked target component (SeasonalThermalStorage). Required. |
 | **temperature_mode** | Can be one of `constant_temperature`, `optimize`, `mean`, `upper`, `lower`. Defaults to `mean`. |
 | **limit_max_output_energy_to_avoid_pulsing** |  Bool to indicate if pulsing should be avoided (not for `temperature_mode` = `optimize`). Defaults to `false`. See additional notes above. |
+| **use_hysteresis** | Bool to indicate if an additional hysteresis on the output temperature of the source should be activated. If true, provide also `hysteresis_temp_on` and `hysteresis_temp_off`. Defaults to `false`. |
+| **hysteresis_temp_on** | Turn-on Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
+| **hysteresis_temp_off** | Turn-off Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
 | **constant_output_temperature** | Temperature for `temperature_mode` =  `constant_temperature`. Defaults to `nothing`. |
 | **optim_temperature_rel_tol** |  Relative tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize`. Defaults to `1e-5`.  Looser relative tolerance could be `1e-3`|
 | **optim_temperature_abs_tol** | Absolute tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize` . Defaults to `0.001`. Looser absolute tolerance could be `0.1` |
