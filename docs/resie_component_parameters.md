@@ -240,6 +240,23 @@ This module is implemented for the following component types:
 | **optim_temperature_rel_tol** |  Relative tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize`. Defaults to `1e-5`.  Looser relative tolerance could be `1e-3`|
 | **optim_temperature_abs_tol** | Absolute tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize` . Defaults to `0.001`. Looser absolute tolerance could be `0.1` |
 
+Below is a template for the input file that can be included in the supporting source components:
+
+``` JSON
+"control_modules": [
+    {
+        "name": "negotiate_temperature",
+        "target_uac": "FILL_IN",
+        "temperature_mode": "mean",
+        "limit_max_output_energy_to_avoid_pulsing": true,
+        "use_hysteresis": true,
+        "hysteresis_temp_on": 13,
+        "hysteresis_temp_off": 5,
+        "_FOR_TEMPERATURE_MODE_CONSTANT_TEMPERATURE": "",
+        "constant_output_temperature": 13.0,
+    }
+]
+```
 
 #### Limit cooling input temperature
 This control module is specially implemented for the combination of an electrolyser with a seasonal thermal energy storage. Here, the electrolyser can use the storage to cool down its high temperature excessive heat. But, at some point, the lowest layer of the storage (equals the return flow into the electrolyser) will reach a temperature that is too high to allow the electrolyser to cool down as required. To handle this, a limit temperature in this control module can be specified, which will disable the energy flow from electrolyser to the seasonal thermal energy storage when the lowest layer of the storage has reaches the provided `temperature_limit`.
