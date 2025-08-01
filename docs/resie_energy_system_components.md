@@ -1309,7 +1309,7 @@ $$ M_{STES,l} = 2 \ (L_l + l_l) \ h_{sidewall,l} $$
 Also the volume of each layer:
 $$ V_{STES,l} = \frac{\Delta z_{l}}{3} \pi \ (L_l^2 + l_l \ L_l \ + l_l^2)  $$
 
-For clarification, the following figure provides a scratch of the truncated quadratic pyramid:
+For clarification, the following figure provides a sketch of the truncated quadratic pyramid:
 
 ![STES sketch for pyramid](fig/250721_STES_scetch_pyramid.drawio.svg)
 

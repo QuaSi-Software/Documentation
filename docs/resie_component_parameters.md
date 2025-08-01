@@ -206,7 +206,7 @@ This module is implemented for the following component types: `HeatPump`
 
 #### Negotiate temperature
 This control module offers several methods for negotiating the temperature for the energy transfer between two components. It can be understood as control logic for the pump that transfers the carrier medium of thermal energy from a source component to a target component.
-It is used for components where the possible amount of energy that can be drawn or delivered in the current time step depends on the temperature at which the energy is supplied or requested. Currently, this are the `GeothermalProbes`, `SolarthermalCollector` and `SeasonalThermalStorage`.
+It is used for components where the possible amount of energy that can be drawn or delivered in the current time step depends on the temperature at which the energy is supplied or requested. Currently, these are:  `GeothermalProbes`, `SolarthermalCollector` and `SeasonalThermalStorage`.
 
 Several methods are available:
 
@@ -218,9 +218,9 @@ Several methods are available:
 
 Normally, `mean` is a good compromise between computational effort and accuracy. But, `optimize` will result in higher energy transfer, assuming an optimal pump control algorithm. 
 
-With setting the parameter `limit_max_output_energy_to_avoid_pulsing` to `true`, another algorithm can be activated that helps preventing the components to pulse, meaning turing energy flow on and off every time step. If activated, the source limits its energy output to ensure that in the following timestep, the same temperature can be reached as in the current time step. In the `GeothermalProbes`, this can lead to unexpected results, e.g. energy will never start if in the probe the initial boreholewall temperature and the undisturbed ground temperature are set close to each other while at the same time the maximum energy output limit is set to a high value. 
+With setting the parameter `limit_max_output_energy_to_avoid_pulsing` to `true`, another algorithm can be activated that helps preventing the components to pulse, meaning turning energy flow on and off every time step. If activated, the source limits its energy output to ensure that in the following timestep, the same temperature can be reached as in the current time step. In the `GeothermalProbes`, this can lead to unexpected results, e.g. energy will never start if in the probe the initial borehole wall temperature and the undisturbed ground temperature are set close to each other while at the same time the maximum energy output limit is set to a high value. 
 
-Additionally, the source can be controlled by a hysteresis on the maximum output temperature of the source in the current time step. Use the flag `use_hysteresis` to activate this feature and provide both the turn-on-temperature `hysteresis_temp_on` and the turn-off-temperature `hysteresis_temp_off`. Typically, the turn-off-temperature is lower than the turn-on-temperature. This feature acts as an additional turn-of switch for all `temperature_mode`.
+Additionally, the source can be controlled by a hysteresis on the maximum output temperature of the source in the current time step. Use the flag `use_hysteresis` to activate this feature and provide both the turn-on-temperature `hysteresis_temp_on` and the turn-off-temperature `hysteresis_temp_off`. Typically, the turn-off-temperature is lower than the turn-on-temperature. This feature acts as an additional turn-of switch for all values of `temperature_mode`.
 
 This module is implemented for the following component types:
 
@@ -233,7 +233,7 @@ This module is implemented for the following component types:
 | **target_uac** | The UAC of the linked target component (SeasonalThermalStorage). Required. |
 | **temperature_mode** | Can be one of `constant_temperature`, `optimize`, `mean`, `upper`, `lower`. Defaults to `mean`. |
 | **limit_max_output_energy_to_avoid_pulsing** |  Bool to indicate if pulsing should be avoided (not for `temperature_mode` = `optimize`). Defaults to `false`. See additional notes above. |
-| **use_hysteresis** | Bool to indicate if an additional hysteresis on the output temperature of the source should be activated. If true, provide also `hysteresis_temp_on` and `hysteresis_temp_off`. Defaults to `false`. |
+| **use_hysteresis** | Bool to indicate if an additional hysteresis on the output temperature of the source should be activated. If true, also provide `hysteresis_temp_on` and `hysteresis_temp_off`. Defaults to `false`. |
 | **hysteresis_temp_on** | Turn-on Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
 | **hysteresis_temp_off** | Turn-off Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
 | **constant_output_temperature** | Temperature for `temperature_mode` =  `constant_temperature`. Defaults to `nothing`. |
@@ -259,7 +259,7 @@ Below is a template for the input file that can be included in the supporting so
 ```
 
 #### Limit cooling input temperature
-This control module is specially implemented for the combination of an electrolyser with a seasonal thermal energy storage. Here, the electrolyser can use the storage to cool down its high temperature excessive heat. But, at some point, the lowest layer of the storage (equals the return flow into the electrolyser) will reach a temperature that is too high to allow the electrolyser to cool down as required. To handle this, a limit temperature in this control module can be specified, which will disable the energy flow from electrolyser to the seasonal thermal energy storage when the lowest layer of the storage has reaches the provided `temperature_limit`.
+This control module is specially implemented for the combination of an electrolyser with a seasonal thermal energy storage. Here, the electrolyser can use the storage to cool down its high temperature excessive heat. But, at some point, the lowest layer of the storage (equals the return flow into the electrolyser) will reach a temperature that is too high to allow the electrolyser to cool down as required. To handle this, a limit temperature in this control module can be specified, which will disable the energy flow from electrolyser to the seasonal thermal energy storage when the lowest layer of the storage has reached the provided `temperature_limit`.
 
 This module is implemented for the following component types:
 
@@ -569,7 +569,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
 | `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
 | `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. For model type `simplified` this must be a constant value and for model types `inverter` and `on-off` this must not be a constant value. |
-| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is set and the actual usage fraction falls below it, the heat pump won’t run. The usage fraction is based on how much energy the pump could produce during each slice (given the temperatures in this slice), not on its design power. These slice values are then combined into a total usage fraction that is compared to the given `min_usage_fraction`. |
+| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is set and the actual usage fraction falls below it, the heat pump won't run. The usage fraction is based on how much energy the pump could produce during each slice (given the temperatures in this slice), not on its design power. These slice values are then combined into a total usage fraction that is compared to the given `min_usage_fraction`. |
 | `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
 | `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
 | `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
@@ -1165,7 +1165,7 @@ To perform this calculation in every timestep, the following input parameters ar
 
 **Control**
 
-The geothermal probe provides internal control methods. The parameter `limit_max_output_energy_to_avoid_pulsing` can be used to activate an algorithm that tries to prevent pulsing (if set to `true`). Here, a kind of *variable-speed fluid pump* is imitated and the output energy is limited to provide the current temperature also in the next timestep. Note that in certain cases, this can lead to no energy being drawn from the geothermal probe at all. If the parameter is set to `false`, the maximum energy in the current time step is set to the `max_output_power` if the temperatures allow an energy extraction. This represents  kind of an *on-off fluid pump* and requires less computational effort.
+The geothermal probe provides internal control methods. The parameter `limit_max_output_energy_to_avoid_pulsing` can be used to activate an algorithm that tries to prevent pulsing (if set to `true`). Here, a kind of *variable-speed fluid pump* is imitated and the output energy is limited to provide the current temperature also in the next timestep. Note that in certain cases, this can lead to no energy being drawn from the geothermal probe at all. If the parameter is set to `false`, the maximum energy in the current time step is set to the `max_output_power` if the temperatures allow an energy extraction. This represents kind of an *on-off fluid pump* and requires less computational effort.
 Note: If the control module `negotiate_temperature` is active, this parameter will be overwritten by the control module! 
 
 

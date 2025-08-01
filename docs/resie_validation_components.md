@@ -314,7 +314,7 @@ When the simulation is performed with a COP scaling factor of 1.0 and a constant
 
 The model of the seasonal thermal energy storage in ReSiE was validated against the TRNSYS Type 342, originally developed by Bengt Eftring and Göran Hellström[^Eftring] and extended by Livio Mazzarella[^Mazzarella], also known as TRNSYS Type 142 or "XST Model". The TRNSYS models includes a fully ground-coupled model of a stratified storage, which is more than the current STES model in ReSiE is capable of. Here, in ReSiE, the thermal exchange to the ground is modeled with a user-defined ground temperature (constant or profile), neglecting any thermal capacity effects of the ground.
 
-For the validation, a self-discharging and a loading and unloading pattern were compared between the two models for a cylindrical storage with 50 000m^3 of storage volume with a h/r ratio of 1.13. In order to make the two models better comparable, a constant ambient air temperature of 20°C is assumed. In ReSiE, a ground temperature of 9 °C is assumed, while in TRNSYS the ground is modeled with typical parameters.  The storage has 75 cm of insolation at the lid and 50 cm on the sidewalls and bottom, with a thermal conductivity of 0.1875 W/(mk). 
+For the validation, a self-discharging and a loading and unloading pattern were compared between the two models for a cylindrical storage with 50,000 m^3 of storage volume with a h/r ratio of 1.13. In order to make the two models better comparable, a constant ambient air temperature of 20 °C is assumed. In ReSiE, a ground temperature of 9 °C is assumed, while in TRNSYS the ground is modeled with typical parameters. The storage has 75 cm of insolation at the lid and 50 cm on the sidewalls and bottom, with a thermal conductivity of 0.1875 W/(m*K). 
 
 First, lets compare the self-unloading of the storage installed fully above the ground during 5 years. The figures shows the temperature within the top and the bottom storage layer. The differences of the temperature within the storage, especially in the bottom layer, can be explained by the constant ground temperature in ReSiE compared to the FEM model in TRNSYS that includes the thermal capacity of the ground below the STES.
 
@@ -347,7 +347,7 @@ The inputs in ReSiE are the following:
 | constant_ground_temperature|  9.0 |  [°C] |
 | initial_load|  1.0 |  [%/100] |
 
-To show the loading and unloading of the storage, an idealized pattern for loading and unloading was simulated both with ReSiE and TRNSYS. Here, a constant mass flow of 40.000 kg/h was assumed both for loading in January - April (input flow in top layer at 90°C) and unloading in September - December (input flow in bottom layer at 10°C). The parameter used are the same as for the self-discharging above. The resulting energy input and output in the storage as well as the temperature distribution within this year is shown below:
+To show the loading and unloading of the storage, an idealized pattern for loading and unloading was simulated both with ReSiE and TRNSYS. Here, a constant mass flow of 40.000 kg/h was assumed both for loading in January - April (input flow in top layer at 90 °C) and unloading in September - December (input flow in bottom layer at 10 °C). The parameter used are the same as for the self-discharging above. The resulting energy input and output in the storage as well as the temperature distribution within this year is shown below:
 
 ![Loading and unloading STES, fully above ground](fig/250728_STES_TRNSYS_unloading_loading.svg)
 
@@ -366,7 +366,7 @@ As seen in the figure, the energy and the temperature are quite close to each ot
 | ReSiE vs. TRNSYS 25% layer                    |        0.54              |              1.43        |     
 | ReSiE vs. TRNSYS bottom layer              |         0.50              |               1.57         |     
 
-The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE will may be extended in the future to better represent the ground-coupling thermal effects. To deal with this, a temperature profile for the ground can be used as input, e.g. with monthly ground temperatures.
+The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE may be extended in the future to better represent the ground-coupling thermal effects. To deal with this, a temperature profile for the ground can be used as input, e.g. with monthly ground temperatures.
 
 ![Discharging STES during 5 years, underground](fig/250728_STES_TRNSYS_in_ground_realistic.svg)
 
