@@ -470,7 +470,6 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `power_el` | `Float` | Y/N | 4000.0 | [W] | The design power of electrical output. |
 | `min_power_fraction` | `Float` | Y/Y | 0.2 | [-] | The minimum fraction of the design power that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | [s] | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | [°C] | The temperature of the heat output. |
 | `efficiency_fuel_in` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `efficiency_el_out` | `String` | Y/Y | `pwlin:0.01,0.17,0.25,0.31,0.35,0.37,0.38,0.38,0.38` | [-] | See [description of efficiency functions](#efficiency-functions). |
@@ -507,7 +506,6 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | `min_power_fraction` | `Float` | Y/Y | 0.4 | [-] | The minimum PLR that is required for one unit of the electrolyser to run. |
 | `min_power_fraction_total` | `Float` | Y/Y | 0.2 | [-] | The minimum PLR that is required for the whole plant to run. |
 | `optimal_unit_plr` | `Float` | Y/Y | 0.65 | [-] | The optimal PLR for each unit at which hydrogen production is most efficient. Only required if dispatch strategy `try_optimal` is used. |
-| `min_run_time` | `UInt` | Y/Y | 3600 | [s] | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `heat_lt_is_usable` | `Bool` | Y/Y | false | [-] | Toggle if the low temperature heat output is usable. |
 | `output_temperature_ht` | `Temperature` | Y/Y | 55.0 | [°C] | The temperature of the high temperature heat output. |
 | `output_temperature_lt` | `Temperature` | Y/Y | 25.0 | [°C] | The temperature of the low temperature heat output. |
@@ -540,7 +538,6 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | [-] | The medium of the fuel intake. |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The maximum thermal design power output. |
 | `min_power_fraction` | `Float` | Y/Y | 0.1 | [-] | The minimum fraction of the design power_th that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 0 | [s] | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | [°C] | The temperature of the heat output. |
 | `efficiency_fuel_in` | `String` | Y/Y | `const:1.1` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
