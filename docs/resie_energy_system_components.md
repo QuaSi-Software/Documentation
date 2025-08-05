@@ -1155,29 +1155,29 @@ where the variables are defined as
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(A_{\text{G}}\) | gross collector area | m<sup>2</sup>
+\(A_{\text{G}}\) | gross collector area | m²
 \(\eta_{\text{0,b}}\) | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) | -
 \(K_{\text{b}}\) | incidence angle modifier (IAM) for beam irradiance | -
 \(\theta_{\text{L}}\) | longitudinal incidence angle | °
 \(\theta_{\text{T}}\) | transversal incidence angle | °
-\(G_{\text{b}}\) | beam solar irradiance | W/m<sup>2</sup>
+\(G_{\text{b}}\) | beam solar irradiance | W/m²
 \(K_{\text{d}}\) | incidence angle modifier (IAM) for diffuse irradiance | -
-\(G_{\text{d}}\) | diffuse solar irradiance | W/m<sup>2</sup>
+\(G_{\text{d}}\) | diffuse solar irradiance | W/m²
 \(\vartheta_{\text{m}}\) | mean fluid temperature | °C
 \(\vartheta_{\text{a}}\) | ambient air temperature | °C
 \(u'\) | reduced wind speed (u - 3 m/s) with u = surrounding wind speed | m/s
-\(E_{\text{L}}\) | long wave irradiance (λ > 3 μm) | W/m<sup>2</sup>
-\(\sigma_{\text{Boltz}}\) | Boltzmann constant | W/(m<sup>2</sup>K<sup>4</sup>)
+\(E_{\text{L}}\) | long wave irradiance (λ > 3 μm) | W/m²
+\(\sigma_{\text{Boltz}}\) | Boltzmann constant | W/(m²K<sup>4</sup>)
 \(T_{\text{a}}\) | absolute ambient air temperature | K
 \(\frac{d\vartheta_{\text{m}}}{dt}\) | change of mean fluid temperature over time | K/s
-\(a_{\text{1}}\) | heat loss coefficient | W/(m<sup>2</sup>K)<s>
-\(a_{\text{2}}\) | temperature dependence of the heat loss coefficient W/(m<sup>2</sup>K<sup>2</sup>)
-\(a_{\text{3}}\) | wind speed dependence of the heat loss coefficient | J/(m<sup>3</sup>K)
+\(a_{\text{1}}\) | heat loss coefficient | W/(m²K)
+\(a_{\text{2}}\) | temperature dependence of the heat loss coefficient W/(m²K²)
+\(a_{\text{3}}\) | wind speed dependence of the heat loss coefficient | J/(m³K)
 \(a_{\text{4}}\) | sky temperature dependence of long wave radiation exchange | -
-\(a_{\text{5}}\) | effective thermal capacity | J/(m<sup>2</sup>K)
+\(a_{\text{5}}\) | effective thermal capacity | J/(m²K)
 \(a_{\text{6}}\) | wind speed dependence of the zero loss efficiency | s/m
-\(a_{\text{7}}\) | wind speed dependence of long wave radiation exchange | W/(m<sup>2</sup>K<sup>4</sup>)
-\(a_{\text{8}}\) | radiation losses | W/(m<sup>2</sup>K<sup>4</sup>)
+\(a_{\text{7}}\) | wind speed dependence of long wave radiation exchange | W/(m²K<sup>4</sup>)
+\(a_{\text{8}}\) | radiation losses | W/(m²K<sup>4</sup>)
 
 The values for the parameters \(a_{\text{1}}\) to \(a_{\text{8}}\) and \(\eta_{\text{0,b}}\), \(K_{\text{b}}\), \(K_{\text{d}}\) are available from thermal testing procedures. Sources for such documents are the solar keymark database[^SolarKeymark] or the ICC-SRCC database[^ICC-SRCC]. If only parameters of an older norm (e.g. EN ISO 9806:2013) are available, they can be put in place of the corresponding a parameters with all unknown values set to 0 or for WISC collectors conversion formulas can be used[^SolarKeymarkAnnexP1].
 Most other variables can be acquired through weather data. Since the wind speed \(u\) is usually given at a height of 10 m an assumption must be made to by which factor the wind speed differs at the chosen location.

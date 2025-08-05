@@ -173,16 +173,35 @@ In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the norma
 [^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
 
 
-### Solarthermal collector
+## Solarthermal collector
 
 To validate the model for solarthermal collector and the solar irradiance calculations, it is compared to TRNSYS as well as measurement data. 
 In the first analysis the focus is on the direct comparison between ReSiE and TRNSYS that both use the same model internally while using different approaches when it comes to the solar irradiance calculations. The goal is to show the general viability of the implemented model.
 In the second chapter ReSiE and TRNSYS are compared against measurement data from a real project with weather data from the closest weather station. To goal of this part is to show how well the models of ReSiE and TRNSYS are in predicting real time performance under imperfect data availability. 
 
-#### Validation against TRNSYS 18
+### Validation against TRNSYS 18
+For the model validation against TRNSYS 18 a typical usage profile of the solarthermal collector is created. Flat plate collectors combined with an air source heat pump are used to supply a newly build single family house with heat for heating and hot water. A buffer tank helps to store excess heat. The control for the solarthermal collector uses a fixed flow rate as soon as heat can be delivered to the buffer tank. 
+To focus the validation on the solarthermal collector model and ignore the effects of other components in the full system simulation, only the inputs and outputs of the collector are used in the following analysis. 
+In ReSiE this is modelled by using only the solarthermal collector and a infinite heat demand. The flow rate and input temperature profiles are given to the collector and the output temperature and generated heat are compared to TRNSYS. Additionally the calculated irradiances in the collector plane are compared to show differences that could influence the results outside of the collector model.
+
+The used parameters are shown in this table:
+| Variable                      | Value |
+| ----------------------------- | ----- |
+| collector_gross_area | 16.38 m² |
+| tilt_angle | 30 ° |
+| azimuth_angle | 0 ° |
+| eta_0_b | 0.734 |
+| K_b_t_array | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] |
+| K_b_l_array | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] |
+| K_d | 0.97 |
+| a_params |[3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] |
+| vol_heat_capacity | 3.903255e6 J/(m³K) |
+| wind_speed_reduction | 1.0 |
 
 
-#### Validation against measurement data
+
+
+### Validation against measurement data
 
 
 ## Heat pump
