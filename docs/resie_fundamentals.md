@@ -57,8 +57,8 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components.
-* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
+* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid output with unlimited power.
+* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid input with unlimited power.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature.
@@ -118,7 +118,7 @@ Determining the order of operations follow an algorithm consisting of a base ord
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`:  `Bounded source`, `Bounded sink` 
+    7. `Process`: `Bounded source`, `Bounded sink`  (first general bounded sources/sinks, then grid inputs/outputs)
     8. `Distribute`: `Bus`
 2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is technically not a rearrangement, as it happens during establishing the base order.
 3. Reorder the `Control` operations to make sure that components that require temperature information during their control step from other components comes last: First the components that require this information in their output (geothermal probe, solar thermal collector), then the components that require the temperature information in their input interface (seasonal thermal store).
