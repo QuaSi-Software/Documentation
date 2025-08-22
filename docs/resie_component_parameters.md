@@ -11,19 +11,22 @@ The description of each component type includes a block with a number of attribu
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
-| **Tracked values** | `IN`, `Max_Energy`, `Losses` |
+| **Tracked values** | `IN`, `Max_Energy`, `LossesGains` |
+| **Auxiliary Plots** | None  |
 
 Of particular note are the descriptions of the medium (if it applies) of the component type and its input and output interfaces. The `Medium` is used for components that could handle any type of medium and need to be configured to work with a specific medium. The attributes `Input media` and `Output media` describes which input and output interfaces the type provides and how the media of those can be configured. The syntax `name`/`value` lists the name of the parameter in the input data that defines the medium first, followed by a forward slash and the default value of the medium, if any. A value of `None` implies that no default is set and therefore it must be given in the input data. A value of `auto` implies that the value is determined with no required input, usually from the `Medium`.
 
-The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values.
+The `Tracked values` attribute lists which values of the component can be tracked with the output specification in the input file (see [this section](resie_input_file_format.md#output-specification-csv-file) for details). Note that a value of `IN` or `OUT` refers to all input or output interfaces of the component. Which these are can be infered from the input and output media attributes and the chosen medium names if they differ from the default values. To track the energy losses or gains of a component to or from the ambient, the `LossesGains` attribute can be requested. Losses are returned as negative values, while gains are defined as positive values. This attribute name applies to most components, although some components may never have gains, e.g. a gas boiler.
+
+The `Auxiliary Plots` list plots the component can create before or after the simulation if `auxiliary_plots` is set to `true` in the `io_settings`. Only given if the component provides any auxiliary plots.
 
 The description further lists which arguments the implementation takes. Let's take a look at an example:
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `efficiency` | `Float` | Y/Y | 0.8 | Ratio of output over input energies. |
-| `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the heat output to a constant value. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | Y/N | `profiles/district/max_power.prf` | [-] | Path to the max power profile. |
+| `efficiency` | `Float` | Y/Y | 0.8 | [-] | Ratio of output over input energies. |
+| `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the heat output to a constant value. |
 
 The name of the entries should match the keys in the input file, which is carried verbatim as entries to the dictionary argument of the component's constructor. The column `R/D` lists if the argument is required (`R`) and if it has a default value (`D`). If the argument has a default value the example value given in the next column also lists what that default value is. Otherwise the example column shows what a value might look like.
 
@@ -84,7 +87,7 @@ Used by heat pumps and similar components to calculate the COP depending on inpu
 
 **Implemented function prototypes**
 
-* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`.
+* `const`: Takes one number and uses it as a constant COP. E.g. `const:3.1`. The constant COP is used for all temperatures, also in bypass mode!
 * `carnot`: Calculates the COP as fraction of the Carnot-COP with a given reduction factor, which is between `0.4` and `0.45` for typical heat pumps. E.g. `carnot:0.4` means \(COP = 0.4 \cdot \frac{273.15 + T_{out}}{T_{out} - T_{in}}\).
 * `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 * `field`: Two-dimensional field values with bi-linear interpolation between the support values. See explanation below for how the definition should be given. The minimal and maximal values are interpreted as the inclusive boundaries of the field. Values outside of the boundaries lead to errors and are not extrapolated. The support values should be equally spaced along the dimensions for numerical stability, although the interpolation algorithm does not check and works with varying spacing too.
@@ -201,6 +204,75 @@ This module is implemented for the following component types: `HeatPump`
 | **output_temps** | Sets if the outputs are sorted by minimum or maximum temperature. Should be `max` or `min` (default).
 | **output_order** | Sets the direction in which the outputs are sorted. Should be `asc` (default), `none` or `desc`. A value of `none` means no reordering is performed.
 
+#### Negotiate temperature
+This control module offers several methods for negotiating the temperature for the energy transfer between two components. It can be understood as control logic for the pump that transfers the carrier medium of thermal energy from a source component to a target component.
+It is used for components where the possible amount of energy that can be drawn or delivered in the current time step depends on the temperature at which the energy is supplied or requested. Currently, these are:  `GeothermalProbes`, `SolarthermalCollector` and `SeasonalThermalStorage`.
+
+Several methods are available:
+
+* `constant_temperature`: This sets the energy transfer between target and source to a constant temperature. Here, `constant_output_temperature` has to be given as well as parameter of the control module. 
+* `upper`: This sets the temperature to the highest possible value, taking into account the temperature limits of both components in the current time step.
+* `lower`: This sets the temperature to the lowest possible value, taking into account the temperature limits of both components in the current time step.
+*  `mean`: This sets the temperature to the mean between the lower and upper temperature limit of the intersecting temperature range of source and target component.
+*  `optimize`: Optimize uses two functions provided by the source and the target component to find the intersecting temperature that maximizes the energy transfer in the current time step. Note that this requires a lot of computing power. The tolerances for the solving algorithm can be adjusted (see table below).
+
+Normally, `mean` is a good compromise between computational effort and accuracy. But, `optimize` will result in higher energy transfer, assuming an optimal pump control algorithm. 
+
+With setting the parameter `limit_max_output_energy_to_avoid_pulsing` to `true`, another algorithm can be activated that helps preventing the components to pulse, meaning turning energy flow on and off every time step. If activated, the source limits its energy output to ensure that in the following timestep, the same temperature can be reached as in the current time step. In the `GeothermalProbes`, this can lead to unexpected results, e.g. energy will never start if in the probe the initial borehole wall temperature and the undisturbed ground temperature are set close to each other while at the same time the maximum energy output limit is set to a high value. In `SolarthermalCollector`, the parameter is not considered.
+
+Additionally, the source can be controlled by a hysteresis on the maximum output temperature of the source in the current time step. Use the flag `use_hysteresis` to activate this feature and provide both the turn-on-temperature `hysteresis_temp_on` and the turn-off-temperature `hysteresis_temp_off`. Typically, the turn-off-temperature is lower than the turn-on-temperature. This feature acts as an additional turn-of switch for all values of `temperature_mode`.
+
+This module is implemented for the following component types:
+
+- Sources: `GeothermalProbes`, `SolarthermalCollector`
+- Targets: `SeasonalThermalStorage`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `negotiate_temperature` |
+| **target_uac** | The UAC of the linked target component (SeasonalThermalStorage). Required. |
+| **temperature_mode** | Can be one of `constant_temperature`, `optimize`, `mean`, `upper`, `lower`. Defaults to `mean`. |
+| **limit_max_output_energy_to_avoid_pulsing** |  Bool to indicate if pulsing should be avoided (not for `temperature_mode` = `optimize` and not for `SolarthermalCollector`). Defaults to `false`. See additional notes above. |
+| **use_hysteresis** | Bool to indicate if an additional hysteresis on the output temperature of the source should be activated. If true, also provide `hysteresis_temp_on` and `hysteresis_temp_off`. Defaults to `false`. |
+| **hysteresis_temp_on** | Turn-on Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
+| **hysteresis_temp_off** | Turn-off Temperature for source, only if `use_hysteresis` =  `true`. Defaults to `nothing`. |
+| **constant_output_temperature** | Temperature for `temperature_mode` =  `constant_temperature`. Defaults to `nothing`. |
+| **optim_temperature_rel_tol** |  Relative tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize`. Defaults to `1e-5`.  Looser relative tolerance could be `1e-3`|
+| **optim_temperature_abs_tol** | Absolute tolerance to find the temperature for maximum energy, only for for `temperature_mode` = `optimize` . Defaults to `0.001`. Looser absolute tolerance could be `0.1` |
+
+Below is a template for the input file that can be included in the supporting source components:
+
+``` JSON
+"control_modules": [
+    {
+        "name": "negotiate_temperature",
+        "target_uac": "FILL_IN",
+        "temperature_mode": "mean",
+        "limit_max_output_energy_to_avoid_pulsing": true,
+        "use_hysteresis": true,
+        "hysteresis_temp_on": 13,
+        "hysteresis_temp_off": 5,
+        "_FOR_TEMPERATURE_MODE_CONSTANT_TEMPERATURE": "",
+        "constant_output_temperature": 13.0,
+    }
+]
+```
+
+#### Limit cooling input temperature
+This control module is specially implemented for the combination of an electrolyser with a seasonal thermal energy storage. Here, the electrolyser can use the storage to cool down its high temperature excessive heat. But, at some point, the lowest layer of the storage (equals the return flow into the electrolyser) will reach a temperature that is too high to allow the electrolyser to cool down as required. To handle this, a limit temperature in this control module can be specified, which will disable the energy flow from electrolyser to the seasonal thermal energy storage when the lowest layer of the storage has reached the provided `temperature_limit`.
+
+This module is implemented for the following component types:
+
+- Sources: `Electrolyser`
+- Targets: `SeasonalThermalStorage`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `limit_cooling_input_temperature`  |
+| **target_uac** |  The UAC of the linked target component (SeasonalThermalStorage). Required. |
+| **temperature_limit** |  The temperature limit for the return flow (input in the output interface of source) that will disable energy transfer between source and target if exceeded. Required. |
+
+
 ## Boundary and connection components
 
 ### General bounded sink
@@ -218,14 +290,14 @@ Generalised implementation of a bounded sink.
 
 Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
-| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W] or [Wh] | Path to the max power profile. Define unit in profile header. |
+| `constant_power` | `Float` | N/N | 4000.0 | [W] | If given, sets the max power of the input to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -244,14 +316,14 @@ Generalised implementation of a bounded source.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the output to a constant value. |
-| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W]  or [Wh]| Path to the max power profile. Define unit in profile header.  |
+| `constant_power` | `Float` | N/N | 4000.0 | [W] | If given, sets the max power of the output to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the output temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -270,9 +342,9 @@ The only implementation of special component `Bus`, used to connect multiple com
 
 Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
 
 ### General fixed sink
 | | |
@@ -289,14 +361,14 @@ Generalised implementation of a fixed sink.
 
 Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | Path to the input energy profile. |
-| `constant_demand` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
-| `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | [W] or [Wh] | Path to the input energy profile. Define unit in profile header. |
+| `constant_demand` | `Float` | N/N | 4000.0 | [W] | [power, not work!] If given, ignores the energy profile and sets the input demand to this constant power. |
+| `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -322,14 +394,14 @@ Generalised implementation of a fixed source.
 
 Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | Path to the output energy profile. |
-| `constant_supply` | `Float` | N/N | 4000.0 | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
-| `scale` | `Float` | N/Y | 1.0 | Factor by which the energy profile values are multiplied. Only applies to profiles. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the output temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the output to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
+| `constant_supply` | `Float` | N/N | 4000.0 | [W] | [power, not work!] If given, ignores the energy profile and sets the output supply to this constant power. |
+| `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the energy profile values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°c] | Path to the profile for the output temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°c] | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -346,14 +418,14 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file).
 
-If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulutative value.
+If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulative value.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `is_source` | `Boolean` | Y/Y | `True` | If true, the grid connection acts as a source. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | If given, sets the temperature of the input (or output) to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `is_source` | `Boolean` | Y/Y | `True` |  [-] | If true, the grid connection acts as a source. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input (or output) to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -374,10 +446,10 @@ A photovoltaic (PV) power plant producing electricity.
 
 The energy it produces in each time step must be given as a profile, but can be scaled by a fixed value.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` | Path to the output energy profile. |
-| `scale` | `Float` | Y/N | 4000.0 | Factor by which the profile values are multiplied. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
+| `scale` | `Float` | Y/N | 4000.0 | [-] | Factor by which the profile values are multiplied. |
 
 ## Transformers
 
@@ -390,21 +462,20 @@ The energy it produces in each time step must be given as a profile, but can be 
 | **Medium** | |
 | **Input media** | `m_gas_in`/`m_c_g_natgas` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
-| **Tracked values** | `IN`, `OUT`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
 A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electricity.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_el` | `Float` | Y/N | 4000.0 | The design power of electrical output. |
-| `min_power_fraction` | `Float` | Y/Y | 0.2 | The minimum fraction of the design power that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 1800 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
-| `efficiency_fuel_in` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_el_out` | `String` | Y/Y | `pwlin:0.01,0.17,0.25,0.31,0.35,0.37,0.38,0.38,0.38` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_heat_out` | `String` | Y/Y | `pwlin:0.8,0.69,0.63,0.58,0.55,0.52,0.5,0.49,0.49` | See [description of efficiency functions](#efficiency-functions). |
-| `linear_interface` | `String` | Y/Y | `fuel_in` | See [description of efficiency functions](#efficiency-functions). |
-| `nr_discretization_steps` | `UInt` | Y/Y | `8` | See [description of efficiency functions](#efficiency-functions). |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `power_el` | `Float` | Y/N | 4000.0 | [W] | The design power of electrical output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.2 | [-] | The minimum fraction of the design power that is required for the plant to run. |
+| `output_temperature` | `Temperature` | N/N | 90.0 | [°C] | The temperature of the heat output. |
+| `efficiency_fuel_in` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_el_out` | `String` | Y/Y | `pwlin:0.01,0.17,0.25,0.31,0.35,0.37,0.38,0.38,0.38` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_out` | `String` | Y/Y | `pwlin:0.8,0.69,0.63,0.58,0.55,0.52,0.5,0.49,0.49` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `linear_interface` | `String` | Y/Y | `fuel_in` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `8` | [-] | See [description of efficiency functions](#efficiency-functions). |
 
 ### Electrolyser
 | | |
@@ -415,7 +486,7 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_ht_out`/`m_h_w_ht1`, `m_heat_lt_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
-| **Tracked values** | `IN`, `OUT`, `Losses`, `Losses_heat`, `Losses_hydrogen` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains`, `Losses_heat`, `Losses_hydrogen` |
 
 Implementation of an electrolyser splitting pute water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -427,26 +498,25 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 * `equal_with_mpf`: Same as an equal distribution, however if the total PLR is lower than `min_power_fraction`, then a number of units are activated at a calculated PLR to ensure the minimum restriction is observed and the demand is met.
 * `try_optimal`: Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low PLR or close to the nominal power, falls back to activating only one or all units.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `power_el` | `Float` | Y/N | 4000.0 | The maximum electrical design power input. |
-| `nr_switchable_units` | `UInt` | Y/Y | 1 | The number of units that can be switched on/off to meet demand. |
-| `dispatch_strategy` | `String` | Y/Y | `equal_with_mpf` | The dispatch strategy to be used to switch on/off units. |
-| `min_power_fraction` | `Float` | Y/Y | 0.4 | The minimum PLR that is required for one unit of the electrolyser to run. |
-| `min_power_fraction_total` | `Float` | Y/Y | 0.2 | The minimum PLR that is required for the whole plant to run. |
-| `optimal_unit_plr` | `Float` | Y/Y | 0.65 | The optimal PLR for each unit at which hydrogen production is most efficient. Only required if dispatch strategy `try_optimal` is used. |
-| `min_run_time` | `UInt` | Y/Y | 3600 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `heat_lt_is_usable` | `Bool` | Y/Y | false | Toggle if the low temperature heat output is usable. |
-| `output_temperature_ht` | `Temperature` | Y/Y | 55.0 | The temperature of the high temperature heat output. |
-| `output_temperature_lt` | `Temperature` | Y/Y | 25.0 | The temperature of the low temperature heat output. |
-| `linear_interface` | `String` | Y/Y | `el_in` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_el_in` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_heat_ht_out` | `String` | Y/Y | `const:0.15` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_heat_lt_out` | `String` | Y/Y | `const:0.07` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_h2_out` | `String` | Y/Y | `const:0.57` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_h2_out_lossless` | `String` | Y/Y | `const:0.6` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_o2_out` | `String` | Y/Y | `const:0.6` | See [description of efficiency functions](#efficiency-functions). |
-| `nr_discretization_steps` | `UInt` | Y/Y | `1` | See [description of efficiency functions](#efficiency-functions). |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `power_el` | `Float` | Y/N | 4000.0 | [W] | The maximum electrical design power input. |
+| `nr_switchable_units` | `UInt` | Y/Y | 1 | [-] | The number of units that can be switched on/off to meet demand. |
+| `dispatch_strategy` | `String` | Y/Y | `equal_with_mpf` | [-] | The dispatch strategy to be used to switch on/off units. |
+| `min_power_fraction` | `Float` | Y/Y | 0.4 | [-] | The minimum PLR that is required for one unit of the electrolyser to run. |
+| `min_power_fraction_total` | `Float` | Y/Y | 0.2 | [-] | The minimum PLR that is required for the whole plant to run. |
+| `optimal_unit_plr` | `Float` | Y/Y | 0.65 | [-] | The optimal PLR for each unit at which hydrogen production is most efficient. Only required if dispatch strategy `try_optimal` is used. |
+| `heat_lt_is_usable` | `Bool` | Y/Y | false | [-] | Toggle if the low temperature heat output is usable. |
+| `output_temperature_ht` | `Temperature` | Y/Y | 55.0 | [°C] | The temperature of the high temperature heat output. |
+| `output_temperature_lt` | `Temperature` | Y/Y | 25.0 | [°C] | The temperature of the low temperature heat output. |
+| `linear_interface` | `String` | Y/Y | `el_in` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_el_in` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_ht_out` | `String` | Y/Y | `const:0.15` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_lt_out` | `String` | Y/Y | `const:0.07` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_h2_out` | `String` | Y/Y | `const:0.57` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_h2_out_lossless` | `String` | Y/Y | `const:0.6` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_o2_out` | `String` | Y/Y | `const:0.6` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `1` |  [-] | See [description of efficiency functions](#efficiency-functions). |
 
 ### Fuel boiler
 | | |
@@ -457,23 +527,22 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | **Medium** | |
 | **Input media** | `m_fuel_in` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
 A boiler that transforms chemical fuel into heat.
 
 This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | The medium of the fuel intake. |
-| `power_th` | `Float` | Y/N | 4000.0 | The maximum thermal design power output. |
-| `min_power_fraction` | `Float` | Y/Y | 0.1 | The minimum fraction of the design power_th that is required for the plant to run. |
-| `min_run_time` | `UInt` | Y/Y | 0 | Minimum run time of the plant in seconds. Will be ignored if other constraints apply. |
-| `output_temperature` | `Temperature` | N/N | 90.0 | The temperature of the heat output. |
-| `efficiency_fuel_in` | `String` | Y/Y | `const:1.1` | See [description of efficiency functions](#efficiency-functions). |
-| `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | See [description of efficiency functions](#efficiency-functions). |
-| `linear_interface` | `String` | Y/Y | `heat_out` | See [description of efficiency functions](#efficiency-functions). |
-| `nr_discretization_steps` | `UInt` | Y/Y | `30` | See [description of efficiency functions](#efficiency-functions). |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | [-] | The medium of the fuel intake. |
+| `power_th` | `Float` | Y/N | 4000.0 | [W] | The maximum thermal design power output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.1 | [-] | The minimum fraction of the design power_th that is required for the plant to run. |
+| `output_temperature` | `Temperature` | N/N | 90.0 | [°C] | The temperature of the heat output. |
+| `efficiency_fuel_in` | `String` | Y/Y | `const:1.1` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `linear_interface` | `String` | Y/Y | `heat_out` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `30` | [-] | See [description of efficiency functions](#efficiency-functions). |
 
 ### Heat pump
 | | |
@@ -484,7 +553,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Medium** | |
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `LossesGains` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
@@ -493,11 +562,11 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `model_type` | `String` | Y/Y | `simplified` | [-] | The model type of the heat pump. Must be one of: `simplified`, `inverter`, `on-off` |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The thermal design power at the heating output. This must be maximal value considering the max power function, as that is normalised to 1.0. |
 | `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
-| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. |
+| `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. Note: If a constant COP is given, the bypass_cop is ignored! |
 | `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
 | `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
 | `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. For model type `simplified` this must be a constant value and for model types `inverter` and `on-off` this must not be a constant value. |
-| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is given and the calculated usage fraction is below this threshold, the heat pump will not run and set used energies to zero. Please note that his fraction is calculated relative to the energies the HP could produce in each slice, not the design power. |
+| `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is set and the actual usage fraction falls below it, the heat pump won't run. The usage fraction is based on how much energy the pump could produce during each slice (given the temperatures in this slice), not on its design power. These slice values are then combined into a total usage fraction that is compared to the given `min_usage_fraction`. |
 | `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
 | `icing_coefficients` | `String` | N/Y | `3,-0.42,15,2,30` | [-] | Parameters for the icing losses model. For details, see [this section](resie_energy_system_components.md#icing-losses-of-heat-pumps-with-air-as-source-medium)|
 | `input_temperature` | `Temperature` | N/N | 20.0 | [°C] | If given, the supplied temperatures at the heat pump input are ignored and the provided constant one is used. |
@@ -517,6 +586,14 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | `eval_factor_elec` | `float` | N/Y | 1.0 | [-] | Factor used in the evaluate function. Setting a larger value gives more weight to reducing electricity input. Only for model type `inverter`. |
 | `x_abstol` | `float` | N/Y | 0.01 | [-] | Absolute tolerance of PLR values during optimisation. |
 | `f_abstol` | `float` | N/Y | 0.001 | [-] | Absolute tolerance of `evaluate()` return values during optimisation. |
+
+**Bypass:**
+
+If the heat pump is operated in bypass mode (input temperature is higher than the requested output temperature), the output temperature is limited to the requested temperature, in other words, the input temperature is cooled down to the requested output temperature or the specified `output_temperature` of the heat pump. The energy required during bypass operation can be specified with the `bypass_cop` parameter, that is used in bypass mode (not for a constant COP, here always the constant COP is used!). If a cool-down is not wanted, the heat pump has to be connected in parallel and not in series, meaning that the energy system provides an actual bypass around the heat pump. Note that this may lead to an incorrect determination of the order of operation and may require manual adjustment (see:  [Order of operation](resie_input_file_format.md#order-of-operation))!
+
+**Temperatures:**
+
+The heat pump model implemented can serve different temperature layers in the input and output during one timestep. If a heat pump is connected to multiple sources and multiple sinks, each source serves a sink until one of them is satisfied, then the next one is used. So several different COPs are used *within one timestep* and aggregated to one total COP in the timestep. See [this Chapter](resie_energy_system_components.md#steps-to-perform-in-the-simulation-model-of-the-heat-pump) for details.
 
 #### Exemplary input file definition for HeatPump
 **Simple heat pump with constant COP, fixed output temperature and no losses**
@@ -562,14 +639,14 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
 
 A generic implementation for energy storage technologies.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the storage. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the storage. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 | [Wh] |The overall capacity of the storage. |
+| `load` | `Float` | Y/N | 6000.0 | [Wh] | The initial load state of the storage. |
 
 ### Battery
 | | |
@@ -580,14 +657,14 @@ A generic implementation for energy storage technologies.
 | **Medium** | `medium`/`m_e_ac_230v` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
 
 A storage for electricity.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the battery. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the battery. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `capacity` | `Float` | Y/N | 12000.0 | [Wh] | The overall capacity of the battery. |
+| `load` | `Float` | Y/N | 6000.0 | [Wh] | The initial load state of the battery. |
 
 ### Buffer Tank
 | | |
@@ -599,7 +676,7 @@ A storage for electricity.
 | **Medium** | `medium`/`m_h_w_ht1` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses`, `CurrentMaxOutTemp` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp` |
 
 A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
@@ -719,23 +796,82 @@ Extended definition of a buffer tank in the input file:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `Losses` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower`  |
+| **Auxiliary Plots** | 3D-Model of the geometry, Cross-sectional drawing, temperature distribution over time  |
 
-A long-term storage for heat stored in a stratified artificial aquifer.
+A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
 
-If the adaptive temperature calculation is activated, the temperatures for the input/output of the STES depends on the load state. If it is sufficiently full (depends on the `switch_point`), the STES can output at the `high_temperature` and takes in at the `high_temperature`. If the load falls below that, the output temperature drops and reaches the `low_temperature` as the load approaches zero.
+The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, as shown in the following figure:
 
-If the adaptive temperature calculation is deactivated, always assumes the `high_temperature` for both input and output.
+![Possible geometries for STES](fig/250722_STES_geometries.jpg)
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `capacity` | `Float` | Y/N | 12000.0 | The overall capacity of the STES. |
-| `load` | `Float` | Y/N | 6000.0 | The initial load state of the STES. |
-| `use_adaptive_temperature` | `Float` | Y/Y | `False` | If true, enables the adaptive output temperature calculation. |
-| `switch_point` | `Float` | Y/Y | 0.25 | Partial load at which the adaptive output temperature calculation switches. |
-| `high_temperature` | `Temperature` | Y/Y | 90.0 | The high end of the adaptive in-/output temperature. |
-| `low_temperature` | `Temperature` | Y/Y | 15.0 | The low end of the adaptive in-/output temperature. |
+ The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
 
+ Important: Currently, the energy exchange with the ground is implemented in a simplified way. The ground does not have a thermal capacity in this model, instead a constant ground temperature is assumed! This can lead to wrong results! A ground temperature profile (e.g. monthly) could be used to mitigate this effect. With a soil temperature of constant 10 °C throughout the year, the losses are significantly too high.
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `volume` | `Float` | Y/N | 12000.0 | [m^3] | The overall volume of the STES. |
+| `initial_load` | `Float` | Y/Y | 0.0 | [%/100] | The initial load of the STES, given in the range from [0.0 - 1.0]. Note that the temperature distribution will be set to an equal temperature in all layers at the beginning of the simulation.  |
+| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | The upper temperature of the STES, equals the highest temperature for loading. |
+| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C]  | The lower temperature of the STES, equals the assumed return flow temperature during unloading. Note that the temperature may become lower due to thermal losses to the ambient. |
+| `shape` | `String` | Y/Y | `quadratic` | [-] | The shape of the cross-section of the STES. Can either be `round` for cylinder/truncated cone or `quadratic` for tank or truncated quadratic pyramid (pit). |
+| `hr_ratio` | `Float` | Y/Y | 0.8 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
+| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
+| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m^3] | The density of the storage medium (typically water). |
+| `cp_medium` | `Float` | Y/Y | 4.186 | [kJ/(kgK)] | The specific thermal capacity of the storage medium (typically water). |
+| `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
+| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | The number of thermal layers in the STES model. |
+| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | The number of thermal layers that are above the ground, meaning their losses are to the ambient air and not to the ground. |
+| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related loading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
+| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related unloading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
+| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related loading rate, given as mass per hour **per input interface** related to the total mass in the STES. |
+| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related unloading rate, given as **total** mass per hour related to the total mass in the STES. |
+| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m^2K)] | The thermal transmission through the lid of the STES`, always into the air. |
+| `thermal_transmission_barrel` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the barrel of the STES, into the air or into the ground, depending on `number_of_layer_above_ground`. |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the bottom of the STES, always into the ground. |
+| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
+| OR: `constant_ambient_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding air temperature to a constant value. |
+| OR: `ambient_temperature_from_global_file` | `String` | Y/N | ` temp_ambient_air` | [-] | If given, sets the surrounding air temperature to the ambient air temperature of the global weather file. |
+| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ground_temperature.prf` | [°C] | Path to the profile for the surrounding ground temperature. |
+| OR: `constant_ground_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
+
+Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
+
+**Exemplary input file definition for SeasonalThermalStorage**
+
+```JSON
+"TST_STES_01": {
+    "type": "SeasonalThermalStorage",
+    "m_heat_in": "m_h_w_ht1",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": [
+        "TST_HP_01"
+    ],
+    "volume": 3000,
+    "initial_load": 0.2,
+    "high_temperature": 95,
+    "low_temperature": 10,
+    "shape": "round",
+    "hr_ratio": 1.5,
+    "sidewall_angle": 60,
+    "rho_medium": 1000,
+    "cp_medium": 4.18,
+    "diffusion_coefficient": 0.000000143,
+    "number_of_layer_total": 25,
+    "number_of_layer_above_ground": 1,
+    "max_load_rate_energy": 0.01,
+    "max_unload_rate_energy": 0.01,
+    "max_load_rate_mass": 0.04,
+    "max_unload_rate_mass": 0.04,
+    "thermal_transmission_lid": 0.25,
+    "thermal_transmission_barrel": 0.375,
+    "thermal_transmission_bottom": 0.375,
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "constant_ground_temperature": 18.0,
+}
+```
 
 ## Heat sources and sinks
 
@@ -754,18 +890,18 @@ A generic heat source for various sources of heat.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
 
-| Name | Type | R/D | Example | Description |
-| ----------- | ------- | --- | ------------------------ | ------------------------ |
-| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | Path to the max power profile. |
-| `constant_power` | `Temperature` | N/N | 4000.0 | If given, sets the max power of the input to a constant value. |
-| `scale` | `Float` | N/Y | 1.0 | Factor by which the max power values are multiplied. Only applies to profiles. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
-| `temperature_reduction_model` | `String` | Y/Y | `none` | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
-| `min_source_in_temperature` | `Float` | N/N | -10.0 | Minimum source input temperature. |
-| `max_source_in_temperature` | `Float` | N/N | 40.0 | Maximum source input temperature. |
-| `minimal_reduction` | `Float` | N/Y | 2.0 | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W] or [Wh] | Path to the max power profile. Define unit in profile header. |
+| `constant_power` | `Temperature` | N/N | 4000.0 | [W] | If given, sets the max power of the input to a constant value. |
+| `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `temperature_reduction_model` | `String` | Y/Y | `none` | [-] | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
+| `min_source_in_temperature` | `Float` | N/N | -10.0 | [°C] | Minimum source input temperature. |
+| `max_source_in_temperature` | `Float` | N/N | 40.0 | [°C] | Maximum source input temperature. |
+| `minimal_reduction` | `Float` | N/Y | 2.0 | [K] | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
 
 **Exemplary input file definition for GenericHeatSource**
 
@@ -796,7 +932,8 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_output_temperature`, `current_input_temperature`, `fluid_reynolds_number` |
+| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_max_output_temperature`, `current_min_input_temperature`, `fluid_reynolds_number` |
+| **Auxiliary Plots** | G-function values for probe field, Geometry/layout of probe field  |
 
 A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 
@@ -972,6 +1109,7 @@ If a `g_function_file_path` is specified, the following parameters are not used 
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
 | `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
 | `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+| `limit_max_output_energy_to_avoid_pulsing` | `Bool` | Y/Y | false | [-] | Bool that specifies whether an attempt should be made to avoid pulsing when calculating the output energy in a time step. See section "Control" below for more information! |
 
 **Parameter for simple model only**
 
@@ -1022,6 +1160,11 @@ To perform this calculation in every timestep, the following input parameters ar
 | `grout_heat_conductivity` | `Float` | Y/Y | 2.0 | [W/(Km)] | heat conductivity of grout (filling material)  |
 | `soil_heat_conductivity` | `Float` | Y/Y | 1.5 | [W/(Km)] | heat conductivity of surrounding soil, homogenous and constant |
 
+**Control**
+
+The geothermal probe provides internal control methods. The parameter `limit_max_output_energy_to_avoid_pulsing` can be used to activate an algorithm that tries to prevent pulsing (if set to `true`). Here, a kind of *variable-speed fluid pump* is imitated and the output energy is limited to provide the current temperature also in the next timestep. Note that in certain cases, this can lead to no energy being drawn from the geothermal probe at all. If the parameter is set to `false`, the maximum energy in the current time step is set to the `max_output_power` if the temperatures allow an energy extraction. This represents kind of an *on-off fluid pump* and requires less computational effort.
+Note: If the control module `negotiate_temperature` is active, this parameter will be overwritten by the control module! 
+
 
 **Exemplary input file definition for GeothermalProbe:**
 
@@ -1046,6 +1189,7 @@ To perform this calculation in every timestep, the following input parameters ar
     "unloading_temperature_spread": 1.5,
     "soil_undisturbed_ground_temperature": 13,
     "boreholewall_start_temperature": 13,
+    "limit_max_output_energy_to_avoid_pulsing": false,
     "___G-FUNCTION FROM LIBRARY___": "",
     "probe_field_geometry": "rectangle",
     "number_of_probes_x": 3, 
@@ -1083,6 +1227,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
+| **Auxiliary Plots** | Simulation mesh of the model, Interactive temperature distribution over time  |
 
 A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
 

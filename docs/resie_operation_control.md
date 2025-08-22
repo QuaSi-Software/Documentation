@@ -39,8 +39,10 @@ The currently implemented callbacks are:
 * `discharge_is_allowed`: Allows the discharging of a battery.
 * `reorder_inputs`: Reorders a list of input energy exchanges used in steps `potential` and `process`.
 * `reorder_outputs`: Reorders a list of output energy exchanges used in steps `potential` and `process`.
+* `determine_temperature_and_energy`: Callback for `negotiate_temperature`. Only checks if a control modules exists that handle the temperature between two components.
+* `cooling_input_temperature_exceeded`: Callback for `limit_cooling_input_temperature`. Checks if a control module exists that interrupts energy flow due to exceeded return flow temperature limit.
 
-**Note:** The callbacks `reorder_inputs` and `reorder_outputs` are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
+**Note:** The callbacks `reorder_inputs`, `reorder_outputs`, `determine_temperature_and_energy` and `cooling_input_temperature_exceeded`  are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
 
 The following describes the currently implemented control modules. The required parameters are described in the [component specification chapter](resie_component_parameters.md#control-modules).
 
@@ -48,6 +50,8 @@ The following describes the currently implemented control modules. The required 
 * `profile_limited`: Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of lower values.
 * `storage_loading`: Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
 * `temperature_sorting`: Controls a component, that can handle multiple inputs or outputs with different temperatures, so that the inputs/outputs are sorted by the temperatures they provide/request. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+* `negotiate_temperature`: Controls the temperature between two components if both of them have temperature-dependent maximal energies. For example a geothermal probe or a solar thermal collector as sources putting energy into a seasonal thermal energy storage. 
+* `limit_cooling_input_temperature`: Control module to block energy transfer between two components if the return temperature is too high for the cooling requirements of the source. For example an electrolyser cools itself by transferring thermal energy into a seasonal thermal storage. If the seasonal thermal storage is too hot in the bottom layer to cool the electrolyser, no energy can be transferred.
 
 ## State machines
 

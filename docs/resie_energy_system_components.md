@@ -1251,32 +1251,67 @@ Neglected: Thermal capacity of the surrounding soil, gravel-water storages
 ![Geometry of STES](fig/221028_STES_Geometry.png)
 Figure and method of generalized geometry definition based on [Steinacker2022][^Steinacker2022].
 
-Ratio between height and mean radius of the STES:
+The geometry of the STES can be either modelled as cylinder or truncated cone with a circular cross-sectional shape, or as cuboid or truncated quadratic pyramid with a quadratic cross-sectional shape. 
+
+For both circular and quadratic cross-sectional shapes STES, the ratio between height and mean radius of the STES is defined as:
 $$ hr_{STES} = \frac{h_{STES}}{\bar{r}_{STES}}  = \frac{h_{STES}}{\frac{R_{STES}+r_{STES}}{2}} $$ 
 
-Upper radius of the STES in dependence of the Volume and \(hr_{STES}\):
+where the radius is equivalent to the edge length for the quadratic cross-sectional shape. 
+
+The slope angle has to be in the range of
+$$  180° - \arctan{\left(\frac{hr_{STES}}{2} \right)}	\geq \alpha_{STES} \geq \arctan{\left(\frac{hr_{STES}}{2} \right)}  $$
+to ensure a valid shape. Analogously, the ratio between the height and the mean radius of the STES \(hr_{STES}\) has to be smaller as
+$$	hr_{STES} \leq 2 \ \tan(\alpha_{STES}) \mathrm{\quad with \quad}   0 ° < \alpha_{STES} < 90 ° $$
+
+**For circular cross-section:**
+
+The upper radius of the STES in dependence of the Volume and \(hr_{STES}\) is calculated as:
 $$
 R_{STES} = \sqrt[3]{ \frac{3 \ V_{STES}}{\pi \ \tan(\alpha_{STES})  \ \left( 1 - \beta^3 \right) } }   \quad \mathrm{with} \quad  \beta = \frac{2 \ \tan(\alpha_{STES}) - hr_{STES}}{2 \ \tan(\alpha_{STES})+hr_{STES}}
 $$
-Lower radius of the STES in dependence of the upper radius \(R_{STES}\):
+and the lower radius of the STES in dependence of the upper radius \(R_{STES}\):
 $$ r_{STES} = R_{STES}  \ \beta $$
-
-Slope angle has to be in the range of
-$$    180° - \arctan{\left(\frac{hr_{STES}}{2} \right)}	\geq \alpha_{STES} \geq \arctan{\left(\frac{hr_{STES}}{2} \right)} $$
-to ensure the shape of a cylinder, a cone or a truncated cone. Analogously, the ratio between the height and the mean radius of the STES \(hr_{LZWSP}\) has to be smaller as
-$$	hr_{LZWSP} \leq 2 \ \tan(\alpha_{LZWSP}) \mathrm{\quad with \quad}   0 ° < \alpha_{LZWSP} < 90 ° $$
 
 The height of the STES can be calculated as
 $$ h_{STES} = hr_{STES} \ \frac{R_{STES}+r_{STES}}{2}   $$
 resulting with the number of layers \(n_l\) into the thickness of each layer
 $$ \Delta z_{l} = \frac{h_{STES}}{n_l} = \text{constant for all layers} $$
 
-Lateral surface of each layer with height \(h_l\), upper radius \(R_l\) and lower radius \(r_l\) of each layer:
-$$ M_{STES,l} = (R_l + r_l) \ \pi \ \sqrt{(R_l - r_l)^2 + h_l^2}  $$
+Lateral surface of each layer with height \(\Delta z_{l}\), upper radius \(R_l\) and lower radius \(r_l\) of each layer:
+$$ M_{STES,l} = (R_l + r_l) \ \pi \ \sqrt{(R_l - r_l)^2 + \Delta z_{l}^2}  $$
 
 Volume of each layer:
-$$ V_{STES,l} = \frac{h_l}{3} \pi \ (R_l^2 + R_l \ r_l \ + r_l^2)  $$
+$$ V_{STES,l} = \frac{\Delta z_{l}}{3} \pi \ (R_l^2 + R_l \ r_l \ + r_l^2)  $$
 
+**For quadratic cross-section:**
+
+The upper edge length \(L_{STES}\) of the STES in dependence of the Volume and \(hr_{STES}\) is calculated as:
+$$
+L_{STES} = \sqrt[3]{ \frac{12 \ V_{STES}}{hr_{STES} \ (1 + \beta) \ (1 + \beta + \beta^2) } }   \quad \mathrm{with} \quad  \beta = \frac{2 \ \tan(\alpha_{STES}) - hr_{STES}}{2 \ \tan(\alpha_{STES}) + hr_{STES}}
+$$
+and the lower edge length \(l_{STES}\) of the STES in dependence of the upper edge length \(L_{STES}\) as:
+$$ l_{STES} = L_{STES}  \ \beta $$
+
+The height of the STES can be calculated as
+$$ h_{STES} = hr_{STES} \ \frac{L_{STES}+l_{STES}}{4}   $$
+resulting with the number of layers \(n_l\) into the thickness of each layer:
+$$ \Delta z_{l} = \frac{h_{STES}}{n_l} = \text{constant for all layers} $$
+With the upper edge length \(L_l\) of each segment \(l = 1 : n_l\)
+$$   L_l =  l_{STES}  + ( L_{STES}  -  l_{STES} ) \  \frac{(l - 1) \  \Delta z_{l}}{h_{STES}}  $$
+and the lower edge length \(l_l\)
+$$   l_l =  l_{STES}  + ( L_{STES}  -  l_{STES}) \ \frac{l \  \Delta z_{l}}{h_{STES}}  $$
+and the sidewall height of each segment \(h_{sidewall,l}\) from the length of the edge of each sidewall \(l_{edge,l}\):
+$$ h_{sidewall,l} = \sqrt{l_{edge,l}^2 - \left( \frac{ L_{STES}  -  l_{STES}}{2}\right) ^2}   \quad \mathrm{with} \quad l_{edge,l} = \sqrt{ \Delta z_{l}^2 + \frac{(L_{STES}  -  l_{STES})^2}{2} } $$
+
+the lateral surface of each layer can be calculated:
+$$ M_{STES,l} = 2 \ (L_l + l_l) \ h_{sidewall,l} $$
+
+Also the volume of each layer:
+$$ V_{STES,l} = \frac{\Delta z_{l}}{3} \pi \ (L_l^2 + l_l \ L_l \ + l_l^2)  $$
+
+For clarification, the following figure provides a sketch of the truncated quadratic pyramid:
+
+![STES sketch for pyramid](fig/250721_STES_scetch_pyramid.drawio.svg)
 
 #### Thermal model for stratified storage
 
@@ -1303,7 +1338,7 @@ Three different energy or exergy loss mechanisms are taken into account as shown
 - Exergy losses due to diffusion processes between the storage layers \(\dot{Q}_{STES,diffus.}\), specified by the diffusion coefficient \(\xi_{STES}\)
 - Exergy losses due to convection (buoyancy) between the storage layers \(\dot{Q}_{STES,buoy.}\).
 
-The temperature \(T_l\) in layer \(l\) with height \(\Delta z_l\) is given by the partial differential equation 
+As currently only direct charging/discharging is implemented and no indirect charging via heating rod e.g., the temperature \(T_l\) in layer \(l\) with height \(\Delta z_l\) is given by the partial differential equation 
 $$
 \frac{\delta T_{STES,l} }{\delta t} = \underbrace{\xi_{STES} \frac{\delta^2 T_{STES,l}}{\delta z^2}}_{\text{diffusion}} + \underbrace{\frac{M_{STES,l} \ U_{STES,l}}{\rho_{STES} \ c_{p,STES} \ V_{STES,l}} \left(T_{STES,amb,l} - T_{STES,l}\right)}_{\text{energy losses to ambient}}  + \  \;  \;  \; \\ 
 \ \\
@@ -1335,17 +1370,23 @@ $$
 
 As the coefficients mentioned above are constant within the simulation time, they can be precomputed for computational efficiency.
 
-To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES as well as exemplary for one transition between two layers the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is always in the top and bottom layers. For correct results, the integrated mass flow within one timestep has to be smaller than the volume of the smallest layer element of the storage (ToDo: Maybe fix this issue in ReSiE?)
-
-![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
-
-To account for buoyancy effects, a check is made in each timestep to determine whether the temperature gradient in the reservoir corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each timestep for all layers, beginning with \(l=2\):
+To account for buoyancy effects, a check is made in each timestep to determine whether the temperature gradient in the STES corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each timestep for all layers, beginning with \(l=2\):
 $$
 T_l = T_l + \theta_l \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1 \text{ and }\\
 T_{l-1} = T_{l-1} - (1-\theta_l) \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1
 $$
 using the volume-ratio of each layer \(\theta_l\) with respect to the surrounding layers, inspired by [Lago2019][^Lago2019]:
 $$  \theta_{l}  = \frac{V_{STES,l-1}}{V_{STES,l} + V_{STES,l-1}} \in [0,1] \text{ for } l > 1. $$
+
+For numerical stability, an internal time step is used for all calculations of the STES:
+
+$$ dt_{internal} = \frac{dt_{global}}{5 \ \frac{\text{max}(mass_{in}, mass_{out})}{\text{mass of smallest segment}} }  $$
+ 
+To quantify the losses or gains to the ambient, they are calculated using an energy balance at the end of each global time step comparing the old and new temperature distribution and all energy inputs and outputs in the current time step.
+
+To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES during charging as well as exemplary the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). If the mass inflow within one timestep is larger than the volume of the smallest segment, an algorithm takes care about the correct mass and temperature flows in and out of every layer. As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is currently always in the top and bottom layer. Also, as assumption and simplification, the return mass flow during unloading into the lowermost layer equals the design lower temperature that is set for the STES.
+
+![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
 
 This method was extensively tested in [Steinacker2022][^Steinacker2022] and compared to calculations performed with TRNSYS Type 142 with high agreement. Is was shown that an optimal number of layers for this model is 25, considering computational efficiency and quality of the results. 
 
@@ -1397,12 +1438,11 @@ Symbol | Description | Unit
 
 ### Borehole thermal energy storage (BTES)
 
-Borehole thermal energy storages are not implemented yet (ToDo).
+See [Geothermal Probes](#geothermal-probes).
 
 ### Aquifer thermal energy storage (ATES)
 
-Aquifer thermal energy storages are not implemented yet (ToDo).
-
+Aquifer thermal energy storages are not implemented yet.
 
 ## Ice storage (IS)
 

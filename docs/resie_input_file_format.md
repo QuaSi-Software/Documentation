@@ -89,9 +89,9 @@ The overall structure of the project file is split into three general sections a
 The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be super helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
 In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
-For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
+For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" and "Gains" must be specified as well, even if it is not defined in the input file.
 
-Below is an example of a custom color list for an energy system with common media (plus "Losses"):
+Below is an example of a custom color list for an energy system with common media (plus "Losses" and "Gains"):
 ```json
  "sankey_plot": {
     "m_h_w_lt1": "red",
@@ -101,7 +101,8 @@ Below is an example of a custom color list for an energy system with common medi
     "m_c_g_natgas": "purple3",
     "m_c_g_h2": "green3",
     "m_c_g_o2": "firebrick1",
-    "Losses": "grey40"
+    "Losses": "grey40",
+    "Gains": "grey40"
 }
 ```					
 
@@ -115,14 +116,14 @@ To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "csv_output_keys": {
-    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "Losses"],
+    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "LossesGains"],
     "TST_01_ELT_01_BAT": ["Load"],
     ...
 }
 ```
 The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
-The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `Losses`, which represents the total energy losses, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
+The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `LossesGains`, which represents the total energy losses (negative) or gains (positive) to or from the ambient, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
 
 To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
 
@@ -168,7 +169,8 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
     "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
     "longitude": 9.190182, 
-    "time_zone": 1.0
+    "time_zone": 1.0,
+    "epsilon": 1e-9
 },
 ```
 
@@ -183,6 +185,7 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
 * `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `time_zone` (`Float`): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
+* `epsilon` (`Float`): The absolute tolerance for all floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to 1e-9.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
@@ -341,7 +344,8 @@ and in local standard time (without DST) without a `time_zone`:
 
 Ahead of the data, a block of metadata describes important information and parameters on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name:value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information. Just make sure that the lines start with a `#`.
 
-* `data_type` (`String`, required): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Intensive_and_extensive_properties) on intensive and extensive properties for more information.
+* `data_type` (`String`, required): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Intensive_and_extensive_properties) on intensive and extensive properties for more information. 
+  **Note:** It does not matter if a component requires an energy profile or a power profile in the "Component parameter" chapter! Just set the `data_type` in the profile correctly, the rest will be done by the simulation engine.
 * `time_definition` (`String`, required): Specifies the kind of the definition of the timestamp, see above for details. Has to be one of `startdate_timestepsize`, `startdate_timestamp`, `datestamp`.
 * `profile_start_date` (`DateTime`): The date of the first datapoint of the profile (only for `startdate_timestepsize` or `startdate_timestamp`)
 * `profile_start_date_format` (`String`): The datetime format for the `profile_start_date` (only for `startdate_timestepsize` or `startdate_timestamp`).
