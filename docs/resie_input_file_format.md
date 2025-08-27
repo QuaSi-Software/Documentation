@@ -16,6 +16,12 @@ The energy system components in the project need to be addressed somehow as the 
 
 An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank (`BT`) used in the first (`01`) `HVAC` cycle of the building `A1` in a project with prefix `TST`.
 
+Please note that UACs should not contain the following characters or sequences:
+
+- empty spaces
+- the sequence `->`
+- equal to any media names
+
 ### Energy media
 
 The specification of components and outputs often mention a medium, such as `m_h_w_ht1 OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
@@ -110,28 +116,45 @@ The resulting plot will be saved by default in `./output/output_sankey.html`. Th
 
 ### Output specification (CSV-file)
 
-The output values of each component can be written to a CSV-file. `csv_output_keys` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all"```, all possible output channels of all components will be written to the CSV-file, while for ```"nothing"``` no file will be created. 
+The output values of each component and the energy (and temperature if present) transferred between components can be written to a CSV-file. Therefore, the parameter `csv_output_keys` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be written, while   ```"csv_output_keys": "all_excl_flows"``` writes all component outputs, but no flow outputs to the CSV-file, and for ```"nothing"``` no file will be created. 
+ 
+If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the list of outputs is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only contain values during the times when energy is being transferred, otherwise they are `NaN`, as the temperatures may not be defined outside of these times.
 
-To specify a custom selection of outputs, use the following syntax:
+A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "csv_output_keys": {
     "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "LossesGains"],
     "TST_01_ELT_01_BAT": ["Load"],
+    "m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]
     ...
 }
 ```
-The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
+There are two different ways of outputs. One is the output of parameters of components as defined in the [component parameters section](resie_component_parameters.md) (first and second line in the example above), and the other one is the energy or temperature flows between components across busses (third line in the example above). See below for a description on the syntax.
+
+**Component output**
+
+For the component parameter output, the keys must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
 The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `LossesGains`, which represents the total energy losses (negative) or gains (positive) to or from the ambient, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
+
+**Flow output**
+
+Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of "source_component_uac->target_component_uac". Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
+
+**Weather output**
 
 To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
 
 ### Output specification (interactive .html plot)
 
-The output values of each component can be plotted in an interactive HTML-based line plot. `output_plot` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all"```, all possible output channels of all components will be plotted in the line plot, while for ```"nothing"``` no plot will be created. Note that for ```"output_plot": "all"```, the unit of each output is not specified as well as there is no `scale_factor` as for custon defined outputs. 
+The output values of each component and the energy (and temperature if present) transferred between components  can be plotted to an interactive HTML-based line plot. Therefore, the parameter `output_plot` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be plotted in the line plot, while   ```"output_plot": "all_excl_flows"``` plots all component outputs, but no flows, and for ```"nothing"``` no plot will be created. 
+ 
+If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the order of lines in the plot is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only display values during the times when energy is being transferred, as they may not be defined outside of these times.
 
-To define a custom plot, use the following syntax:
+The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
+
+A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "output_plot": {
@@ -146,15 +169,32 @@ To define a custom plot, use the following syntax:
         "axis": "left",
         "unit": "kW",
         "scale_factor": 0.001
+    },
+    "3": {
+        "key": {"m_h_w_ht1": ["TST_STC_01->TST_DEM_02"]},
+        "axis": ["left", "right"],
+        "unit": ["kWh", "°C"],
+        "scale_factor": [0.001, 1]
     }
     ...
 }
 ```
-The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+As for the CSV-output, the plot can both display component outputs as defined in the [component parameters section](resie_component_parameters.md) (first and second block in the example above) and energy or temperature flows between components across busses (third block  in the example above). 
+
+The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` , ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! If not handled differently, the default units are `Watt-hours` **during the current time step** and `°C` for temperatures. If `kilo-Watt-hours` should be plotted, a `"scale_factor": 0.001`  has to be applied to convert the `Wh` (default) to `kWh`.
+
+**Component output**
+
+To specify component outputs, the ```"key"```  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component. See also the example above, first and second block. The ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are scalar values that are applied to this single output parameter.
+
+**Flow output**
+
+To specify an energy and temperature flow output, the ```"key"``` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as "source_component_uac->target_component_uac". See also the example above, third block. Here, ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are vector elements that have to contain exactly two values each, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that always both energy and temperature are plotted.
+
+**Weather output**
 
 To plot the weather data read in from a provided weather file to the interactive HTML plot, the flag `plot_weather_data` in the `io_settings` can be set to `true`. Here, no scaling or other settings can be made yet.
 
-The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
 ## Simulation parameters
 ```json
@@ -164,7 +204,7 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
     "start_end_unit": "dd.mm.yyyy HH:MM",
     "time_step": 60,
     "time_step_unit": "minutes",
-    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "weather_file_path": "./path/to/dat/or/epw/weather_file.epw",
     "weather_interpolation_type_general": "stepwise",
     "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
@@ -299,7 +339,7 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     0.929535186
     ...
 ``` 
-- `startdate_timestamp`: A given timestamp (first coloumn) with a custom unit along with the data (second column) and a startdate
+- `startdate_timestamp`: A given timestamp (first column) with a custom unit along with the data (second column) and a startdate
 ```csv
     # time_definition: 			 startdate_timestamp
     # profile_start_date: 		 01.01.2020 00:00:00
@@ -310,7 +350,7 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     900;   0.929535186
     ...
 ```
-- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! If the time series includes DST, the `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Any offset in the timestamp (e.g. 01.01.2020 01:00+01:00) is ignored, the specified `time_zone` is only used to calculate the local standard time, but does not move profiles from different time zones to a common one! Note that leap days will be filtered out in order to be consistent with weather files. The example below shows how to enter data with DST.
+- `datestamp`: A datetime stamp in a user-defined format (first column) along with the data (second column). If no time zone is given, the datetime stamp is assumed to be local standard time without daylight savings! If the time series includes DST, the `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Any offset in the timestamp (e.g. 01.01.2020 01:00+01:00) is ignored, the specified `time_zone` is only used to calculate the local standard time, but does not move profiles from different time zones to a common one! Note that leap days will be filtered out in order to be consistent with weather files. The example below shows how to enter data with DST.
 ```csv
     # time_definition: 	datestamp
     # timestamp_format: dd.mm.yyyy HH:MM 
