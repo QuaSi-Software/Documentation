@@ -118,9 +118,10 @@ Some parameters specify behaviour of multiple modules on the same component as w
 
 | | |
 | --- | --- |
-| **aggregation_plr_limit** | How the upper PLR limit is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
-| **aggregation_charge** | How the charging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
-| **aggregation_discharge** | How the discharging flag is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+| **aggregation_plr_limit** | Defines how the callback `upper_plr_limit` is aggregated. Should be either `max` (take the maximum) or `min` (take the minimum). Defaults to `max`. |
+| **aggregation_charge** | Defines how the callback `charge_is_allowed` is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+| **aggregation_discharge** | Defines how the callback `discharge_is_allowed` is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
+| **aggregation_check_src_to_snk** | Defines how the callback `check_src_to_snk` is aggregated. Should be either `all` (all must be `true`) or `any` (any one must be `true`). Defaults to `all`. |
 
 The aggregation defined in `aggregation_plr_limit` applies to the control modules `storage_driven` and `profile_limited` as they both use the PLR limit callback `upper_plr_limit`.
 
@@ -271,6 +272,18 @@ This module is implemented for the following component types:
 | **name** | Name of the module. Fixed value of `limit_cooling_input_temperature`  |
 | **target_uac** |  The UAC of the linked target component (SeasonalThermalStorage). Required. |
 | **temperature_limit** |  The temperature limit for the return flow (input in the output interface of source) that will disable energy transfer between source and target if exceeded. Required. |
+
+
+#### Forbid source to sink
+Forbids that a defined source is used to supply a defined sink. As this uses the callback `check_src_to_snk`, this is specifically used for components with a layered approach to energy flow calculation, e.g. a heat pump. A bus has this functionality built-in and does not need a control module.
+
+This module is implemented for the following component types: `HeatPump`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `forbid_src_to_snk` |
+| **src_uac** |  The UAC of the source component. Required. |
+| **snk_uac** |  The UAC of the sink component. Required. |
 
 
 ## Boundary and connection components
