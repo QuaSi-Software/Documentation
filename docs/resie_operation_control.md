@@ -41,6 +41,7 @@ The currently implemented callbacks are:
 * `reorder_outputs`: Reorders a list of output energy exchanges used in steps `potential` and `process`.
 * `determine_temperature_and_energy`: Callback for `negotiate_temperature`. Only checks if a control modules exists that handle the temperature between two components.
 * `cooling_input_temperature_exceeded`: Callback for `limit_cooling_input_temperature`. Checks if a control module exists that interrupts energy flow due to exceeded return flow temperature limit.
+* `check_src_to_snk`: Checks if a defined source is allowed to be used for supplying a defined sink. This is implemented for transformers that have a layered approach to calculating energy flow, which currently is only the heat pump.
 
 **Note:** The callbacks `reorder_inputs`, `reorder_outputs`, `determine_temperature_and_energy` and `cooling_input_temperature_exceeded`  are not aggregated. They are evaluated one module at a time in the order they appear in the component config within the project file.
 
@@ -52,6 +53,7 @@ The following describes the currently implemented control modules. The required 
 * `temperature_sorting`: Controls a component, that can handle multiple inputs or outputs with different temperatures, so that the inputs/outputs are sorted by the temperatures they provide/request. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 * `negotiate_temperature`: Controls the temperature between two components if both of them have temperature-dependent maximal energies. For example a geothermal probe or a solar thermal collector as sources putting energy into a seasonal thermal energy storage. 
 * `limit_cooling_input_temperature`: Control module to block energy transfer between two components if the return temperature is too high for the cooling requirements of the source. For example an electrolyser cools itself by transferring thermal energy into a seasonal thermal storage. If the seasonal thermal storage is too hot in the bottom layer to cool the electrolyser, no energy can be transferred.
+* `forbid_src_to_snk`: Forbids that a defined source is used to supply a defined sink. As this uses the callback `check_src_to_snk`, this is specifically used for components with a layered approach to energy flow calculation, e.g. a heat pump. A bus has this functionality built-in and does not need a control module.
 
 ## State machines
 
