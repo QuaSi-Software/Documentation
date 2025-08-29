@@ -237,10 +237,10 @@ The specification for the components involved in the simulation is the most comp
 "components": {
     "TST_01_HZG_01_CHP": {
         "type": "CHPP",
-        "output_refs": [
-            "TST_01_HZG_01_BUS",
-            "TST_01_ELT_01_BUS"
-        ],
+        "output_refs": {
+            "m_heat_out": "TST_01_HZG_01_BUS",
+            "m_el_out": "TST_01_ELT_01_BUS"
+        },
         "control_parameters": {
             "load_storages m_e_ac_230v": false
         },
@@ -255,6 +255,17 @@ The specification for the components involved in the simulation is the most comp
         ],
         "power_el": 12500,
         "m_heat_out": "m_h_w_ht1"
+    },
+    "TST_01_HZG_01_HP": {
+        "type": "HeatPump",
+        "output_refs": [
+            "TST_01_HZG_01_BUS"
+        ],
+        "power_th": 9000,
+        "min_power_function": "const:0.0",
+        "cop_function": "carnot:0.4",
+        "power_losses_factor": 1.0,
+        "heat_losses_factor": 1.0
     },
     "TST_01_HZG_01_BUS": {
         "type": "Bus",
@@ -284,10 +295,12 @@ The specification is a map mapping a component's UAC to the parameters required 
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also [this explanation](resie_energy_systems.md#energy-media)).
-* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other components to which the component outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `output_refs` (`List{String}`/`Dict{String,Any}`, non-Busses only): The UACs of other components to which the current component outputs. For components with one output, a list is sufficient (see heat pump in the example above). For components with multiple outputs, currently heat pumps and electrolysers, a dict instead of a list should be given with `"output name": "target UAC"` to achieve uniqueness (see CHPP in the example above). This applies not for busses as they are handled differently! The relevant output names are given below:
+    * CHPP: `m_heat_out`, `m_el_out`
+    * Electrolyser:  `m_heat_ht_out`,  `m_h2_out`,  `m_o2_out`; optional: `m_heat_lt_out`
 * `control_parameters` (`Dict{String,Any}`): Parameters of the control and operational strategy of the component. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations. This entry can be omitted.
 * `control_modules` (`List{Dict{String,Any}}`): List of control modules, where each entry holds the required parameters for that module. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations on control modules. This list can be omitted if no module is activated for the component.
-* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
+* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name can be one of the predefined media names, but can also be an other one (see also [this chapter on media naming](resie_energy_systems.md#energy-media)).  Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
 
 The following parameter entries are for `Bus` components only:
 
