@@ -32,9 +32,7 @@ In this example a heating and a cooling demand are satisfied by making use of th
 
 There is no additional heat supplier in the system, which is only possible as the cooling demand has a fairly high base load all the time and a heat storage is used to buffer peaks. This could model an office building which, in addition to room cooling, also produces waste heat from a cluster of servers.
 
-**Note:** At the moment a heat pump can supply multiple components, in this case the buffer tank and the heating demand, at the same time, but only at the higher of the two temperatures. This makes the HP less efficient than it could be as it will supply the heating demand with 70 °C heat even if the requested temperature is lower. This will likely be addressed in future updates.
-
-**Note:** At the moment the order of operations determined by ReSiE for this energy systems does not work as expected as it prioritises the second HP over the first. This is solved by manually adjusting the order of operations and importing it in the input file. This issue will likely be addressed in future updates.
+The heat pumps works on multiple temperature layer, resulting in different COPs for different combinations of input and output temperatures. The heat pump 1 can cover the demand directly, or load the the buffer tank on a higher temperature, or both is done within the same timestep. This results in a mean COP and mean output temperature over the whole timestep. The defined prioritization (usable energy of heat pump 1 has a higher priority as heat pump 2) works as expected.
 
 ## District with sector coupling
 ![Complex district energy system with multiple sectors](fig/examples/240411_multisector_district.svg)
