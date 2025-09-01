@@ -18,13 +18,12 @@ An example for a UAC system could be a hierarchical structure based on location 
 
 Please note that UACs should not contain the following characters or sequences:
 
-- empty spaces
 - the sequence `->`
 - equal to any media names
 
 ### Energy media
 
-The specification of components and outputs often mention a medium, such as `m_h_w_ht1 OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
+The specification of components and outputs often mention a medium, such as `m_h_w_ht1:OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
 
 ## Project file structure
 
@@ -52,7 +51,7 @@ The overall structure of the project file is split into three general sections a
     "csv_output_file": "./output/out.csv",
     "csv_time_unit": "hours",
     "csv_output_keys": {
-        "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
+        "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"],
         ...
     },
     "csv_output_weather": true,
@@ -60,7 +59,7 @@ The overall structure of the project file is split into three general sections a
     "output_plot_time_unit": "date",
 	"output_plot": {
 		"1": {
-			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"]},
+			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"]},
 			"axis": "left",
 			"unit": "kW",
 			"scale_factor": 0.001
@@ -124,7 +123,7 @@ A custom output does not filter or sort, but uses the order specified in the inp
 
 ```json
 "csv_output_keys": {
-    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "LossesGains"],
+    "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT", "m_e_ac_230v:OUT", "LossesGains"],
     "TST_01_ELT_01_BAT": ["Load"],
     "m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]
     ...
@@ -134,7 +133,7 @@ There are two different ways of outputs. One is the output of parameters of comp
 
 **Component output**
 
-For the component parameter output, the keys must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
+For the component parameter output, the keys must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1:OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
 
 The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `LossesGains`, which represents the total energy losses (negative) or gains (positive) to or from the ambient, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
 
@@ -159,13 +158,13 @@ A custom output does not filter or sort, but uses the order specified in the inp
 ```json
 "output_plot": {
     "1": {
-        "key": {"TST_HP_01": ["m_h_w_lt1 IN"]},
+        "key": {"TST_HP_01": ["m_h_w_lt1:IN"]},
         "axis": "left",
         "unit": "kW",
         "scale_factor": 0.001
     },
     "2": {
-        "key": {"TST_HP_01": ["m_h_w_ht1 OUT"]},
+        "key": {"TST_HP_01": ["m_h_w_ht1:OUT"]},
         "axis": "left",
         "unit": "kW",
         "scale_factor": 0.001

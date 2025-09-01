@@ -72,7 +72,6 @@ Please note that if two components are connected directly to each other (meaning
 
 For user-defined media names, please ensure that the following characters or sequences are not part of the names:
 
-- empty spaces
 - the sequence `->`
 - equal to any UAC
 
