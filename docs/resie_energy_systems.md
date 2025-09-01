@@ -68,6 +68,14 @@ The names of all media can also be user-defined. The name of any medium of any i
 
 For some components such as busses, grid connections, demands and some storages, the medium name of each component can be given with the specifier `medium` (`String`). For others, such as transformers and storages with temperature differentials, user-definable media names of each in- and output can be given using certain specifiers such as `m_heat_in` or `m_el_out`. The exact specifiers can be found in the [specification of parameters](resie_component_parameters.md) for each component.
 
+Please note that if two components are connected directly to each other (meaning through direct connection or via one ore more busses, but without other components in between) in two different ways, e.g. a CHP connected both for heat and electricity output to the same heat pump, the media names have to be different of these two ways! Otherwise, the energy system can not be built correctly.
+
+For user-defined media names, please ensure that the following characters or sequences are not part of the names:
+
+- the character `:`
+- the sequence `->`
+- equal to any UAC
+
 ## Interfaces
 
 When writing the implementation of components a problem has emerged in the functionality handling the processing[^2] of energy. There must be a way to track the energy balances between components which is the same for all types of components, so that the processing code does not need to know which types of component it can connect to and how to transfer energy. In particular this has been shown to be a problem with control and processing calculations for components that are supposed to feed into a demand and fill a storage at the same time.
