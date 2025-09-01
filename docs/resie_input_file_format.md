@@ -139,7 +139,7 @@ The second part of the entry describes which of the available variables of the c
 
 **Flow output**
 
-Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of "source_component_uac->target_component_uac". Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
+Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. Currently, always both energy and temperature are output, even for non-thermal media. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of "source_component_uac->target_component_uac". Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
 
 **Weather output**
 
@@ -153,7 +153,7 @@ If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the order of 
 
 The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
-A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax:
+A custom output does not sort alphabetically, but uses the order specified in the input file. It filters temperature flows if they contain no data, e.g. for non-thermal media or if no energy has been transferred. To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "output_plot": {
@@ -184,11 +184,11 @@ The name of each object of this entry is a consecutive number starting from 1. E
 
 **Component output**
 
-To specify component outputs, the ```"key"```  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component. See also the example above, first and second block. The ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are scalar values that are applied to this single output parameter.
+To specify component outputs, the ```"key"```  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component as defined in the [component parameters section](resie_component_parameters.md). See also the example above, first and second block. The ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are scalar values that are applied to this single output parameter.
 
 **Flow output**
 
-To specify an energy and temperature flow output, the ```"key"``` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as "source_component_uac->target_component_uac". See also the example above, third block. Here, ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are vector elements that have to contain exactly two values each, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that always both energy and temperature are plotted.
+To specify an energy and temperature flow output, the ```"key"``` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as "source_component_uac->target_component_uac". See also the example above, third block. Here, ```"axis"```, ```"unit"``` and  ```"scale_factor"``` can be vector elements that contain either one entry for the energy or two entries for energy and temperature flow, if the temperature should be plotted additionally. Then, exactly two values have to be given, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that even if two entries in the the meta information are given, the temperature might be filtered and not displayed if either no energy flow was present or a non-thermal media was requested.
 
 **Weather output**
 
@@ -294,9 +294,7 @@ The specification is a map mapping a component's UAC to the parameters required 
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also [this explanation](resie_energy_systems.md#energy-media)).
-* `output_refs` (`List{String}`/`Dict{String,Any}`, non-Busses only): The UACs of other components to which the current component outputs. For components with one output, a list is sufficient (see heat pump in the example above). For components with multiple outputs, currently heat pumps and electrolysers, a dict instead of a list should be given with `"output name": "target UAC"` to achieve uniqueness (see CHPP in the example above). This applies not for busses as they are handled differently! The relevant output names are given below:
-    * CHPP: `m_heat_out`, `m_el_out`
-    * Electrolyser:  `m_heat_ht_out`,  `m_h2_out`,  `m_o2_out`; optional: `m_heat_lt_out`
+* `output_refs` (`List{String}`/`Dict{String,Any}`, non-Busses only): The UACs of other components to which the current component outputs. For components with one output, a list is sufficient (see heat pump in the example above). For components with multiple outputs, currently CHPPs and electrolysers, a dict instead of a list should be given with `"output name": "target UAC"` to achieve uniqueness (see CHPP in the example above). This applies not for busses as they are handled differently! The relevant output media names can be found in the [component parameters section](resie_component_parameters.md) in "Output media" in the attribute block of the relevant components.
 * `control_parameters` (`Dict{String,Any}`): Parameters of the control and operational strategy of the component. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations. This entry can be omitted.
 * `control_modules` (`List{Dict{String,Any}}`): List of control modules, where each entry holds the required parameters for that module. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations on control modules. This list can be omitted if no module is activated for the component.
 * `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name can be one of the predefined media names, but can also be an other one (see also [this chapter on media naming](resie_energy_systems.md#energy-media)).  Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
