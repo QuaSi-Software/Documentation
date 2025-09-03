@@ -203,28 +203,33 @@ To plot the weather data read in from a provided weather file to the interactive
     "start_end_unit": "dd.mm.yyyy HH:MM",
     "time_step": 60,
     "time_step_unit": "minutes",
+    "__OPTIONAL PARAMETER__": "",
+    "start_output": "01.06.2024 00:00",
     "weather_file_path": "./path/to/dat/or/epw/weather_file.epw",
     "weather_interpolation_type_general": "stepwise",
     "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
     "longitude": 9.190182, 
     "time_zone": 1.0,
-    "epsilon": 1e-9
+    "epsilon": 1e-9,
+    "force_profiles_to_repeat": false
 },
 ```
 
-* `start` (`String`): Start time of the simulation as datetime format.
+* `start` (`String`): Start time of the simulation as datetime format. 
+* `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are output. The energies in the sankey, output CSV and output plot are starting at the start_output time specified.
 * `end` (`String`): End time (inclusive) of the simulation as datetime format, will be rounded down to the nearest multiple of time_step.
-* `start_end_unit` (`String`): Datetime format specifier for start and end time.
+* `start_end_unit` (`String`): Datetime format specifier for start, start_output and end time.
 * `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
 * `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
-* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
-* `weather_interpolation_type_general` (`String`): (Optional) Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `weather_interpolation_type_solar` (`String`): (Optional) Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
-* `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
-* `time_zone` (`Float`): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
-* `epsilon` (`Float`): The absolute tolerance for all floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to 1e-9.
+* `weather_file_path` (`String`, optional): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
+* `weather_interpolation_type_general` (`String`, optional): Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `weather_interpolation_type_solar` (`String`, optional): Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `latitude` (`Float`, optional): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `longitude` (`Float`, optional): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `time_zone` (`Float`, optional): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
+* `epsilon` (`Float`, optional): The absolute tolerance for all floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to 1e-9.
+* `force_profiles_to_repeat` (`Bool`, optional): If set to true, all utilized profiles are allowed to be repeated, even if denied or not specified in the profile header! Attention: This parameter disables the profile parameter in the profile header! Defaults to false.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
