@@ -640,6 +640,64 @@ The heat pump model implemented can serve different temperature layers in the in
 }
 ```
 
+### Unified eletric transformer, inverter and rectifier (UTIR)
+| | |
+| --- | --- |
+| **Type name** | `UTIR`|
+| **File** | `energy_systems/electric_producers/utir.jl` |
+| **System function** | `transformer` |
+| **Medium** | |
+| **Input media** | `m_el_in` |
+| **Output media** | `m_el_out` |
+| **Tracked values** | `IN`, `OUT`, `LossesGains` |
+
+A unified model for electric transformers, inverters and rectifiers.
+
+This can be used to model eletric components that transform from one type of electricity, at one voltage level, to another type or voltage level.
+
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `m_el_in` | `String` | Y/N | `m_e_dc_12v` | [-] | The medium of the input electricity. |
+| `m_el_out` | `String` | Y/N | `m_e_ac_230v` | [-] | The medium of the output electricity. |
+| `power` | `Float` | Y/N | 4000.0 | [W] | The maximum electric power output. |
+| `min_power_fraction` | `Float` | Y/Y | 0.0 | [-] | The minimum fraction of the design power that is required for the component to run. |
+| `efficiency_el_in` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `efficiency_el_out` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `linear_interface` | `String` | Y/Y | `el_in` | [-] | See [description of efficiency functions](#efficiency-functions). |
+| `nr_discretization_steps` | `UInt` | Y/Y | `30` | [-] | See [description of efficiency functions](#efficiency-functions). |
+
+#### Exemplary input file definition for UTIR
+
+**Inverter converting PV output to household AC**
+```json
+"TST_INV_01": {
+    "type": "UTIR",
+    "output_refs": ["TST_BUS_AC"],
+    "m_el_in": "m_e_dc_pv",
+    "m_el_out": "m_e_ac_230v",
+    "power": 10000,
+    "efficiency_el_in": "const:1.0",
+    "efficiency_el_out": "const:0.92",
+    "linear_interface": "el_in",
+    "min_power_fraction": 0.0
+}
+```
+
+**Transformer converting from a high to a medium voltage grid with load-dependent efficiency and minimum part load**
+```json
+"TST_TRF_01": {
+    "type": "UTIR",
+    "output_refs": ["TST_BUS_AC_5kV"],
+    "m_el_in": "m_e_ac_100kv",
+    "m_el_out": "m_e_ac_5kv",
+    "power": 10000000,
+    "efficiency_el_in": "const:1.0",
+    "efficiency_el_out": "logarithmic:1.0,0.9",
+    "linear_interface": "el_in",
+    "min_power_fraction": 0.1
+}
+```
+
 
 ## Storage
 
