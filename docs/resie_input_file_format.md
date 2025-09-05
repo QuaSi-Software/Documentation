@@ -18,6 +18,7 @@ An example for a UAC system could be a hierarchical structure based on location 
 
 Please note that UACs should not contain the following characters or sequences:
 
+- the character `:`
 - the sequence `->`
 - equal to any media names
 
@@ -326,18 +327,18 @@ It may be convenient to first export the `auxiliary_info` without a specificatio
 Example of a generated order of operation:
 ```json
 "order_of_operation": [
-    "TST_DEM_01 s_reset",
-    "TST_HP_01 s_reset",
-    "TST_SRC_01 s_reset",
-    "TST_GRI_01 s_reset",
-    "TST_DEM_01 s_control",
-    "TST_HP_01 s_control",
-    "TST_SRC_01 s_control",
-    "TST_GRI_01 s_control",
-    "TST_DEM_01 s_process",
-    "TST_HP_01 s_process",
-    "TST_SRC_01 s_process",
-    "TST_GRI_01 s_process"
+    "TST_DEM_01:s_reset",
+    "TST_HP_01:s_reset",
+    "TST_SRC_01:s_reset",
+    "TST_GRI_01:s_reset",
+    "TST_DEM_01:s_control",
+    "TST_HP_01:s_control",
+    "TST_SRC_01:s_control",
+    "TST_GRI_01:s_control",
+    "TST_DEM_01:s_process",
+    "TST_HP_01:s_process",
+    "TST_SRC_01:s_process",
+    "TST_GRI_01:s_process"
 ]
 ```
 
