@@ -1404,7 +1404,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance |
 | `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. according to DIN EN ISO 9806:2017[^ISO9806]. A good source for values is the solar keymark database[^SolarKeymark]  |
 | `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | J/(m³K) | Volumetric heat capacity of the fluid in the collector. |
-| `wind_speed_reduction` | `Float` | Y/Y | 0.5 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
+| `wind_speed_reduction` | `Float` | Y/Y | 1.0 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
 | `delta_T` | `Float` | Y/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
 | OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | m³/s/m² | Constant specific flow rate per m² collector_gross_area. Either delta_T or spec_flow_rate has to be defined. |
 | `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s/m² | Minimal spec_flow_rate to start producing energy; used together with delta_T |
@@ -1436,7 +1436,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "a_params": [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0],
 
     "vol_heat_capacity": 3921470,
-    "wind_speed_reduction": 1,
+    "wind_speed_reduction": 1.0,
     "delta_T": 4,
     "spec_flow_rate_min": 3.0E-08
 }
