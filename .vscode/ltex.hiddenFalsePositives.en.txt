@@ -1,1 +1,0 @@
-{"rule":"CURRENCY","sentence":"^\\Q\\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-)[0-9]+\\Q \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-)[0-9]+\\Q \\E(?:Dummy|Ina|Jimmy-|Dummy-|Maniquí-|Maniquíes-)[0-9]+\\Q $$ x = \\begin{cases} \\frac{1}{2} & \\text{for U-probe} \\\\ \\frac{1}{4} & \\text{for double-U-probe} \\end{cases} $$\\E$"}
