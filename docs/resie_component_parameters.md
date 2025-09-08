@@ -1215,9 +1215,9 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Medium** | |
 | **Input media** | |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
-| **Tracked values** | `OUT`, `Temperature`, `Max_Energy`,`Average_Temperature` , `Used_Energy`, `direct_solar_irradiance`, `delta_T`, `spec_flow_rate` |
+| **Tracked values** | `OUT`, `Temperature_Output`, `Temperature_Mean_Collector` , `direct_normal_irradiance`, `beam_solar_irradiance_in_plane`, `diffuse_solar_irradiance_in_plane`, `delta_T`, `spec_flow_rate` |
 
-Solarthermal collector producing heat depending on weather conditions.
+Solarthermal collector producing heat depending on weather conditions. The collector works in two modes depending if the collector should regulate the specific flow rate  `spec_flow_rate`  or temperature difference between input and output temperature `delta_T`. For this exclusively either `delta_T` or `spec_flow_rate` can be set to a fixed value.  If `delta_T` is set `spec_flow_rate_min` can be given, to make sure the collector doesn't turn on when only a very small flow rate and therefore small energy can be extracted from the collector. They same works for `spec_flow_rate` and `delta_T_min`.
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ---|--------------------- | ------------------------ |
@@ -1238,18 +1238,18 @@ Solarthermal collector producing heat depending on weather conditions.
 | OR:`constant_wind_speed` | `Float` | Y/N | 5.2 | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or wind_speed_file_path) |
 | `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
 | `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
-| `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between 0 and 90° with 0°=south, 90°=east/west. Other angles are not considered, since the incidence angle modifier values are not measured for values outside of [0°;90°C] |
+| `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between -180 and 180° with 0°=south, -90°=east, 90°=west. 
 | `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Gross area of the solarthermal collector |
 | `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) |
 | `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
 | `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
 | `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance |
-| `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. |
+| `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. according to DIN EN ISO 9806:2017[^ISO9806]. A good source for values is the solar keymark database[^SolarKeymark]  |
 | `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | J/(m³K) | Volumetric heat capacity of the fluid in the collector. |
 | `wind_speed_reduction` | `Float` | Y/Y | 0.5 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
 | `delta_T` | `Float` | Y/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
-| OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | m³/s | Constant flow rate in collector. Either delta_T or spec_flow_rate has to be defined. |
-| `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s | Minimal spec_flow_rate to start producing energy; used together with delta_T |
+| OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | m³/s/m² | Constant specific flow rate per m² collector_gross_area. Either delta_T or spec_flow_rate has to be defined. |
+| `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s/m² | Minimal spec_flow_rate to start producing energy; used together with delta_T |
 | OR:`delta_T_min` | `Float` | N/Y | 2.0 | K | Minimal delta_T to start producing energy; used together with spec_flow_rate |
 
 **Exemplary input file definition for solarthermal collector:**
@@ -1279,7 +1279,10 @@ Solarthermal collector producing heat depending on weather conditions.
 
     "vol_heat_capacity": 3921470,
     "wind_speed_reduction": 1,
-    "delta_t": 4,
+    "delta_T": 4,
     "spec_flow_rate_min": 3.0E-08
 }
 ```
+
+[^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
+[^SolarKeymark]: Solar Keymark, https://solarkeymark.eu/database/
