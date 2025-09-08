@@ -1413,7 +1413,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 **Exemplary input file definition for solarthermal collector:**
 
 ```JSON
-"TST_GTC_01": {
+"TST_STC_01": {
     "type": "SolarthermalCollector",
     "m_heat_out": "m_h_w_lt1",
     "output_refs": ["TST_DEM_01"],
