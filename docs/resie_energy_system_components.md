@@ -1171,7 +1171,7 @@ Symbol | Description | Unit
 \(T_{\text{a}}\) | absolute ambient air temperature | K
 \(\frac{d\vartheta_{\text{m}}}{dt}\) | change of mean fluid temperature over time | K/s
 \(a_{\text{1}}\) | heat loss coefficient | W/(m²K)
-\(a_{\text{2}}\) | temperature dependence of the heat loss coefficient W/(m²K²)
+\(a_{\text{2}}\) | temperature dependence of the heat loss coefficient | W/(m²K²)
 \(a_{\text{3}}\) | wind speed dependence of the heat loss coefficient | J/(m³K)
 \(a_{\text{4}}\) | sky temperature dependence of long wave radiation exchange | -
 \(a_{\text{5}}\) | effective thermal capacity | J/(m²K)
@@ -1244,8 +1244,8 @@ Symbol | Description | Unit
 \(\Delta T\) | Temperature difference between input and output | K
 \(\dot{v}\) | Collector flow rate | m³/s
 \(G_{dni}\) | Direct normal irradiance | W/m²
-\(G_b\) |  Beam solar irradiance on the collector plan | W/m²
-\(G_d\) |  Diffuse solar irradiance on the collector plan | W/m²
+\(G_b\) |  Beam solar irradiance on the collector plane | W/m²
+\(G_d\) |  Diffuse solar irradiance on the collector plane | W/m²
 
 **Parameters of the solarthermal collector:**
 
