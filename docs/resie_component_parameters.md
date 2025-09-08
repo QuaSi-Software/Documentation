@@ -1397,7 +1397,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
 | `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
 | `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between -180 and 180° with 0°=south, -90°=east, 90°=west. 
-| `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Gross area of the solarthermal collector |
+| `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Reflectance of the ground around the collector which can be approximated by the albedo of the ground |
 | `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) |
 | `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
 | `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
