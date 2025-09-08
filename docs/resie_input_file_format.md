@@ -16,9 +16,14 @@ The energy system components in the project need to be addressed somehow as the 
 
 An example for a UAC system could be a hierarchical structure based on location and affiliation of the components within the buildings, encoded as segments and separated by an underscore. For example, `TST_A1_HVAC_01_BT` could reference a buffer tank (`BT`) used in the first (`01`) `HVAC` cycle of the building `A1` in a project with prefix `TST`.
 
+Please note that UACs should not contain the following characters or sequences:
+
+- the sequence `->`
+- equal to any media names
+
 ### Energy media
 
-The specification of components and outputs often mention a medium, such as `m_h_w_ht1 OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
+The specification of components and outputs often mention a medium, such as `m_h_w_ht1:OUT` to specifiy a high temperature heat output of some component. You can find a full explanation of what media are in the context of ReSiE [in the chapter on energy systems](resie_energy_systems.md#energy-media). We encourage the use of this naming structure, but this is not strictly necessary.
 
 ## Project file structure
 
@@ -46,7 +51,7 @@ The overall structure of the project file is split into three general sections a
     "csv_output_file": "./output/out.csv",
     "csv_time_unit": "hours",
     "csv_output_keys": {
-        "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"],
+        "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"],
         ...
     },
     "csv_output_weather": true,
@@ -54,7 +59,7 @@ The overall structure of the project file is split into three general sections a
     "output_plot_time_unit": "date",
 	"output_plot": {
 		"1": {
-			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT"]},
+			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"]},
 			"axis": "left",
 			"unit": "kW",
 			"scale_factor": 0.001
@@ -89,9 +94,9 @@ The overall structure of the project file is split into three general sections a
 The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be super helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
 In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
-For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" must be specified as well, even if it is not defined in the input file.
+For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" and "Gains" must be specified as well, even if it is not defined in the input file.
 
-Below is an example of a custom color list for an energy system with common media (plus "Losses"):
+Below is an example of a custom color list for an energy system with common media (plus "Losses" and "Gains"):
 ```json
  "sankey_plot": {
     "m_h_w_lt1": "red",
@@ -101,7 +106,8 @@ Below is an example of a custom color list for an energy system with common medi
     "m_c_g_natgas": "purple3",
     "m_c_g_h2": "green3",
     "m_c_g_o2": "firebrick1",
-    "Losses": "grey40"
+    "Losses": "grey40",
+    "Gains": "grey40"
 }
 ```					
 
@@ -109,51 +115,85 @@ The resulting plot will be saved by default in `./output/output_sankey.html`. Th
 
 ### Output specification (CSV-file)
 
-The output values of each component can be written to a CSV-file. `csv_output_keys` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all"```, all possible output channels of all components will be written to the CSV-file, while for ```"nothing"``` no file will be created. 
+The output values of each component and the energy (and temperature if present) transferred between components can be written to a CSV-file. Therefore, the parameter `csv_output_keys` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be written, while   ```"csv_output_keys": "all_excl_flows"``` writes all component outputs, but no flow outputs to the CSV-file, and for ```"nothing"``` no file will be created. 
+ 
+If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the list of outputs is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only contain values during the times when energy is being transferred, otherwise they are `NaN`, as the temperatures may not be defined outside of these times.
 
-To specify a custom selection of outputs, use the following syntax:
+A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "csv_output_keys": {
-    "TST_01_HZG_01_CHP": ["m_h_w_ht1 OUT", "m_e_ac_230v OUT", "Losses"],
+    "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT", "m_e_ac_230v:OUT", "LossesGains"],
     "TST_01_ELT_01_BAT": ["Load"],
+    "m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]
     ...
 }
 ```
-The keys of this map must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1 OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
+There are two different ways of outputs. One is the output of parameters of components as defined in the [component parameters section](resie_component_parameters.md) (first and second line in the example above), and the other one is the energy or temperature flows between components across busses (third line in the example above). See below for a description on the syntax.
 
-The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `Losses`, which represents the total energy losses, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
+**Component output**
+
+For the component parameter output, the keys must correspond exactly to the UAC of the components defined in the component specification. By the definition of a map, each component can only appear once in this map. If multiple outputs for a single component should be tracked, multiple entries should be put in the list mapped to that component's UAC. Each entry describes one input, output or other variable of that component. For example, `m_h_w_ht1:OUT` means that the output of medium `m_h_w_ht1` (hot water) of that component should be tracked.
+
+The second part of the entry describes which of the available variables of the component the desired output is. For most components either `IN` (input) and/or `OUT` (output) is available, which additional variables depending on the type. For example, storage components often have the variable `Load` available, which corresponds to the amount of energy stored in the component. Also, most of the transformer and storage components have the output variable `LossesGains`, which represents the total energy losses (negative) or gains (positive) to or from the ambient, while some components have an additional splitting into different media of the losses, like `Losses_heat` or `Losses_hydrogen`.  These additional variables do not have a medium associated with them and hence should be declared with their name alone. For details, which output channels are available for each component, see the [chapter on the component parameters](resie_component_parameters.md). 
+
+**Flow output**
+
+Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. Currently, always both energy and temperature are output, even for non-thermal media. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of "source_component_uac->target_component_uac". Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
+
+**Weather output**
 
 To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
 
 ### Output specification (interactive .html plot)
 
-The output values of each component can be plotted in an interactive HTML-based line plot. `output_plot` can either be ```"all"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all"```, all possible output channels of all components will be plotted in the line plot, while for ```"nothing"``` no plot will be created. Note that for ```"output_plot": "all"```, the unit of each output is not specified as well as there is no `scale_factor` as for custon defined outputs. 
+The output values of each component and the energy (and temperature if present) transferred between components  can be plotted to an interactive HTML-based line plot. Therefore, the parameter `output_plot` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be plotted in the line plot, while   ```"output_plot": "all_excl_flows"``` plots all component outputs, but no flows, and for ```"nothing"``` no plot will be created. 
+ 
+If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the order of lines in the plot is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only display values during the times when energy is being transferred, as they may not be defined outside of these times.
 
-To define a custom plot, use the following syntax:
+The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
+
+A custom output does not sort alphabetically, but uses the order specified in the input file. It filters temperature flows if they contain no data, e.g. for non-thermal media or if no energy has been transferred. To specify a custom selection of outputs, use the following syntax:
 
 ```json
 "output_plot": {
     "1": {
-        "key": {"TST_HP_01": ["m_h_w_lt1 IN"]},
+        "key": {"TST_HP_01": ["m_h_w_lt1:IN"]},
         "axis": "left",
         "unit": "kW",
         "scale_factor": 0.001
     },
     "2": {
-        "key": {"TST_HP_01": ["m_h_w_ht1 OUT"]},
+        "key": {"TST_HP_01": ["m_h_w_ht1:OUT"]},
         "axis": "left",
         "unit": "kW",
         "scale_factor": 0.001
+    },
+    "3": {
+        "key": {"m_h_w_ht1": ["TST_STC_01->TST_DEM_02"]},
+        "axis": ["left", "right"],
+        "unit": ["kWh", "°C"],
+        "scale_factor": [0.001, 1]
     }
     ...
 }
 ```
-The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` that has to match the UAC-name of the component and the medium of the requested data, ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! 
+As for the CSV-output, the plot can both display component outputs as defined in the [component parameters section](resie_component_parameters.md) (first and second block in the example above) and energy or temperature flows between components across busses (third block  in the example above). 
+
+The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` , ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! If not handled differently, the default units are `Watt-hours` **during the current time step** and `°C` for temperatures. If `kilo-Watt-hours` should be plotted, a `"scale_factor": 0.001`  has to be applied to convert the `Wh` (default) to `kWh`.
+
+**Component output**
+
+To specify component outputs, the ```"key"```  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component as defined in the [component parameters section](resie_component_parameters.md). See also the example above, first and second block. The ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are scalar values that are applied to this single output parameter.
+
+**Flow output**
+
+To specify an energy and temperature flow output, the ```"key"``` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as "source_component_uac->target_component_uac". See also the example above, third block. Here, ```"axis"```, ```"unit"``` and  ```"scale_factor"``` can be vector elements that contain either one entry for the energy or two entries for energy and temperature flow, if the temperature should be plotted additionally. Then, exactly two values have to be given, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that even if two entries in the the meta information are given, the temperature might be filtered and not displayed if either no energy flow was present or a non-thermal media was requested.
+
+**Weather output**
 
 To plot the weather data read in from a provided weather file to the interactive HTML plot, the flag `plot_weather_data` in the `io_settings` can be set to `true`. Here, no scaling or other settings can be made yet.
 
-The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
 ## Simulation parameters
 ```json
@@ -163,26 +203,33 @@ The results will be saved by default in `./output/output_plot.html`. The plot ca
     "start_end_unit": "dd.mm.yyyy HH:MM",
     "time_step": 60,
     "time_step_unit": "minutes",
-    "weather_file_path": "./path/to/dat/or/epw/wather_file.epw",
+    "__OPTIONAL PARAMETER__": "",
+    "start_output": "01.06.2024 00:00",
+    "weather_file_path": "./path/to/dat/or/epw/weather_file.epw",
     "weather_interpolation_type_general": "stepwise",
     "weather_interpolation_type_solar": "linear_solar_radiation",
     "latitude": 48.755749,
     "longitude": 9.190182, 
-    "time_zone": 1.0
+    "time_zone": 1.0,
+    "epsilon": 1e-9,
+    "force_profiles_to_repeat": false
 },
 ```
 
-* `start` (`String`): Start time of the simulation as datetime format.
+* `start` (`String`): Start time of the simulation as datetime format. 
+* `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are output. The energies in the sankey, output CSV and output plot are starting at the start_output time specified.
 * `end` (`String`): End time (inclusive) of the simulation as datetime format, will be rounded down to the nearest multiple of time_step.
-* `start_end_unit` (`String`): Datetime format specifier for start and end time.
+* `start_end_unit` (`String`): Datetime format specifier for start, start_output and end time.
 * `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
 * `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
-* `weather_file_path` (`String`): (Optional) File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
-* `weather_interpolation_type_general` (`String`): (Optional) Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `weather_interpolation_type_solar` (`String`): (Optional) Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `latitude` (`Float`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
-* `longitude` (`Float`): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
-* `time_zone` (`Float`): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
+* `weather_file_path` (`String`, optional): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
+* `weather_interpolation_type_general` (`String`, optional): Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `weather_interpolation_type_solar` (`String`, optional): Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `latitude` (`Float`, optional): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `longitude` (`Float`, optional): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `time_zone` (`Float`, optional): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
+* `epsilon` (`Float`, optional): The absolute tolerance for all floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to 1e-9.
+* `force_profiles_to_repeat` (`Bool`, optional): If set to true, all utilized profiles are allowed to be repeated, even if denied or not specified in the profile header! Attention: This parameter disables the profile parameter in the profile header! Defaults to false.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
@@ -194,10 +241,10 @@ The specification for the components involved in the simulation is the most comp
 "components": {
     "TST_01_HZG_01_CHP": {
         "type": "CHPP",
-        "output_refs": [
-            "TST_01_HZG_01_BUS",
-            "TST_01_ELT_01_BUS"
-        ],
+        "output_refs": {
+            "m_heat_out": "TST_01_HZG_01_BUS",
+            "m_el_out": "TST_01_ELT_01_BUS"
+        },
         "control_parameters": {
             "load_storages m_e_ac_230v": false
         },
@@ -212,6 +259,17 @@ The specification for the components involved in the simulation is the most comp
         ],
         "power_el": 12500,
         "m_heat_out": "m_h_w_ht1"
+    },
+    "TST_01_HZG_01_HP": {
+        "type": "HeatPump",
+        "output_refs": [
+            "TST_01_HZG_01_BUS"
+        ],
+        "power_th": 9000,
+        "min_power_function": "const:0.0",
+        "cop_function": "carnot:0.4",
+        "power_losses_factor": 1.0,
+        "heat_losses_factor": 1.0
     },
     "TST_01_HZG_01_BUS": {
         "type": "Bus",
@@ -241,10 +299,10 @@ The specification is a map mapping a component's UAC to the parameters required 
 
 * `type` (`String`): The exact name of the type of the component.
 * `medium` (`String`): Some components can be used for a number of different media, for example a bus or a storage. If that is the case, this entry must match exactly one of the medium codes used in the energy system (see also [this explanation](resie_energy_systems.md#energy-media)).
-* `output_refs` (`List{String}`, non-Busses only): A list of UACs of other components to which the component outputs. Assignment of medium to component is given implicitly, as a component cannot output to two different components of the same medium.
+* `output_refs` (`List{String}`/`Dict{String,Any}`, non-Busses only): The UACs of other components to which the current component outputs. For components with one output, a list is sufficient (see heat pump in the example above). For components with multiple outputs, currently CHPPs and electrolysers, a dict instead of a list should be given with `"output name": "target UAC"` to achieve uniqueness (see CHPP in the example above). This applies not for busses as they are handled differently! The relevant output media names can be found in the [component parameters section](resie_component_parameters.md) in "Output media" in the attribute block of the relevant components.
 * `control_parameters` (`Dict{String,Any}`): Parameters of the control and operational strategy of the component. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations. This entry can be omitted.
 * `control_modules` (`List{Dict{String,Any}}`): List of control modules, where each entry holds the required parameters for that module. See [this chapter](resie_operation_control.md) and [this section](resie_component_parameters.md#control-modules) for explanations on control modules. This list can be omitted if no module is activated for the component.
-* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name has to match exactly one of the predefined media or a custom medium. Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
+* `m_heat_out` (`String`): The inputs and outputs of a component can be optionally configured with a chosen medium instead of the default value for the component's type. In this example the CHP's heat output has been configured to use medium `m_h_w_ht1`. The name can be one of the predefined media names, but can also be an other one (see also [this chapter on media naming](resie_energy_systems.md#energy-media)).  Which parameter configures which input/output (e.g. `m_el_in` for electricity input) can be found in the [chapter on input specification of component parameters](resie_component_parameters.md).
 
 The following parameter entries are for `Bus` components only:
 
@@ -296,7 +354,7 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     0.929535186
     ...
 ``` 
-- `startdate_timestamp`: A given timestamp (first coloumn) with a custom unit along with the data (second column) and a startdate
+- `startdate_timestamp`: A given timestamp (first column) with a custom unit along with the data (second column) and a startdate
 ```csv
     # time_definition: 			 startdate_timestamp
     # profile_start_date: 		 01.01.2020 00:00:00
@@ -307,7 +365,7 @@ Three different ways of defining a profile can be chosen by the parameter `time_
     900;   0.929535186
     ...
 ```
-- `datestamp`: A datetime stamp in a user-defined format (first coloumn) along with the data (second column). If no time zone is given, the datetime stamp is assumend to be local standard time without daylight savings! If the time series includes DST, the `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Any offset in the timestamp (e.g. 01.01.2020 01:00+01:00) is ignored, the specified `time_zone` is only used to calculate the local standard time, but does not move profiles from different time zones to a common one! Note that leap days will be filtered out in order to be consistent with weather files. The example below shows how to enter data with DST.
+- `datestamp`: A datetime stamp in a user-defined format (first column) along with the data (second column). If no time zone is given, the datetime stamp is assumed to be local standard time without daylight savings! If the time series includes DST, the `time_zone` has to be given in the IANA format, also known as tz identifier. A list is provided [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Any offset in the timestamp (e.g. 01.01.2020 01:00+01:00) is ignored, the specified `time_zone` is only used to calculate the local standard time, but does not move profiles from different time zones to a common one! Note that leap days will be filtered out in order to be consistent with weather files. The example below shows how to enter data with DST.
 ```csv
     # time_definition: 	datestamp
     # timestamp_format: dd.mm.yyyy HH:MM 
@@ -341,7 +399,8 @@ and in local standard time (without DST) without a `time_zone`:
 
 Ahead of the data, a block of metadata describes important information and parameters on the time series data. The metadata is given as comment lines (starting the line with `#`) of `name:value` pairs. Some specific metadata is expected, as described in the following, but any kind of metadata can be added to provide additional information. Just make sure that the lines start with a `#`.
 
-* `data_type` (`String`, required): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Intensive_and_extensive_properties) on intensive and extensive properties for more information.
+* `data_type` (`String`, required): The kind of the provided data, has to be `intensive` or `extensive`. Intensive data refers to quantities that do *not* depend on the size or amount of material, e.g. temperature, power, relative costs or relative schedules. Extensive data refers to quantities that depend on the amount of material, e.g. energy, mass or absolute costs. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Intensive_and_extensive_properties) on intensive and extensive properties for more information. 
+  **Note:** It does not matter if a component requires an energy profile or a power profile in the "Component parameter" chapter! Just set the `data_type` in the profile correctly, the rest will be done by the simulation engine.
 * `time_definition` (`String`, required): Specifies the kind of the definition of the timestamp, see above for details. Has to be one of `startdate_timestepsize`, `startdate_timestamp`, `datestamp`.
 * `profile_start_date` (`DateTime`): The date of the first datapoint of the profile (only for `startdate_timestepsize` or `startdate_timestamp`)
 * `profile_start_date_format` (`String`): The datetime format for the `profile_start_date` (only for `startdate_timestepsize` or `startdate_timestamp`).
@@ -350,6 +409,7 @@ Ahead of the data, a block of metadata describes important information and param
 * `time_zone` (`String`): A timezone in [IANA format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that applies for the datetime index. Must only be given if daylight saving is included in the `datestamp`. Only for `datestamp`.
 * `time_shift_seconds` (`Integer`, optional): Specifies the number of seconds by which to shift the timestamps of a profile. A positive value shifts the timestamps forward in time, meaning a specific value will align with an earlier time step. Conversely, a negative value shifts the timestamps backward, aligning a specific value with a later time step. If the timestamps do not align with the simulation timestep after the shift, the values will be linearly interpolated. This can be useful, for example, if a profile does not align with the convention that values represent the timespan following the given time step. If this results in a missing value at the beginning or end of a profile, the last or first value is duplicated. Attention: The linear interpolation may lead to a different sum and mean of the converted profile compared to the original one!
 * `interpolation_type` (`String`, optional): Specifies the interpolation type for profile segmentation. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "stepwise". Attention: Classic and time_preserving linear interpolation may lead to a different sum and mean of the converted profile in every time step compared to the original one! If you want to maintain the integral of a profile exactly, use step interpolation! A description and comparison of the different methods is given in [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `repeat_profile` (`String`, optional): If set to `yes` or `true`, the profile will be repeated n-times to cover the whole simulation time. This only works if the profile starts at or ahead of the simulation start time. Note that the profiles are repeated completely starting again with the first value of the profile, even if the profile start is ahead of the simulation start! This feature can be used to perform multi-year simulation with yearly profiles, or to use a profile with a coverage of one week for a yearly simulation repeating this week over and over again.
 
 The format specifier for a custom datetime format can be composed from the table below, that holds a selection of the possible format types that are defined by the Julia *Dates* module:
   

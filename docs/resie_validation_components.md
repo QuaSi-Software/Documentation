@@ -397,3 +397,67 @@ When the simulation is performed with a COP scaling factor of 1.0 and a constant
 [^Combitherm]: Combitherm: Betriebsanleitung Kälteanlage KWW 2/6563 R513A, Hersteller-Dokumentation Combitherm, 2021
 
 [^StiebelEltronWPL]: STIEBEL ELTRON: Bedienung und Installation für Luft-Wasser-Wärmepumpen WPL 13-23 E/cool, Hersteller-Dokumentation STIEBEL ELTRON, Stand 9147.
+
+## Seasonal thermal energy storage (STES)
+
+The model of the seasonal thermal energy storage in ReSiE was validated against the TRNSYS Type 342, originally developed by Bengt Eftring and Göran Hellström[^Eftring] and extended by Livio Mazzarella[^Mazzarella], also known as TRNSYS Type 142 or "XST Model". The TRNSYS models includes a fully ground-coupled model of a stratified storage, which is more than the current STES model in ReSiE is capable of. Here, in ReSiE, the thermal exchange to the ground is modeled with a user-defined ground temperature (constant or profile), neglecting any thermal capacity effects of the ground.
+
+For the validation, a self-discharging and a loading and unloading pattern were compared between the two models for a cylindrical storage with 50,000 m^3 of storage volume with a h/r ratio of 1.13. In order to make the two models better comparable, a constant ambient air temperature of 20 °C is assumed. In ReSiE, a ground temperature of 9 °C is assumed, while in TRNSYS the ground is modeled with typical parameters. The storage has 75 cm of insolation at the lid and 50 cm on the sidewalls and bottom, with a thermal conductivity of 0.1875 W/(m*K). 
+
+First, lets compare the self-unloading of the storage installed fully above the ground during 5 years. The figures shows the temperature within the top and the bottom storage layer. The differences of the temperature within the storage, especially in the bottom layer, can be explained by the constant ground temperature in ReSiE compared to the FEM model in TRNSYS that includes the thermal capacity of the ground below the STES.
+
+![Self-discharging of STES during 5 years, fully above ground](fig/250728_STES_TRNSYS_above_ground.svg)
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] | abs. temp. diff. after 5 years [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. TRNSYS top layer                   | 1.23                     |  1.54                     |     1.2         |
+| ReSiE vs. TRNSYS bottom layer                   | 2.59                      |  6.51                     |       0.7       |
+
+The inputs in ReSiE are the following:
+
+| Variable                      | Value |Unit |
+| ----------------------------- | ----- | ----- |
+| constant_ambient_temperature|  20 |  [°C] |
+| volume|  50000 |  [m^3] |
+| hr_ratio|  1.13 |  [-] |
+| sidewall_angle|  90 |  [°] |
+| shape|  "round" |  [-] |
+| rho_medium|  1000 |  [kg/m^3] |
+| cp_medium|  4.18 |  [kJ/(kgK)] |
+| diffusion_coefficient| 0.143 * 10^-6 |  [m^2/s] |
+| number_of_layer_total|  25 |  [-] |
+| number_of_layer_above_ground|  25|  [-] |
+| high_temperature|  90 |  [°C] |
+| low_temperature|  10 |  [°C] |
+| thermal_transmission_lid|  0.25 |  [W/(m^2K)] |
+| thermal_transmission_barrel|  0.375 |  [W/(m^2K)] |
+| thermal_transmission_bottom|  0.375 |  [W/(m^2K)] |
+| constant_ground_temperature|  9.0 |  [°C] |
+| initial_load|  1.0 |  [%/100] |
+
+To show the loading and unloading of the storage, an idealized pattern for loading and unloading was simulated both with ReSiE and TRNSYS. Here, a constant mass flow of 40.000 kg/h was assumed both for loading in January - April (input flow in top layer at 90 °C) and unloading in September - December (input flow in bottom layer at 10 °C). The parameter used are the same as for the self-discharging above. The resulting energy input and output in the storage as well as the temperature distribution within this year is shown below:
+
+![Loading and unloading STES, fully above ground](fig/250728_STES_TRNSYS_unloading_loading.svg)
+
+As seen in the figure, the energy and the temperature are quite close to each other. Only during self-discharging in summer, the differences between the models can be seen.
+
+| compared variants                   | mean energy diff. | max. energy  diff. | 
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. TRNSYS Energy (absolute values)      |    18.4 kWh                  |           71.9 kWh            |     
+| ReSiE vs. TRNSYS Energy (relative to maximum)  |     0.50 %              |        1.93 %          |     
+
+| compared variants                   | mean abs. temp. diff. [K] | max. abs. temp.  diff. [K] | 
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. TRNSYS top layer                     |      0.59               |        1.61               |     
+| ReSiE vs. TRNSYS 75% layer                    |      0.56                 |           1.57            |     
+| ReSiE vs. TRNSYS middle layer               |         0.52            |                1.49       |     
+| ReSiE vs. TRNSYS 25% layer                    |        0.54              |              1.43        |     
+| ReSiE vs. TRNSYS bottom layer              |         0.50              |               1.57         |     
+
+The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE may be extended in the future to better represent the ground-coupling thermal effects. To deal with this, a temperature profile for the ground can be used as input, e.g. with monthly ground temperatures.
+
+![Discharging STES during 5 years, underground](fig/250728_STES_TRNSYS_in_ground_realistic.svg)
+
+[^Eftring]: Bengt Eftring and Göran Hellström: "Heat Storage in the Ground. Stratified storage temperature model." 1989. University of Lund, Sweden.
+
+[^Mazzarella]: Livio Mazzarella: "Multi-flow stratified thermal storage model with full-mixed Layers: PdM - XST." 1992, Institut für Thermodynamik der Universität Stuttgart, Germany and Dipartimento di Energetica Politecnico di Milano, Italy

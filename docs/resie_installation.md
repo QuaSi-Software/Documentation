@@ -1,7 +1,7 @@
 # Installation and usage instructions
 **Requirements:**
 
-* Julia, minimum v1.8.5 and tested up to v1.11.3. You can find installation instructions [here](https://julialang.org/downloads/). Works best using Juliaup instead of precompiled binary files.
+* Julia, minimum v1.8.5 and tested up to v1.11.3. You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
 
 **Installation of ReSiE:**
 

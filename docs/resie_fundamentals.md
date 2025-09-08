@@ -34,6 +34,8 @@ While the conservation of energy is upheld, this does not mean that losses canno
 
 Due to the difficulty of generalizing the impact of these losses, they are not generally included in the energy flow model. Instead, the implementation of components that typically incur significant losses take this into account with imperfect conversion of energy. These losses are considered outside the system boundary and ignored. It is possible to track these for further analysis outside the simulation, e.g. as internal heating load for a thermal simulation of technical equipment and the surrounding room.
 
+Within the implementation of components, losses are currently handled as positive values, but for the output, **losses to the ambient are defined as negative and gains from the ambient as positive values**.
+
 ## Domain and boundaries
 
 Due to the generalized nature of the energy system used by ReSiE, there is no explicit scale inherent to the model. However in practicality there is a large number of parameters and nominal values involved in running an accurate simulation. The implementation of components in ReSiE is done while keeping a scale of buildings and districts in mind, meaning that performing a simulation of a large electric power network would yield inaccurate results. In particular transport losses are not modeled and (electric) power is represented as a simplified model.
@@ -56,8 +58,8 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components.
-* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment.
+* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid output with unlimited power.
+* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid input with unlimited power.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature.
@@ -117,11 +119,13 @@ Determining the order of operations follow an algorithm consisting of a base ord
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`:  `Bounded source`, `Bounded sink` 
+    7. `Process`: `Bounded source`, `Bounded sink`  (first general bounded sources/sinks, then grid inputs/outputs)
     8. `Distribute`: `Bus`
-2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is also technically not a rearrangement, as it happens during establishing the base order.
-4. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
-5. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
+2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is technically not a rearrangement, as it happens during establishing the base order.
+3. Reorder the `Control` operations to make sure that components that require temperature information during their control step from other components comes last: First the components that require this information in their output (geothermal probe, solar thermal collector), then the components that require the temperature information in their input interface (seasonal thermal store).
+4. Reorder the `Process` operation of components connected to the input and output interfaces of busses to ensure they follow the priorities on the bus. This acts as an addition to the initial order determined by the algorithm of 2. and applies only if there is no grid input/output at this bus, as with grid input/output, the output/input priorities of connected components do not matter.  
+5. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
+6. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
 
 The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:
 ![Illustration of the base order of operation](fig/230515_base_OoO.svg)
