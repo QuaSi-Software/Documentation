@@ -12,12 +12,12 @@ As measurement data, the project "GEW" in Gelsenkirchen, Germany was used. The m
 
 The 36 probes of the irregular shaped probe field were approximated using a rectangle shape with 3 x 12 probes with a distance of 8 m each in ReSiE, as there are no double-row L-configurations available as they are in EED, which would fit best to the original shape of the probe field. The g-function for this probe field was taken from the open source library by Spitler and Cook[^Spitler,Cook]. The thermal properties of the soil are known from a thermal response test at the site. 
 
-[^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu:  G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
+[^Spitler,Cook]: J. D. Spitler, J. C. Cook, T. West, and X. Liu: G-Function Library for Modeling Vertical Bore Ground Heat Exchanger. Geothermal Data Repository, 2021. doi: [https://doi.org/10.15121/1811518](https://doi.org/10.15121/1811518).
 
 The results showed a high sensibility to the soil parameters and the thermal borehole resistance (or the parameters required to calculate it). The different probe field configuration in EED, a double L-configuration, compared to a rectangle in ReSiE, has almost no effect on the results.
 The undisturbed ground temperature and also the temperature spread, that is assumed for the energy loading and unloading of the probe field, are also quite sensitive to the resulting average fluid temperature in the detailed model in ReSiE, as this directly affects the velocity of the fluid in the pipes and therefore the thermal resistance of the borehole. In the case study investigated, the power of the regeneration was much higher than the power of heat extraction, and therefore the temperature spread of loading had to be adjusted to meet the reality. The maximal output and input power was set very high to not limit the external energy sink and source into and out of the probe field. The thermal borehole resistance was calculated with the detailed model in ReSiE, but the simplified model with a constant thermal borehole resistance of \(0.1~W/(Km)\) shows also very good results in the comparison given the highly reduced amount of required input parameters.
 
-For a better overview, the daily averaged mean temperature within the probe field is compared betweeen ReSiE (both simplified and detailed model), EED and the measurement data in the figure below. In the following table, the mean and the maximum absolute temperature differences are given, calculated for a timestep of one hour. Below, a line plot is comparing the daily averaged temperature of all four variants for an exemplary week.
+For a better overview, the daily averaged mean temperature within the probe field is compared between ReSiE (both simplified and detailed model), EED and the measurement data in the figure below. In the following table, the mean and the maximum absolute temperature differences are given, calculated for a timestep of one hour. Below, a line plot is comparing the daily averaged temperature of all four variants for an exemplary week.
 
 | compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
 | ----------------------------------- | ------------------------- | ------------------------- | 
@@ -50,15 +50,15 @@ The input parameter of the simulation above is given in the following table. The
 | effective thermal resistance [(Km)/W]   | 0.1 / calculated | calculated | ?         |
 | soil undisturbed ground temperature [°C]| **13**        | **13**    | 12            |
 | soil heat conductivity [W/(Km)]         | 1.6           | 1.6       | 1.6 (from thermal response test) |
-| soil density [kg/m^3]                   | 1800          | 1800      | ? (clay and silt) |
+| soil density [kg/m³]                   | 1800          | 1800      | ? (clay and silt) |
 | soil specific heat capacity [J/(kgK)]   | 2400          | 2400      | 2400          |
-| ground heat capacity [MJ/(m^3/K)]       | -             | 4.32      | ?             |        
+| ground heat capacity [MJ/(m³/K)]       | -             | 4.32      | ?             |        
 | pipe diameter outer [m]                 | 0.032         | 0.032     | 0.0320        |
 | pipe diameter inner [m]                 | 0.0262        | 0.0262    | 0.0262        |
 | pipe heat conductivity [W/(Km)]         | 0.42          | 0.42      | ?             |
 | fluid specific heat capacity [J/(kgK)]  | 3795          | 3795      | 3795          |
-| fluid density [kg/m^3]                  | 1052          | 1052      | 1052          |
-| fluid kinematic viscosity [m^2/s]       | 3.9e-6        | -         | ?             |
+| fluid density [kg/m³]                  | 1052          | 1052      | 1052          |
+| fluid kinematic viscosity [m²/s]       | 3.9e-6        | -         | ?             |
 | fluid dynamic viscosity [Kg/(ms)]       | -             | 4.103e-3  | ?             |
 | fluid heat conductivity [W/(Km)]        | 0.48          | 0.48      | 0.48          |
 | fluid prandtl number [-]                | 31.3          | ?         | 31.3          |
@@ -87,7 +87,7 @@ First, the geothermal collector was simulated with all three simulations models 
 | ReSiE vs. TRNSYS                    | 0.16                      |  1.18                     |
 
 
-Then, a realistic energy demand profile for heating and hot water of a 2.500 m^2 building with 85 % living and 15 % commercial usage was used to evaluate the dynamic behaviour of the models. Especially in summer, small deviations between ReSiE and TRNSYS are visible, but an overall congruency can be observed. In short term analysis, the model in ReSiE shows stronger gradients in the change in extraction power compared to TRNSYS, which may originate from the different model of the thermal transport from fluid to the pipe-surrounding soil. Overall, all three models show acceptable differences. 
+Then, a realistic energy demand profile for heating and hot water of a 2.500 m² building with 85 % living and 15 % commercial usage was used to evaluate the dynamic behaviour of the models. Especially in summer, small deviations between ReSiE and TRNSYS are visible, but an overall congruency can be observed. In short term analysis, the model in ReSiE shows stronger gradients in the change in extraction power compared to TRNSYS, which may originate from the different model of the thermal transport from fluid to the pipe-surrounding soil. Overall, all three models show acceptable differences. 
 
 ![Validation of collector model with TRNSYS and DELPHIN: Average fluid temperature over one year with energy profile as demand](fig/241220_profile_one_year.svg)
 
@@ -138,11 +138,11 @@ In ReSiE the detailed model for the energy transport from fluid to soil was used
 | considered_soil_depth | 10.0 m |
 | soil_specific_heat_capacity | 850 J/(kgK) |
 | soil_specific_heat_capacity_frozen | 850 J/(kgK) |
-| soil_density | 1900 kg/m^3 |
+| soil_density | 1900 kg/m³ |
 | soil_heat_conductivity | 2.4 W/(mK) |
 | soil_heat_conductivity_frozen | 2.9 W/(mK) |
 | soil_specific_enthalpy_of_fusion | 90000 J/K |
-| surface_convective_heat_transfer_coefficient | 14.7 W/(m^2 K) |
+| surface_convective_heat_transfer_coefficient | 14.7 W/(m² K) |
 | surface_reflection_factor | 0.25 |
 | surface_emissivity | 0.9 |
 | unloading_temperature_spread | 3.0 K |
@@ -152,8 +152,8 @@ In ReSiE the detailed model for the energy transport from fluid to soil was used
 | pipe_heat_conductivity | 0.4 W/(mK) |
 | fluid_specific_heat_capacity | 3944 J/(kgK) |
 | fluid_heat_conductivity | 0.499 W/(mK) |
-| fluid_density | 1025 kg/m^3 |
-| fluid_kinematic_viscosity | 3.6e-6 m^2/s |
+| fluid_density | 1025 kg/m³ |
+| fluid_kinematic_viscosity | 3.6e-6 m²/s |
 | fluid_prantl_number | 30 |
 
 The parameters for the comparison with the measurement data were deviating as follows, due to extremely wet conditions, the beginning of the heating season and therefore warm soil, and the high volume flow through the collector:
@@ -167,10 +167,98 @@ The parameters for the comparison with the measurement data were deviating as fo
         
 In DELPHIN, a thermal transmission from fluid to pipe of 50 W/m²K for the normal simulations and 700 W/m²K for the measurement data was used.
 
+
 [^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 [^DELPHIN]: H. Fechner, U. Ruisinger, A. Nicolai, J. Grunedwald: DELPHIN - Simulationsprogramm für den gekoppelten Warme-, Luft-, Feuchte-, Schadstoff- und Salztransport. TU Dresden / Bauklimatik-Dresden. [https://bauklimatik-dresden.de/delphin/index.php](https://bauklimatik-dresden.de/delphin/index.php)
 
+
+## Solarthermal collector
+
+To validate the model for solarthermal collector and the solar irradiance calculations, it is compared to TRNSYS as well as measurement data. 
+In the first analysis the focus is on the direct comparison between ReSiE and TRNSYS that both use a model based on DIN EN ISO 9806:2017[^ISO9806] internally while using different approaches when it comes to the solar irradiance calculations and calculation of dynamic behaviour. The goal is to show the general viability of the implemented model.
+In the second chapter ReSiE and TRNSYS are compared against measurement data from a real project with weather data from the closest weather station. To goal of this part is to show how well the models of ReSiE and TRNSYS are in predicting real time performance under imperfect data availability. 
+
+[^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
+
+### Validation against TRNSYS 18
+For the model validation against TRNSYS 18 a typical usage profile of the solarthermal collector is created. Flat plate collectors combined with an air source heat pump are used to supply a newly build single family house with heat for heating and hot water. A buffer tank helps to store excess heat. The control for the solarthermal collector uses a fixed flow rate as soon as heat can be delivered to the buffer tank. 
+To focus the validation on the solarthermal collector model and ignore the effects of other components in the full system simulation, only the inputs and outputs of the collector are used in the following analysis. In TRNSYS Type 1286 is used to simulate the collector and Type 15-10 to calculate the solar irradiance in the collector plane.
+In ReSiE the system is modelled by using only the solarthermal collector and an infinite heat demand. The flow rate and input temperature profiles are given to the collector and the output temperature and generated heat are compared to TRNSYS. Additionally the calculated irradiances in the collector plane are compared to show differences that could influence the results outside of the collector model.
+
+The used parameters are shown in this table:
+| Variable                      | Value |
+| ----------------------------- | ----- |
+| collector_gross_area | 16.38 m² |
+| tilt_angle | 30 ° |
+| azimuth_angle | 0 ° |
+| eta_0_b | 0.734 |
+| K_b_t_array | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] |
+| K_b_l_array | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] |
+| K_d | 0.97 |
+| a_params |[3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] |
+| vol_heat_capacity | 3.903255e6 J/(m³K) |
+| wind_speed_reduction | 1.0 |
+| ground_reflectance | 0.4 |
+
+In comparison to TRNSYS ReSiE shows -3.8 % difference in produced heat. This can be largely attributed to the different model used for the diffuse irradiance which results in -6.2 % reduced diffuse irradiance and -2.9 % total irradiance in the collector plane. When the ReSiE model is run with given irradiances from TRNSYS the difference in produced heat is reduced to 0.8 %.
+If we take a more detailed look at the model behaviour in an example of three summer days in the following figures we notice two main effects. 
+The first one is, that at the start of the collector operation (first time step with flow rate >0) the ReSiE model shows a less strong dynamic reaction. The produced heat in the first time step is usually lower than TRNSYS but dropping less in the next time step. This effect might be connected to TRNSYS using subtimesteps for simulation and modelling a collector array with multiple collectors in series.
+The second effect is that the output temperature of the ReSiE model is higher during  the middle of the day (e.g. at 30.07 12:00), which can be attributed to the difference in the diffuse irradiance model, which is visible in the second figure.
+
+![Validation of solar thermal collector model with TRNSYS: Output temperature and produced heat of the collector](fig/validation_solar_thermal/temperatur_trnsys.png)
+
+![Validation of solar thermal collector model with TRNSYS: Solar radiation in collector plane](fig/validation_solar_thermal/strahlung_trnsys.png)
+
+In the next table are the mean and the maximum absolute temperature differences given for a few different cases. 
+- w/o irradiance means that the irradiance values of TRNSYS is used instead of it's own irradiance calculation. 
+- w/o operation start means that the first timestep after the start of operation is ignored.
+- in operation means that all values are ignored if the flow rate is 0.
+
+| compared variants               | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. TRNSYS   												  | 0.68     |  15.7   |
+| ReSiE vs. TRNSYS in operation			  					| 0.76     |  4.66   |
+| ReSiE vs. TRNSYS w/o operation start   			  | 0.63     |  3.83   |
+| ReSiE w/o irradiance vs. TRNSYS   					  | 0.37     |  10.9   |
+| ReSiE w/o irradiance vs. TRNSYS in operation	| 0.30     |  3.73   |
+| ReSiE w/o irradiance vs. TRNSYS w/o operation start | 0.23    |  3.73   | 
+
+### Validation against measurement data
+
+In the second step the model is validated against measurement data. For this case a multifamily house is with a heat pump and solarthermal absorbers on the roof is chosen. The measurement data covers outside air temperature, temperature at the collector output, flow rate and temperature to the collector. The flow rate and temperature to the collector are measured in the building basement, while the output temperature is measured at the collector. The wind speed and irradiance values are taken from the nearest weather station of the DWD (Deutscher Wetterdienst). The parameters in the data sheet of the collector are given for the old standard DIN EN ISO 9806:2013 and are converted to DIN EN ISO 9806:2017 using [^SolarKeymarkAnnexP1]. The input parameters for ReSiE are given in the following table.
+
+| Variable                      | Value |
+| ----------------------------- | ----- |
+| collector_gross_area | 430 m² |
+| tilt_angle | 5 ° |
+| azimuth_angle | 0 ° |
+| eta_0_b | 0.5664 |
+| K_b_t_array | [1.00, 1.00, 1.00, 1.00, 1.00, 0.89, 0.71, 0.36, 0.00] |
+| K_b_l_array | [1.00, 1.00, 1.00, 1.00, 1.00, 0.89, 0.71, 0.36, 0.00] |
+| K_d | 0.96 |
+| a_params |[43.41, 0, 3.59, 0.47855, 3906, 0.04633, 0.03938, 0] |
+| vol_heat_capacity | 3.921470e6 J/(m³K) |
+| wind_speed_reduction | 1.0 |
+| ground_reflectance | 0.4 |
+
+The difference in produced heat between measurements and ReSiE is +8.5 % for ReSiE. This is a very good result, if we take into consideration the irradiance and wind speed data is wasn't available as locally measured values but only from the closest weather station. It brings a high uncertainty considering local effects on wind speed through surrounding buildings and on irradiance through clouds. Another effect to take into consideration is the difference in measuring the output temperature at the collector and the input temperature and flow rate in the building basement. This decouples the values slightly considering the long pipes running from the basement to the roof.
+
+The figure below shows 5 days in the beginning of June highlighting the differences between simulation and measurement. 
+The biggest difference can be seen when the operation is only active for one timestep for example on the 03.06 or at the beginning and end of the operation. This can be attributed to misleading measurements. The measurements are only available in 15 minute timesteps but internally the sensors create a mean value over those 15 minutes. So if the water flow is active for only 5 minutes the flow rate is reported as 1/3 over the whole timestep. The same is true for the temperature. When the water flow is active, usually fresh cold water is replacing the warmed up stale water in the pipes, which shows up as a temperature drop in the input temperature. If the water flow is active only for the last 5 minutes of a timestep the temperature is average with the higher values from the first 10 minutes, leading to a higher mean value and a wrong response from the simulation model.
+
+![Validation of solar thermal collector model with TRNSYS: Output temperature and produced heat of the collector](fig/validation_solar_thermal/temperatur_RSTV.png)
+
+The mean and maximum absolute temperature differences are given in the next table analogous to the validation against TRNSYS. As expected the differences are higher than in the synthetic comparison against TRNSYS, but still give good results during the operation of the collector. 
+
+| compared variants               | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
+| ----------------------------------- | ------------------------- | ------------------------- | 
+| ReSiE vs. Measurement										  | 2.83     |  38.3   |
+| ReSiE vs. Measurement in operation			  	| 0.87     |  21.4   |
+| ReSiE vs. Measurement w/o operation start   | 0.42     |  18.9   |
+
+
+[^SolarKeymarkAnnexP1]: Solar Keymark. "Annex P1 Collectors EN 12975 General: R6/ Edition 2023-05-12." Technical documentation. Zugriff am: 12. Juni 2024. [Online.] Verfügbar: https://solarkeymark.eu/the-network/certification-scheme-rules/
 
 ## Heat pump
 

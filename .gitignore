@@ -14,3 +14,6 @@ docs/fig/Thumbs.db
 
 # ignore everything in data directory unless explicitly added
 docs/data/*
+
+# local data for spellchecking
+.vscode/*
