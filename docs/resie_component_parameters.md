@@ -1398,11 +1398,11 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
 | `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between -180 and 180° with 0°=south, -90°=east, 90°=west. 
 | `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Reflectance of the ground around the collector which can be approximated by the albedo of the ground |
-| `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\) |
-| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
-| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. |
-| `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance |
-| `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector. according to DIN EN ISO 9806:2017[^ISO9806]. A good source for values is the solar keymark database[^SolarKeymark]  |
+| `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\). A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance. A good source for values is the solar keymark database[^SolarKeymark]|
+| `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector according to DIN EN ISO 9806:2017[^ISO9806]. A good source for values is the solar keymark database[^SolarKeymark]  |
 | `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | J/(m³K) | Volumetric heat capacity of the fluid in the collector. |
 | `wind_speed_reduction` | `Float` | Y/Y | 1.0 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
 | `delta_T` | `Float` | Y/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
@@ -1410,7 +1410,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s/m² | Minimal spec_flow_rate to start producing energy; used together with delta_T |
 | OR:`delta_T_min` | `Float` | N/Y | 2.0 | K | Minimal delta_T to start producing energy; used together with spec_flow_rate |
 
-**Exemplary input file definition for solarthermal collector:**
+**Exemplary input file definition for flat plate solarthermal collector:**
 
 ```JSON
 "TST_STC_01": {
@@ -1424,7 +1424,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "infrared_sky_radiation_from_global_file": "longWaveIrr",
     "wind_speed_from_global_file": "wind_speed",
 
-    "collector_gross_area": 46.8,
+    "collector_gross_area": 2.34,
     "tilt_angle": 30,
     "azimuth_angle": 0,
     "ground_reflectance":0.4,
@@ -1434,6 +1434,70 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "K_b_l_array":[1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00],
     "K_d": 0.97,
     "a_params": [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0],
+
+    "vol_heat_capacity": 3921470,
+    "wind_speed_reduction": 1.0,
+    "delta_T": 4,
+    "spec_flow_rate_min": 3.0E-08
+}
+```
+
+**Exemplary input file definition for a WISC solarthermal collector:**
+
+```JSON
+"TST_STC_01": {
+    "type": "SolarthermalCollector",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": ["TST_DEM_01"],
+
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "beam_solar_radiation_from_global_file": "beamHorIrr",
+    "diffuse_solar_radiation_from_global_file": "difHorIrr",
+    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "wind_speed_from_global_file": "wind_speed",
+
+    "collector_gross_area": 2.56,
+    "tilt_angle": 5,
+    "azimuth_angle": 0,
+    "ground_reflectance":0.4,
+
+    "eta_0_b": 0.702,
+    "K_b_t_array":[1.00, 1.00, 1.00, 1.00, 1.00, 0.89, 0.71, 0.36, 0.00],
+    "K_b_l_array":[1.00, 1.00, 1.00, 1.00, 1.00, 0.89, 0.71, 0.36, 0.00],
+    "K_d": 0.96,
+    "a_params": [32.64, 0.0, 1.93, 0.3159, 3906, 0.04633, 0.02085, 0.0],
+
+    "vol_heat_capacity": 3921470,
+    "wind_speed_reduction": 1.0,
+    "delta_T": 4,
+    "spec_flow_rate_min": 3.0E-08
+}
+```
+
+**Exemplary input file definition for a evacuated tube solarthermal collector:**
+
+```JSON
+"TST_STC_01": {
+    "type": "SolarthermalCollector",
+    "m_heat_out": "m_h_w_lt1",
+    "output_refs": ["TST_DEM_01"],
+
+    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "beam_solar_radiation_from_global_file": "beamHorIrr",
+    "diffuse_solar_radiation_from_global_file": "difHorIrr",
+    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "wind_speed_from_global_file": "wind_speed",
+
+    "collector_gross_area": 3.35,
+    "tilt_angle": 30,
+    "azimuth_angle": 0,
+    "ground_reflectance":0.4,
+
+    "eta_0_b": 0.576,
+    "K_b_t_array":[1.01, 1.01, 1.03, 1.04, 0.97, 1.06, 1.13, 0.57, 0.00],
+    "K_b_l_array":[1.00, 1.00, 0.99, 0.97, 0.91, 0.85, 0.70, 0.35, 0.00],
+    "K_d": 1.12,
+    "a_params": [0.473, 0.003, 0.0, 0.0, 13340, 0.0, 0.0, 0.0],
 
     "vol_heat_capacity": 3921470,
     "wind_speed_reduction": 1.0,
