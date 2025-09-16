@@ -18,6 +18,7 @@ An example for a UAC system could be a hierarchical structure based on location 
 
 Please note that UACs should not contain the following characters or sequences:
 
+- the character `:`
 - the sequence `->`
 - equal to any media names
 
@@ -309,10 +310,14 @@ The following parameter entries are for `Bus` components only:
 * `connections` (`Dict{String, Any}`): Configuration of the connections of components over a bus. Sub-configs are:
     * `output_order` (`List{String}`): Similar to the entry `output_refs`, however the order of UACs in this list corresponds to the output priorities of components on the bus with entries at the beginning being given the highest priority and receiving energy first.
     * `input_order` (`List{String}`): Similar to the entry `output_order` but for the inputs on the bus.
-    * `energy_flow` (`List{List{Int}}`): A matrix that defines which components are allowed to deliver energy to which other components. Rows correspond to the inputs and columns to outputs of the bus, both in the order defined in the entries `input_order` and `output_order`. The numbers should be 1 if the energy flow from the input (row) to the output (column) is allowed or 0 if it is not. No other numbers should be used. The following figure illustrates the principle of the `energy_flow` matrix on the basis of a bus with a CHP, a heat pump, a storage and a demand component. Only the heat pump is allowed to load the storage, while all three inputs (including storage) are allowed to deliver energy to the demand.
-<center>![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)</center>
-
-
+    * `energy_flow` (`List{List{Int}}`): A matrix that defines which components are allowed to deliver energy to which other components. Rows correspond to the inputs and columns to outputs of the bus, both in the order defined in the entries `input_order` and `output_order`. 
+    Two different ways of defining the energy matrix are available: 
+        * To simply allow or deny a connection while using the specified `input_order` and `output_order` as distribution order in the bus, the `energy_flow` matrix should be filled with 1 or 0 only. The numbers should be 1 if the energy flow from the input (row) to the output (column) is allowed or 0 if it is not. No other numbers should be used. The following figure illustrates the principle of the `energy_flow` matrix on the basis of a bus with a CHP, a heat pump, a storage and a demand component. Only the heat pump is allowed to load the storage, while all three inputs (including storage) are allowed to deliver energy to the demand. 
+    <center>![Storage Loading Matrix](fig/230328_Storage_Loading_Matrix.svg)</center>
+        * To manipulate the order of distribution for every source or sink differently, the matrix can also be filled with zeros (connections denied) and consecutive ascending numbers starting from 1 (connections allowed). Then, the distribution order is no longer orientated on the general `input_order` and `output_order` of the bus, but instead each input -> output connection is prioritized by the order specified in the energy flow matrix. This can be helpful to simulate local grids, e.g. two houses, each with a PV and a power demand that is met by the own PV on first priority, but with the possibility to exchange the excess energy of each house to the other house. **Important Notes:**
+            * This feature can not be used for interconnected busses. If you still want to use this feature, first create a single bus from the interconnected busses, which is always possible.
+            * This feature may not work as expected for all possible energy systems, although it has been tested to work with many. 
+   
 ## Order of operation
 
 The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `auxiliary_info` flag and the `auxiliary_info_file` path in the [Input/Output section](resie_input_file_format.md#input-output-settings) described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
@@ -322,18 +327,18 @@ It may be convenient to first export the `auxiliary_info` without a specificatio
 Example of a generated order of operation:
 ```json
 "order_of_operation": [
-    "TST_DEM_01 s_reset",
-    "TST_HP_01 s_reset",
-    "TST_SRC_01 s_reset",
-    "TST_GRI_01 s_reset",
-    "TST_DEM_01 s_control",
-    "TST_HP_01 s_control",
-    "TST_SRC_01 s_control",
-    "TST_GRI_01 s_control",
-    "TST_DEM_01 s_process",
-    "TST_HP_01 s_process",
-    "TST_SRC_01 s_process",
-    "TST_GRI_01 s_process"
+    "TST_DEM_01:s_reset",
+    "TST_HP_01:s_reset",
+    "TST_SRC_01:s_reset",
+    "TST_GRI_01:s_reset",
+    "TST_DEM_01:s_control",
+    "TST_HP_01:s_control",
+    "TST_SRC_01:s_control",
+    "TST_GRI_01:s_control",
+    "TST_DEM_01:s_process",
+    "TST_HP_01:s_process",
+    "TST_SRC_01:s_process",
+    "TST_GRI_01:s_process"
 ]
 ```
 
