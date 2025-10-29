@@ -725,17 +725,116 @@ A generic implementation for energy storage technologies.
 | **Type name** | `Battery`|
 | **File** | `energy_systems/storage/battery.jl` |
 | **System function** | `storage` |
-| **Medium** | `medium`/`m_e_ac_230v` |
-| **Input media** | `None`/`auto` |
-| **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains` |
+| **Medium** |  |
+| **Input media** | `m_el_in`/`m_e_ac_230v` |
+| **Output media** | `m_el_out`/`m_e_ac_230v`, `m_heat_lt_out`/`m_h_w_lt1` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `charge_efficiency`, `discharge_efficiency`, `CellVoltage`, `SOC`, `ExtractedCharge`, `Cycles`, `Temperature` |
 
 A storage for electricity.
 
-| Name | Type | R/D |  Example | Unit | Description |
-| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+Multiple model types are available. The model `simplified` is a very basic energy storage with no chemistry processes being modelled and a fixed charge and discharge efficiency must be given. The model `detailed`  models the chemical process with a parametrised voltage-capacity curve for a battery cell. The battery cycle and temperature dependency are also modelled.
+To simplify the use of this model multiple battery chemistries are provided with default parameters. To choose the lithium iron phosphate battery use the model type `Li-LFP`. Other battery chemistry presets will follow with future updates.
+See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more details how the parameters are defined and more details to the `detailed` model.
+
+**General parameter:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `model_type` | `String` | Y/Y | "simplified" | [-] | type of the battery model: `simplified`, `detailed`, `Li-LFP` |
 | `capacity` | `Float` | Y/N | 12000.0 | [Wh] | The overall capacity of the battery. |
-| `load` | `Float` | Y/N | 6000.0 | [Wh] | The initial load state of the battery. |
+| `load` | `Float` | Y/Y | 0.0 | [Wh] | The initial load state of the battery. |
+| `charge_efficiency` | `Float` | Y/N | 0.97 |  [-] | efficiency while charging the battery; only needed for model type `simplified` |
+| `discharge_efficiency` | `Float` | Y/N | 0.97 |  [-] |efficiency while discharging the battery; only needed for model type `simplified` |
+| `self_discharge_rate` | `Float` | Y/Y | 0.0 | [%/month] | rate of self-discharge, that is only applied if no charge or discharge is happening; month = 30 days |
+| `max_charge_C_rate` | `Float` | Y/Y | 1.0 | [1/h] |  the maximum charging C-Rate of the battery related to the capacity if model_type = `simplified` otherwise related to cell capacity |
+| `max_discharge_C_rate` | `Float` | Y/Y | 1.0 | [1/h] |  the maximum discharging C-Rate of the battery related to the capacity if model_type = `simplified` otherwise related to cell capacity |
+| `SOC_min` | `Float` | Y/Y | 0.0 |  [%] |The minimum SOC until which will be discharged. For the model_type `detailed` this is not a strict value since the capacity depends on discharge current. With self-discharge the SOC can fall until 0 even if `SOC_min` is set higher than that. |
+| `SOC_max` | `Float` | Y/Y | 100.0 |  [%] |The maximum SOC until which will be charged. |
+
+**Parameter for the "detailed" model:**
+
+| `V_n_bat` | `Float` | Y/N | 153.6 |  [V] | The total nominal battery voltage. |
+| `cell_cutoff_current` | `Float` | Y/Y | 0.3 % of `capacity_cell_Ah` |  [A] | If the charge current falls below this value the battery is defined as full in Constant Voltage charging. |
+| `cycles` | `Float` | Y/Y | 1 |  [-] | The number of full battery cycles at the start of the simulation. Minimum is 1 |
+| `Temp` | `Float` | Y/Y | 25 |  [°C] | The battery temperature. Is set to constant since adequate temperature control is assumed. |
+
+**Parameter for the "detailed" model if not specific chemistry is chosen:**
+
+| Name        | Type    | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | ------- | ---- | ----------- |
+| `V_n` | `Float` | Y/Y | 3.2 |  [V] | The nominal cell voltage |
+| `r_i` | `Float` | Y/Y | 0.00016 |  [\(\varOmega\)] | The internal cell resistance |
+| `V_0` | `Float` | Y/Y | 3.36964 |  [V] | Parameter for battery constant voltage |
+| `K` | `Float` | Y/Y | 0.03546 |  [V] | Parameter for polarisation voltage |
+| `A` | `Float` | Y/Y | 0.08165 |  [V] | Parameter for exponential zone amplitude |
+| `B` | `Float` | Y/Y | 0.1003 |  [1/(Ah)] | Parameter for exponential zone time constant inverse |
+| `capacity_cell_Ah` | `Float` | Y/Y | 1090 | [Ah] | Nominal cell capacity. |
+| `m` | `Float` | Y/Y | 1.0269 |  [-] | Parameter for capacity factor. |
+| `alpha` | `Float` | Y/Y | -0.01212 |  [-] |Parameter for current dependence of capacity. |
+| `k_qn` | `Array` | Y/Y | [-1.27571e-7, 1.22095e-11] |  [-] | Parameters of cycle dependency of capacity |
+| `k_qT` | `Array` | Y/Y | [1.32729e-3, -7.9763e-6] |  [-] | Parameters of temperature dependency of capacity |
+| `k_n` | `Array` | Y/Y | [9.71249e-6, 7.51635e-4, -8.59363e-5, -2.92489e-4] |  [-] | Parameters of cycle dependency of `V_0`, `r_i`, `K` and `A` |
+| `k_T` | `Array` | Y/Y | [1.05135e-3, 1.83721e-2, -7.72438e-3, -4.31833e-2] |  [-] | Parameters of temperature dependency of `V_0`, `r_i`, `K` and `A` |
+| `I_ref` | `Float` | Y/Y | 100.0 |  [A] | Reference current used in parametrisation |
+| `T_ref` | `Float` | Y/Y | 25.0 |  [°C] | Reference temperature used in parametrisation |
+
+**Exemplary input file definition for battery**
+
+Minimal definition of a buffer tank in the input file:
+
+```JSON
+"TST_BAT_01": {
+    "type": "Battery",
+    "m_el_in": "m_e_ac_230v",
+    "m_el_out": "m_e_ac_230v",
+    "output_refs": ["TST_BUS_EL_01"],
+    "model_type": "simplified",
+    "charge_efficiency": 0.99,
+    "discharge_efficiency": 0.99,
+    "capacity": 8280,
+}
+```
+
+Extended definition of a battery in the input file:
+
+```JSON
+"TST_BAT_01": {
+    "type": "Battery",
+    "m_el_in": "m_e_ac_230v",
+    "m_el_out": "m_e_ac_230v",
+    "output_refs": ["TST_BUS_EL_01"],
+    "___GENERAL PARAMETER___"
+    "model_type": "detailed",
+    "capacity": 8280,
+    "load": 828,
+    "self_discharge_rate": 0.03,
+    "max_charge_C_rate": 0.1,
+    "max_discharge_C_rate": 0.1,
+    "SOC_min": 10,
+    "SOC_max": 90,
+    "__DETAILED AND LI-LFP MODEL ONLY__"
+    "V_n_bat": 153.6,
+    "cell_cutoff_current": 3,
+    "cycles": 1,
+    "Temp": 25.0,
+    "___DETAILED MODEL WITH OWN CELL CHEMISTRY ONLY___"
+    "V_n": 3.2,
+    "r_i": 0.00016,
+    "V_0": 3.36964,
+    "K": 0.03546,
+    "A": 0.08165,
+    "B": 0.1003,
+    "capacity_cell_Ah": 1090,
+    "m":1.0269,
+    "alpha":-0.01212,
+    "k_qn":[-1.27571e-7, 1.22095e-11],
+    "k_qT":[1.32729e-3, -7.9763e-6],
+    "k_n":[9.71249e-6, 7.51635e-4, -8.59363e-5, -2.92489e-4],
+    "k_T":[1.05135e-3, 1.83721e-2, -7.72438e-3, -4.31833e-2],
+    "I_ref":100,
+    "T_ref":25
+}
+```
 
 ### Buffer Tank
 | | |
