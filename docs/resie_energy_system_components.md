@@ -904,7 +904,6 @@ t | current simulation time | \([s]\)
 #### Overview
 There are several types of geothermal heat collectors. The model in ReSiE covers classic horizontal geothermal heat exchangers with a typical depth of 1-2 m below the surface, e.g. by a number of pipes laid parallel to each other. In addition to the physical properties of the soil, local weather conditions have a noticable influence on the soil temperature due to the low installation depth below the earth's surface, e.g. compared to geothermal probe systems. When designing geothermal collectors, the aim is to achieve partial icing of the ground around the collector pipes during the heating season in order to utilize latently stored energy. However, the iced volume around the collector pipes must not be so large as to prevent precipitation from seeping into deeper layers of the earth. VDI 4640-2 specifies design values for the area-related heat extraction capacity depending on the soil type and the climate zone.
 
-
 #### Simulation domain and boundary conditions
 For modeling horizontal geothermal collectors, a numerical approach is chosen here, which discretizes the soil and calculates a two-dimensional temperature field at each time step. 
 
@@ -938,7 +937,7 @@ The control volumes are calculated as follows:
 $$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z $$
 where \(V_{i,j}\) is the control volume around a node and \(\Delta x\), \(\Delta y\), and \(\Delta z\) are the variable location step widths in x, y, and z directions, respectively.
 
-**Numerical scheme.** The implemented solver uses an **implicit backward-Euler** discretization on the non-uniform grid. This results in a sparse linear system per time step that includes heat conduction in the soil and the boundary/source terms described below. Temperature-dependent properties and phase change are treated by a short Picard iteration. (See “Phase Change” and “Boundary Conditions” for how these terms enter the balance.)
+**Numerical scheme.** The solver employs an **implicit backward-Euler** time discretization on the non-uniform grid. In each global time step, the code assembles and solves a sparse linear system that combines (i) heat conduction between neighbouring control volumes, (ii) storage in the control volume, and (iii) boundary/source contributions. Temperature-dependent properties and the phase-change term are handled by a short Picard iteration: properties are evaluated at the current iterate, the linear system is rebuilt and solved, and the iterate is updated until the prescribed tolerance is reached. In the implicit scheme, the conduction fluxes and the storage term are written at the new time level and combined with the boundary/source contributions. This yields, in each time step, a sparse linear system for the unknown temperature field at \(n\). There is no internal sub-stepping.
 
 #### Modelling of the soil
 In the context of this model, the soil is considered to be homogeneous with uniform and temporally constant physical properties. 
@@ -958,13 +957,9 @@ $$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta y
 
 $$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j}$$
 
-where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil.
+where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil. In the implementation, the face conductivity \(\lambda_{soil}\) is evaluated as the arithmetic mean of the adjacent cells’ \(\lambda_{soil}(T)\) at the current Picard iterate.
 
 ![numerical approach geothermal heat collector](fig/231016_numerical_approach_geothermal_heat_collector.svg)
-
-**Numerical scheme.** The solver employs an **implicit backward-Euler** time discretization on the non-uniform grid. In each global time step, the code assembles and solves a sparse linear system that combines (i) heat conduction between neighbouring control volumes, (ii) storage in the control volume, and (iii) boundary/source contributions. Temperature-dependent properties and the phase-change term are handled by a short Picard iteration: properties are evaluated at the current iterate, the linear system is rebuilt and solved, and the iterate is updated until the prescribed tolerance is reached.
-
-**Time integration.** In the implicit scheme, the conduction fluxes and the storage term are written at the new time level and combined with the boundary/source contributions. This yields, in each time step, a sparse linear system for the unknown temperature field at \(n\). There is no internal sub-stepping.
 
 #### Linear system assembly (code behavior)
 In each time step, the code constructs and solves
@@ -1008,8 +1003,8 @@ For the nodes at the upper simulation edge, which represent the earth's surface,
 $$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
 where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
 
-$$\dot{q}_{\text{glob}} = (1 - r) \; \dot{q}_{\text{solar,glob}}$$
-with \(r\) as the reflectance of the earth's surface and \(\dot{q}_{\text{solar,glob}}\) as the global horizontal solar radiation on the surface;
+$$\dot{q}_{\text{glob}} = (1 - r) \; E_{glob}$$
+with \(r\) as the reflectance of the earth's surface and \(E_{glob}\) as the global horizontal solar radiation on the surface;
 
 $$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{sky}}^4 - (T_{i,1} + 273.15)^4)$$
 with
@@ -1049,7 +1044,7 @@ $$
 
 Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeüberträger für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 $$ k = \left( \frac{D_o}{D_i \; \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\; D_o}{2 \; \lambda_p} + \frac{\Delta x_{min}}{2 \; \lambda_{soil}} \right)^{-1} $$
 
@@ -1094,7 +1089,7 @@ As \(c_{soil}(T)\) is used in the energy balances of every volume element and de
 
 As a result, the heat capacity significantly increases during the phase change, reducing the temperature variation between time steps. This effect is illustrated in the following figure, where a constant energy demand is drawn from a soil volume element.
 
-![Temperature of a volument element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
+![Temperature of a volume element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
 
 The volume element has a mass of 1000 kg and is cooled down from 5 to -5 °C. The specific heat capacity is \( c_{soil,\ fr} = c_{soil,\ unfr} = 850 \ J/(kgK)\)  in frozen and unfrozen state with an energy of fusion of \(h_{lat} = 90 \, 000 \ J/kg \) . This results in a total energy of 27 361 Wh that is taken out of the element (54.7 W for 500 hours).
 
@@ -1106,8 +1101,10 @@ Symbol | Description | Unit
 \(\alpha_{\text{konv}}\) | convective heat transfer coefficient  | [W/  \((m² K)\)] 
 \(\Delta t\) | global time step size | [s]
 \(\Delta x, \Delta y,\Delta z\)  | step widths in x, y, and z direction  | [m] 
+\(\Delta x_{min}\) | minimum mesh width used in the pipe/soil coupling formula | [m]
 \(\epsilon\)  | emissivity of the surface  | [-] 
 \(\lambda_{soil}\)  | thermal conductivity of the soil  | [W / (m K)] 
+\(\lambda_p\) | thermal conductivity of the pipe | [W/(m K)]
 \(\rho_{soil}\)  | density of the soil   | [kg / \(m³\)] 
 \(\sigma_{\text{Boltzmann}}\) | Stefan-Boltzmann constant | [W / \((m² K^4)\)] 
 \(A_{x,z}, A_{y,z}\) | control-volume face areas in x–z and y–z planes | [\(m²\)
@@ -1122,11 +1119,14 @@ Symbol | Description | Unit
 \(h_{lat}\) | specific enthalpy of fusion of the soil| [J / kg]
 \(i\)  | index for the node position in x-direction  | [-]
 \(j\)  | index for the node position in y-direction  | [-]
+\(k\) | heat transfer coefficient (pipe/soil coupling) | [W/(m² K)]
 \(l_{\text{pipe}}\) | total length of the pipe | [m] 
 \(n\)  | index for the time step   | [-]
 \(Nu\)  | Nußelt number	   | [-]
 \(Pr\)  | Prandtl number	| [-]
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
+\(\nu_{\text{fl}}\) | kinematic viscosity of the fluid | [m²/s]
+\(\lambda_{fluid}\) | thermal conductivity of the fluid | [W/(m K)]
 \(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m²\)]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m²\)]
 \(\dot{q}_{\text{rad}}\)  |  long wave radiation exchange with the environment   | [W / \(m²\)]
