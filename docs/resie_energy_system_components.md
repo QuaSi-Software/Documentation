@@ -954,9 +954,9 @@ $$\dot{Q}_1 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i-1,j} - T_{i,j})}{\Delta x
 
 $$\dot{Q}_2 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i}$$
 
-$$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta y_{j-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta y_{j-1}}$$
 
-$$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j}$$
 
 where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil.
 
@@ -1005,7 +1005,7 @@ In addition, the lateral simulation boundaries are considered adiabatic, so the 
 At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
 For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
 
-$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
+$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
 where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
 
 $$\dot{q}_{\text{glob}} = (1 - r) \; \dot{q}_{\text{solar,glob}}$$
