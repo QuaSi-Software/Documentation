@@ -961,70 +961,91 @@ where \(A\) is the contact area between the adjacent control volumes and \(\lamb
 
 ![numerical approach geothermal heat collector](fig/231016_numerical_approach_geothermal_heat_collector.svg)
 
-#### Linear system assembly (code behavior)
-In each time step, the code constructs and solves
+#### Linear system assembly and boundary conditions
+
+This section summarizes what the implicit solver does in each global time step, consistent with the flux definitions \(\dot{Q}_1\dots\dot{Q}_4\) (with \(\Delta x\) horizontal and \(\Delta y\) vertical). All node temperatures at the new time level are stacked into \(\mathbf{T}_n\) and solved from
 \[
 \mathbf{A}\,\mathbf{T}_{n}=\mathbf{b},
 \]
-where \(\mathbf{T}_{n}\) contains the temperatures of all nodes at the new time level. Nodes are stored in row-major order: a node \((i,j)\) with \(i=1,\dots,n_x\), \(j=1,\dots,n_y\) is mapped to 
+using a row-major flattening \(p=(j-1)\,n_x+i \Rightarrow T_{n,p}\equiv T_{n,i,j}\). 
+
+On the non-uniform grid the face areas are
 \[
-p=(j-1)\,n_x+i \quad\text{so that}\quad T_{n,p}\equiv T_{n,i,j}.
+A_{y,z}=\frac{\Delta y_{j-1}+\Delta y_j}{2}\,\Delta z,\qquad
+A_{x,z}=\frac{\Delta x_{i-1}+\Delta x_i}{2}\,\Delta z.
 \]
 
-For each interior node \((i,j)\), the diagonal coefficient comprises a storage part and the conductances to its four neighbours. The storage term is
+For each interior node \((i,j)\), backward-Euler yields a storage term
 \[
 a_{P0}=\frac{\rho_{soil}\,c_{soil}\!\big(T^{(k)}_{i,j}\big)\,V_{i,j}}{\Delta t},
 \]
-with \(T^{(k)}\) the current Picard iterate. The conductances \(G_W,G_E,G_N,G_S\) are computed on the non-uniform grid from the areas and distances given above. Thermal conductivity on faces is evaluated by arithmetic averaging of \(\lambda_{soil}\) from the two adjacent cells at \(T^{(k)}\). The resulting coefficients are
+and four face conductances corresponding to the directions of \(\dot{Q}_1\dots\dot{Q}_4\):
 \[
-a_W=G_W,\quad a_E=G_E,\quad a_N=G_N,\quad a_S=G_S,\qquad a_P=a_{P0}+a_W+a_E+a_N+a_S.
+G_W=\frac{A_{y,z}\,\lambda_W}{\Delta x_{i-1}},\quad
+G_E=\frac{A_{y,z}\,\lambda_E}{\Delta x_i},\quad
+G_N=\frac{A_{x,z}\,\lambda_N}{\Delta y_{j-1}},\quad
+G_S=\frac{A_{x,z}\,\lambda_S}{\Delta y_j}.
+\]
+Face conductivities \(\lambda_{\bullet}\) are arithmetic means of the adjacent cells’ \(\lambda_{soil}(T^{(k)})\). Each face heat rate equals the corresponding conductance times the temperature difference across that face:
+\[
+\dot{Q}_1=G_W(T_{i-1,j}-T_{i,j}), \\
+ \dot{Q}_2=G_E(T_{i+1,j}-T_{i,j}), \\
+  \dot{Q}_3=G_N(T_{i,j-1}-T_{i,j}), \\
+  \dot{Q}_4=G_S(T_{i,j+1}-T_{i,j}). 
 \]
 
-The matrix row for node \((i,j)\) is
+The lateral outer boundaries are adiabatic (missing neighbours simply do not contribute). At the lower boundary \((j=n_y)\) the temperature is prescribed (Dirichlet): the row is overwritten with \(A_{p,p}=1\) and \(b_p=T_{\text{ground}}\). 
+
+At the surface \((j=1)\) there is no conduction from above; instead, the top face is replaced by environmental exchange consisting of convection with ambient air, long-wave radiation to the sky, and absorption of global irradiance:
 \[
-a_P\,T_{n,i,j}-a_W\,T_{n,i-1,j}-a_E\,T_{n,i+1,j}-a_N\,T_{n,i,j-1}-a_S\,T_{n,i,j+1}=b_{i,j},
+\dot{q}_{\text{konv}}=\alpha_{\text{konv}}\,(T_{\text{amb}}-T_{i,1}), \\
+\dot{q}_{\text{rad}}=\epsilon\,\sigma_{\text{Boltzmann}}\!\big(T_{sky}^4-(T_{i,1}+273.15)^4\big),  \\
+\dot{q}_{\text{glob}}=(1-r)\,E_{glob},
 \]
-which is inserted at row \(p\) with columns corresponding to the neighbour indices. On adiabatic outer boundaries, missing neighbours do not contribute entries. The bottom boundary is prescribed by overwriting the corresponding rows with \(A_{p,p}=1\) and \(b_p=T_{\text{ground}}\).
-
-The right-hand side collects the old-time storage contribution and explicit sources:
-\[
-b_{i,j}=a_{P0}\,T_{n-1,i,j}+S^{\text{surf}}_{i,j}+S^{\text{pipe}}_{i,j}.
-\]
-On the surface (\(j=1\)), convection is included implicitly by increasing the diagonal and adding \(\alpha_{\text{konv}}A_{x,z}T_{\text{amb}}\) to \(b\). Long-wave radiation and solar input are evaluated explicitly using \(T_{n-1}\). Around the pipe, the extraction/injection power is distributed to the five surrounding soil nodes by fixed weights that sum to the represented half-domain.
-
-During the Picard loop, \(c_{soil}(T)\) and \(\lambda_{soil}(T)\) are re-evaluated at the updated iterate. The system is reassembled and resolved until the maximum change in the temperature field falls below the specified tolerance.
-
-#### Boundary Conditions
-The control volumes around the computational nodes at the outer edges of the simulation area are calculated so that the respective control volumes do not extend beyond the simulation boundary.
-In addition, the lateral simulation boundaries are considered adiabatic, so the heat fluxes over the adiabatic control surfaces are set to zero when calculating the temperature.
-At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
-For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
-
-$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
-where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
-
-$$\dot{q}_{\text{glob}} = (1 - r) \; E_{glob}$$
-with \(r\) as the reflectance of the earth's surface and \(E_{glob}\) as the global horizontal solar radiation on the surface;
-
-$$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{sky}}^4 - (T_{i,1} + 273.15)^4)$$
 with
-$$ T_{sky} = \left (\frac{\dot{q}_{\text{horizontal infrared radiation}}}{\sigma_{\text{Boltzmann}}} \right ) ^ {0.25} $$
+\[
+T_{sky}=\left(\frac{\dot{q}_{\text{horizontal infrared radiation}}}{\sigma_{\text{Boltzmann}}}\right)^{0.25}.\qquad
+\]
+Convection is treated **implicitly** by adding \(\alpha_{\text{konv}}A_{x,z}\) to the diagonal \(a_P\) and \(\alpha_{\text{konv}}A_{x,z}T_{\text{amb}}\) to the RHS, while radiation and solar are treated **explicitly** (evaluated at \(T^{\text{old}}_{i,1}\)) and added only to the RHS:
+\[
+S^{\text{surf}}_{i,1}
+= A_{x,z}\Big[\alpha_{\text{konv}}\,T_{\text{amb}}+\epsilon\,\sigma_{\text{Boltzmann}}\big(T_{sky}^4-(T^{\text{old}}_{i,1}+273.15)^4\big)+(1-r)\,E_{glob}\Big],
+\]
+and \(S^{\text{surf}}_{i,j}=0\) for \(j>1\).
 
-where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}\) is the Stefan-Boltzmann constant, \(T_{sky}\) the effective mean sky temperature (sky radiative temperature) in Kelvin, \(T_{i,1}\) the temperature of the surface soil element and \(\dot{q}_{\text{horizontal infrared radiation}}\) the horizontal infrared radiation intensity from the sky;
-
-$$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \; (T_{\text{amb}} - T_{i,1})$$
-with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T_{amb}\) the ambient air temperature.
-
-**Implementation note.** In the implicit scheme, \(\dot{q}_{\text{konv}}\) is treated implicitly via the diagonal and RHS terms, while \(\dot{q}_{\text{rad}}\) is evaluated explicitly at the previous time step’s surface temperature to keep the linear system per step.
-
-Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid 
-is modelled in one node. Each of the five neighbouring nodes are set to \(\Delta x = \Delta y = D_o / 2\) while the two volumina at the 
-mirror axis are cut in half. As simplification, to each of the five nodes 1/4 of the soil volume surrounding the pipe is assigned, and 1/8 for the halved nodes. However, the temperature of the five nodes is averaged afterwards.
+The thermal interaction with the pipe fluid is represented as an internal source/sink distributed to the five soil nodes adjacent to the fluid node. Because only half of the pipe’s surroundings lies inside the simulated half-domain, the per-pipe power \(q_{\text{pipe}}=\tilde{q}_{\text{in,out}}\,l_{\text{pipe}}\) is split by fixed weights that sum to \(0.5\) (extraction negative, injection positive) and is added directly to the RHS at the corresponding rows, as shown in the figure below, where \(h_{pipe}\) is the vertical index of the pipe node:
+\[
+\begin{aligned}
+S^{\text{pipe}}_{1,h_{\text{pipe}}-1}=\tfrac{1}{16}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{1,h_{\text{pipe}}+1}=\tfrac{1}{16}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}}=\tfrac{1}{8}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}-1}=\tfrac{1}{8}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}+1}=\tfrac{1}{8}\,q_{\text{pipe}}.
+\end{aligned}
+\]
 
 ![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
-The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground.
-Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
+The resulting matrix coefficients are
+\[
+a_W=G_W,\; a_E=G_E,\; a_N=G_N,\; a_S=G_S,\qquad
+\]
+leading to
+\[
+a_P=a_{P0}+a_W+a_E+a_N+a_S \ \left(+ \alpha_{\text{konv}}\,A_{x,z} \text{ for surface nodes } j = 1 \right),
+\]
+so each row \(p\) of the matrix equation reads
+\[
+a_P\,T_{n,i,j}-a_W\,T_{n,i-1,j}-a_E\,T_{n,i+1,j}-a_N\,T_{n,i,j-1}-a_S\,T_{n,i,j+1}=b_{i,j}.
+\]
+The matrix \(\mathbf{A}\) is assembled as a sparse matrix with one diagonal entry \(a_P\) (capacity plus all face conductances, plus implicit convection at the surface) and up to four off-diagonals \(-G_\bullet\) to existing neighbours, while the lateral adiabatic faces contribute nothing and bottom Dirichlet rows are set to \((1)\).
+
+For every node the RHS then has the form
+\[
+b_{i,j}=a_{P0}\,T_{n-1,i,j}+S^{\text{surf}}_{i,j}+S^{\text{pipe}}_{i,j},
+\]
+and a short Picard loop updates \(c_{soil}(T)\) and \(\lambda_{soil}(T)\) at the current iterate \(T^{(k)}\), rebuilds \(\mathbf{A}\) and \(\mathbf{b}\), and repeats until convergence.
+
 
 #### Heat Carrier Fluid
 The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail. Additionally to the method for the calculation of the laminar Nußelt number for the determination of the convective heat transfer coefficient on the inside of the pipe \(\alpha_i \) introduced by Ramming and explained above, a method by Stephan[^Stephan1959] [^Waermeatlas] is implemented and can be chosen in the user input file:
