@@ -1038,13 +1038,68 @@ so each row \(p\) of the matrix equation reads
 \[
 a_P\,T_{n,i,j}-a_W\,T_{n,i-1,j}-a_E\,T_{n,i+1,j}-a_N\,T_{n,i,j-1}-a_S\,T_{n,i,j+1}=b_{i,j}.
 \]
-The matrix \(\mathbf{A}\) is assembled as a sparse matrix with one diagonal entry \(a_P\) (capacity plus all face conductances, plus implicit convection at the surface) and up to four off-diagonals \(-G_\bullet\) to existing neighbours, while the lateral adiabatic faces contribute nothing and bottom Dirichlet rows are set to \((1)\).
 
 For every node the RHS then has the form
 \[
 b_{i,j}=a_{P0}\,T_{n-1,i,j}+S^{\text{surf}}_{i,j}+S^{\text{pipe}}_{i,j},
 \]
 and a short Picard loop updates \(c_{soil}(T)\) and \(\lambda_{soil}(T)\) at the current iterate \(T^{(k)}\), rebuilds \(\mathbf{A}\) and \(\mathbf{b}\), and repeats until convergence.
+
+The matrix \(\mathbf{A}\) is assembled as a sparse matrix with one diagonal entry \(a_P\) (capacity plus all face conductances, plus implicit convection at the surface) and up to four off-diagonals \(-G_\bullet\) to existing neighbours, while the lateral adiabatic faces contribute nothing and bottom Dirichlet rows are set to \((1)\). The built of the matrix \(\mathbf{A}\)  is described in more detail below.
+
+**Block form of \(\mathbf{A}\) with explicit first and last blocks (entries in \(a\)-parameters)**
+
+\[
+\mathbf{A}=
+\begin{bmatrix}
+\boxed{B_1} & \boxed{C_1} & 0 & \cdots & 0 \\
+\boxed{D_2} & B_2 & C_2 & \ddots & \vdots \\
+0 & \ddots & \ddots & \ddots & 0 \\
+\vdots & \ddots & D_{n_y-1} & B_{n_y-1} & C_{n_y-1} \\
+0 & \cdots & 0 & \boxed{D_{n_y}} & \boxed{B_{n_y}}
+\end{bmatrix}
+\]
+
+**First horizontal block \(B_1\) (size \(n_x\times n_x\)):**
+\[
+B_1=
+\begin{bmatrix}
+a_P(1,1)        & -a_E(1,1)     & 0              & \cdots & 0 \\
+-a_W(2,1)       & a_P(2,1)      & -a_E(2,1)      & \ddots & \vdots \\
+0               & -a_W(3,1)     & a_P(3,1)       & \ddots & 0 \\
+\vdots          & \ddots        & \ddots         & \ddots & -a_E(n_x-1,1) \\
+0               & \cdots        & 0              & -a_W(n_x,1) & a_P(n_x,1)
+\end{bmatrix}
+\]
+(with \(a_P(i,1)\) including \(a_{\mathrm{surf}}(i,1)=\alpha_{\mathrm{konv}}A_{x,z}(i,1)\)).
+
+**Coupling from row \(j=1\) to \(j=2\):**
+\[
+C_1=\mathrm{diag}\!\big(-a_S(1,1),\,-a_S(2,1),\,\dots,\,-a_S(n_x,1)\big).
+\]
+
+**Coupling from row \(j=2\) to \(j=1\):**
+\[
+D_2=\mathrm{diag}\!\big(-a_N(1,2),\,-a_N(2,2),\,\dots,\,-a_N(n_x,2)\big).
+\]
+
+**Last horizontal block \(B_{n_y}\) (size \(n_x\times n_x\)):**
+\[
+B_{n_y}=
+\begin{bmatrix}
+a_P(1,n_y)        & -a_E(1,n_y)     & 0                 & \cdots & 0 \\
+-a_W(2,n_y)       & a_P(2,n_y)      & -a_E(2,n_y)       & \ddots & \vdots \\
+0                 & -a_W(3,n_y)     & a_P(3,n_y)        & \ddots & 0 \\
+\vdots            & \ddots          & \ddots            & \ddots & -a_E(n_x-1,n_y) \\
+0                 & \cdots          & 0                 & -a_W(n_x,n_y) & a_P(n_x,n_y)
+\end{bmatrix}
+\]
+(\(a_P(i,n_y)\) has no surface add-on).
+
+**Coupling from row \(j=n_y\) to \(j=n_y-1\):**
+\[
+D_{n_y}=\mathrm{diag}\!\big(-a_N(1,n_y),\,-a_N(2,n_y),\,\dots,\,-a_N(n_x,n_y)\big).
+\]
 
 
 #### Heat Carrier Fluid
