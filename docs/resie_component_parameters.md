@@ -1319,6 +1319,8 @@ The parameters characterising the soil and its moisture content, such as heat ca
 | OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
 | OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m²] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
 | `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
+| `max_picard_iter` | `Int` | Y/Y | 3 | [-] | maximum number of iterations during implicit solving to find correct temperature-dependent thermal conductivity of the soil |
+| `picard_tol` | `Float` | Y/Y | 1e-3 | [K] | tolerance for picard iteration: absolute temperature difference between two iterations |
 | `regeneration` | `Bool` | Y/Y | true | [-] | flag if regeneration should be taken into account |
 | `max_output_power` | `Float` | Y/Y | 20 | [W/m²] | maximum output power per collector area |
 | `max_input_power` | `Float` | Y/Y | 20 | [W/m²] | maximum input power per collector area |
@@ -1382,7 +1384,7 @@ To perform this calculation in every timestep, the following input parameters ar
     "ambient_temperature_from_global_file": "temp_ambient_air",
     "global_solar_radiation_from_global_file": "globHorIrr",
     "infrared_sky_radiation_from_global_file": "longWaveIrr",
-    "accuracy_mode": "rough",
+    "accuracy_mode": "normal",
     "regeneration": false,
     "max_output_power": 25,
     "max_input_power": 25,
