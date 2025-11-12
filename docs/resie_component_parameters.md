@@ -5,9 +5,9 @@ The description of each component type includes a block with a number of attribu
 
 | | |
 | --- | --- |
-| **Type name** | `BoundedSink`|
-| **File** | `energy_systems/general/bounded_sink.jl` |
-| **System function** | `bounded_sink` |
+| **Type name** | `FlexibleSink`|
+| **File** | `energy_systems/general/flexible_sink.jl` |
+| **System function** | `flexible_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
@@ -33,12 +33,12 @@ The name of the entries should match the keys in the input file, which is carrie
 The type refers to the type it is expected to have after being parsed by the JSON library. The type `Temperature` is an internal structure and simply refers to either `Float` or `Nothing`, the null-type in Julia. In general, a temperature of `Nothing` implies that any temperature is accepted and only the amount of energy is revelant. More restrictive number types are automatically cast to their superset, but *not* the other way around, e.g: \(UInt \rightarrow Int \rightarrow Float \rightarrow Temperature\). Dictionaries given in the `{"key":value}` notation in JSON are parsed as `Dict{String,Any}`.
 
 ### Storage un-/loading
-All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. Here are exemplary parameters for a `BoundedSupply`:
+All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. Here are exemplary parameters for a `FlexibleSupply`:
 
 ```json
 {
     "uac": "TST_SRC_01",
-    "type": "BoundedSupply",
+    "type": "FlexibleSupply",
     "medium": "m_h_w_lt1",
     ...
     "control_parameters": {
@@ -191,7 +191,7 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **storage_uac** | The UAC of the storage component linked to the module.
 
 #### Temperature sorting
-Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` steps are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 
 **Note:** This will overwrite the order defined in the bus!
 
@@ -288,18 +288,18 @@ This module is implemented for the following component types: `HeatPump`
 
 ## Boundary and connection components
 
-### General bounded sink
+### General flexible sink
 | | |
 | --- | --- |
-| **Type name** | `BoundedSink`|
-| **File** | `energy_systems/general/bounded_sink.jl` |
-| **System function** | `bounded_sink` |
+| **Type name** | `FlexibleSink`|
+| **File** | `energy_systems/general/flexible_sink.jl` |
+| **System function** | `flexible_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | |
 | **Tracked values** | `IN`, `Max_Energy`, `Temperature` |
 
-Generalised implementation of a bounded sink.
+Generalised implementation of a flexible sink.
 
 Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
@@ -314,18 +314,18 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
-### General bounded supply
+### General flexible supply
 | | |
 | --- | --- |
-| **Type name** | `BoundedSupply`|
-| **File** | `energy_systems/general/bounded_supply.jl` |
-| **System function** | `bounded_source` |
+| **Type name** | `FlexibleSupply`|
+| **File** | `energy_systems/general/flexible_supply.jl` |
+| **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
 | **Output media** | `None`/`auto` |
 | **Tracked values** | `OUT`, `Max_Energy`, `Temperature` |
 
-Generalised implementation of a bounded source.
+Generalised implementation of a flexible source.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
@@ -423,7 +423,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | --- | --- |
 | **Type name** | `GridConnection`|
 | **File** | `energy_systems/connections/grid_connection.jl` |
-| **System function** | `bounded_source`, `bounded_sink` |
+| **System function** | `flexible_source`, `flexible_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
 | **Output media** | `None`/`auto` |
@@ -431,7 +431,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file).
 
-If parameter `is_source` is true, acts as a `bounded_source` with only one output connection. Otherwise a `bounded_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulative value.
+If parameter `is_source` is true, acts as a `flexible_source` with only one output connection. Otherwise a `flexible_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulative value.
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
@@ -951,7 +951,7 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
 | --- | --- |
 | **Type name** | `GenericHeatSource`|
 | **File** | `energy_systems/heat_sources/generic_heat_source.jl` |
-| **System function** | `bounded_source` |
+| **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
 | **Output media** | `None`/`auto` |
@@ -1429,7 +1429,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Type name** | `SolarthermalCollector`|
 | **File** | `energy_systems/heat_sources/solarthermal_collector.jl` |
 | **Available models** | `default` |
-| **System function** | `bounded_source` |
+| **System function** | `flexible_source` |
 | **Medium** | |
 | **Input media** | |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |

@@ -2,8 +2,8 @@
 
 An important part of what makes ReSiE's simulation model different from similar tools is how the control of energy system components is handled. Actualized energy systems, as they are built in real buildings, have a complex control scheme that also incorporates aspects that are not part of the model, such as hydraulic components and feed/return lines. This in turn requires that these complex control schemes can be modeled as close to reality as possible while staying inside the fundamental model of energy balances.
 
-## The control step
-Because the general calculation of energies of components might require information from other components in the energy system, particularly information that cannot be communicated across interfaces between directly connected components, it has proven beneficial to introduce a simulation step in which some information is determined and communicated before the operation of components is calculated in the `potential` and `process` steps. This step is also used to fetch information that is given as input or can otherwise be determined without any information from components.
+## The control operation
+Because the general calculation of energies of components might require information from other components in the energy system, particularly information that cannot be communicated across interfaces between directly connected components, it has proven beneficial to introduce aoperation in which some information is determined and communicated before the operation of components is calculated in the `potential` and `process` operations. This operation is also used to fetch information that is given as input or can otherwise be determined without any information from components.
 
 ## General mechanisms of control
 Each component is assigned a controller that handles general mechanisms of control and updates any [control modules](resie_operation_control.md#control-modules) that might be attached to the component.
@@ -11,8 +11,8 @@ Each component is assigned a controller that handles general mechanisms of contr
 ### Storage un-/loading flags
 All components can be set to be dis-/allowed to un-/load storages to which they output or from which they draw energy. This only makes sense if an intermediary bus exists because direct connections to/from storages must always be allowed to transfer energy. The flags to control this behaviour are set in the `control_parameters` entry of the component parameter specification (compare [component specification](resie_component_parameters.md#storage-un-loading)). Similarly, components can be configured to be dis-/allowed to draw energy from storages. Any input/output not specified in this way is assumed to be allowed to un-/load storages.
 
-### Consideration of interfaces for the potential step
-Transformer components perform fairly complex calculations of their operation in the `potential` step (which is repeated in the `process` step). As part of this calculation they check how much energy is available on each of their input/output interfaces. Due to this complexity it is in rare cases necessary to specify that a particular input/output shouldn't be taken into account. This can be controlled with parameters in the `control_parameters` entry of the component configuration.
+### Consideration of interfaces for the potential operation
+Transformer components perform fairly complex calculations of their operation in the `potential` operation (which is repeated in the `process` operation). As part of this calculation they check how much energy is available on each of their input/output interfaces. Due to this complexity it is in rare cases necessary to specify that a particular input/output shouldn't be taken into account. This can be controlled with parameters in the `control_parameters` entry of the component configuration.
 
 ```json
 {
@@ -37,8 +37,8 @@ The currently implemented callbacks are:
 * `upper_plr_limit`: Sets the upper limit of the PLR to a given value. "Upper" in this case means that the PLR is calculated to not exceed this value, but it may be lower due to the exact circumstances of available energies on the inputs and outputs of a component. For example a module might set the limit to 75%, however the component is limited by available input energy and can only be operated at 50%. This callback is implemented for transformers.
 * `charge_is_allowed`: Allows the charging of a battery.
 * `discharge_is_allowed`: Allows the discharging of a battery.
-* `reorder_inputs`: Reorders a list of input energy exchanges used in steps `potential` and `process`.
-* `reorder_outputs`: Reorders a list of output energy exchanges used in steps `potential` and `process`.
+* `reorder_inputs`: Reorders a list of input energy exchanges used in operations `potential` and `process`.
+* `reorder_outputs`: Reorders a list of output energy exchanges used in operations `potential` and `process`.
 * `determine_temperature_and_energy`: Callback for `negotiate_temperature`. Only checks if a control modules exists that handle the temperature between two components.
 * `cooling_input_temperature_exceeded`: Callback for `limit_cooling_input_temperature`. Checks if a control module exists that interrupts energy flow due to exceeded return flow temperature limit.
 * `check_src_to_snk`: Checks if a defined source is allowed to be used for supplying a defined sink. This is implemented for transformers that have a layered approach to calculating energy flow, which currently is only the heat pump.

@@ -2,9 +2,9 @@
 
 The simulation engine works on the concept of energy balances on the level of technical equipment units. While conservation of energy is expected to be observed in any simulation of physical processes, the simulation engine specifically does not consider other concepts often appearing in energy simulations such as full thermodynamics, static/dynamic fluid simulation or electric power flow. These limitations are shared by a number of simulation engines similar to ReSiE, as research and use of these tools has shown that these are necessary limitations to cut the scope of the simulation down to something that finishes calculations in a reasonable time scale.
 
-The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of components to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for bounded[^1] sources of energy, ensuring the energy balances are held for each component along the way.
+The geometry of buildings also does not play a role in the simulation and the full network of technical systems connected in a building (and across buildings) is reduced to a network of energy system components that each process energy. Given the typical task of finding a suitable selection of components to satisfy a fixed demand of energy in a building, it is therefore the engine's task to work backwards to find solutions for flexible[^1] sources of energy, ensuring the energy balances are held for each component along the way.
 
-[^1]: *Bounded* and *fixed* here refers to a classification in regards to how much energy a component processes. Bounded sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or components that process a certain amount energy regardless of demand.
+[^1]: *Flexible* and *fixed* here refers to a classification in regards to how much energy a component processes. Flexible sources and sinks have lower and upper limits, but are flexible in the amount they process. Fixed sources and sinks represent a precise demand of energy that must be met or components that process a certain amount energy regardless of demand.
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
@@ -57,8 +57,8 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Bounded sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid output with unlimited power.
-* `Bounded source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid input with unlimited power.
+* `Flexible sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid output with unlimited power.
+* `Flexible source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid input with unlimited power.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature.
@@ -83,45 +83,45 @@ First the components are loaded and initialized from the input project file. The
 ### Main loop over time
 ```pseudocode
 for time = t_start to t_end {
-    perform_steps(components, order)
+    perform_operations(components, order)
     check_balances(components)
     write_output(components)
     advance_simulation()
 }
 ```
 
-Inside the loop over time, first the simulation steps are performed for each component. Then each component is checked to ensure the energy balances are preserved, meaning that all energy outputs (including losses) have a matching input and vice versa. This is necessary in particular as a safeguard against bugs in the implementation and operational strategies that produce unexpected results.
+Inside the loop over time, first the simulation operations are performed for each component. Then each component is checked to ensure the energy balances are preserved, meaning that all energy outputs (including losses) have a matching input and vice versa. This is necessary in particular as a safeguard against bugs in the implementation and operational strategies that produce unexpected results.
 
 After the balance check, output is written according to the output specification in the project file. The simulation engine specifically does not write all output as this can produce excessive amounts of data. Finally, the simulation is advanced to the next time step.
 
-The simulation steps for each component are:
+The operations for each component are:
 
 * `Reset`: Reset values for the next time step.
 * `Control`: Calculate control behavior to check if a component should run or not. Also write information on required/provided temperatures and energy limitations, if these are already known at this point.
-* `Potential`: Calculates the potential energy that can be processed by a transformer. This is necessary when several transformers are connected directly or through busses, as this might lead to multiple solutions of how to operate the transformers. No energy is processed in this step.
+* `Potential`: Calculates the potential energy that can be processed by a transformer. This is necessary when several transformers are connected directly or through busses, as this might lead to multiple solutions of how to operate the transformers. No energy is processed during this operation.
 * `Process`: Process energy depending on the type of the component and if the control behavior dictates the component should run.
 * `Load`: For storage components, take in any excess of energy after the processing of connected components.
 * `Distribute`: For bus components, distribute energy supplied and requested by each connected component and calculate the energy transfered between connected busses.
 
 ### Determining order of operations
 
-For each component of the energy system some or all of the simulation steps are performed on that component. An *operation* is a pair of a component and a simulation step. **Note:** In the following "order of operations" and "order of operation" is used as they describe the same concept albeit with slightly different meaning.
+For each component of the energy system some or all of the operations are performed on that component. **Note:** In the following "order of operations" and "order of operation" is used as they describe the same concept albeit with slightly different meaning.
 
 Determining the order of operations follow an algorithm consisting of a base order and several rearrangement steps. Each rearrangement step imposes some order over some or all of the operations and is potentially overwritten by the rearrangement steps following after that.
 
 **Note: As of now, it is an open question if this algorithm produces correct results for all relevant energy systems.**
 
 1. Set up a base order of operations determined by the system function of the components:
-    1. `Reset`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
-    2. `Control`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Bounded source`, `Bounded sink` 
+    1. `Reset`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Flexible source`, `Flexible sink` 
+    2. `Control`: `Fixed source`, `Fixed sink`, `Bus`, `Transformer`, `Storage`,  `Flexible source`, `Flexible sink` 
     3. `Process`:  `Fixed source`, `Fixed sink`, `Bus`
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`: `Bounded source`, `Bounded sink`  (first general bounded sources/sinks, then grid inputs/outputs)
+    7. `Process`: `Flexible source`, `Flexible sink`  (first general flexible sources/sinks, then grid inputs/outputs)
     8. `Distribute`: `Bus`
 2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is technically not a rearrangement, as it happens during establishing the base order.
-3. Reorder the `Control` operations to make sure that components that require temperature information during their control step from other components comes last: First the components that require this information in their output (geothermal probe, solar thermal collector), then the components that require the temperature information in their input interface (seasonal thermal store).
+3. Reorder the `Control` operations to make sure that components that require temperature information during their control operation from other components comes last: First the components that require this information in their output (geothermal probe, solar thermal collector), then the components that require the temperature information in their input interface (seasonal thermal store).
 4. Reorder the `Process` operation of components connected to the input and output interfaces of busses to ensure they follow the priorities on the bus. This acts as an addition to the initial order determined by the algorithm of 2. and applies only if there is no grid input/output at this bus, as with grid input/output, the output/input priorities of connected components do not matter.  
 5. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
 6. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
