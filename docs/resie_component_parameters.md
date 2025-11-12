@@ -269,6 +269,50 @@ This module is implemented for the following component types: `HeatPump`
 | **src_uac** |  The UAC of the source component. Required. |
 | **snk_uac** |  The UAC of the sink component. Required. |
 
+#### Economic control
+Reorders priorities and changes the energy flow matrix on a bus depending on a price profile and a threshold value. This uses both callbacks `change_bus_priorities` and `reorder_operations`, which both take effect at the beginning of a timestep.
+
+This module is implemented for the following component types: `Bus`
+
+| | |
+| --- | --- |
+| **name** | Name of the module. Fixed value of `economic_control` |
+| **bus_uac** | The UAC of the bus to control. Required. |
+| **price_profile_path** | Path to the price profile checked against the threshold. Required. |
+| **limit_price** | The threshold below/above which the priorities are switched. Required. |
+| **new_connections** | The input/output priorities and energy flow matrix when the current price is below the threshold. Required. |
+
+An example of this control module used for an electricity bus to switch the priorities of heat providers and en-/disable battery dis/-charging:
+``` JSON
+"control_modules": [
+    {
+        "name": "economic_control",
+        "bus_uac": "BUS_Power",
+        "price_profile_path": "./profiles/tests/operation_electricity_price.prf",
+        "limit_price": 80.0,
+        "new_connections": {
+            "input_order": [
+                "Photovoltaic",
+                "Grid_IN",
+                "Battery"
+            ],
+            "output_order": [
+                "HeatPump",
+                "HeatingRod",
+                "Demand_Power",
+                "Battery",
+                "Grid_OUT"
+            ],
+            "energy_flow": [
+                [1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 0],
+                [0, 0, 1, 0, 0]
+            ]
+        }
+    }
+]
+```
+
 
 ## Boundary and connection components
 
