@@ -925,7 +925,9 @@ Within the simulation domain, a computational grid is built for the numerical ca
 
 Here, a grid with the accuracy mode "normal" is shown as example:
 
-<center>![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}</center>
+<p style="text-align: center" markdown="span">
+![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}
+</p>
 
 The following figure presents a convergence study for the numerical grid used in the geothermal collector across the different accuracy modes outlined above (with an additional "extreme_rough" to clarify the convergence). Notably, starting with the "normal" accuracy mode, convergence is observed, particularly during the soil’s phase change stage.
 

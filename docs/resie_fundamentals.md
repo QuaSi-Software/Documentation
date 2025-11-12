@@ -8,9 +8,10 @@ The geometry of buildings also does not play a role in the simulation and the fu
 
 To illustrate, let's look at a simple example. A heating demand, in the medium of hot water, must be met by a gas boiler, which in turn requires an input of natural gas from a public grid.
 
-<center>![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
-
-Example of the energy flow of a gas boiler providing heat for the heating demand C.</center>
+<p style="text-align: center" markdown="span">
+![Example of a simple energy flow from public gas grid to boiler to demand](fig/example_energy_flow.png)
+<br/>
+<span>Example of the energy flow of a gas boiler providing heat for the heating demand C.</span></p>
 
 A practical way to operate the gas boiler in this example would be a demand-driven strategy. As such the task to be performed is to meet the demand by operating the gas boiler such that the overall energy balance is conserved.
 
@@ -41,7 +42,9 @@ Due to the generalized nature of the energy system used by ReSiE, there is no ex
 
 The domain of the simulation can therefore be considered as the technical equipment providing energy to a number of connected buildings up to a scale where transport losses cannot be ignored anymore. Outside the domain are three major other domains to and from which the energy system connect:
 
-<center>![Illustration of the model domain and boundaries](fig/domain_boundaries.png){: style="height:400px"}</center>
+<p style="text-align: center" markdown="span">
+![Illustration of the model domain and boundaries](fig/domain_boundaries.png){: style="height:400px"}
+</p>
 
 The first of these is the environment, which plays a role for components that directly draw energy from the environment such as solar collectors or heat pumps fed by ambient heat from the atmosphere or the ground. The second are public grids, usually for electricity, heat and natural gas, however grids of any kind of energy-carrying medium can be modeled. An important difference to the environment is that energy can be both drawn from the grids and fed back into them if there is a surplus.
 

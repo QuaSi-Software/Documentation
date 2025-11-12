@@ -82,9 +82,10 @@ When writing the implementation of components a problem has emerged in the funct
 
 [^2]: Here "processing" is a stand-in for the transport, transfer or transformation of energy. The term is used to differentiate the "action" from the control of a component.
 
-<center>![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
-
-An energy system component A connected via an interfaces to an other component B.</center>
+<p style="text-align: center" markdown="span">
+![Illustration how interfaces connect components](fig/230515_system_interfaces.svg)
+<br/>
+<span>An energy system component A connected via an interfaces to an other component B.</span></p>
 
 To solve this problem interfaces have been introduced, which act as an intermediary between components. The output of a component connects to the "left" of an interface and the input of the receiving component on the "right". That way energy always flows from left to right.
 
@@ -130,15 +131,21 @@ Important terms and definitions:
 
 - Middle Transformer (MT): A middle transformer is defined as a transformer with two or more input interfaces and/or two or more output interfaces, with each "seeing" at least one other transformer.
 
-<center>![Middle transformer definition example](fig/240708_transformer_chain_ooo_middle_transformer.svg)</center>
+<p style="text-align: center" markdown="span">
+![Middle transformer definition example](fig/240708_transformer_chain_ooo_middle_transformer.svg)
+</p>
 
 - Middle Bus (MB): A middle bus is defined as a bus with two or more input interfaces and/or two or more output interfaces, with each "seeing" at least one other transformer.
 
-<center>![Middle bus definition example](fig/240708_transformer_chain_ooo_middle_bus.svg)</center>
+<p style="text-align: center" markdown="span">
+![Middle bus definition example](fig/240708_transformer_chain_ooo_middle_bus.svg)
+</p>
 
 - Parallel Branches (PB): Parallel branches are defined as branches that offer more than one way between two busses, with each way containing at least one other transformer under consideration of the direction of the energy flow.
 
-<center>![Palallel branches definition example](fig/240708_transformer_chain_ooo_parallels.svg)</center>
+<p style="text-align: center" markdown="span">
+![Palallel branches definition example](fig/240708_transformer_chain_ooo_parallels.svg)
+</p>
 
 
 #### Algorithm for linear chains
@@ -172,7 +179,9 @@ Further aspects:
 
 Interdependencies occur when there are allowed connections between two branches of an MB or an MT, e.g:
 
-<center>![Interdependencies beween branches example](fig/240708_transformer_chain_ooo_branch_interdependencies.svg)</center>
+<p style="text-align: center" markdown="span">
+![Interdependencies beween branches example](fig/240708_transformer_chain_ooo_branch_interdependencies.svg)
+</p>
 
 
 #### Energy Systems that can cause problems when automatically determining the order of operation
@@ -181,15 +190,21 @@ There are some energy systems that cause problems when determining the order of 
 
 -   A middle bus or middle transformer that is part of a parallel branch may cause problems for the automated generation of the order of operation. Although, it should be possible to simulate these energy systems with a custom order.
   
-<center>![Middle Transformer in parallels](fig/240708_transformer_chain_ooo_problematic_systems_MT_in_parallel.svg)</center>
+<p style="text-align: center" markdown="span">
+![Middle Transformer in parallels](fig/240708_transformer_chain_ooo_problematic_systems_MT_in_parallel.svg)
+</p>
 
 -   Logical loops, e.g. if a CHPP is directly connected to the same heat pump both on the electric and the thermal side. The optimal operational state of the two components could only be determined with an iterative solving or with setting up and solving a single equation, but not with the stepwise approach of ReSiE.
    
-<center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MTs.svg)</center>
+<p style="text-align: center" markdown="span">
+![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MTs.svg)
+</p>
 
 - Energy systems without a connection to any grid (insular system) may not find an optimal solution at the point where the storages are empty! Adding a grid in the simulation can help to find a suitable order of operation and an appropriate solution of the simulation. The grid input/output can then be seen as necessary energy balancing required to operate the insular system in a stable manner.
 - Energy systems with multiple middle busses with heat sources of different temperatures in the rear MB used by a heat pump can cause problems in the calculation. The branches of the rear MB should be calculated forward to make sure that the rear heat pump knows the available energy and the temperatures. However, due to the interconnected nature of these middle buses, the rear MB is calculated in reverse in order to allow information to propagate to the first MB. Unfortunately, this order can lead to balance errors. These errors occur because the rear heat pump, which operates based on different COP, doesn't have prior knowledge of the available energy during its potential operation. It assumes that it will receive all the necessary energy at the temperature prioritized as the highest input. A custom order can help to solve this.
-<center>![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MBs.svg)</center>
+<p style="text-align: center" markdown="span">
+![Directly connected middle dransformer](fig/240708_transformer_chain_ooo_problematic_systems_connected_MBs.svg)
+</p>
 
 
 
@@ -201,9 +216,10 @@ Given that energy can only flow in one direction in such a chain, the entire cha
 
 **Note:** This mechanism of a proxy bus only works if there are no loops between the busses. This produces a modelling challenge as it would be convenient to model a district heating network as multiple busses that request and provide heat to/from each other. It is currently an open question how to best address this problem and we hope to improve this in future versions of ReSiE.
 
-<center>![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
-
-Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</center>
+<p style="text-align: center" markdown="span">
+![Proxy bus created from three principal busses with three inputs and two outputs.](fig/240314_proxy_bus_creation.svg)
+<br/>
+<span>Illustration of how a proxy bus is created and how input/output priorities and energy flow is preserved.</span></p>
 
 
 ## Bus and interface functionalities with temperature layers
@@ -212,13 +228,17 @@ The general purpose and functionality of interfaces in a simple one-to-one conne
 
 The complexity increases further when heat pumps are involved, as interfaces must handle different temperature levels simultaneously. This is somewhat contrary to the general definition of media, which typically represent one temperature per time step. For example, consider a heat pump connected to two sources with different supply temperatures and two demands, each with different demand temperatures as shown in the figure below. Since a heat pump cannot send two temperatures simultaneously via an interface, the model abstracts this operation by splitting it within a time step. For instance, within a 15-minute time step, the heat pump might provide a high temperature for hot water for 5 minutes and a low temperature for underfloor heating for 10 minutes. At the same time, it can draw energy from two sources at different temperatures, resulting in various COPs based on the composition of the individual input and output layers. This results in an average mixing temperature over the current time step for the input and output interfaces based on the current distribution of energy flows and their temperatures.
 
-<center>![Temperature layer of heat pump with multiple sources and demands](fig/240730_temperature_layer.svg)</center>
+<p style="text-align: center" markdown="span">
+![Temperature layer of heat pump with multiple sources and demands](fig/240730_temperature_layer.svg)
+</p>
 
 During the potential operation, the maximum required and available energies at the respective temperatures are calculated and written to the interface. The interface then forwards this information to the bus, which stores the information and allocates the energy to other components. The method can also be used to override the priorities on the bus, which are set to a constant ordering for the entire simulation. This allows the heat pump to determine during its potential and process operations from which source it draws energy in the current time step, regardless of the priorities on the bus.
 
 If there are other transformers in the list of sources or sinks that have not yet been calculated at the time of the heat pump's potential operation, the heat pump might lack complete information for its calculations. This is shown in the modified example from above in the figure below. While the temperatures are written during the control operation and non-transformer components also write their maximum energy in this operation, the energies of transformers are only calculated later during the potential or process operation. To address this, a mechanism allows the heat pump to determine how much energy it could supply or take for each temperature, regardless of the current energy distribution to other inputs or outputs. The bus handles any excess energy by linearly reducing the theoretically maximum possible energy at other temperatures proportionally when energy is called up at one temperature (internal parameter `has_calculated_all_maxima` indicating that a component has calculated each source or target individually as if no other ones exists, like geothermal probe, solar thermal collector and heat pump). Another method implemented for components with temperature-dependent energy demand (seasonal thermal energy storage) is a direct re-calculation within the component triggered by the bus (internal parameter `recalculate_max_energy` in the `MaxEnergy` struct). These methods ensure a closed-loop step-by-step calculation, even with incomplete information. Full information (energies and temperatures) must be available at least for the input or output, which should be ensured by the algorithm determining the order of operations.
 
-<center>![Temperature layer of heat pump with multiple sources and demands with other transformer](fig/240730_temperature_layer_transformer.svg)</center>
+<p style="text-align: center" markdown="span">
+![Temperature layer of heat pump with multiple sources and demands with other transformer](fig/240730_temperature_layer_transformer.svg)
+</p>
 
 In concrete terms, a **bus and the communication with the connected components work as follows** (this may only be relevant if you plan to develop your own components):
 

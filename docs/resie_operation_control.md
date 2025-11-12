@@ -59,7 +59,9 @@ The following describes the currently implemented control modules. The required 
 
 Some control modules make use of state machines in their calculation. State machines are a [common concept](https://en.wikipedia.org/wiki/Finite-state_machine) in computer science and are useful in working with state based on predefined conditions. They have also been used in programming the building control system of actualized building. In the simulation model they are used with some modifications as described in the following.
 
-<center>![Example of a state machine with two states](fig/240718_example_state_machine.svg)</center>
+<p style="text-align: center" markdown="span">
+![Example of a state machine with two states](fig/240718_example_state_machine.svg)
+</p>
 
 The example above shows a state machine with two states "Off" and "Fill tank" that starts in state "Off". Between the two states are transitions based on boolean expressions of complex conditions as compared to symbols in the input alphabet in the common definition. When the state machine is checked to advance its state and the expression of a transition evaluates as true, it is followed to the new state.
 
