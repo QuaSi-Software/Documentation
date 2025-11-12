@@ -151,22 +151,6 @@ A definition of a control module with its control parameter can be done for exam
 }
 ```
 
-#### Economical discharge
-Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
-
-**Note:** At the moment there is no mechanism to prevent the battery to be fully discharged in a single timestep. This will be changed in a future update.
-
-This module is implemented for the following component types: `Battery`
-
-| | |
-| --- | --- |
-| **name** | Name of the module. Fixed value of `economical_discharge` |
-| **pv_threshold** | Treshold of the PV plant below which discharge is allowed. Absolute value in Wh. |
-| **min_charge** | The minimum charge level required for discharge to be allowed. Defaults to `0.2`. |
-| **discharge_limit** | The charge level to which the battery is discharged, below which discharge is stopped. Defaults to `0.05` |
-| **pv_plant_uac** | The UAC of the PV plant that is linked to the module. |
-| **battery_uac** | The UAC of the battery to which the module is attached. |
-
 #### Profile limited
 Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
 

@@ -47,7 +47,6 @@ The currently implemented callbacks are:
 
 The following describes the currently implemented control modules. The required parameters are described in the [component specification chapter](resie_component_parameters.md#control-modules).
 
-* `economical_discharge`: Handles the discharging of a battery to only be allowed if sufficient charge is available and a linked PV plant has available power below a given threshold. Mostly used for examplatory purposes.
 * `profile_limited`: Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of lower values.
 * `storage_loading`: Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
 * `temperature_sorting`: Controls a component, that can handle multiple inputs or outputs with different temperatures, so that the inputs/outputs are sorted by the temperatures they provide/request. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
