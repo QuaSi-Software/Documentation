@@ -277,20 +277,18 @@ This module is implemented for the following component types: `Bus`
 | | |
 | --- | --- |
 | **name** | Name of the module. Fixed value of `economic_control` |
-| **bus_uac** | The UAC of the bus to control. Required. |
 | **price_profile_path** | Path to the price profile checked against the threshold. Required. |
 | **limit_price** | The threshold below/above which the priorities are switched. Required. |
-| **new_connections** | The input/output priorities and energy flow matrix when the current price is below the threshold. Required. |
+| **new_connections_below_limit** | The input/output priorities and energy flow matrix when the current price is below the threshold. Required. |
 
 An example of this control module used for an electricity bus to switch the priorities of heat providers and en-/disable battery dis/-charging:
 ``` JSON
 "control_modules": [
     {
         "name": "economic_control",
-        "bus_uac": "BUS_Power",
         "price_profile_path": "./profiles/tests/operation_electricity_price.prf",
         "limit_price": 80.0,
-        "new_connections": {
+        "new_connections_below_limit": {
             "input_order": [
                 "Photovoltaic",
                 "Grid_IN",
