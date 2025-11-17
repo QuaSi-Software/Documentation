@@ -187,6 +187,7 @@ To focus the validation on the solarthermal collector model and ignore the effec
 In ReSiE the system is modelled by using only the solarthermal collector and an infinite heat demand. The flow rate and input temperature profiles are given to the collector and the output temperature and generated heat are compared to TRNSYS. Additionally the calculated irradiances in the collector plane are compared to show differences that could influence the results outside of the collector model.
 
 The used parameters are shown in this table:
+
 | Variable                      | Value |
 | ----------------------------- | ----- |
 | collector_gross_area | 16.38 m² |

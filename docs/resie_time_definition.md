@@ -66,7 +66,9 @@ as result and can only be used for the segmentation of hourly data.
 All methods handle intensive and extensive values appropriately. The following figure compares the four methods to illustrate their results
 when segmentating hourly data (light grey) to a 15 minute timestep. Note that each dot at a given time represents the sum/mean of the upcoming time step:
 
-<center>![Profile segmentaton methods](fig/250224_segmentation_algorithms.svg)</center>
+<p style="text-align: center" markdown="span">
+![Profile segmentaton methods](fig/250224_segmentation_algorithms.svg)
+</p>
 
 For **aggregation**, ReSiE sums the original values to compute the new time step for extensive data, while it calculates the mean of the original values for intensive data to generate the corresponding value in the new profile.
 
@@ -76,6 +78,10 @@ If some timestamps are missing at the beginning or end of the profile during the
 
 **Note**: Linear interpolation for time shifts and segmentation may smoothen the original profile, potentially changing the total sum/mean of the profile. If preserving the original sum/mean is crucial, use stepwise interpolation instead and no time shift. The difference is illustrated in the figures below. The first shows the different integral of the `linear_classic` and `stepwise` segmentation methods, the second the smoothing effect of a time shift.
 
-<center>![Profile segmentaton methods](fig/240905_profile_segmentation_methods_comparison.jpg)</center>
+<p style="text-align: center" markdown="span">
+![Profile segmentaton methods](fig/240905_profile_segmentation_methods_comparison.jpg)
+</p>
 
-<center>![Profile time shift smoothing](fig/240905_profile_timeshift_smoothing_comparison.jpg)</center>
+<p style="text-align: center" markdown="span">
+![Profile time shift smoothing](fig/240905_profile_timeshift_smoothing_comparison.jpg)
+</p>

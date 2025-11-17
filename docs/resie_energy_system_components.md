@@ -375,7 +375,7 @@ Because cooling demands in ReSiE are modeled as fixed sources of heat, no change
 The example ["Heating and cooling demands"](resie_exemplary_energy_systems.md#heating-and-cooling-demands) shows how a cooling demand can be handled using a heat pump.
 
 ### Compression chiller (CC)
-Compression chillers are modeled as compression [heat pumps](resie_energy_system_components.md#heat-pump-hp). The produced waste heat, at a higher temperature then the cooling demand, can be removed from the system by a generic bounded sink.
+Compression chillers are modeled as compression [heat pumps](resie_energy_system_components.md#heat-pump-hp). The produced waste heat, at a higher temperature then the cooling demand, can be removed from the system by a generic flexible sink.
 
 ### Absorption/adsorption chiller (AAC)
 
@@ -683,7 +683,7 @@ air | hot air absorber | [Generic Heat Source](resie_energy_system_components.md
 ### Generic Heat Source
 ![Energy flow of a generic heat source](fig/240613_generic_heat_source.svg)
 
-Acts as a general bounded supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
+Acts as a general flexible supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
 
 The heat exchanger can be modelled with a constant temperature reduction, a LMTD-based approach or no reduction at all.
 
@@ -925,7 +925,9 @@ Within the simulation domain, a computational grid is built for the numerical ca
 
 Here, a grid with the accuracy mode "normal" is shown as example:
 
-<center>![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}</center>
+<p style="text-align: center" markdown="span">
+![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}
+</p>
 
 The following figure presents a convergence study for the numerical grid used in the geothermal collector across the different accuracy modes outlined above (with an additional "extreme_rough" to clarify the convergence). Notably, starting with the "normal" accuracy mode, convergence is observed, particularly during the soil’s phase change stage.
 
@@ -1367,7 +1369,7 @@ Symbol | Description | Unit
 
 
 #### Limits of the simulation model
-Describe limits depending on the actual implemented model (Transformer or bounded source) (ToDo) 
+Describe limits depending on the actual implemented model (Transformer or flexible source) (ToDo) 
 
 
 
