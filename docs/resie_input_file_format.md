@@ -42,6 +42,7 @@ The overall structure of the project file is split into three general sections a
 ## Input / Output settings
 ```json
 "io_settings": {
+    "base_path": "/path/to/project_dir",
     "auxiliary_info": true,
     "auxiliary_info_file": "./auxiliary_info.md",
     "auxiliary_plots": true,
@@ -71,7 +72,7 @@ The overall structure of the project file is split into three general sections a
     "step_info_interval": 500
 },
 ```
-
+* `base_path`: (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
 * `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
 * `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
