@@ -375,7 +375,7 @@ Because cooling demands in ReSiE are modeled as fixed sources of heat, no change
 The example ["Heating and cooling demands"](resie_exemplary_energy_systems.md#heating-and-cooling-demands) shows how a cooling demand can be handled using a heat pump.
 
 ### Compression chiller (CC)
-Compression chillers are modeled as compression [heat pumps](resie_energy_system_components.md#heat-pump-hp). The produced waste heat, at a higher temperature then the cooling demand, can be removed from the system by a generic bounded sink.
+Compression chillers are modeled as compression [heat pumps](resie_energy_system_components.md#heat-pump-hp). The produced waste heat, at a higher temperature then the cooling demand, can be removed from the system by a generic flexible sink.
 
 ### Absorption/adsorption chiller (AAC)
 
@@ -683,7 +683,7 @@ air | hot air absorber | [Generic Heat Source](resie_energy_system_components.md
 ### Generic Heat Source
 ![Energy flow of a generic heat source](fig/240613_generic_heat_source.svg)
 
-Acts as a general bounded supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
+Acts as a general flexible supply component on a medium that has a temperature and with an optional, simplified [heat exchanger](resie_energy_system_components.md#heat-exchanger) built in. Requires an input for \(T_{source,in}\) and for the maximum value of \(\dot{Q}_{out}\) in the current time step.
 
 The heat exchanger can be modelled with a constant temperature reduction, a LMTD-based approach or no reduction at all.
 
@@ -904,7 +904,6 @@ t | current simulation time | \([s]\)
 #### Overview
 There are several types of geothermal heat collectors. The model in ReSiE covers classic horizontal geothermal heat exchangers with a typical depth of 1-2 m below the surface, e.g. by a number of pipes laid parallel to each other. In addition to the physical properties of the soil, local weather conditions have a noticable influence on the soil temperature due to the low installation depth below the earth's surface, e.g. compared to geothermal probe systems. When designing geothermal collectors, the aim is to achieve partial icing of the ground around the collector pipes during the heating season in order to utilize latently stored energy. However, the iced volume around the collector pipes must not be so large as to prevent precipitation from seeping into deeper layers of the earth. VDI 4640-2 specifies design values for the area-related heat extraction capacity depending on the soil type and the climate zone.
 
-
 #### Simulation domain and boundary conditions
 For modeling horizontal geothermal collectors, a numerical approach is chosen here, which discretizes the soil and calculates a two-dimensional temperature field at each time step. 
 
@@ -926,7 +925,9 @@ Within the simulation domain, a computational grid is built for the numerical ca
 
 Here, a grid with the accuracy mode "normal" is shown as example:
 
-<center>![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}</center>
+<p style="text-align: center" markdown="span">
+![Mesh of a grid with "normal" accuracy](fig/241028_collector_calculation_mesh.svg){: style="height:600px"}
+</p>
 
 The following figure presents a convergence study for the numerical grid used in the geothermal collector across the different accuracy modes outlined above (with an additional "extreme_rough" to clarify the convergence). Notably, starting with the "normal" accuracy mode, convergence is observed, particularly during the soil’s phase change stage.
 
@@ -938,7 +939,7 @@ The control volumes are calculated as follows:
 $$ V_{i,j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z $$
 where \(V_{i,j}\) is the control volume around a node and \(\Delta x\), \(\Delta y\), and \(\Delta z\) are the variable location step widths in x, y, and z directions, respectively.
 
-The implemented solver uses explicit finite difference method for the central nodes combined with appropriate boundary conditions (no-flux to the right, Dirichlet to the ground).
+**Numerical scheme.** The solver employs an **implicit backward-Euler** time discretization on the non-uniform grid. In each global time step, the code assembles and solves a sparse linear system that combines (i) heat conduction between neighbouring control volumes, (ii) storage in the control volume, and (iii) boundary/source contributions. Temperature-dependent properties and the phase-change term are handled by a short Picard iteration: properties are evaluated at the current iterate, the linear system is rebuilt and solved, and the iterate is updated until the prescribed tolerance is reached. In the implicit scheme, the conduction fluxes and the storage term are written at the new time level and combined with the boundary/source contributions. This yields, in each time step, a sparse linear system for the unknown temperature field at \(n\). There is no internal sub-stepping.
 
 #### Modelling of the soil
 In the context of this model, the soil is considered to be homogeneous with uniform and temporally constant physical properties. 
@@ -946,11 +947,6 @@ However, an extension to include several earth layers in y-direction would be po
 parameters to the computational nodes. Also, different soil properties like heat conductivity and heat capacity of frozen and 
 unfrozen soil are included. The basis of the temperature calculation is the energy balance in each control volume for each time step:
 
-$$Q_{\text{in,out},i,j} = V_{i,j} \; \rho_{\text{soil}} \; c_{soil} \; (T_n - T_{n-1})_{i,j}$$
-
-where \(Q_{\text{in,out},i,j}\) is the heat energy supplied or released between two time steps, \(V_{i,j}\) is the control volume, 
-\(\rho_{soil}\) is the density of the soil, \(c_{soil}\) is the specific heat capacity of the soil , \(T\) is the temperature 
-of the respective node, and \(n\) is an index for the time step. 
 It is assumed that the heat transport between the volume elements in the soil is based exclusively on heat conduction. 
 The heat fluxes \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) are supplied to or extracted from the adjacent volume elements around 
 the node (i,j) and are calculated with the following equations based on the Fourier's Law of heat conduction:
@@ -959,60 +955,154 @@ $$\dot{Q}_1 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i-1,j} - T_{i,j})}{\Delta x
 
 $$\dot{Q}_2 = A_{y,z} \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i} = \frac{(\Delta y_{j-1} + \Delta y_j)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i+1,j} - T_{i,j})}{\Delta x_i}$$
 
-$$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_3 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta y_{j-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j-1} - T_{i,j})}{\Delta y_{j-1}}$$
 
-$$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta x_{i-1}}$$
+$$\dot{Q}_4 = A_{x,z} \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j} = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; \lambda_{soil} \; \frac{(T_{i,j+1} - T_{i,j})}{\Delta y_j}$$
 
-where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil.
-The heat flows \(\dot{Q}_{1}\) to \(\dot{Q}_{4}\) supplied to and extracted from the volume element are summed up and multiplied 
-by the internal time step size τ:
-
-$$Q_{\text{in,out},i,j} = (\dot{Q}_1 + \dot{Q}_2 + \dot{Q}_3 + \dot{Q}_4) \; \tau$$
+where \(A\) is the contact area between the adjacent control volumes and \(\lambda_{soil}\) is the thermal conductivity of the soil. In the implementation, the face conductivity \(\lambda_{soil}\) is evaluated as the arithmetic mean of the adjacent cells’ \(\lambda_{soil}(T)\) at the current Picard iterate.
 
 ![numerical approach geothermal heat collector](fig/231016_numerical_approach_geothermal_heat_collector.svg)
 
-If the value of τ is chosen too large, numerical instabilities and thus completely wrong calculation results may occur. 
-According to the TRNSYS Type 710 Model (Hirsch, Hüsing & Rockendorf 2017)[^Type710], the maximum internal time step size depends 
-significantly on the physical properties of the soil and the minimum spacial step size and can be determined as follows:
+#### Linear system assembly and boundary conditions
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+This section summarizes what the implicit solver does in each global time step, consistent with the flux definitions \(\dot{Q}_1\dots\dot{Q}_4\) (with \(\Delta x\) horizontal and \(\Delta y\) vertical). All node temperatures at the new time level are stacked into \(\mathbf{T}_n\) and solved from
+\[
+\mathbf{A}\,\mathbf{T}_{n}=\mathbf{b},
+\]
+using a row-major flattening \(p=(j-1)\,n_x+i \Rightarrow T_{n,p}\equiv T_{n,i,j}\). 
 
-$$\tau_{\text{max}} = \min \left( \frac{c_{soil,\ frozen}}{\lambda_{soil,\ frozen}},\frac{c_{soil,\ unfrozen}}{\lambda_{soil,\ unfrozen}} \right) \; \frac{\rho_{soil} \; \min(\Delta x_{\text{min}}, \Delta y_{\text{min}})^2}{4}$$
+On the non-uniform grid the face areas are
+\[
+A_{y,z}=\frac{\Delta y_{j-1}+\Delta y_j}{2}\,\Delta z,\qquad
+A_{x,z}=\frac{\Delta x_{i-1}+\Delta x_i}{2}\,\Delta z.
+\]
 
-By rearranging the equation of the energy balance from above, the new value for the temperature of each control volume can be 
-calculated for the current time step as
-$$ T_{n,i,j} = T_{n-1,i,j} + \frac{Q_{\text{in,out},i,j}}{V_{i,j} \; c_{soil}(T_{n-1,i,j}) \; \rho_{soil}} $$
+For each interior node \((i,j)\), backward-Euler yields a storage term
+\[
+a_{P0}=\frac{\rho_{soil}\,c_{soil}\!\big(T^{(k)}_{i,j}\big)\,V_{i,j}}{\Delta t},
+\]
+and four face conductances corresponding to the directions of \(\dot{Q}_1\dots\dot{Q}_4\):
+\[
+G_W=\frac{A_{y,z}\,\lambda_W}{\Delta x_{i-1}},\quad
+G_E=\frac{A_{y,z}\,\lambda_E}{\Delta x_i},\quad
+G_N=\frac{A_{x,z}\,\lambda_N}{\Delta y_{j-1}},\quad
+G_S=\frac{A_{x,z}\,\lambda_S}{\Delta y_j}.
+\]
+Face conductivities \(\lambda_{\bullet}\) are arithmetic means of the adjacent cells’ \(\lambda_{soil}(T^{(k)})\). Each face heat rate equals the corresponding conductance times the temperature difference across that face:
+\[
+\dot{Q}_1=G_W(T_{i-1,j}-T_{i,j}), \\
+ \dot{Q}_2=G_E(T_{i+1,j}-T_{i,j}), \\
+  \dot{Q}_3=G_N(T_{i,j-1}-T_{i,j}), \\
+  \dot{Q}_4=G_S(T_{i,j+1}-T_{i,j}). 
+\]
 
+The lateral outer boundaries are adiabatic (missing neighbours simply do not contribute). At the lower boundary \((j=n_y)\) the temperature is prescribed (Dirichlet): the row is overwritten with \(A_{p,p}=1\) and \(b_p=T_{\text{ground}}\). 
 
-#### Boundary Conditions
-The control volumes around the computational nodes at the outer edges of the simulation area are calculated so that the respective control volumes do not extend beyond the simulation boundary.
-In addition, the lateral simulation boundaries are considered adiabatic, so the heat fluxes over the adiabatic control surfaces are set to zero when calculating the temperature.
-At the lowest computational nodes, the temperature is defined as constant before the simulation starts, which is why all computational steps for calculating new temperatures are eliminated.
-For the nodes at the upper simulation edge, which represent the earth's surface, no heat conduction from above is considered. Instead, weather effects in the form of solar radiation into the ground (\(\dot{q}_{\text{glob}}\)), heat radiation from the ground to the surroundings (\(\dot{q}_{\text{rad}}\)) and convective heat exchange between the ground and the air flow above (\(\dot{q}_{\text{konv}}\)) are taken into account. The heat flow from above (in the figure: \(\dot{Q}_{3}\) of the uppermost nodes) is therefore calculated as:
-
-$$\dot{Q}_{3,i,1} = A_{x,z} \; (\dot{q}_{\text{glob}} - \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}}) = \frac{(\Delta x_{i-1} + \Delta x_i)}{2} \; \Delta z \; (\dot{q}_{\text{glob}} + \dot{q}_{\text{rad}} + \dot{q}_{\text{konv}})$$
-where \(\dot{q}_{\text{glob}}\) is the incoming global radiation, \(\dot{q}_{\text{rad}}\) is the long wave radiation exchange with the ambient, and \(\dot{q}_{\text{konv}}\) is the convective heat flux between the surface and the air flowing over it. These terms are calculated as follows:
-
-$$\dot{q}_{\text{glob}} = (1 - r) \; \dot{q}_{\text{solar,glob}}$$
-with \(r\) as the reflectance of the earth's surface and \dot{q}_{\text{solar,glob}} as the global horizontal solar radiation on the surface;
-
-$$\dot{q}_{\text{rad}} = \epsilon \; \sigma_{\text{Boltzmann}} \; (T_{\text{sky}}^4 - (T_{i,1} + 273.15)^4)$$
+At the surface \((j=1)\) there is no conduction from above; instead, the top face is replaced by environmental exchange consisting of convection with ambient air, long-wave radiation to the sky, and absorption of global irradiance:
+\[
+\dot{q}_{\text{konv}}=\alpha_{\text{konv}}\,(T_{\text{amb}}-T_{i,1}), \\
+\dot{q}_{\text{rad}}=\epsilon\,\sigma_{\text{Boltzmann}}\!\big(T_{sky}^4-(T_{i,1}+273.15)^4\big),  \\
+\dot{q}_{\text{glob}}=(1-r)\,E_{glob},
+\]
 with
-$$ T_{sky} = \left (\frac{\dot{q}_{\text{horizontal infrared radiation}}}{\sigma_{\text{Boltzmann}}} \right ) ^ {0.25} $$
+\[
+T_{sky}=\left(\frac{\dot{q}_{\text{horizontal infrared radiation}}}{\sigma_{\text{Boltzmann}}}\right)^{0.25}.\qquad
+\]
+Convection is treated **implicitly** by adding \(\alpha_{\text{konv}}A_{x,z}\) to the diagonal \(a_P\) and \(\alpha_{\text{konv}}A_{x,z}T_{\text{amb}}\) to the RHS, while radiation and solar are treated **explicitly** (evaluated at \(T^{\text{old}}_{i,1}\)) and added only to the RHS:
+\[
+S^{\text{surf}}_{i,1}
+= A_{x,z}\Big[\alpha_{\text{konv}}\,T_{\text{amb}}+\epsilon\,\sigma_{\text{Boltzmann}}\big(T_{sky}^4-(T^{\text{old}}_{i,1}+273.15)^4\big)+(1-r)\,E_{glob}\Big],
+\]
+and \(S^{\text{surf}}_{i,j}=0\) for \(j>1\).
 
-where \(\epsilon\) is the emissivity of the surface, \(\sigma_{\text{Boltzmann}}\) is the Stefan-Boltzmann constant, \(T_{sky}\) the effective mean sky temperature (sky radiative temperature) in Kelvin, \(T_{i,1}\) the temperature of the surface soil element and \(\dot{q}_{\text{horizontal infrared radiation}}\) the horizontal infrared radiation intensity from the sky;
-
-$$\dot{q}_{\text{konv}} = \alpha_{\text{konv}} \; (T_{\text{amb}} - T_{i,1})$$
-with \(\alpha_{\text{konv}}\) as the convective heat transfer coefficient at the surface and \(T_{amb}\) the ambient air temperature.
-
-Another important aspect of the model is the interface between the collector pipe and the surrounding soil. The heat carrier fluid 
-is modelled in one node. Each of the five neighbouring nodes are set to \(\Delta x = \Delta y = D_o / 2\) while the two volumina at the 
-mirror axis are cut in half. As simplification, to each of the five nodes 1/4 of the soil volume surrounding the pipe is assigned, and 1/8 for the halved nodes. However, the temperature of the five nodes is averaged afterwards.
+The thermal interaction with the pipe fluid is represented as an internal source/sink distributed to the five soil nodes adjacent to the fluid node. Because only half of the pipe’s surroundings lies inside the simulated half-domain, the per-pipe power \(q_{\text{pipe}}=\tilde{q}_{\text{in,out}}\,l_{\text{pipe}}\) is split by fixed weights that sum to \(0.5\) (extraction negative, injection positive) and is added directly to the RHS at the corresponding rows, as shown in the figure below, where \(h_{pipe}\) is the vertical index of the pipe node:
+\[
+\begin{aligned}
+S^{\text{pipe}}_{1,h_{\text{pipe}}-1}=\tfrac{1}{16}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{1,h_{\text{pipe}}+1}=\tfrac{1}{16}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}}=\tfrac{1}{8}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}-1}=\tfrac{1}{8}\,q_{\text{pipe}},\\
+S^{\text{pipe}}_{2,h_{\text{pipe}}+1}=\tfrac{1}{8}\,q_{\text{pipe}}.
+\end{aligned}
+\]
 
 ![pipe surrounding nodes](fig/231218_pipe_surrounding.svg)
 
-The temperature calculation in the nodes neighbouring the pipe differs from the others in that an internal heat source or sink appears in the calculation equation. The internal heat source or sink represents the thermal heat flow that is extracted from or introduced into the ground.
-Since only half of the pipe's surroundings are in the simulation area, the heat flow given to the model is halved and distributed to each node as an internal heat source.
+The resulting matrix coefficients are
+\[
+a_W=G_W,\; a_E=G_E,\; a_N=G_N,\; a_S=G_S,\qquad
+\]
+leading to
+\[
+a_P=a_{P0}+a_W+a_E+a_N+a_S \ \left(+ \alpha_{\text{konv}}\,A_{x,z} \text{ for surface nodes } j = 1 \right),
+\]
+so each row \(p\) of the matrix equation reads
+\[
+a_P\,T_{n,i,j}-a_W\,T_{n,i-1,j}-a_E\,T_{n,i+1,j}-a_N\,T_{n,i,j-1}-a_S\,T_{n,i,j+1}=b_{i,j}.
+\]
+
+For every node the RHS then has the form
+\[
+b_{i,j}=a_{P0}\,T_{n-1,i,j}+S^{\text{surf}}_{i,j}+S^{\text{pipe}}_{i,j},
+\]
+and a short Picard loop updates \(c_{soil}(T)\) and \(\lambda_{soil}(T)\) at the current iterate \(T^{(k)}\), rebuilds \(\mathbf{A}\) and \(\mathbf{b}\), and repeats until convergence.
+
+The matrix \(\mathbf{A}\) is assembled as a sparse matrix with one diagonal entry \(a_P\) (capacity plus all face conductances, plus implicit convection at the surface) and up to four off-diagonals \(-G_\bullet\) to existing neighbours, while the lateral adiabatic faces contribute nothing and bottom Dirichlet rows are set to \((1)\). The built of the matrix \(\mathbf{A}\)  is described in more detail below.
+
+**Block form of \(\mathbf{A}\) with explicit first and last blocks (entries in \(a\)-parameters)**
+
+\[
+\mathbf{A}=
+\begin{bmatrix}
+\boxed{B_1} & \boxed{C_1} & 0 & \cdots & 0 \\
+\boxed{D_2} & B_2 & C_2 & \ddots & \vdots \\
+0 & \ddots & \ddots & \ddots & 0 \\
+\vdots & \ddots & D_{n_y-1} & B_{n_y-1} & C_{n_y-1} \\
+0 & \cdots & 0 & \boxed{D_{n_y}} & \boxed{B_{n_y}}
+\end{bmatrix}
+\]
+
+**First horizontal block \(B_1\) (size \(n_x\times n_x\)):**
+\[
+B_1=
+\begin{bmatrix}
+a_P(1,1)        & -a_E(1,1)     & 0              & \cdots & 0 \\
+-a_W(2,1)       & a_P(2,1)      & -a_E(2,1)      & \ddots & \vdots \\
+0               & -a_W(3,1)     & a_P(3,1)       & \ddots & 0 \\
+\vdots          & \ddots        & \ddots         & \ddots & -a_E(n_x-1,1) \\
+0               & \cdots        & 0              & -a_W(n_x,1) & a_P(n_x,1)
+\end{bmatrix}
+\]
+(with \(a_P(i,1)\) including \(a_{\mathrm{surf}}(i,1)=\alpha_{\mathrm{konv}}A_{x,z}(i,1)\)).
+
+**Coupling from row \(j=1\) to \(j=2\):**
+\[
+C_1=\mathrm{diag}\!\big(-a_S(1,1),\,-a_S(2,1),\,\dots,\,-a_S(n_x,1)\big).
+\]
+
+**Coupling from row \(j=2\) to \(j=1\):**
+\[
+D_2=\mathrm{diag}\!\big(-a_N(1,2),\,-a_N(2,2),\,\dots,\,-a_N(n_x,2)\big).
+\]
+
+**Last horizontal block \(B_{n_y}\) (size \(n_x\times n_x\)):**
+\[
+B_{n_y}=
+\begin{bmatrix}
+a_P(1,n_y)        & -a_E(1,n_y)     & 0                 & \cdots & 0 \\
+-a_W(2,n_y)       & a_P(2,n_y)      & -a_E(2,n_y)       & \ddots & \vdots \\
+0                 & -a_W(3,n_y)     & a_P(3,n_y)        & \ddots & 0 \\
+\vdots            & \ddots          & \ddots            & \ddots & -a_E(n_x-1,n_y) \\
+0                 & \cdots          & 0                 & -a_W(n_x,n_y) & a_P(n_x,n_y)
+\end{bmatrix}
+\]
+(\(a_P(i,n_y)\) has no surface add-on).
+
+**Coupling from row \(j=n_y\) to \(j=n_y-1\):**
+\[
+D_{n_y}=\mathrm{diag}\!\big(-a_N(1,n_y),\,-a_N(2,n_y),\,\dots,\,-a_N(n_x,n_y)\big).
+\]
+
 
 #### Heat Carrier Fluid
 The description of the heat carrier fluid is very similar to the explanations in the chapter "Geothermal probes", which is why it is not explained here in detail. Additionally to the method for the calculation of the laminar Nußelt number for the determination of the convective heat transfer coefficient on the inside of the pipe \(\alpha_i \) introduced by Ramming and explained above, a method by Stephan[^Stephan1959] [^Waermeatlas] is implemented and can be chosen in the user input file:
@@ -1026,13 +1116,13 @@ $$ Nu_\text{laminar, Stephan} = 3.66 +
 \cdot \left( \frac{{Pr}_{{fluid}}}{{Pr}_{{water}}} \right)^{0.11}
 $$
 
-[^Stephan1959]: Stephan, Karl (1959): Wärmeübergang und Druckabfall bei nicht ausgebildeter Laminarströmung in Rohren und in ebenen Spalten. In: Chemie Ingenieur Technik 31 (12), S. 773–778. DOI: 10.1002/cite.330311204.
+[^Stephan1959]: Stephan, Karl (1959): Wärmeübergang und Druckabfall bei nicht ausgebildeter Laminarströmung in Rohren und in ebenen Spalten. In: Chemie Ingenieur Technik 31 (12), S. 773–778. DOI: 10.1002/cite.330311204 . 
 
 [^Waermeatlas]: VDI-Gesellschaft Verfahrenstechnik und Chemieingenieurwesen (2013): VDI-Wärmeatlas. Mit 320 Tabellen. 11., bearb. und erw. Aufl. Berlin, Heidelberg: Springer Vieweg.
 
 Instead of the thermal borehole resistance from the probe model, a length-related thermal pipe resistance is introduced for the geothermal collector model. First, the following equation in accordance to (Hirsch, Hüsing & Rockendorf 2017)[^Type710] is used to calculate the heat transfer coefficient between the heat carrier fluid and the surrounding soil.
 
-[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeübertrager für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
+[^Type710]: H. Hirsch, F. Hüsing, and G. Rockendorf: Modellierung oberflächennaher Erdwärmeüberträger für Systemsimulationen in TRNSYS, BauSIM, Dresden, 2016.
 
 $$ k = \left( \frac{D_o}{D_i \; \alpha_i} + \frac{ln \left(\frac{D_o}{D_i} \right)\; D_o}{2 \; \lambda_p} + \frac{\Delta x_{min}}{2 \; \lambda_{soil}} \right)^{-1} $$
 
@@ -1040,73 +1130,81 @@ where \(k\) is the heat transfer coefficient, \(\alpha_i \) is the convective he
 
 $$ R_p = \left( k \; \frac{\pi \; D_o \; l_{pipe}}{l_{pipe}} \right)^{-1} = \left( k \; \pi \; D_o  \right)^{-1} $$
 
-
-The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,m}}\) is calculated using the length-related thermal resistance \(R_p \):
-$$T_{\text{fl,m}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \; R_p$$
+The heat extraction or heat input capacity is related to the tube length of the collector and a mean fluid temperature \(T_{\text{fl,am}}\) is calculated using the length-related thermal resistance \(R_p \):
+$$T_{\text{fl,am}} = T_{\text{soil,pipe surrounding}} + \tilde{q}_{\text{in,out}} \; R_p$$
 
 with \(\tilde{q}_{\text{in,out}}\) as the length-specific heat extraction or injection rate and \(T_{\text{soil,pipe surrounding}}\) as the temperature of the nodes adjacent to the fluid node. 
 
 Optional, dynamic fluid properties for a 30 vol-% ethylene glycol mix, adapted from TRNSYS Type 710, are implemented using the following temperature-dependent properties for the calculation of the dynamic viscosity \(\nu_{\text{fl}}\) and thermal conductivity of the fluid, \(\lambda_{fluid}\), both needed for the calculation of temperature-dependent Reynolds and Prandtl numbers:
 
-$$ \nu_{\text{fl}} = 0.0000017158 \, T_{\text{fl,m}}^2 - 0.0001579079 \, T_{\text{fl,m}} + 0.0048830621 $$
-$$ \lambda_{fluid} = 0.0010214286 \, T_{\text{fl,m}} + 0.447 $$
+$$ \nu_{\text{fl}} = 0.0000017158 \, T_{\text{fl,am}}^2 - 0.0001579079 \, T_{\text{fl,am}} + 0.0048830621 $$
+$$ \lambda_{fluid} = 0.0010214286 \, T_{\text{fl,am}} + 0.447 $$
 
 #### Phase Change
-In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled by applying the apparent heat capacity method adapted from Muhieddine2015[^Muhieddine]. During the phase change, the phase change enthalpy is released or bound, which is why the temperature remains almost constant during the phenomenon of freezing or melting. Basically, the apparent heat capacity method in the phase change process assigns a temperature-dependent apparent heat capacity to the volume element, which is calculated via a normal distribution of the phase change enthalpy over a defined temperature range around the icing temperature, as shown in the following figure:
-
-![Normal distribution of apparent heat capacity during freezing](fig/241028_soil_heat_capacity_freezing.svg)
-
-The resulting temperature-dependent specific heat capacity of the soil, \(c_{soil}(T)\), shown in the curve above, is described with the following equation:
+In this model, the phase change of the water in the soil from liquid to solid and vice versa is modeled via an **enthalpy formulation**. During the phase change, the fusion enthalpy is released or bound, which is why the temperature remains almost constant during the phenomenon of freezing or melting. The resulting temperature-dependent specific heat capacity of the soil, \(c_{soil}(T)\), is described over the user-defined freezing interval as follows:
 
 $$ c_{soil}(T) = \begin{cases}
 c_{soil,\ unfr} & T \geq T_{\text{freezing upper limit}} \\
-c_{lat}(T) & T_{\text{freezing lower limit}} < T < T_{\text{freezing upper limit}} \\
 c_{soil,\ fr} & T \leq T_{\text{freezing lower limit}} \\
+c_{soil,\ fr} + (c_{soil,\ unfr} - c_{soil,\ fr}) \dfrac{T - T_{\text{freezing lower limit}}}{T_{\text{freezing upper limit}} - T_{\text{freezing lower limit}}} \;+\; h_{lat} \;\dfrac{d\lambda}{dT}(T) & \text{else}
 \end{cases} $$
 
-with:
+with a smooth liquid fraction between the limits,
+\[
+\lambda(T)=
+\begin{cases}
+0, & T \le T_{\text{freezing lower limit}}\\[2pt]
+s^2(3-2s),\quad s=\dfrac{T-T_{\text{freezing lower limit}}}{T_{\text{freezing upper limit}}-T_{\text{freezing lower limit}}}, & T_{\text{freezing lower limit}}<T<T_{\text{freezing upper limit}}\\[6pt]
+1, & T \ge T_{\text{freezing upper limit}}
+\end{cases}
+\]
+and derivative inside the band
+\[
+\dfrac{d\lambda}{dT}(T)=\dfrac{6\,s(1-s)}{T_{\text{freezing upper limit}}-T_{\text{freezing lower limit}}}.
+\]
 
-$$ c_{lat}(T) = h_{lat} \frac{5}{\Delta T_{lat} \sqrt{2 \pi}} \exp \left( -\frac{(T - T_{lat})^2}{2 (\frac{\Delta T_{lat}}{5})^2} \right) + c_{soil,\ fr} + (c_{soil,\ unfr} - c_{soil,\ fr}) \frac{T - (T_{lat} - \frac{\Delta T_{lat}}{2})}{\Delta T_{lat}}$$
-
-$$ \Delta T_{lat} = T_{\text{freezing upper limit}} - T_{\text{freezing lower limit}}  $$ 
-
-$$ T_{lat} = \frac{T_{\text{freezing upper limit}} + T_{\text{freezing lower limit}} }{2} $$
-
-where \(T_{\text{freezing upper limit}} \) and \(T_{\text{freezing lower limit}} \) are the upper and lower temperature limit of the freezing process, \(T_{lat}\) the mid point between these upper and lower temperature limit and \(\Delta T_{lat}\) is the temperature difference between the upper and lower temperature limit. \(h_{lat}\) is the specific freezing (or fusion) enthalpy of the soil and \(c_{soil,\ unfr} \) and \(c_{soil,\ fr} \) are the specific heat capacity of the unfrozen and frozen soil. As \(c_{soil}(T)\) is used in the energy balances of every volume element, but also depends on the soil temperature, a solving algorithm is used to determine its correct value as well as the correct temperature of each volume element in every time step.
+As \(c_{soil}(T)\) is used in the energy balances of every volume element and depends on the temperature, a short iterative solving algorithm (Picard iteration) updates the temperature-dependent terms each time step. When a linear predictor indicates that no node lies in or enters the freezing interval in the current step, the system is assembled and solved once without activating the latent term.
 
 As a result, the heat capacity significantly increases during the phase change, reducing the temperature variation between time steps. This effect is illustrated in the following figure, where a constant energy demand is drawn from a soil volume element.
 
-![Temperature of a volument element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
+![Temperature of a volume element during freezing](fig/241028_collector_soil_freezing_temperature_constant_demand.svg)
 
 The volume element has a mass of 1000 kg and is cooled down from 5 to -5 °C. The specific heat capacity is \( c_{soil,\ fr} = c_{soil,\ unfr} = 850 \ J/(kgK)\)  in frozen and unfrozen state with an energy of fusion of \(h_{lat} = 90 \, 000 \ J/kg \) . This results in a total energy of 27 361 Wh that is taken out of the element (54.7 W for 500 hours).
 
-[^Muhieddine]: M. Muhieddine, E. Canot, and R. March, Various Approaches for Solving Problems in Heat Conduction with Phase Change: HAL, 2015.
+### Technical description – Symbols and units
 
 Symbol | Description | Unit
 -------- | -------- | --------
 \(\alpha_{i}\) | convective heat transfer coefficient on the inside of the pipe  | [W / \((m² K)\)] 
 \(\alpha_{\text{konv}}\) | convective heat transfer coefficient  | [W/  \((m² K)\)] 
-\(\Delta x, \Delta y,\Delta z,\)  | step widths in x, y, and z direction  | [m] 
+\(\Delta t\) | global time step size | [s]
+\(\Delta x, \Delta y,\Delta z\)  | step widths in x, y, and z direction  | [m] 
+\(\Delta x_{min}\) | minimum mesh width used in the pipe/soil coupling formula | [m]
 \(\epsilon\)  | emissivity of the surface  | [-] 
 \(\lambda_{soil}\)  | thermal conductivity of the soil  | [W / (m K)] 
+\(\lambda_p\) | thermal conductivity of the pipe | [W/(m K)]
 \(\rho_{soil}\)  | density of the soil   | [kg / \(m³\)] 
 \(\sigma_{\text{Boltzmann}}\) | Stefan-Boltzmann constant | [W / \((m² K^4)\)] 
-\(\tau\)  |  internal time step size  | [s] 
-\(A\)  | contact area between two adjacent control volumes  | [\(m²\)]
+\(A_{x,z}, A_{y,z}\) | control-volume face areas in x–z and y–z planes | [\(m²\)
+\(a_{P0}, a_{P}, a_{W}, a_{E}, a_{N}, a_{S}\) | linear system coefficients (storage & face conductances) | [W / K]]
 \(c_{soil}(T)\)  | specific heat capacity of the soil, depends on the temperature  | [J / (kg K)]
 \(c_{soil,\ fr}\)  | specific heat capacity of the frozen soil   | [J / (kg K)]
 \(c_{soil,\ unfr}\) | specific heat capacity of the unfrozen soil   | [J / (kg K)]
 \(D_i \)  | inside diameter of the pipe   | [m]
 \(D_o \)  | outside diameter of the pipe   | [m]
 \(E_{glob}\)  | global solar radiation on horizontal surface | [W / \(m²\)]
+\(G_{W}, G_{E}, G_{N}, G_{S}\) | face thermal conductances | [W / K]
 \(h_{lat}\) | specific enthalpy of fusion of the soil| [J / kg]
 \(i\)  | index for the node position in x-direction  | [-]
 \(j\)  | index for the node position in y-direction  | [-]
-\(l_{\text{pipe}}\) |total length of a the pipe | [m] 
+\(k\) | heat transfer coefficient (pipe/soil coupling) | [W/(m² K)]
+\(l_{\text{pipe}}\) | total length of the pipe | [m] 
 \(n\)  | index for the time step   | [-]
 \(Nu\)  | Nußelt number	   | [-]
-\(Pr\)  | Prandtl number	|
+\(Pr\)  | Prandtl number	| [-]
 \(\tilde{q}_{\text{in,out}}\)  | length-specific heat extraction or injection rate   | [W / m]
+\(\nu_{\text{fl}}\) | kinematic viscosity of the fluid | [m²/s]
+\(\lambda_{fluid}\) | thermal conductivity of the fluid | [W/(m K)]
 \(\dot{q}_{\text{horizontal infrared radiation}}\) | horizontal infrared radiation intensity from the sky | [W / \(m²\)]
 \(\dot{q}_{\text{glob}}\)  | global radiation   | [W / \(m²\)]
 \(\dot{q}_{\text{rad}}\)  |  long wave radiation exchange with the environment   | [W / \(m²\)]
@@ -1118,13 +1216,13 @@ Symbol | Description | Unit
 \(R_p \)  | length-specific thermal pipe resistance   | [(m K) / W]
 \(T\)  | temperature   | [°C]
 \(T_{abs}\)  | absolute temperature   | [K]
+\(T_{\text{amb}}\) | ambient air temperature | [°C]
 \(T_{\text{fl,am}}\) | mean fluid temperature   | [°C]
 \(T_{\text{freezing upper limit}}\) | upper temperature limit of the freezing process | [°C]
 \(T_{\text{freezing lower limit}}\) | lower temperature limit of the freezing process | [°C]
 \(T_{sky} \) | effective mean sky temperature (sky radiative temperature) | [K]
 \(T_{\text{soil,pipe surrounding}}\)| temperature of the nodes adjacent to the fluid node  | [°C]
 \(V_{i,j}\)  | control volume   | [\(m³\)]
-
 
 ### Solarthermal collector
 A solarthermal collector uses the energy from the sun to provide heat. Different collectors can be used, usually depending on the use case and needed temperature. For all collector types the same simulation model is used. Typical types of collectors are:
@@ -1271,7 +1369,7 @@ Symbol | Description | Unit
 
 
 #### Limits of the simulation model
-Describe limits depending on the actual implemented model (Transformer or bounded source) (ToDo) 
+Describe limits depending on the actual implemented model (Transformer or flexible source) (ToDo) 
 
 
 

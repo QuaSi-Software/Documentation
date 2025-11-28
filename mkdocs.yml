@@ -23,6 +23,7 @@ markdown_extensions:
   - footnotes 
   - attr_list
   - abbr
+  - md_in_html
   - pymdownx.snippets:
         auto_append:
             - includes/abbreviations.md
