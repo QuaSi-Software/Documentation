@@ -352,7 +352,7 @@ In the corresponding bus, two input interfaces from the heat pump need to be def
 ```
 A few important notes on this feature that need to be kept in mind:
 
-- This feature is still in a beta state and might not work for all combinations of control modules and energy systems.
+- This feature is still in a beta state and might not work for all combinations of control modules and energy systems. In particular, the control modules connected to the heat pump are currently not designed to distinguish between primary and secondary interfaces, but treat them as a single one.
 - The order of the primary and secondary interfaces on the heat bus input has to match the output order of the power sources on the power bus according to their allocation to the heat output interfaces. Both orders can be dynamically changed using suitable control modules in the busses, but then the control modules on the heat and power busses must follow the same rules.
 - To make use of this feature also for 1-to-1 transformers such as an electrode boiler, the heat pump model can be used with a COP set to `const:1.0`. Then the created heat input interface on the output side is zero and can be ignored. This might not be the nicest solution, but is suitable for now.
 
