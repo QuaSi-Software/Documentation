@@ -626,6 +626,14 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | `x_abstol` | `float` | N/Y | 0.01 | [-] | Absolute tolerance of PLR values during optimisation. |
 | `f_abstol` | `float` | N/Y | 0.001 | [-] | Absolute tolerance of `evaluate()` return values during optimisation. |
 
+For the use of secondary interfaces on the thermal output of the heat pump, the following parameters are additionally required. See  [this section](resie_input_file_format.md#secondary-interfaces) for the general usage and purpose of these secondary interfaces.
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `has_secondary_interface` | `Bool` | N/Y | false | [-] | A bool to activate the secondary interface on the thermal output of the heat pump
+| `primary_el_sources` | `Vector{String}` | N/N | ["SRC_GOOD_1", "SRC_GOOD_2"] | [-] | A vector of source names that are connected to the heat pump and should be mapped to the primary heat output interface
+| `secondary_el_sources` | `Vector{String}` | N/N | ["SRC_BAD"] | [-] | A vector of source names that are connected to the heat pump and should be mapped to the secondary heat output interface
+
 **Bypass:**
 
 If the heat pump is operated in bypass mode (input temperature is higher than the requested output temperature), the output temperature is limited to the requested temperature, in other words, the input temperature is cooled down to the requested output temperature or the specified `output_temperature` of the heat pump. The energy required during bypass operation can be specified with the `bypass_cop` parameter, that is used in bypass mode (not for a constant COP, here always the constant COP is used!). If a cool-down is not wanted, the heat pump has to be connected in parallel and not in series, meaning that the energy system provides an actual bypass around the heat pump. Note that this may lead to an incorrect determination of the order of operation and may require manual adjustment (see:  [Order of operation](resie_input_file_format.md#order-of-operation))!
