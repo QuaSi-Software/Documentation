@@ -19,6 +19,7 @@ An example for a UAC system could be a hierarchical structure based on location 
 Please note that UACs should not contain the following characters or sequences:
 
 - the character `:`
+-  the character `#`
 - the sequence `->`
 - equal to any media names
 
@@ -319,6 +320,42 @@ The following parameter entries are for `Bus` components only:
             * This feature can not be used for interconnected busses. If you still want to use this feature, first create a single bus from the interconnected busses, which is always possible.
             * This feature may not work as expected for all possible energy systems, although it has been tested to work with many. 
    
+### Secondary Interfaces
+
+**Note:** Currently, only the heat pump’s thermal output supports a secondary interface!
+
+In many energy systems, a single component can draw from several input sources (e.g. different electricity feeds, heat sources or fuels) that differ in cost, availability or other attributes. Typically, one source should be used preferentially, with others only used if the first is insufficient. However, if this prioritisation is meant to span multiple components on a bus (for example, a heat pump together with storage and additional supplies), the existing control mechanisms in ReSiE reach their limits. Without explicit support for this, users would have to duplicate components or accept that the model combines sources in ways that are technically valid but operationally undesired.
+
+Therefore, secondary interfaces have been added. This allows a transformer component to duplicate its output interface and map different sources to separate output interfaces. Both interfaces have to be connected to the same bus, and within the bus they can be assigned different orders to feed a demand. This makes it possible to express strategies such as a heat pump on a heat bus with two electricity sources: the heat pump is first driven by source A (e.g. local PV generation) to produce heat, then the heat demand is covered by other connected components (e.g. storage), and if heat demand remains, the heat pump is then driven by source B (e.g. the grid), while preserving all effects such as part-load-dependent efficiencies within the heat pump.
+
+To use this feature, the heat pump needs additional parameters. A secondary `output_ref` has to be added by appending `_secondary` to `m_heat_out`, as shown below. Both outputs have to be referenced to the same bus. The parameters `primary_el_sources` and `secondary_el_sources` of the heat pump are vectors holding the names of the power sources connected to the heat pump’s electrical input. They define which source is connected to which output interface. The primary interface is the existing one, while the secondary interface is the additional one.
+
+```json
+    "output_refs": {
+        "m_heat_out": "BUS_TH",
+        "m_heat_out_secondary": "BUS_TH"
+    },
+    "has_secondary_interface": true,
+    "primary_el_sources": ["SRC_GOOD_1", "SRC_GOOD_2"],
+    "secondary_el_sources": ["SRC_BAD"],
+```
+In the corresponding bus, two input interfaces from the heat pump need to be defined as follows. They can be treated like all other interfaces, with other inputs in between. The secondary interface has to be labeled with the source name and the suffix `#secondary`.
+
+```json
+    "connections": {
+        "input_order": [
+            "HP_01",
+            "BFT_01",
+            "HP_01#secondary"
+        ],
+    }
+```
+A few important notes on this feature that need to be kept in mind:
+
+- This feature is still in a beta state and might not work for all combinations of control modules and energy systems. In particular, the control modules connected to the heat pump are currently not designed to distinguish between primary and secondary interfaces, but treat them as a single one.
+- The order of the primary and secondary interfaces on the heat bus input has to match the output order of the power sources on the power bus according to their allocation to the heat output interfaces. Both orders can be dynamically changed using suitable control modules in the busses, but then the control modules on the heat and power busses must follow the same rules.
+- To make use of this feature also for 1-to-1 transformers such as an electrode boiler, the heat pump model can be used with a COP set to `const:1.0`. Then the created heat input interface on the output side is zero and can be ignored. This might not be the nicest solution, but is suitable for now.
+
 ## Order of operation
 
 The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `auxiliary_info` flag and the `auxiliary_info_file` path in the [Input/Output section](resie_input_file_format.md#input-output-settings) described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
