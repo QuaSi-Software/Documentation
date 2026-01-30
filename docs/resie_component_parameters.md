@@ -768,7 +768,7 @@ See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy
 | ----------- | ------- | --- | ------- | ---- | ----------- |
 | `model_type` | `String` | Y/Y | "simplified" | [-] | type of the battery model: `simplified`, `detailed`, `Li-LFP` |
 | `capacity` | `Float` | Y/N | 12000.0 | [Wh] | The overall capacity of the battery. |
-| `load` | `Float` | Y/Y | 0.0 | [Wh] | The initial load state of the battery. |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the  battery. |
 | `charge_efficiency` | `Float` | Y/N | 0.97 |  [-] | efficiency while charging the battery; only needed for model type `simplified` |
 | `discharge_efficiency` | `Float` | Y/N | 0.97 |  [-] |efficiency while discharging the battery; only needed for model type `simplified` |
 | `self_discharge_rate` | `Float` | Y/Y | 0.0 | [%/month] | rate of self-discharge, that is only applied if no charge or discharge is happening; month = 30 days |
@@ -1693,3 +1693,8 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 
 [^ISO9806]: DIN EN ISO 9806, Solarenergie – Thermische Sonnenkollektoren – Prüfverfahren (German version EN ISO 9806:2017). DEUTSCHE NORM, pp. 1–107, 2018.
 [^SolarKeymark]: Solar Keymark, https://solarkeymark.eu/database/
+
+### Photovoltaic thermal collector (PVT)
+
+A PVT collector is not currently implemented as a whole component but can be closely approximated by using a solarthermal collector and a photovoltaic collector. The thermal performance of a PVT collector is measured in the same way as other thermal collectors and parameters for different types can be found in the solar keymark database[^SolarKeymark]. The parameters usually resemble WISC collectors. The example for WISC at [Solarthermal Collector ](resie_component_parameters.md#solarthermal-collector) can be used for a quick setup.
+Possible efficiency improvements of the PV collector through the cooling by the the thermal collector can be approximated by adding 5% to 10% to the generation profile. A more detailed approach modelling the detailed effects on PV generation will be implemented in the future.
