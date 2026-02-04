@@ -963,7 +963,7 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
 | `ground_domain_depth_factor` | `Float` | Y/Y | 2.0 | [-] | factor for derived domain depth (multiplied by total storage height); ignored if `ground_domain_depth` is set |
 | `ground_domain_radius` | `Float` | N/N | 60.0 | [m] | soil domain radius; if not provided, derived from storage size using `ground_domain_radius_factor` |
 | `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | soil domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
-| `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high` |
+| `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high`. See below for details. |
 | `ground_layers_depths` | `Vector{Float}` | N/N | `[0.0, 2.0, 10.0]` | [m] | layer interface depths from surface; defines intervals `[d[i], d[i+1])` that are mapped to `ground_layers_k`, `ground_layers_roh` and `ground_layers_cp` (will be extended to `ground_domain_depth` if not already covered) |
 | `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per soil layer; if shorter than the number of defined soil layers, the last value is repeated |
 | `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per soil layer; broadcasting rule as above |
@@ -974,6 +974,26 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
 | `thermal_transmission_overlap` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective surface U-value of the overlap ring (only used if `has_top_insulation_overlap=true`) |
 | `bottom_soil_boundary` | `String` | Y/Y | `Neumann` | [-] | bottom boundary condition: `Neumann` (adiabatic, zero flux) or `Dirichlet` (fixed temperature using ground temperature input) |
 
+
+**Ground accuracy mode**
+
+The parameter `ground_accuracy_mode` selects a predefined mesh resolution for the axisymmetric FVM soil domain used for ground coupling. Internally it maps to four mesh controls:
+
+- `min_w`: minimum cell width in refined regions, defined relative to the height of the STES layers (`mindz`).
+- `max_w`: maximum allowed cell width in the far-field / deep ground.
+- `n_wall`: number of radial cells across the near-wall refinement band per vertical STES layer step, only  if `sidewall_angle < 90°` (higher values better resolve wall heat exchange).
+- `ef`: geometric expansion factor for grading from fine to coarse cells (growth ratio between adjacent cells).
+
+The available presets are:
+
+- `very_rough`: `min_w = mindz/1`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+- `rough`: `min_w = mindz/2`, `max_w = 8 m`, `n_wall = 1`, `ef = 2.0`
+- `normal`: `min_w = mindz/3`, `max_w = 4 m`, `n_wall = 1`, `ef = 2.0`
+- `high`: `min_w = mindz/4`, `max_w = 2 m`, `n_wall = 2`, `ef = 2.0`
+- `very_high`: `min_w = mindz/8`, `max_w = 1 m`, `n_wall = 3`, `ef = 2.0`
+- `IEA_ES_39`: `min_w = mindz/2.74`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+
+Higher accuracy increases the number of soil cells (especially near the wall and in the refined regions),  improving resolution of ground temperature gradients and storage heat losses, at the cost of higher runtime and memory use. In most cases, `rough` or `normal` should be good enough!
 
 **Exemplary input file definition for SeasonalThermalStorage**
 
