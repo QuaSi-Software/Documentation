@@ -1470,7 +1470,7 @@ Symbol | Description | Unit
 \(A_{top}\)  | surface area of the cylinder top | [m²]
 \(A_{bottom}\)  | surface area of the cylinder bottom | [m²]
 \(\rho\)  | density of the heat carrier medium in the STTES | [kg/m³]
-\(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
+\(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [J/(kg K)]
 \(T_{hot}\)  | rated upper temperature of the STTES | [°C]
 \(T_{cold}\)  | rated lower temperature of the STTES | [°C]
 \(T_{ambientair}\)  | ambient temperature of the air around the STTES | [°C]
@@ -1642,17 +1642,17 @@ This method was extensively tested in [Steinacker2022][^Steinacker2022] and comp
 This section describes the mathematical model used to couple a stratified seasonal thermal storage to the surrounding ground. The discretization and solver follow the same **cell-centered axisymmetric finite-volume (FVM)** scheme as in the *Geothermal Collector* model. What differs is the geometry mapping and the boundary conditions that represent the storage wall and base which is described in the following.
 
 ##### Governing equation (soil)
-In cylindrical coordinates \((r,z)\) with axial symmetry, the soil temperature field \(T(r,z,t)\\) satisfies the transient heat conduction equation
+In cylindrical coordinates \((r,z)\) with axial symmetry, the soil temperature field \(T(r,z,t)\) satisfies the transient heat conduction equation
 \[
-\rho(z)\,c(z)\,\frac{\partial T}{\partial t}
+\rho_{soil}(z)\,cp_{soil}(z)\,\frac{\partial T}{\partial t}
 \;=\;
-\frac{1}{r}\frac{\partial}{\partial r}\!\left[r\,k(z)\,\frac{\partial T}{\partial r}\right]
+\frac{1}{r}\frac{\partial}{\partial r}\!\left[r\,k_{soil}(z)\,\frac{\partial T}{\partial r}\right]
 \;+\;
-\frac{\partial}{\partial z}\!\left[k(z)\,\frac{\partial T}{\partial z}\right],
+\frac{\partial}{\partial z}\!\left[k_{soil}(z)\,\frac{\partial T}{\partial z}\right],
 \; r\in[0,\,R_\infty],\; z\in[0,\,H_\infty].
 \]
 
-Here, \(r\) is the radial coordinate measured from the symmetry axis and \(z\) is the depth measured downward from the ground surface. The material properties \(\rho(z)\) (density), \(c(z)\) (specific heat capacity) and \(k(z)\) (thermal conductivity) are assumed piecewise constant in depth to represent stratified soil layers.
+Here, \(r\) is the radial coordinate measured from the symmetry axis and \(z\) is the depth measured downward from the ground surface. The material properties \(\rho_{soil}(z)\) (density), \(cp_{soil}(z)\) (specific heat capacity) and \(k_{soil}(z)\) (thermal conductivity) are assumed piecewise constant in depth to represent stratified soil layers.
 
 ##### Computational domain and mesh
 The domain is a half-plane with symmetry on the axis \(r=0\), surface at \(z=0\), and depth \(H_\infty\).
@@ -1673,7 +1673,7 @@ An overview of the boundary conditions of the soil is given below. See also the 
 - **Symmetry axis** (\(r=0\)): adiabatic, \(\partial T/\partial r=0\)
 - **Far radius** (\(r=R_\infty\)): adiabatic, \(\partial T/\partial r=0\) (domain has to be chosen large enough)
 - **Ground surface towards ambient air** (\(z=0\)): Robin condition
-  \[  -k\,\frac{\partial T}{\partial z} \,=\, h(r)\,(T - T_a), \]
+  \[  -k\,\frac{\partial T}{\partial z} \,=\, h(r)\,(T - T_{amb}), \]
   with a radially piecewise constant heat transfer coefficient \(h\) to represent an optional insulation overlap ring:
   \[  h(r)=  \begin{cases}
     U_{\text{ov}}, & R_s \le r \le R_s + w_{\text{ov}},\\
@@ -1683,7 +1683,7 @@ An overview of the boundary conditions of the soil is given below. See also the 
 - **Deep boundary** (\(z=H_\infty\)): either Dirichlet \(T=T_g\) (set to undisturbed ground temperature) or Neumann \(\partial T/\partial z=0\) (adiabatic)
 - **Storage wall (buried part)**: Robin condition on the exterior soil side,
   \[
-  -k\,\frac{\partial T}{\partial n} \,=\, U_w\,(T - T_{\text{storage,layer}}),
+  -k\,\frac{\partial T}{\partial n} \,=\, U_w\,(T - T_{\text{STES,layer}}),
   \]
   where \(n\) is the outward unit normal at the wall (pointing from the storage into the surrounding soil) and
   \(\partial T/\partial n\) is the temperature gradient component normal to the wall. The parameter
@@ -1691,7 +1691,7 @@ An overview of the boundary conditions of the soil is given below. See also the 
   resistance. The exchange area per horizontal slice equals the true slanted lateral area.
 - **Storage base**: Robin condition on the ground beneath the storage footprint,
   \[
-  -k\,\frac{\partial T}{\partial z} \,=\, U_b\,(T - T_{\text{storage,base}}),
+  -k\,\frac{\partial T}{\partial z} \,=\, U_b\,(T - T_{\text{STES,base}}),
   \]
  integrated over the area-equivalent circular footprint. Here \(U_b\) is the effective  base heat-transfer coefficient (U-value) between the storage bottom and the underlying soil, lumping the thermal resistance of the bottom construction/insulation and any contact resistance.
 
@@ -1717,22 +1717,22 @@ The stratified storage exchanges heat with its surroundings via UA terms per sto
 
 1. **Wall segments (per buried storage layer):** The net heat rate \(Q_{\text{wall}}\) obtained from the assembled Robin terms along that layer’s wall band is
    \[
-   Q_{\text{wall}} \;=\; \sum_{\text{row}} U_{\text{eff}}\,A_{\text{row}}\,(T_{\text{storage}}-T_{\text{soil,row}})
+   Q_{\text{wall}} \;=\; \sum_{\text{row}} U_{\text{eff}}\,A_{\text{row}}\,(T_{\text{STES}}-T_{\text{soil,row}})
    \]
-   with \(A_{\text{row}}\) the effective wall area represented by a soil row, \(T_{\text{storage}}\) the temperature of the corresponding storage layer and \(T_{\text{soil,row}}\) the cell-center temperature of the adjacent soil control volume. 
+   with \(A_{\text{row}}\) the effective wall area represented by a soil row, \(T_{\text{STES}}\) the temperature of the corresponding storage layer and \(T_{\text{soil,row}}\) the cell-center temperature of the adjacent soil control volume. 
    An effective ambient temperature for that storage layer is then defined by
    \[
-   Q_{\text{wall}} \;=\; U_w\,A_{\text{storage}}\,(T_{\text{storage}}-T_{\text{eff}}),
+   Q_{\text{wall}} \;=\; U_w\,M_{\text{STES}}\,(T_{\text{STES}}-T_{\text{eff}}),
    \qquad
    \Rightarrow\quad
-   T_{\text{eff}} \;=\; T_{\text{storage}}-\frac{Q_{\text{wall}}}{U_w\,A_{\text{storage}}}
+   T_{\text{eff}} \;=\; T_{\text{STES}}-\frac{Q_{\text{wall}}}{U_w\,M_{\text{STES}}}
    \]
-   where \(A_{\text{storage}}\) is the wall area of the current storage layer.
+   where \(M_{\text{STES}}\) is the wall area of the current storage layer.
    Using this \(T_{\text{eff}}\) in the storage’s 1D energy balance guarantees that the storage–soil energy exchange equals the FVM flux.
 
-2. **Base segment:** The soil temperature under the footprint is averaged area-weighted over concentric rings to obtain \(T_{\text{base}}\). The effective ambient temperature for the base is
+2. **Base segment:** The soil temperature under the footprint is averaged area-weighted over concentric rings to obtain \(T_{\text{soil,base}}\). The effective ambient temperature for the base is
    \[
-   T_{\text{eff,base}} \;=\; T_{\text{storage,base}} - \frac{U_{\text{eff}}}{U_b}\,\bigl(T_{\text{storage,base}}-T_{\text{soil,base}}\bigr),
+   T_{\text{eff,base}} \;=\; T_{\text{STES,base}} - \frac{U_{\text{eff}}}{U_b}\,\bigl(T_{\text{STES,base}}-T_{\text{soil,base}}\bigr),
    \]
    with the same series-resistance reduction (\(U_{\text{eff}}\)) as used in assembly.
 
@@ -1764,34 +1764,49 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(Q_{STES,rated}\)  | rated thermal energy capacity of the STES | [MWh]
-\(x_{STES,start}\)  | thermal energy contend of the STES at the beginning of the simulation in relation to \(Q_{STES,rated}\)  | [%]
-\(T_{STES,hot}\)  | rated upper temperature of the STES | [°C]
-\(T_{STES,cold}\)  | rated lower temperature of the STES | [°C]
+\(A_{\text{row}}\) | effective wall exchange area represented by a soil row (depth band) | [m²]
+\(\alpha_{STES,slope}\) | slope angle of the wall of the STES with respect to the horizon | [°]
 \(c_{STES,max,load}\) | maximum charging rate (C-rate) of STES | [1/h]
 \(c_{STES,max,unload}\) | maximum discharging rate (C-rate) of STES | [1/h]
-\(V_{STES}\)  | volume of the STES | [m³]
-\(\alpha_{STES,slope}\)  | slope angle of the wall of the STES with respect to the horizon | [°]
-\(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
-\(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m³]
-\(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
-\(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m²/s]
-\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m² K]
-\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m² K]
-\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m² K]
-\(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
-\(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
-\(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]
-\(\boldsymbol{T}_{STES,amb}\)  | timeseries of ambient temperature | [°C]
-
-
-**State variables of the STES:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\({Q}_{STES}\)  | current amount of thermal energy stored in the STES | [MWh]
-\(x_{STES}\)  | current charging state of the STES   | [%]
-\(\boldsymbol{T}_{STES}\)  | vector of current temperatures in every layer of the STES   | [°C]
+\(cp_{soil}(z)\) | soil specific heat capacity (piecewise constant per depth interval) | [J/(kg·K)]
+\(cp_{STES}\) | specific heat capacity of the heat carrier medium in the STES | [J/(kg·K)]
+\(\delta\) | normal distance from boundary face to adjacent soil cell center | [m]
+\(h(r)\) | effective soil-air surface heat transfer coefficient | [W/(m²·K)]
+\(H_\infty\) | soil domain depth (bottom boundary location) | [m]
+\(h_s\) | soil–air surface heat transfer coefficient outside the insulation overlap ring | [W/(m²·K)]
+\(hr_{STES}\) | ratio between height and mean radius of the STES | [-]
+\(k_{soil}(z)\) | soil thermal conductivity (piecewise constant per depth interval) | [W/(m·K)]
+\(M_{\text{STES}}\) | wall area of the current storage layer used in the STES UA term | [m²]
+\(n\) | outward unit normal direction at the storage wall (from storage into soil) | [-]
+\(n_{STES,layers,above\ ground}\) | number of thermal layers of the STES above the ground surface | [pcs.]
+\(n_{STES,layers,total}\) | number of thermal layers in the STES for the simulation | [pcs.]
+\(Q_{\text{wall}}\) | net wall heat rate from a buried storage layer to the soil (positive: storage → soil) | [W]
+\(r\) | radial coordinate (distance from symmetry axis) | [m]
+\(R_\infty\) | outer (far-field) radius of the soil domain | [m]
+\(R_s\) | (area-equivalent) storage radius at the ground surface | [m]
+\(\rho_{soil}(z)\) | soil density (piecewise constant per depth interval) | [kg/m³]
+\(\rho_{STES}\) | density of the heat carrier medium in the STES | [kg/m³]
+\(t\) | time | [s]
+\(T(r,z,t)\) | soil temperature field varying in time | [°C]
+\(T_{amb}\) | ambient air temperature used in the surface Robin boundary condition | [°C]
+\(T_g\) | prescribed deep/undisturbed ground temperature (Dirichlet option at \(z=H_\infty\)) | [°C]
+\(T_{\text{eff,base}}\) | effective ambient temperature for the storage base | [°C]
+\(T_{\text{eff}}\) | effective ambient temperature for a storage wall layer | [°C]
+\(T_{\text{soil,base}}\) | area-weighted mean soil temperature under the footprint (cell-center based rings) | [°C]
+\(T_{\text{soil,row}}\) | soil cell-center temperature of the adjacent soil control volume next to the wall | [°C]
+\(T_{\text{STES,base}}\) | temperature of the bottom storage layer/segment used for base exchange | [°C]
+\(T_{\text{STES}}\) | temperature of the corresponding storage layer (segment) | [°C]
+\(U_b\) | effective base heat-transfer coefficient (U-value) between storage bottom and soil | [W/(m²·K)]
+\(U_w\) | effective wall heat-transfer coefficient (U-value) between storage layer and adjacent soil | [W/(m²·K)]
+\(U_{\text{eff}}\) | effective Robin coefficient reduced to the cell center, \(U_{\text{eff}}=(1/U+\delta/k)^{-1}\) | [W/(m²·K)]
+\(U_{\text{ov}}\) | thermal transmission (U-value) of the insulation overlap ring | [W/(m²·K)]
+\(U_{STES,bottom}\) | thermal transmission (U-value) of the STES bottom | [W/(m²·K)]
+\(U_{STES,lid}\) | thermal transmission (U-value) of the STES lid | [W/(m²·K)]
+\(U_{STES,wall}\) | thermal transmission (U-value) of the STES wall | [W/(m²·K)]
+\(V_{STES}\) | volume of the STES | [m³]
+\(w_{\text{ov}}\) | radial width of the insulation overlap ring | [m]
+\(\xi_{STES}\) | coefficient of diffusion of the heat carrier medium in the STES into itself | [m²/s]
+\(z\) | vertical coordinate (depth measured downward from ground surface) | [m]
 
 ### Borehole thermal energy storage (BTES)
 
