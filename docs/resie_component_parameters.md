@@ -902,15 +902,15 @@ Extended definition of a buffer tank in the input file:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower` (additional ground-field outputs in `FVM` if `reproduce_IEA_ES_Task39` is activated) |
-| **Auxiliary Plots** | 3D-Model of the geometry of the STES, cross-sectional drawing of the STES, temperature distribution over time within the STES, temperature difference to ambient for each STES layer, ground mesh & time-shiftable soil temperature field for `FVM` |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `LossesGains_top`, `LossesGains_sidewalls`, `LossesGains_bottom`,`CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower` (additional temperature outputs for ground and STES if `reproduce_IEA_ES_Task39` is activated) |
+| **Auxiliary Plots** | 3D-Model of the geometry of the STES, cross-sectional drawing of the STES, temperature distribution over time within the STES, temperature difference to ambient for each STES layer, ground mesh & time-shiftable ground temperature field for `FVM` |
 
 A stratified seasonal thermal energy storage (STES) represented by a 1D multi-layer model of the storage medium. Thermal stratification is represented via diffusion and buoyancy effects. Loading is modelled with a thermal lance (charging into the layer matching the inlet temperature), while unloading is taken from the topmost layer with a return temperature at `low_temperature`. Currently, no indirect loading or unloading is included. 
 
 Heat losses are modelled through lid, side walls, and base. The interaction with the surrounding ground can be represented either by:
 
 - `ground_model="simple"`: prescribed ground temperature (profile or constant), no thermal capacity of the ground, or
-- `ground_model="FVM"`: axisymmetric transient soil conduction model (finite volume), providing dynamic effective ambient temperatures for buried wall layers and the base of the STES.
+- `ground_model="FVM"`: axisymmetric transient ground conduction model (finite volume), providing dynamic effective ambient temperatures for buried wall layers and the base of the STES.
 
 The seasonal thermal storage can be modelled either as pit  (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, depending on the given `shape` and the `sidewall_angle`, as shown in the following figure:
 
@@ -929,12 +929,12 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `shape` | `String` | Y/Y | `quadratic` | [-] | cross-section shape: `round` for cone or (truncated) cylinder or `quadratic` for (truncated) quadratic pyramid or cuboid  |
 | `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | height-to-mean-radius ratio (round) or height-to-mean-half-side ratio (quadratic) |
 | `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | wall slope angle w.r.t. the horizon (0…90°); 90° corresponds to vertical wall |
-| `ground_model` | `String` | Y/Y | `simple` | [-] | choose `simple` (prescribed ground temperature) or `FVM` (transient axisymmetric soil conduction model) |
+| `ground_model` | `String` | Y/Y | `simple` | [-] | choose `simple` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
 | `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m³] | density of the storage medium |
 | `cp_medium` | `Float` | Y/Y | 4186.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
 | `diffusion_coefficient` | `Float` | Y/Y | 1.43e-7 | [m²/s] | effective thermal diffusion coefficient used for stratification/diffusion modelling |
 | `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | number of thermal layers in the storage model (from bottom to top) |
-| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | number of top layers located above ground (losses to ambient air instead of soil/ground model) |
+| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | number of top layers located above ground (losses to ambient air instead of ground model) |
 | `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max charging C-rate (energy per hour relative to storage energy capacity) |
 | `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max discharging C-rate (energy per hour relative to storage energy capacity) |
 | `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | optional max charging mass-flow rate **per input interface**, relative to total storage mass |
@@ -961,23 +961,23 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
 | ----------- | ------- | --- | --- | --- | --- |
 | `ground_domain_radius_factor` | `Float` | Y/Y | 1.5 | [-] | factor for derived domain radius (multiplied by storage radius at ground surface); ignored if `ground_domain_radius` is set |
 | `ground_domain_depth_factor` | `Float` | Y/Y | 2.0 | [-] | factor for derived domain depth (multiplied by total storage height); ignored if `ground_domain_depth` is set |
-| `ground_domain_radius` | `Float` | N/N | 60.0 | [m] | soil domain radius; if not provided, derived from storage size using `ground_domain_radius_factor` |
-| `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | soil domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
+| `ground_domain_radius` | `Float` | N/N | 60.0 | [m] | ground domain radius; if not provided, derived from storage size using `ground_domain_radius_factor` |
+| `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | ground domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
 | `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high`. See below for details. |
 | `ground_layers_depths` | `Vector{Float}` | N/N | `[0.0, 2.0, 10.0]` | [m] | layer interface depths from surface; defines intervals `[d[i], d[i+1])` that are mapped to `ground_layers_k`, `ground_layers_roh` and `ground_layers_cp` (will be extended to `ground_domain_depth` if not already covered) |
-| `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per soil layer; if shorter than the number of defined soil layers, the last value is repeated |
-| `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per soil layer; broadcasting rule as above |
-| `ground_layers_cp` | `Vector{Float}` | Y/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per soil layer; broadcasting rule as above |
+| `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per ground layer; if shorter than the number of defined ground layers, the last value is repeated |
+| `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per ground layer; broadcasting rule as above |
+| `ground_layers_cp` | `Vector{Float}` | Y/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per ground layer; broadcasting rule as above |
 | `soil_surface_hconv` | `Float` | Y/Y | 14.7 | [W/(m²·K)] | convective heat transfer coefficient at the ground surface outside the overlap ring |
 | `has_top_insulation_overlap` | `Bool` | Y/Y | false | [-] | enables an optional insulation overlap ring at the ground surface around the storage |
 | `top_insulation_overlap_width` | `Float` | Y/Y | 5.0 | [m] | radial width of the surface overlap ring (only used if `has_top_insulation_overlap=true`) |
 | `thermal_transmission_overlap` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective surface U-value of the overlap ring (only used if `has_top_insulation_overlap=true`) |
-| `bottom_soil_boundary` | `String` | Y/Y | `Neumann` | [-] | bottom boundary condition: `Neumann` (adiabatic, zero flux) or `Dirichlet` (fixed temperature using ground temperature input) |
+| `ground_bottom_boundary` | `String` | Y/Y | `Neumann` | [-] | bottom boundary condition: `Neumann` (adiabatic, zero flux) or `Dirichlet` (fixed temperature using ground temperature input) |
 
 
 **Ground accuracy mode**
 
-The parameter `ground_accuracy_mode` selects a predefined mesh resolution for the axisymmetric FVM soil domain used for ground coupling. Internally it maps to four mesh controls:
+The parameter `ground_accuracy_mode` selects a predefined mesh resolution for the axisymmetric FVM ground domain used for ground coupling. Internally it maps to four mesh controls:
 
 - `min_w`: minimum cell width in refined regions, defined relative to the height of the STES layers (`mindz`).
 - `max_w`: maximum allowed cell width in the far-field / deep ground.
@@ -993,7 +993,7 @@ The available presets are:
 - `very_high`: `min_w = mindz/8`, `max_w = 1 m`, `n_wall = 3`, `ef = 2.0`
 - `IEA_ES_39`: `min_w = mindz/2.74`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
 
-Higher accuracy increases the number of soil cells (especially near the wall and in the refined regions),  improving resolution of ground temperature gradients and storage heat losses, at the cost of higher runtime and memory use. In most cases, `rough` or `normal` should be good enough!
+Higher accuracy increases the number of ground cells (especially near the wall and in the refined regions),  improving resolution of ground temperature gradients and storage heat losses, at the cost of higher runtime and memory use. In most cases, `rough` or `normal` should be good enough!
 
 **Exemplary input file definition for SeasonalThermalStorage**
 
@@ -1041,7 +1041,7 @@ Higher accuracy increases the number of soil cells (especially near the wall and
     "has_top_insulation_overlap": true,
     "top_insulation_overlap_width": 5.0,
     "thermal_transmission_overlap": 0.1,
-    "bottom_soil_boundary": "Neumann"}
+    "ground_bottom_boundary": "Neumann"}
 ```
 
 ## Heat sources and sinks
