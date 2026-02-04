@@ -892,7 +892,7 @@ Extended definition of a buffer tank in the input file:
 }
 ```
 
-### Seasonal thermal storage
+### Seasonal thermal storage / universal stratified (ground-coupled) thermal storage
 | | |
 | --- | --- |
 | **Type name** | `SeasonalThermalStorage` |
@@ -949,7 +949,7 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simple` and as reference/deep boundary temperature in `FVM` ground model) |
 | OR: `constant_ground_temperature` | `Temperature` | Y/N | 10.0 | [°C] | constant ground temperature (same usage as above) |
 | `output_layer_from_top` | `Int` | Y/Y | 1 | [-] | layer index for extraction, counted from the top (1 = topmost layer) |
-| `reproduce_IEA_ES_Task39` | `String` | N/Y | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
+| `reproduce_IEA_ES_Task39` | `String` | N/N | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
 
 
 Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
@@ -965,9 +965,9 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
 | `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | soil domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
 | `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high` |
 | `ground_layers_depths` | `Vector{Float}` | N/N | `[0.0, 2.0, 10.0]` | [m] | layer interface depths from surface; defines intervals `[d[i], d[i+1])` that are mapped to `ground_layers_k`, `ground_layers_roh` and `ground_layers_cp` (will be extended to `ground_domain_depth` if not already covered) |
-| `ground_layers_k` | `Vector{Float}` | N/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per soil layer; if shorter than the number of defined soil layers, the last value is repeated |
-| `ground_layers_rho` | `Vector{Float}` | N/Y | `[2000.0]` | [kg/m³] | mass density per soil layer; broadcasting rule as above |
-| `ground_layers_cp` | `Vector{Float}` | N/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per soil layer; broadcasting rule as above |
+| `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per soil layer; if shorter than the number of defined soil layers, the last value is repeated |
+| `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per soil layer; broadcasting rule as above |
+| `ground_layers_cp` | `Vector{Float}` | Y/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per soil layer; broadcasting rule as above |
 | `soil_surface_hconv` | `Float` | Y/Y | 14.7 | [W/(m²·K)] | convective heat transfer coefficient at the ground surface outside the overlap ring |
 | `has_top_insulation_overlap` | `Bool` | Y/Y | false | [-] | enables an optional insulation overlap ring at the ground surface around the storage |
 | `top_insulation_overlap_width` | `Float` | Y/Y | 5.0 | [m] | radial width of the surface overlap ring (only used if `has_top_insulation_overlap=true`) |
