@@ -1673,7 +1673,7 @@ An overview of the boundary conditions of the soil is given below. See also the 
 - **Symmetry axis** (\(r=0\)): adiabatic, \(\partial T/\partial r=0\)
 - **Far radius** (\(r=R_\infty\)): adiabatic, \(\partial T/\partial r=0\) (domain has to be chosen large enough)
 - **Ground surface towards ambient air** (\(z=0\)): Robin condition
-  \[  -k\,\frac{\partial T}{\partial z} \,=\, h(r)\,(T - T_{amb}), \]
+  \[  -k\,\frac{\partial T}{\partial z} \,=\, h(r)\,(T - T_{air}), \]
   with a radially piecewise constant heat transfer coefficient \(h\) to represent an optional insulation overlap ring:
   \[  h(r)=  \begin{cases}
     U_{\text{ov}}, & R_s \le r \le R_s + w_{\text{ov}},\\
@@ -1788,12 +1788,13 @@ Symbol | Description | Unit
 \(\rho_{STES}\) | density of the heat carrier medium in the STES | [kg/m³]
 \(t\) | time | [s]
 \(T(r,z,t)\) | soil temperature field varying in time | [°C]
-\(T_{amb}\) | ambient air temperature used in the surface Robin boundary condition | [°C]
+\(T_{air}\) | ambient air temperature used in the surface Robin boundary condition | [°C]
 \(T_g\) | prescribed deep/undisturbed ground temperature (Dirichlet option at \(z=H_\infty\)) | [°C]
 \(T_{\text{eff,base}}\) | effective ambient temperature for the storage base | [°C]
 \(T_{\text{eff}}\) | effective ambient temperature for a storage wall layer | [°C]
 \(T_{\text{soil,base}}\) | area-weighted mean soil temperature under the footprint (cell-center based rings) | [°C]
 \(T_{\text{soil,row}}\) | soil cell-center temperature of the adjacent soil control volume next to the wall | [°C]
+\(T_{\text{STES,amb}}\) | temperature of the ambient (air or ground) of the STES per layer | [°C]
 \(T_{\text{STES,base}}\) | temperature of the bottom storage layer/segment used for base exchange | [°C]
 \(T_{\text{STES}}\) | temperature of the corresponding storage layer (segment) | [°C]
 \(U_b\) | effective base heat-transfer coefficient (U-value) between storage bottom and soil | [W/(m²·K)]
