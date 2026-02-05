@@ -907,7 +907,7 @@ Extended definition of a buffer tank in the input file:
 | --- | --- |
 | **Type name** | `SeasonalThermalStorage` |
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
-| **Available models** | `ground_model="simple"` (default), `ground_model="FVM"` |
+| **Available models** | `ground_model="simplified"` (default), `ground_model="FVM"` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
@@ -919,7 +919,7 @@ A stratified seasonal thermal energy storage (STES) represented by a 1D multi-la
 
 Heat losses are modelled through lid, side walls, and base. The interaction with the surrounding ground can be represented either by:
 
-- `ground_model="simple"`: prescribed ground temperature (profile or constant), no thermal capacity of the ground, or
+- `ground_model="simplified"`: prescribed ground temperature (profile or constant), no thermal capacity of the ground, or
 - `ground_model="FVM"`: axisymmetric transient ground conduction model (finite volume), providing dynamic effective ambient temperatures for buried wall layers and the base of the STES.
 
 The seasonal thermal storage can be modelled either as pit  (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, depending on the given `shape` and the `sidewall_angle`, as shown in the following figure:
@@ -939,7 +939,7 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `shape` | `String` | Y/Y | `quadratic` | [-] | cross-section shape: `round` for cone or (truncated) cylinder or `quadratic` for (truncated) quadratic pyramid or cuboid  |
 | `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | height-to-mean-radius ratio (round) or height-to-mean-half-side ratio (quadratic) |
 | `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | wall slope angle w.r.t. the horizon (0…90°); 90° corresponds to vertical wall |
-| `ground_model` | `String` | Y/Y | `simple` | [-] | choose `simple` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
+| `ground_model` | `String` | Y/Y | `simplified` | [-] | choose `simplified` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
 | `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m³] | density of the storage medium |
 | `cp_medium` | `Float` | Y/Y | 4180.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
 | `diffusion_coefficient` | `Float` | Y/Y | 1.43e-7 | [m²/s] | effective thermal diffusion coefficient used for stratification/diffusion modelling |
@@ -956,7 +956,7 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/ambient_temperature.prf` | [°C] | ambient temperature time series profile (choose only one ambient option) |
 | OR: `constant_ambient_temperature` | `Temperature` | Y/N | 18.0 | [°C] | constant ambient temperature (choose only one ambient option) |
 | OR: `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | ambient dry-bulb temperature from the global weather file (choose only one ambient option) |
-| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simple` and as reference/deep boundary temperature in `FVM` ground model) |
+| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simplified` and as reference/deep boundary temperature in `FVM` ground model) |
 | OR: `constant_ground_temperature` | `Temperature` | Y/N | 10.0 | [°C] | constant ground temperature (same usage as above) |
 | `output_layer_from_top` | `Int` | Y/Y | 1 | [-] | layer index for extraction, counted from the top (1 = topmost layer) |
 | `reproduce_IEA_ES_Task39` | `String` | N/N | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
