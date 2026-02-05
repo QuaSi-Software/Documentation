@@ -400,6 +400,8 @@ Generalised implementation of a fixed sink.
 
 Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSink is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | [W] or [Wh] | Path to the input energy profile. Define unit in profile header. |
@@ -408,6 +410,9 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant demand, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -433,6 +438,8 @@ Generalised implementation of a fixed source.
 
 Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSupply is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
@@ -441,6 +448,9 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°c] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°c] | If given, sets the temperature of the output to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant supply, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
