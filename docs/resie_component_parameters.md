@@ -931,7 +931,7 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | wall slope angle w.r.t. the horizon (0…90°); 90° corresponds to vertical wall |
 | `ground_model` | `String` | Y/Y | `simple` | [-] | choose `simple` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
 | `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m³] | density of the storage medium |
-| `cp_medium` | `Float` | Y/Y | 4186.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
+| `cp_medium` | `Float` | Y/Y | 4180.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
 | `diffusion_coefficient` | `Float` | Y/Y | 1.43e-7 | [m²/s] | effective thermal diffusion coefficient used for stratification/diffusion modelling |
 | `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | number of thermal layers in the storage model (from bottom to top) |
 | `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | number of top layers located above ground (losses to ambient air instead of ground model) |
