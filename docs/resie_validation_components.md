@@ -529,6 +529,8 @@ Also, the temperature of the output mass flow and the energy content in the STES
 
 Additionally, sensitivity analyses have been performed of different simulation time steps (15 min, 60 min, 120 min) and mesh resolutions (very_rough, rough, normal, high, very_high) to check the consistency of the ReSiE STES model.
 
+Overall, the comparison shows that ReSiE reproduce the results of TRNSYS and Matlab very closely (high agreement and low error metrics), whereas the other tools exhibit noticeably larger deviations in temperature and/or STES energy content.
+
 [^IEA_ES_39]: International Energy Agency - Energy Storage - Task 39:  Large Thermal Energy Storages for District Heating.  Website: [https://iea-es.org/task-39/](https://iea-es.org/task-39/)
 
 [^IEA_ES_39_Testcases]: Wim van Helden et al.: IEA ES Task 39 - Large Thermal Energy Storages for District Heating. Subtask C: Round Robin Simulations. Deliverable C2a: Modelling guidelines - Round robin test case description (for comparative simulations). 2024. Available at [https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf](https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf)
