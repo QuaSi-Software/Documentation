@@ -526,11 +526,12 @@ Also, the temperature of the output mass flow and the energy content in the STES
 
 ![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-P: Energy content](fig/260205_IEA_ES_Task39_PTES-1-P_Tout.svg)
 
-
-Additionally, sensitivity analyses have been performed of different simulation time steps (15 min, 60 min, 120 min) and mesh resolutions (very_rough, rough, normal, high, very_high) to check the consistency of the ReSiE STES model.
-
 Across all four year-long testcases, TRNSYS shows the most consistent agreement with the ReSiE baseline - temperature deviations are generally small (RMSE_T as low as 0.057 °C in TTES-1-AG and ≤ 1.28 °C elsewhere) with near-zero bias (|MBE_T| ≤ 0.20 °C), and the storage-energy agreement is similarly strong (CVRMSE_E mostly 0.11–1.51% and NMBE_E essentially zero in the best cases), whereas Matlab can match reasonably well in some cases (e.g., PTES-1-C temperature RMSE_T 1.69 °C) but is less robust across scenarios (notably TTES-1-UG with RMSE_T 3.30 °C and a more pronounced negative energy bias in PTES-1-C with NMBE_E -1.60%). 
 The remaining tools (Comsol, Dymola, Modelica) exhibit systematically larger and/or more case-dependent discrepancies, most evident in TTES-1-AG where Comsol and Dymola show substantially higher energy scatter and underestimation (CVRMSE_E up to 5.44%, NMBE_E up to -5.15%) alongside markedly higher temperature RMSEs (about 3.2 °C).
+
+Additionally, sensitivity analyses have been performed of different simulation time steps (15 min, 60 min, 120 min) and mesh resolutions (very_rough, rough, normal, high, very_high) to check the consistency of the ReSiE STES model. Exemplary, the losses of the STES to the ambient are shown below for different mesh resolutions:
+
+![Sensitivity analysis in ReSiE for mesh resolution of STES model](fig/260205_IEA_ES_Task39_TTES-1-UG_mesh_sensitivity.svg)
 
 Overall, ReSiE is fully in line with the other simulation environments for typical energy-supply-system use, i.e., it reproduces the relevant temperature and storage-energy behavior with deviations that remain within a practically acceptable range for system-level performance assessment and comparative studies.
 
