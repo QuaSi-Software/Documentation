@@ -401,11 +401,15 @@ When the simulation is performed with a COP scaling factor of 1.0 and a constant
 
 ## Seasonal thermal energy storage (STES)
 
-The model of the seasonal thermal energy storage in ReSiE was validated against the TRNSYS Type 342, originally developed by Bengt Eftring and Göran Hellström[^Eftring] and extended by Livio Mazzarella[^Mazzarella], also known as TRNSYS Type 142 or "XST Model". The TRNSYS models includes a fully ground-coupled model of a stratified storage, which is more than the current STES model in ReSiE is capable of. Here, in ReSiE, the thermal exchange to the ground is modeled with a user-defined ground temperature (constant or profile), neglecting any thermal capacity effects of the ground.
+### STES without ground-coupling against TRNSYS Type 342
+
+Note: The validation shown here was done with the simplified ground model without FVM!  For the model including ground-coupling, see the next section!
+
+The model of the seasonal thermal energy storage in ReSiE was validated against the TRNSYS Type 342, originally developed by Bengt Eftring and Göran Hellström[^Eftring] and extended by Livio Mazzarella[^Mazzarella], also known as TRNSYS Type 142 or "XST Model". The TRNSYS models includes a fully ground-coupled model of a stratified storage. Here, in ReSiE, the thermal exchange to the ground is modeled with a user-defined ground temperature (constant or profile), neglecting any thermal capacity effects of the ground. The ground-coupling is taken into account in the comparison to simulations results in the IEA ES Task 39 described below.
 
 For the validation, a self-discharging and a loading and unloading pattern were compared between the two models for a cylindrical storage with 50,000 m^3 of storage volume with a h/r ratio of 1.13. In order to make the two models better comparable, a constant ambient air temperature of 20 °C is assumed. In ReSiE, a ground temperature of 9 °C is assumed, while in TRNSYS the ground is modeled with typical parameters. The storage has 75 cm of insolation at the lid and 50 cm on the sidewalls and bottom, with a thermal conductivity of 0.1875 W/(m*K). 
 
-First, lets compare the self-unloading of the storage installed fully above the ground during 5 years. The figures shows the temperature within the top and the bottom storage layer. The differences of the temperature within the storage, especially in the bottom layer, can be explained by the constant ground temperature in ReSiE compared to the FEM model in TRNSYS that includes the thermal capacity of the ground below the STES.
+First, lets compare the self-unloading of the storage installed **fully above the ground** during 5 years. The figures shows the temperature within the top and the bottom storage layer. The differences of the temperature within the storage, especially in the bottom layer, can be explained by the constant ground temperature in ReSiE compared to the FVM model in TRNSYS that includes the thermal capacity of the ground below the STES.
 
 ![Self-discharging of STES during 5 years, fully above ground](fig/250728_STES_TRNSYS_above_ground.svg)
 
@@ -455,10 +459,76 @@ As seen in the figure, the energy and the temperature are quite close to each ot
 | ReSiE vs. TRNSYS 25% layer                    |        0.54              |              1.43        |     
 | ReSiE vs. TRNSYS bottom layer              |         0.50              |               1.57         |     
 
-The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FEM model of the TRNSYS Type 342. The model in ReSiE may be extended in the future to better represent the ground-coupling thermal effects. To deal with this, a temperature profile for the ground can be used as input, e.g. with monthly ground temperatures.
+The figure below shows the simulation results of the STES buried under ground with only 1 layer above and 24 layers below the ground surface. Here, the difference in the simulation results is clearly visible between the simplified model in ReSIE and the detailed FVM model of the TRNSYS Type 342. The model in ReSiE has been extended by a ground-coupling FVM which is validated below.
 
 ![Discharging STES during 5 years, underground](fig/250728_STES_TRNSYS_in_ground_realistic.svg)
 
 [^Eftring]: Bengt Eftring and Göran Hellström: "Heat Storage in the Ground. Stratified storage temperature model." 1989. University of Lund, Sweden.
 
 [^Mazzarella]: Livio Mazzarella: "Multi-flow stratified thermal storage model with full-mixed Layers: PdM - XST." 1992, Institut für Thermodynamik der Universität Stuttgart, Germany and Dipartimento di Energetica Politecnico di Milano, Italy
+
+### STES with ground coupling using test cases of IEA ES Task 39
+
+The updated model of the STES was compared to the test cases provided by the International Energy Agency Energy Storage Task 39 (IEA ES Task 39)[^IEA_ES_39]. The Task has delivered four test cases that can all be modelled with the STES model in ReSiE:
+
+- TTES-1-AG: A cylindrical tank above ground.
+- TTES-1-UG: A cylindrical tank fully buried below ground.
+- PTES-1-C: A truncated cone fully buried below ground.
+- PTES-1-P: A truncated pyramid fully buried below ground.
+
+All test cases are described in detail in the deliverable C2a of the Task 39[^IEA_ES_39_Testcases]. The four test cases were reproduced with ReSiE and compared to the results shared by the Task 39 participants. The input files of ReSiE and the corresponding profiles, the result files of the simulation and comparisons to the simulation results provided by the Task 39 are all available [here](data/validation_STES/IEA-ES-Task39_ReSiE.zip) for the four test cases listed above. An overview of the comparison to the simulation results of other simulation models provided by the Task 39 participants is shown below.
+
+First, the yearly energy input, energy output und energy losses to the ambient are compared for the four test cases against some of the results of the other simulation tools shared by the Task 39. The relative percentage deviations to ReSiE are given above the bars. Note that only the fifth year of the simulation is compared here as defined in the test cases.
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-AG: Energy balance](fig/260205_IEA_ES_Task39_TTES-1-AG_energy_balance.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-UG: Energy balance](fig/260205_IEA_ES_Task39_TTES-1-UG_energy_balance.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-C: Energy balance](fig/260205_IEA_ES_Task39_PTES-1-C_energy_balance.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-P: Energy balance](fig/260205_IEA_ES_Task39_PTES-1-P_energy_balance.svg)
+
+Also, the temperature of the output mass flow and the energy content in the STES are compared for each simulation case against the ReSiE baseline. For each comparison, paired time-step values are evaluated (with ReSiE on the x-axis and the respective simulation result on the y-axis). For the temperature comparison, the root mean square error (RMSE) and the mean bias error (MBE) are reported; for the energy-content comparison, the coefficient of variation of RMSE (CVRMSE) and the normalized mean bias error (NMBE) are reported.
+
+- **RMSE** quantifies the typical magnitude of deviations (in the same unit as the variable, e.g. °C):
+  \[   \mathrm{RMSE}=\sqrt{\frac{1}{n}\sum_{i=1}^{n}\left(y_i-x_i\right)^2}  \]
+
+- **MBE** quantifies the systematic offset (bias) between the compared result and ReSiE (same unit as the variable). Positive values indicate overestimation relative to ReSiE:
+  \[  \mathrm{MBE}=\frac{1}{n}\sum_{i=1}^{n}\left(y_i-x_i\right) \]
+
+- **CVRMSE** is RMSE normalized by the mean baseline value, reported in percent (useful for comparing across testcases/scales):
+  \[  \mathrm{CVRMSE}[\%]=100\cdot\frac{\mathrm{RMSE}}{\overline{x}} \]
+
+- **NMBE** is MBE normalized by the mean baseline value, reported in percent. Positive values indicate overestimation relative to ReSiE:
+  \[  \mathrm{NMBE}[\%]=100\cdot\frac{\mathrm{MBE}}{\overline{x}} \]
+
+**Testcase TTES-1-AG:**
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-AG: Output temperature](fig/260205_IEA_ES_Task39_TTES-1-AG_Energy.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-AG: Energy content](fig/260205_IEA_ES_Task39_TTES-1-AG_Tout.svg)
+
+**Testcase TTES-1-UG:**
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-UG: Output temperature](fig/260205_IEA_ES_Task39_TTES-1-UG_Energy.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase TTES-1-UG: Energy content](fig/260205_IEA_ES_Task39_TTES-1-UG_Tout.svg)
+
+**Testcase PTES-1-C:**
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-C: Output temperature](fig/260205_IEA_ES_Task39_PTES-1-C_Energy.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-C: Energy content](fig/260205_IEA_ES_Task39_PTES-1-C_Tout.svg)
+
+**Testcase PTES-1-P:**
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-P: Output temperature](fig/260205_IEA_ES_Task39_PTES-1-P_Energy.svg)
+
+![Comparison of IEA ES Task39 results between ReSiE and others for testcase PTES-1-P: Energy content](fig/260205_IEA_ES_Task39_PTES-1-P_Tout.svg)
+
+
+Additionally, sensitivity analyses have been performed of different simulation time steps (15 min, 60 min, 120 min) and mesh resolutions (very_rough, rough, normal, high, very_high) to check the consistency of the ReSiE STES model.
+
+[^IEA_ES_39]: International Energy Agency - Energy Storage - Task 39:  Large Thermal Energy Storages for District Heating.  Website: [https://iea-es.org/task-39/](https://iea-es.org/task-39/)
+
+[^IEA_ES_39_Testcases]: Wim van Helden et al.: IEA ES Task 39 - Large Thermal Energy Storages for District Heating. Subtask C: Round Robin Simulations. Deliverable C2a: Modelling guidelines - Round robin test case description (for comparative simulations). 2024. Available at [https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf](https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf)
