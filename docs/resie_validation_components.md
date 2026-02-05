@@ -529,7 +529,10 @@ Also, the temperature of the output mass flow and the energy content in the STES
 
 Additionally, sensitivity analyses have been performed of different simulation time steps (15 min, 60 min, 120 min) and mesh resolutions (very_rough, rough, normal, high, very_high) to check the consistency of the ReSiE STES model.
 
-Overall, the comparison shows that ReSiE reproduce the results of TRNSYS and Matlab very closely (high agreement and low error metrics), whereas the other tools exhibit noticeably larger deviations in temperature and/or STES energy content.
+Across all four year-long testcases, TRNSYS shows the most consistent agreement with the ReSiE baseline - temperature deviations are generally small (RMSE_T as low as 0.057 °C in TTES-1-AG and ≤ 1.28 °C elsewhere) with near-zero bias (|MBE_T| ≤ 0.20 °C), and the storage-energy agreement is similarly strong (CVRMSE_E mostly 0.11–1.51% and NMBE_E essentially zero in the best cases), whereas Matlab can match reasonably well in some cases (e.g., PTES-1-C temperature RMSE_T 1.69 °C) but is less robust across scenarios (notably TTES-1-UG with RMSE_T 3.30 °C and a more pronounced negative energy bias in PTES-1-C with NMBE_E -1.60%). 
+The remaining tools (Comsol, Dymola, Modelica) exhibit systematically larger and/or more case-dependent discrepancies, most evident in TTES-1-AG where Comsol and Dymola show substantially higher energy scatter and underestimation (CVRMSE_E up to 5.44%, NMBE_E up to -5.15%) alongside markedly higher temperature RMSEs (about 3.2 °C).
+
+Overall, ReSiE is fully in line with the other simulation environments for typical energy-supply-system use, i.e., it reproduces the relevant temperature and storage-energy behavior with deviations that remain within a practically acceptable range for system-level performance assessment and comparative studies.
 
 [^IEA_ES_39]: International Energy Agency - Energy Storage - Task 39:  Large Thermal Energy Storages for District Heating.  Website: [https://iea-es.org/task-39/](https://iea-es.org/task-39/)
 
