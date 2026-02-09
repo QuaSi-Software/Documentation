@@ -1470,7 +1470,7 @@ Symbol | Description | Unit
 \(A_{top}\)  | surface area of the cylinder top | [m²]
 \(A_{bottom}\)  | surface area of the cylinder bottom | [m²]
 \(\rho\)  | density of the heat carrier medium in the STTES | [kg/m³]
-\(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [kJ/(kg K)]
+\(cp\)  | specific heat capacity of the heat carrier medium in the STTES | [J/(kg K)]
 \(T_{hot}\)  | rated upper temperature of the STTES | [°C]
 \(T_{cold}\)  | rated lower temperature of the STTES | [°C]
 \(T_{ambientair}\)  | ambient temperature of the air around the STTES | [°C]
@@ -1492,7 +1492,7 @@ Seasonal thermal energy storages can be used to shift thermal energy from the su
 
 ### Tank (TTES) and Pit (PTES) thermal energy storage 
 
-Neglected: Thermal capacity of the surrounding soil, gravel-water storages
+Neglected: gravel-water storages
 
 #### Generalized geometry for TTES and PTES
 ![Geometry of STES](fig/221028_STES_Geometry.png)
@@ -1637,6 +1637,116 @@ To illustrate the principle of the implemented model, the following figure shows
 
 This method was extensively tested in [Steinacker2022][^Steinacker2022] and compared to calculations performed with TRNSYS Type 142 with high agreement. Is was shown that an optimal number of layers for this model is 25, considering computational efficiency and quality of the results. 
 
+#### Ground-coupling
+
+This section describes the mathematical model used to couple a stratified seasonal thermal storage to the surrounding ground. The discretization and solver follow the same **cell-centered axisymmetric finite-volume (FVM)** scheme as in the *Geothermal Collector* model. What differs is the geometry mapping and the boundary conditions that represent the storage wall and base which is described in the following.
+
+##### Governing equation (soil)
+In cylindrical coordinates \((r,z)\) with axial symmetry, the soil temperature field \(T(r,z,t)\) satisfies the transient heat conduction equation
+\[
+\rho_{soil}(z)\,cp_{soil}(z)\,\frac{\partial T}{\partial t}
+\;=\;
+\frac{1}{r}\frac{\partial}{\partial r}\!\left[r\,k_{soil}(z)\,\frac{\partial T}{\partial r}\right]
+\;+\;
+\frac{\partial}{\partial z}\!\left[k_{soil}(z)\,\frac{\partial T}{\partial z}\right],
+\; r\in[0,\,R_\infty],\; z\in[0,\,H_\infty].
+\]
+
+Here, \(r\) is the radial coordinate measured from the symmetry axis and \(z\) is the depth measured downward from the ground surface. The material properties \(\rho_{soil}(z)\) (density), \(cp_{soil}(z)\) (specific heat capacity) and \(k_{soil}(z)\) (thermal conductivity) are assumed piecewise constant in depth to represent stratified soil layers.
+
+##### Computational domain and mesh
+The domain is a half-plane with symmetry on the axis \(r=0\), surface at \(z=0\), and depth \(H_\infty\).
+Non-uniform meshes are used:
+
+- **Vertical mesh** resolves (v1) the buried part of the storage one-to-one with the storage layers and (v2) the region just below the base until the deep ground via geometric coarsening. Depths where soil properties change are aligned with cell faces (additional nodes at layer interfaces).
+- **Radial mesh** is built as a sequence of refinement bands from the symmetry axis to \(r=R_\infty\): it starts fine at the axis then coarsens towards the mid-radius of the storage and becomes fine again up to the bottom storage radius (end of the base footprint) (h1), remains uniformly fine along the buried slanted wall band (h2), transitions via a fine-to-coarse grading into the optional surface insulation overlap ring (h3), and finally continues with fine-to-coarse geometric growth towards the outer boundary \(r=R_\infty\) (h4).
+
+Exemplary, a visual representation of a fully-buried ground-coupled PTES with insulation overlap  is shown below:
+![ground mesh around pit thermal storage](fig/260203_STES_ground_coupling_mesh.svg)
+
+##### Geometry mapping
+Round storages (cylinder, frustum) are represented directly. Quadratic storages (cuboid, truncated quadratic pyramid) are mapped to an area-equivalent axisymmetric shape: at each horizontal cut the circular radius is chosen so that its area equals the true planform area. The lateral wall is slanted; the true conical (or pyramidal) lateral area per vertical slice is used via a constant slant-area factor multiplying the cylindrical lateral area, ensuring correct wall-exchange area.
+
+##### Boundary conditions
+An overview of the boundary conditions of the soil is given below. See also the figure above for a visual representation.
+
+- **Symmetry axis** (\(r=0\)): adiabatic, \(\partial T/\partial r=0\)
+- **Far radius** (\(r=R_\infty\)): adiabatic, \(\partial T/\partial r=0\) (domain has to be chosen large enough)
+- **Ground surface towards ambient air** (\(z=0\)): Robin condition
+  \[  -k\,\frac{\partial T}{\partial z} \,=\, h(r)\,(T - T_{air}), \]
+  with a radially piecewise constant heat transfer coefficient \(h\) to represent an optional insulation overlap ring:
+  \[  h(r)=  \begin{cases}
+    U_{\text{ov}}, & R_s \le r \le R_s + w_{\text{ov}},\\
+    h_s, & \text{elsewhere},
+  \end{cases}  \]
+  where \(R_s\) is the (area-equivalent) storage radius at the surface, \(w_{\text{ov}}\) is the overlap width, \(U_{\text{ov}}\) the effective surface U-value of the top insulation overlap ring and  \(h_s\) the effective surface heat transfer coefficient outside of the top insulation.
+- **Deep boundary** (\(z=H_\infty\)): either Dirichlet \(T=T_g\) (set to undisturbed ground temperature) or Neumann \(\partial T/\partial z=0\) (adiabatic)
+- **Storage wall (buried part)**: Robin condition on the exterior soil side,
+  \[
+  -k\,\frac{\partial T}{\partial n} \,=\, U_w\,(T - T_{\text{STES,layer}}),
+  \]
+  where \(n\) is the outward unit normal at the wall (pointing from the storage into the surrounding soil) and
+  \(\partial T/\partial n\) is the temperature gradient component normal to the wall. The parameter
+  \(U_w\) is the effective wall heat-transfer coefficient (U-value) between the storage medium  and the adjacent soil, i.e. it lump-sums the thermal resistance of the wall/insulation and any near-wall contact
+  resistance. The exchange area per horizontal slice equals the true slanted lateral area.
+- **Storage base**: Robin condition on the ground beneath the storage footprint,
+  \[
+  -k\,\frac{\partial T}{\partial z} \,=\, U_b\,(T - T_{\text{STES,base}}),
+  \]
+ integrated over the area-equivalent circular footprint. Here \(U_b\) is the effective  base heat-transfer coefficient (U-value) between the storage bottom and the underlying soil, lumping the thermal resistance of the bottom construction/insulation and any contact resistance.
+
+##### Discretization and time integration
+A cell-centered finite-volume scheme with axisymmetric metrics is used (see also the description of the [geothermal heat collector](#geothermal-heat-collector)):
+
+- Diffusive conductances are placed on faces; face areas and distances use the actual axisymmetric geometry.
+- Material properties are piecewise constant per row (depth interval).
+- Time stepping is implicit Euler:
+  \[
+  \mathbf{A}\,\mathbf{T}^{n+1}=\mathbf{b}(\mathbf{T}^{n}),
+  \]
+  solved as a sparse linear system each step.
+
+To remain consistent with a face Robin condition applied to a cell-centered control volume, all Robin coefficients use a series-resistance reduction to the cell center:
+\[
+U_{\text{eff}} \;=\; \left(\frac{1}{U}+\frac{\delta}{k}\right)^{-1},
+\]
+where \(\delta\) is the normal distance from the boundary to the adjacent cell center. This preserves the correct flux against the discrete volume.
+
+##### Coupling soil <-> storage
+The stratified storage exchanges heat with its surroundings via UA terms per storage segment (side and base). Note that all storage layers have the same height, and each is aligned with the soil grid in the vertical direction: the soil mesh contains one or more soil cells over the depth of each storage layer, and storage layer interfaces coincide with soil cell faces. After each soil solve:
+
+1. **Wall segments (per buried storage layer):** The net heat rate \(Q_{\text{wall}}\) obtained from the assembled Robin terms along that layer’s wall band is
+   \[
+   Q_{\text{wall}} \;=\; \sum_{\text{row}} U_{\text{eff}}\,A_{\text{row}}\,(T_{\text{STES}}-T_{\text{soil,row}})
+   \]
+   with \(A_{\text{row}}\) the effective wall area represented by a soil row, \(T_{\text{STES}}\) the temperature of the corresponding storage layer and \(T_{\text{soil,row}}\) the cell-center temperature of the adjacent soil control volume. 
+   An effective ambient temperature for that storage layer is then defined by
+   \[
+   Q_{\text{wall}} \;=\; U_w\,M_{\text{STES}}\,(T_{\text{STES}}-T_{\text{eff}}),
+   \qquad
+   \Rightarrow\quad
+   T_{\text{eff}} \;=\; T_{\text{STES}}-\frac{Q_{\text{wall}}}{U_w\,M_{\text{STES}}}
+   \]
+   where \(M_{\text{STES}}\) is the wall area of the current storage layer.
+   Using this \(T_{\text{eff}}\) in the storage’s 1D energy balance guarantees that the storage–soil energy exchange equals the FVM flux.
+
+2. **Base segment:** The soil temperature under the footprint is averaged area-weighted over concentric rings to obtain \(T_{\text{soil,base}}\). The effective ambient temperature for the base is
+   \[
+   T_{\text{eff,base}} \;=\; T_{\text{STES,base}} - \frac{U_{\text{eff}}}{U_b}\,\bigl(T_{\text{STES,base}}-T_{\text{soil,base}}\bigr),
+   \]
+   with the same series-resistance reduction (\(U_{\text{eff}}\)) as used in assembly.
+
+3. **Above-ground side and lid:** these exchange with the ambient air, i.e. their effective ambient temperature equals the ambient air temperature. Note that no radiation is included for now.
+
+##### Initial condition
+The soil field is initialized as a linear depth profile between the ambient air temperature at the surface and the deep ground temperature at the bottom of the domain.
+
+##### Assumptions and scope
+- **Pure conduction** in the ground; no groundwater advection, moisture transport, or freeze–thaw.
+- **Axisymmetric** representation; non-circular storages are handled by area-equivalent mapping.
+- **Surface radiation** and short-wave gains are not modeled explicitly; their net effect can be emulated by the surface transfer parameterization if needed.
+- **Temperature-dependencies** in the soil are neglected, no freezing is included in the model.
+
 **Inputs and Outputs of the STES:**
 
 Symbol | Description | Unit
@@ -1654,34 +1764,50 @@ Symbol | Description | Unit
 
 Symbol | Description | Unit
 -------- | -------- | --------
-\(Q_{STES,rated}\)  | rated thermal energy capacity of the STES | [MWh]
-\(x_{STES,start}\)  | thermal energy contend of the STES at the beginning of the simulation in relation to \(Q_{STES,rated}\)  | [%]
-\(T_{STES,hot}\)  | rated upper temperature of the STES | [°C]
-\(T_{STES,cold}\)  | rated lower temperature of the STES | [°C]
+\(A_{\text{row}}\) | effective wall exchange area represented by a soil row (depth band) | [m²]
+\(\alpha_{STES,slope}\) | slope angle of the wall of the STES with respect to the horizon | [°]
 \(c_{STES,max,load}\) | maximum charging rate (C-rate) of STES | [1/h]
 \(c_{STES,max,unload}\) | maximum discharging rate (C-rate) of STES | [1/h]
-\(V_{STES}\)  | volume of the STES | [m³]
-\(\alpha_{STES,slope}\)  | slope angle of the wall of the STES with respect to the horizon | [°]
-\(hr_{STES}\)  | ratio between height and mean radius of the STES | [-]
-\(\rho_{STES}\)  | density of the heat carrier medium in the STES | [kg/m³]
-\(cp_{STES}\)  | specific heat capacity of the heat carrier medium in the STES | [kJ/(kg K)]
-\(\xi_{STES}\)  | coefficient of diffusion of the heat carrier medium in the STES into itself | [m²/s]
-\(U_{STES,lid}\)  | thermal transmission of the STES' lid | [W/m² K]
-\(U_{STES,wall}\)  | thermal transmission of the STES' wall | [W/m² K]
-\(U_{STES,bottom}\)  | thermal transmission of the STES' bottom | [W/m² K]
-\(n_{STES,layers,total}\)  | number of thermal layer in the STES for the simulation | [pcs.]
-\(n_{STES,layers,above \ ground}\)  | number of thermal layer of the STES above the ground surface | [pcs.]
-\(\boldsymbol{T}_{STES,ground}\)  | timeseries or constant of ground temperature | [°C]
-\(\boldsymbol{T}_{STES,amb}\)  | timeseries of ambient temperature | [°C]
-
-
-**State variables of the STES:**
-
-Symbol | Description | Unit
--------- | -------- | --------
-\({Q}_{STES}\)  | current amount of thermal energy stored in the STES | [MWh]
-\(x_{STES}\)  | current charging state of the STES   | [%]
-\(\boldsymbol{T}_{STES}\)  | vector of current temperatures in every layer of the STES   | [°C]
+\(cp_{soil}(z)\) | soil specific heat capacity (piecewise constant per depth interval) | [J/(kg·K)]
+\(cp_{STES}\) | specific heat capacity of the heat carrier medium in the STES | [J/(kg·K)]
+\(\delta\) | normal distance from boundary face to adjacent soil cell center | [m]
+\(h(r)\) | effective soil-air surface heat transfer coefficient | [W/(m²·K)]
+\(H_\infty\) | soil domain depth (bottom boundary location) | [m]
+\(h_s\) | soil–air surface heat transfer coefficient outside the insulation overlap ring | [W/(m²·K)]
+\(hr_{STES}\) | ratio between height and mean radius of the STES | [-]
+\(k_{soil}(z)\) | soil thermal conductivity (piecewise constant per depth interval) | [W/(m·K)]
+\(M_{\text{STES}}\) | wall area of the current storage layer used in the STES UA term | [m²]
+\(n\) | outward unit normal direction at the storage wall (from storage into soil) | [-]
+\(n_{STES,layers,above\ ground}\) | number of thermal layers of the STES above the ground surface | [pcs.]
+\(n_{STES,layers,total}\) | number of thermal layers in the STES for the simulation | [pcs.]
+\(Q_{\text{wall}}\) | net wall heat rate from a buried storage layer to the soil (positive: storage → soil) | [W]
+\(r\) | radial coordinate (distance from symmetry axis) | [m]
+\(R_\infty\) | outer (far-field) radius of the soil domain | [m]
+\(R_s\) | (area-equivalent) storage radius at the ground surface | [m]
+\(\rho_{soil}(z)\) | soil density (piecewise constant per depth interval) | [kg/m³]
+\(\rho_{STES}\) | density of the heat carrier medium in the STES | [kg/m³]
+\(t\) | time | [s]
+\(T(r,z,t)\) | soil temperature field varying in time | [°C]
+\(T_{air}\) | ambient air temperature used in the surface Robin boundary condition | [°C]
+\(T_g\) | prescribed deep/undisturbed ground temperature (Dirichlet option at \(z=H_\infty\)) | [°C]
+\(T_{\text{eff,base}}\) | effective ambient temperature for the storage base | [°C]
+\(T_{\text{eff}}\) | effective ambient temperature for a storage wall layer | [°C]
+\(T_{\text{soil,base}}\) | area-weighted mean soil temperature under the footprint (cell-center based rings) | [°C]
+\(T_{\text{soil,row}}\) | soil cell-center temperature of the adjacent soil control volume next to the wall | [°C]
+\(T_{\text{STES,amb}}\) | temperature of the ambient (air or ground) of the STES per layer | [°C]
+\(T_{\text{STES,base}}\) | temperature of the bottom storage layer/segment used for base exchange | [°C]
+\(T_{\text{STES}}\) | temperature of the corresponding storage layer (segment) | [°C]
+\(U_b\) | effective base heat-transfer coefficient (U-value) between storage bottom and soil | [W/(m²·K)]
+\(U_w\) | effective wall heat-transfer coefficient (U-value) between storage layer and adjacent soil | [W/(m²·K)]
+\(U_{\text{eff}}\) | effective Robin coefficient reduced to the cell center, \(U_{\text{eff}}=(1/U+\delta/k)^{-1}\) | [W/(m²·K)]
+\(U_{\text{ov}}\) | thermal transmission (U-value) of the insulation overlap ring | [W/(m²·K)]
+\(U_{STES,bottom}\) | thermal transmission (U-value) of the STES bottom | [W/(m²·K)]
+\(U_{STES,lid}\) | thermal transmission (U-value) of the STES lid | [W/(m²·K)]
+\(U_{STES,wall}\) | thermal transmission (U-value) of the STES wall | [W/(m²·K)]
+\(V_{STES}\) | volume of the STES | [m³]
+\(w_{\text{ov}}\) | radial width of the insulation overlap ring | [m]
+\(\xi_{STES}\) | coefficient of diffusion of the heat carrier medium in the STES into itself | [m²/s]
+\(z\) | vertical coordinate (depth measured downward from ground surface) | [m]
 
 ### Borehole thermal energy storage (BTES)
 

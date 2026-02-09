@@ -400,6 +400,8 @@ Generalised implementation of a fixed sink.
 
 Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSink is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | [W] or [Wh] | Path to the input energy profile. Define unit in profile header. |
@@ -408,6 +410,9 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant demand, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -433,6 +438,8 @@ Generalised implementation of a fixed source.
 
 Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSupply is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
@@ -441,6 +448,9 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°c] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°c] | If given, sets the temperature of the output to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant supply, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -814,7 +824,7 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
 | OR: `volume` | `Float` | Y/N | 15.5 |  [\(m³\)] | volume of the BT: Note that either volume or capacity should be given.  |
 | `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m³\)] | density of the heat carrier medium |
-| `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
+| `cp_medium` | `Float` | Y/Y | 4180 |  [J/(kg K)] |specific thermal capacity of the heat carrier medium |
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
 | `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the buffer tank |
@@ -873,7 +883,7 @@ Extended definition of a buffer tank in the input file:
     "model_type": "ideally_stratified",
     "capacity": 300000,
     "rho_medium": 1000,
-    "cp_medium": 4.18,
+    "cp_medium": 4180,
     "high_temperature": 80.0,
     "low_temperature": 15.0,
     "initial_load": 0.5,
@@ -892,57 +902,108 @@ Extended definition of a buffer tank in the input file:
 }
 ```
 
-### Seasonal thermal storage
+### Seasonal thermal storage / universal stratified (ground-coupled) thermal storage
 | | |
 | --- | --- |
-| **Type name** | `SeasonalThermalStorage`|
+| **Type name** | `SeasonalThermalStorage` |
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
+| **Available models** | `ground_model="simplified"` (default), `ground_model="FVM"` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower`  |
-| **Auxiliary Plots** | 3D-Model of the geometry, Cross-sectional drawing, temperature distribution over time  |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `LossesGains_top`, `LossesGains_sidewalls`, `LossesGains_bottom`,`CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower` (additional temperature outputs for ground and STES if `reproduce_IEA_ES_Task39` is activated) |
+| **Auxiliary Plots** | 3D-Model of the geometry of the STES, cross-sectional drawing of the STES, temperature distribution over time within the STES, temperature difference to ambient for each STES layer, ground mesh & time-shiftable ground temperature field for `FVM` |
 
-A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
+A stratified seasonal thermal energy storage (STES) represented by a 1D multi-layer model of the storage medium. Thermal stratification is represented via diffusion and buoyancy effects. Loading is modelled with a thermal lance (charging into the layer matching the inlet temperature), while unloading is taken from the topmost layer with a return temperature at `low_temperature`. Currently, no indirect loading or unloading is included. 
 
-The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, as shown in the following figure:
+Heat losses are modelled through lid, side walls, and base. The interaction with the surrounding ground can be represented either by:
+
+- `ground_model="simplified"`: prescribed ground temperature (profile or constant), no thermal capacity of the ground, or
+- `ground_model="FVM"`: axisymmetric transient ground conduction model (finite volume), providing dynamic effective ambient temperatures for buried wall layers and the base of the STES.
+
+The seasonal thermal storage can be modelled either as pit  (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, depending on the given `shape` and the `sidewall_angle`, as shown in the following figure:
 
 ![Possible geometries for STES](fig/250722_STES_geometries.jpg)
 
- The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
+A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
 
- Important: Currently, the energy exchange with the ground is implemented in a simplified way. The ground does not have a thermal capacity in this model, instead a constant ground temperature is assumed! This can lead to wrong results! A ground temperature profile (e.g. monthly) could be used to mitigate this effect. With a soil temperature of constant 10 °C throughout the year, the losses are significantly too high.
+**General Parameter for geometry, stratification, limits and losses**
 
 | Name | Type | R/D | Example | Unit | Description |
-| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `volume` | `Float` | Y/N | 12000.0 | [m^3] | The overall volume of the STES. |
-| `initial_load` | `Float` | Y/Y | 0.0 | [%/100] | The initial load of the STES, given in the range from [0.0 - 1.0]. Note that the temperature distribution will be set to an equal temperature in all layers at the beginning of the simulation.  |
-| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | The upper temperature of the STES, equals the highest temperature for loading. |
-| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C]  | The lower temperature of the STES, equals the assumed return flow temperature during unloading. Note that the temperature may become lower due to thermal losses to the ambient. |
-| `shape` | `String` | Y/Y | `quadratic` | [-] | The shape of the cross-section of the STES. Can either be `round` for cylinder/truncated cone or `quadratic` for tank or truncated quadratic pyramid (pit). |
-| `hr_ratio` | `Float` | Y/Y | 0.8 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
-| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
-| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m^3] | The density of the storage medium (typically water). |
-| `cp_medium` | `Float` | Y/Y | 4.186 | [kJ/(kgK)] | The specific thermal capacity of the storage medium (typically water). |
-| `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
-| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | The number of thermal layers in the STES model. |
-| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | The number of thermal layers that are above the ground, meaning their losses are to the ambient air and not to the ground. |
-| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related loading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
-| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related unloading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
-| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related loading rate, given as mass per hour **per input interface** related to the total mass in the STES. |
-| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related unloading rate, given as **total** mass per hour related to the total mass in the STES. |
-| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m^2K)] | The thermal transmission through the lid of the STES`, always into the air. |
-| `thermal_transmission_barrel` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the barrel of the STES, into the air or into the ground, depending on `number_of_layer_above_ground`. |
-| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the bottom of the STES, always into the ground. |
-| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
-| OR: `constant_ambient_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding air temperature to a constant value. |
-| OR: `ambient_temperature_from_global_file` | `String` | Y/N | ` temp_ambient_air` | [-] | If given, sets the surrounding air temperature to the ambient air temperature of the global weather file. |
-| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ground_temperature.prf` | [°C] | Path to the profile for the surrounding ground temperature. |
-| OR: `constant_ground_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
+| ----------- | ------- | --- | --- | --- | --- |
+| `volume` | `Float` | Y/N | 12000.0 | [m³] | total storage volume |
+| `initial_load` | `Float` | Y/Y | 0.0 | [-] | initial state of charge in the range 0…1 |
+| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | upper/rated storage temperature (maximum charging temperature) |
+| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C] | lower/rated storage temperature (assumed return temperature during unloading; storage may drop below due to losses) |
+| `shape` | `String` | Y/Y | `quadratic` | [-] | cross-section shape: `round` for cone or (truncated) cylinder or `quadratic` for (truncated) quadratic pyramid or cuboid  |
+| `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | height-to-mean-radius ratio (round) or height-to-mean-half-side ratio (quadratic) |
+| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | wall slope angle w.r.t. the horizon (0…90°); 90° corresponds to vertical wall |
+| `ground_model` | `String` | Y/Y | `simplified` | [-] | choose `simplified` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
+| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m³] | density of the storage medium |
+| `cp_medium` | `Float` | Y/Y | 4180.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
+| `diffusion_coefficient` | `Float` | Y/Y | 1.43e-7 | [m²/s] | effective thermal diffusion coefficient used for stratification/diffusion modelling |
+| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | number of thermal layers in the storage model (from bottom to top) |
+| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | number of top layers located above ground (losses to ambient air instead of ground model) |
+| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max charging C-rate (energy per hour relative to storage energy capacity) |
+| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max discharging C-rate (energy per hour relative to storage energy capacity) |
+| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | optional max charging mass-flow rate **per input interface**, relative to total storage mass |
+| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | optional max discharging mass-flow rate (**total**), relative to total storage mass |
+| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective U-value through the lid (always to ambient air) |
+| `thermal_transmission_barrel_above_ground` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the side walls for above-ground layers (to ambient air) |
+| `thermal_transmission_barrel_below_ground` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the side walls for buried layers (to ground) |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the base (always to the ground) |
+| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/ambient_temperature.prf` | [°C] | ambient temperature time series profile (choose only one ambient option) |
+| OR: `constant_ambient_temperature` | `Temperature` | Y/N | 18.0 | [°C] | constant ambient temperature (choose only one ambient option) |
+| OR: `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | ambient dry-bulb temperature from the global weather file (choose only one ambient option) |
+| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simplified` and as reference/deep boundary temperature in `FVM` ground model) |
+| OR: `constant_ground_temperature` | `Temperature` | Y/N | 10.0 | [°C] | constant ground temperature (same usage as above) |
+| `output_layer_from_top` | `Int` | Y/Y | 1 | [-] | layer index for extraction, counted from the top (1 = topmost layer) |
+| `reproduce_IEA_ES_Task39` | `String` | N/N | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
 
-Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+
+Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
+
+**Ground coupling model `FVM` (only if `ground_model="FVM"`)**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | --- | --- |
+| `ground_domain_radius_factor` | `Float` | Y/Y | 1.5 | [-] | factor for derived domain radius (multiplied by storage radius at ground surface); ignored if `ground_domain_radius` is set |
+| `ground_domain_depth_factor` | `Float` | Y/Y | 2.0 | [-] | factor for derived domain depth (multiplied by total storage height); ignored if `ground_domain_depth` is set |
+| `ground_domain_radius` | `Float` | N/N | 60.0 | [m] | ground domain radius; if not provided, derived from storage size using `ground_domain_radius_factor` |
+| `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | ground domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
+| `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high`. See below for details. |
+| `ground_layers_depths` | `Vector{Float}` | N/N | `[0.0, 2.0, 10.0]` | [m] | layer interface depths from surface; defines intervals `[d[i], d[i+1])` that are mapped to `ground_layers_k`, `ground_layers_roh` and `ground_layers_cp` (will be extended to `ground_domain_depth` if not already covered) |
+| `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per ground layer; if shorter than the number of defined ground layers, the last value is repeated |
+| `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per ground layer; broadcasting rule as above |
+| `ground_layers_cp` | `Vector{Float}` | Y/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per ground layer; broadcasting rule as above |
+| `soil_surface_hconv` | `Float` | Y/Y | 14.7 | [W/(m²·K)] | convective heat transfer coefficient at the ground surface outside the overlap ring |
+| `has_top_insulation_overlap` | `Bool` | Y/Y | false | [-] | enables an optional insulation overlap ring at the ground surface around the storage |
+| `top_insulation_overlap_width` | `Float` | Y/Y | 5.0 | [m] | radial width of the surface overlap ring (only used if `has_top_insulation_overlap=true`) |
+| `thermal_transmission_overlap` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective surface U-value of the overlap ring (only used if `has_top_insulation_overlap=true`) |
+| `ground_bottom_boundary` | `String` | Y/Y | `Neumann` | [-] | bottom boundary condition: `Neumann` (adiabatic, zero flux) or `Dirichlet` (fixed temperature using ground temperature input) |
+
+
+**Ground accuracy mode**
+
+The parameter `ground_accuracy_mode` selects a predefined mesh resolution for the axisymmetric FVM ground domain used for ground coupling. Internally it maps to four mesh controls:
+
+- `min_w`: minimum cell width in refined regions, defined relative to the height of the STES layers (`mindz`).
+- `max_w`: maximum allowed cell width in the far-field / deep ground.
+- `n_wall`: number of radial cells across the near-wall refinement band per vertical STES layer step, only  if `sidewall_angle < 90°` (higher values better resolve wall heat exchange).
+- `ef`: geometric expansion factor for grading from fine to coarse cells (growth ratio between adjacent cells).
+
+The available presets are:
+
+- `very_rough`: `min_w = mindz/1`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+- `rough`: `min_w = mindz/2`, `max_w = 8 m`, `n_wall = 1`, `ef = 2.0`
+- `normal`: `min_w = mindz/3`, `max_w = 4 m`, `n_wall = 1`, `ef = 2.0`
+- `high`: `min_w = mindz/4`, `max_w = 2 m`, `n_wall = 2`, `ef = 2.0`
+- `very_high`: `min_w = mindz/8`, `max_w = 1 m`, `n_wall = 3`, `ef = 2.0`
+- `IEA_ES_39`: `min_w = mindz/2.74`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+
+Higher accuracy increases the number of ground cells (especially near the wall and in the refined regions),  improving resolution of ground temperature gradients and storage heat losses, at the cost of higher runtime and memory use. In most cases, `rough` or `normal` should be good enough!
 
 **Exemplary input file definition for SeasonalThermalStorage**
 
@@ -951,31 +1012,46 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
     "type": "SeasonalThermalStorage",
     "m_heat_in": "m_h_w_ht1",
     "m_heat_out": "m_h_w_lt1",
-    "output_refs": [
-        "TST_HP_01"
-    ],
-    "volume": 3000,
-    "initial_load": 0.2,
-    "high_temperature": 95,
-    "low_temperature": 10,
-    "shape": "round",
-    "hr_ratio": 1.5,
-    "sidewall_angle": 60,
-    "rho_medium": 1000,
-    "cp_medium": 4.18,
-    "diffusion_coefficient": 0.000000143,
-    "number_of_layer_total": 25,
-    "number_of_layer_above_ground": 1,
-    "max_load_rate_energy": 0.01,
-    "max_unload_rate_energy": 0.01,
-    "max_load_rate_mass": 0.04,
-    "max_unload_rate_mass": 0.04,
-    "thermal_transmission_lid": 0.25,
-    "thermal_transmission_barrel": 0.375,
-    "thermal_transmission_bottom": 0.375,
+    "output_refs": ["TST_DEM_01"],		
+    "volume": 50000,
+    "initial_load": 0.0,
     "ambient_temperature_from_global_file": "temp_ambient_air",
-    "constant_ground_temperature": 18.0,
-}
+    "constant_ground_temperature": 10.0,
+    "___GEOMETRY_AND_PHYSICS___": "",
+    "hr_ratio": 0.55,
+    "sidewall_angle": 27.5,
+    "shape": "round",
+    "rho_medium": 988.1,
+    "cp_medium": 4181,
+    "diffusion_coefficient": 1.43e-7,
+    "number_of_layer_total": 30,
+    "number_of_layer_above_ground": 0,
+    "output_layer_from_top": 1,
+    "thermal_transmission_lid": 0.1,
+    "thermal_transmission_barrel_above_ground": 0.2,
+    "thermal_transmission_barrel_below_ground": 0.2,
+    "thermal_transmission_bottom": 0.2,											   
+    "___TEMPERATURES_AND_LIMITS___": "",
+    "high_temperature": 90,
+    "low_temperature": 10,
+    "max_load_rate_energy": 1,
+    "max_unload_rate_energy": 1,
+    "max_load_rate_mass": 1,
+    "max_unload_rate_mass": 1,
+    "___FOR_GROUND_MODEL_FVM_ONLY___": "",
+    "ground_model": "FVM",
+    "ground_accuracy_mode": "rough",
+    "ground_domain_radius_factor": 1.5,
+    "ground_domain_depth_factor": 2.0,
+    "ground_layers_depths": [0.0, 2.0, 10.0],
+    "ground_layers_k": [1.5, 2.0], 
+    "ground_layers_rho": [ 2100 ],
+    "ground_layers_cp": [ 1330 ],
+    "soil_surface_hconv": 15.5,
+    "has_top_insulation_overlap": true,
+    "top_insulation_overlap_width": 5.0,
+    "thermal_transmission_overlap": 0.1,
+    "ground_bottom_boundary": "Neumann"}
 ```
 
 ## Heat sources and sinks
