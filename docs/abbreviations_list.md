@@ -69,6 +69,7 @@
 | STTES        | Short-Therm Thermal Energy Storage                                          |
 | SUT          | Start-Up Time                                                               |
 | SoDeLe       | Solar Simulation as easy as can be [simulation tool]                        |
+| TB       | Thermal Booster                                                                |
 | TRNSYS       | TRaNsient SYstems Simulation [simulation tool]                              |
 | TRY          | Test Reference Year                                                         |
 | TMY          | Typical Meteorological Year                                                 |
