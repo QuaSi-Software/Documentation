@@ -58,6 +58,7 @@ The overall structure of the project file is split into three general sections a
         ...
     },
     "csv_output_weather": true,
+    "write_csv_continuously": false,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
 	"output_plot": {
@@ -78,6 +79,7 @@ The overall structure of the project file is split into three general sections a
 * `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `csv_output_weather` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is exported to the CSV file. Defaults to `false`.
+* `write_csv_continuously` (`Boolean`): (Optional) If true, CSV output will be written continuously, meaning in every time step. Activating this function will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
 * `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): If true, ReSiE will create additional plots of components, if available (currently only available for geothermal probe). Defaults to `false`.
