@@ -379,7 +379,7 @@ Compression chillers are modeled as compression [heat pumps](resie_energy_system
 
 ### Absorption/adsorption chiller (AAC)
 
-Absorption/adsorption chillers are not implemented yet.
+**This component is not implemented yet!**
 
 
 ## Hydrogen Electrolyser (HEL)
@@ -769,6 +769,9 @@ Symbol | Description | Unit
 
 
 ## Heat exchanger
+
+**This component is not implemented yet!**
+
 ![Energy flow of a heat exchanger](fig/240613_heat_exchanger.svg)
 
 There are many different types of heat exchangers, all of which result in different calculations when derived from first principles of thermodynamics. As detailed thermodynamics and hydraulics are not part of ReSiE's simulation model, a simplified model is used. Of the three inputs \(T_{source,in}\), \(T_{sink,in}\), \(\dot{Q}_{in}\) and three outputs \(T_{source,out}\), \(T_{sink,out}\), \(\dot{Q}_{out}\), typically \(T_{source,out}\) and \(T_{sink,in}\) remain unknown. Here, "source" and "sink" stand in for the commonly called hot and cold sides of a heat exchanger.
@@ -1952,18 +1955,22 @@ See [Geothermal Probes](#geothermal-probes).
 
 ### Aquifer thermal energy storage (ATES)
 
-Aquifer thermal energy storages are not implemented yet.
+**This component is not implemented yet!**
 
 ## Ice storage (IS)
 
-Ice storages are not implemented yet (ToDo).
+**This component is not implemented yet!**
 
 ## Hydrogen fuel cell (FC)
+
+**This component is not implemented yet!**
+
 ![Energy flow of hydrogen fuel cell](fig/221031_H2_Fuel_Cell.svg)
 
-Hydrogen fuel cells are not implemented yet (ToDo).
-
 ## Photovoltaic (PV)
+
+**This component is not implemented yet! Use precalculated profiles in a fixed source instead.**
+
 ![Energy flow of photovoltaic](fig/221028_PV.svg)
 
 For the calculation of the electrical power output of photovoltaic systems, a separate simulation tool was developed and integrated into ReSiE. It is based on the Python extension pvlib[^pvlib] and uses the model chain approach described in the pvlib documentation. Technical data of specific PV modules and DC-AC inverters are taken from the SAM model[^SAM-Model] and integrated into pvlib.
@@ -1976,11 +1983,10 @@ Inputs can include orientation, tilt, ambient albedo, type of installation (e.g.
 
 
 ## Wind power (WP)
+
+**This component is not implemented yet! Use precalculated profiles in a fixed source instead.**
+
 ![Energy flow of wind power](fig/221028_Wind.svg)
-
-windpowerlib (ToDo)
-
-Achtung: Winddaten von EPW nicht geeignet!
 
 ## Battery (BA)
 
@@ -2043,11 +2049,11 @@ Symbol | Description | Unit
 
 
 ## Hydrogen compressor (HC)
+
+**This component is not implemented yet.**
+
 ![Energy flow of hydrogen compressor](fig/221028_HydroCompress.svg)
 
-## ToDo
-- In Tabelle Parameter nur Parameter, die auch eingegeben werden, alle anderen im Text einführen
-- check for consistency: part-load, timestep, start-up, shut-down
   
 ## References
 ///Footnotes Go Here///
