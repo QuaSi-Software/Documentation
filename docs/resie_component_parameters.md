@@ -379,11 +379,13 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
+A description of the available parameters and their usage can be found in the chapter about the [input file format](resie_input_file_format.md#bus).
+
 Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
+| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md#bus) for details. |
 
 ### General fixed sink
 | | |
