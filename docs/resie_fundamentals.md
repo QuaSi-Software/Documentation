@@ -128,6 +128,7 @@ Determining the order of operations follow an algorithm consisting of a base ord
 4. Reorder the `Process` operation of components connected to the input and output interfaces of busses to ensure they follow the priorities on the bus. This acts as an addition to the initial order determined by the algorithm of 2. and applies only if there is no grid input/output at this bus, as with grid input/output, the output/input priorities of connected components do not matter.  
 5. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
 6. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
+7. Reorder the `Process` step of flexible sources and flexible sinks and the `Load` step of storages that are directly (without an intermediate bus) connected to transformers such that their steps come always after the `Process` step of the connected transformer.
 
 The base order is also illustrated in the following figure, adapted from [Ott2023][^Ott2023]:
 ![Illustration of the base order of operation](fig/230515_base_OoO.svg)
