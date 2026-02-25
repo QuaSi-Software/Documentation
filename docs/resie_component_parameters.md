@@ -154,7 +154,7 @@ A definition of a control module with its control parameter can be done for exam
 #### Profile limited
 Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster` (with respect to power_el)
 
 | | |
 | --- | --- |
@@ -164,7 +164,7 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 #### Storage-driven
 Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -175,11 +175,11 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **storage_uac** | The UAC of the storage component linked to the module.
 
 #### Temperature sorting
-Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+Controls a component so that the availabe energies of the thermal inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 
 **Note:** This will overwrite the order defined in the bus!
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -261,7 +261,7 @@ This module is implemented for the following component types:
 #### Forbid source to sink
 Forbids that a defined source is used to supply a defined sink. As this uses the callback `check_src_to_snk`, this is specifically used for components with a layered approach to energy flow calculation, e.g. a heat pump. A bus has this functionality built-in and does not need a control module.
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump` and `ThermalBooster`, both for `heat_in` and `heat_out`
 
 | | |
 | --- | --- |
@@ -612,7 +612,7 @@ The thermal booster combines low-temperature heat and additional boost energy (e
 
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
-| `power_el` | `Float` | Y/N | `5000.0` | [W] | Maximum additional boost power of the booster (e.g. electrical rated power). |
+| `power_el` | `Float` | Y/N | `5000.0` | [W] | Maximum additional boost power of the booster (e.g. electrical rated power). Is also the reference power for part-load dependent control modules. |
 | `cp_medium_out` | `Float` | Y/Y | `4180.0` | [J/(kg·K)] | Specific heat capacity of the output medium. |
 | `terminal_dT` | `Float` | Y/Y | `2.0` | [K] | Minimal terminal temperature difference of the heat exchanger of low-temperature heat in and pre-heating of the demand (pre-heating to max. `input_temperature` - `terminal_dT`) |
 | `power_losses_factor` | `Float` | Y/Y | `0.97` | [-] | Efficiency factor of the boost energy, e.g. conversion losses with respect to the boost input energy. |
