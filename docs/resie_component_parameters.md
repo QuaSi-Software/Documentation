@@ -154,7 +154,7 @@ A definition of a control module with its control parameter can be done for exam
 #### Profile limited
 Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster` (with respect to power_el)
 
 | | |
 | --- | --- |
@@ -164,7 +164,7 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 #### Storage-driven
 Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -175,11 +175,11 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **storage_uac** | The UAC of the storage component linked to the module.
 
 #### Temperature sorting
-Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+Controls a component so that the availabe energies of the thermal inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 
 **Note:** This will overwrite the order defined in the bus!
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -261,7 +261,7 @@ This module is implemented for the following component types:
 #### Forbid source to sink
 Forbids that a defined source is used to supply a defined sink. As this uses the callback `check_src_to_snk`, this is specifically used for components with a layered approach to energy flow calculation, e.g. a heat pump. A bus has this functionality built-in and does not need a control module.
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump` and `ThermalBooster`, both for `heat_in` and `heat_out`
 
 | | |
 | --- | --- |
@@ -379,11 +379,13 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
+A description of the available parameters and their usage can be found in the chapter about the [input file format](resie_input_file_format.md#bus).
+
 Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
+| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md#bus) for details. |
 
 ### General fixed sink
 | | |
@@ -592,6 +594,57 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `linear_interface` | `String` | Y/Y | `heat_out` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `nr_discretization_steps` | `UInt` | Y/Y | `30` | [-] | See [description of efficiency functions](#efficiency-functions). |
+
+### Thermal booster (TB)
+| | |
+| --- | --- |
+| **Type name** | `ThermalBooster` |
+| **File** | `energy_systems/heat_producers/thermal_booster.jl` |
+| **System function** | `transformer` |
+| **Medium** |  |
+| **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
+| **Output media** | `m_heat_out`/`m_h_w_ht1` |
+| **Tracked values** | `IN`,  `OUT`, `LossesGains`, `Losses_power`, `Losses_heat`, `mean_intermediate_temperature` |
+
+The thermal booster combines low-temperature heat and additional boost energy (e.g. electricity) to raise a thermal demand (`m_heat_in`) from its return (input) temperature to a higher supply (output) temperature. It first uses low-temperature heat (`m_heat_in`) to preheat the flow and then adds boost energy (`m_el_in`) to reach the desired outlet temperature, subject to configured loss factors and power limits. It can be used to model an electrical booster e.g. to get domestic hot water from a low-temperature district heating network. Two boolean flags control whether the device may operate purely from boost energy and whether boost energy may compensate a lack of low-temperature heat in order to deliver the requested heat demand.
+
+**Input parameters**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `power_el` | `Float` | Y/N | `5000.0` | [W] | Maximum additional boost power of the booster (e.g. electrical rated power). Is also the reference power for part-load dependent control modules. |
+| `cp_medium_out` | `Float` | Y/Y | `4180.0` | [J/(kg·K)] | Specific heat capacity of the output medium. |
+| `terminal_dT` | `Float` | Y/Y | `2.0` | [K] | Minimal terminal temperature difference of the heat exchanger of low-temperature heat in and pre-heating of the demand (pre-heating to max. `input_temperature` - `terminal_dT`) |
+| `power_losses_factor` | `Float` | Y/Y | `0.97` | [-] | Efficiency factor of the boost energy, e.g. conversion losses with respect to the boost input energy. |
+| `heat_losses_factor` | `Float` | Y/Y | `0.95` | [-] | Efficiency factor of the low-temperature heat, e.g. thermal loses with respect to the  low-temperature heat input energy. |
+| `output_temperature` | `Temperature` | N/N | `60.0` | [°C] | Optional fixed outlet temperature. If set, the booster provides this temperature at `m_heat_out`. If not given, the desired outlet temperature is determined by the connected component(s). |
+| `input_temperature` | `Temperature` | N/N | `35.0` | [°C] | Optional fixed source-side input temperature. If set, only input layers compatible with this temperature band are used as low-temperature sources. If not given, the source temperature is determined from the connected component(s). |
+| `demand_input_temperature` | `Temperature` | Y/N | `12.0` | [°C] | Constant demand return (input) temperature into the boosters output. Either this or `demand_input_temperature_profile_file_path` must be provided. |
+|  OR: `demand_input_temperature_profile_file_path` | `String` | Y/N | `"profiles/demand_return.prf"` | [–] | Path to a profile file for a time-varying demand return (input) temperature into the boosters output. Either this or `demand_input_temperature` must be provided. |
+| `allow_boost_solely` | `Bool` | Y/Y | `true` | [-] | Controls boost-only operation. If `true`, the thermal booster may deliver heat even when no low-temperature heat input is available. If `false`, the component requires a non-zero low-temperature contribution and if non is available, no heat output is supplied, even if boost energy would be available. Default is `true`. |
+| `allow_boost_additional` | `Bool` | Y/Y | `true` | [-] | Controls additional boosting. If `false`, the low-temperature side must always heat the demand as far as possible (up to its maximum intermediate temperature), and the booster is only allowed to do the remaining temperature lift. In this case, the delivered heat is essentially limited by the available low-temperature heat. If `true`, the low-temperature side is not forced to provide the maximum possible temperature lift; whenever low-temperature heat is not sufficient, the model can use additional boost energy to cover the missing part and still deliver the required heat output energy. Default is `true`. |
+
+Note: at least **one** of `demand_input_temperature` or `demand_input_temperature_profile_file_path` must be given. 
+
+**Exemplary input file definition for ThermalBooster**
+
+```json
+"TRF_TB_01": {
+    "type": "ThermalBooster",
+    "m_el_in": "m_e_ac_230v",
+    "m_heat_in": "m_h_w_lt1",
+    "m_heat_out": "m_h_w_ht1",
+    "output_refs": ["DEM_01"],
+    "power_el": 5000.0,
+    "cp_medium_out": 4180.0,
+    "constant_demand_input_temperature": 12,
+    "terminal_dT": 2.0,
+    "power_losses_factor": 0.97,
+    "heat_losses_factor": 0.95,
+    "allow_boost_solely": true,
+    "allow_boost_additional": true,
+}
+```
 
 ### Heat pump
 | | |
