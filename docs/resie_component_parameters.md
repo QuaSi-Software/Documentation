@@ -743,7 +743,7 @@ A generic implementation for energy storage technologies.
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `capacity` | `Float` | Y/N | 12000.0 | [Wh] |The overall capacity of the storage. |
-| `load` | `Float` | Y/N | 6000.0 | [Wh] | The initial load state of the storage. |
+| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the  battery. |
 
 ### Battery
 | | |
