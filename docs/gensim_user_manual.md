@@ -1,3 +1,4 @@
+# User manual
 ## 1 Installation
 
 GenSim relies on several external software tools to deliver its functionality and conduct simulations. Below, we detail these software requirements and guide you through their installation process. It's important to pay special attention to the recommended versions of these tools. Since the development of GenSim often trails behind these other software applications, using newer versions than those recommended can lead to compatibility issues. Sticking to the suggested versions ensures smooth integration and optimal performance of GenSim in your simulations.
@@ -18,12 +19,12 @@ Quickstart:
 See chapter 2 & 3 for detailed description on how to use GenSim. 
 
 ### *Microsoft Excel®* (and possible alternatives)
-The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy-access to the functionalities of GenSim. GenSim could also be used without the provided GUI. This will not be described further here, but you can find more information on how to do so in the `CONTRIBUTING.md` in the GitHub repository of GenSim.
+The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy access to the functionalities of GenSim. GenSim could also be used without the provided GUI. This will not be described further here, but you can find more information on how to do so in the `CONTRIBUTING.md` in the GitHub repository of GenSim.
 
 GenSim has been tested with the following versions of *Microsoft Excel®*:
 
 * Office 2016 (16.0.5422.1000)
-* Office 365 (as of Nov 1st 2023)
+* Office 365 (as of March 1st 2026)
 
 **Note:** *Microsoft Excel®* may require you to enable macros before you can use the software and to enable access to the VBA Object Model. This can be done in the *Trust Center* in the options of *Microsoft Excel®* as shown in the following figure. The shown settings allow access to the VBA Object Model and allow macros to be run after prompting the user.
 
@@ -37,9 +38,9 @@ SketchUp is a software for modelling buildings (among other things) and can be u
 We recommend using SketchUp 2017, however this version is no longer publicly available. We still need to test the use of newer versions of SketchUp for the use with GenSim. Until then it may not be possible to acquire a version that works with GenSim. Sorry!
 
 ### OpenStudio
-As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently supported version is 2.7.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases/tag/v2.7.0). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
+As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently required version is 3.10.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases/tag/v3.10.0). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
 
-* The default installation folder should be `C:\openstudio-2.7.0`. You can use a different folder, in which case you should note the installation path to specify it later in the `GenSim.xlsm` GUI. We recommend a folder on the same disk as GenSim.
+* The default installation folder should be `C:\openstudio-3.10.0`. You can use a different folder, in which case you should note the installation path to specify it later in the `GenSim.xlsm` GUI. We recommend a folder on the same disk as GenSim.
 * On the installer page where you can select which components of OpenStudio to install, please select all components.
 
 ### Configuring GenSim
@@ -68,15 +69,15 @@ Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25
 
 **Custom weather data sets**
 
-In general, any *EnergyPlus®* weather data set can be used for the simulation in GenSim. A complete weather data set always consists of an EPW-file and a DDY-file which must be saved with the same file name in the subfolder "weather" in the GenSim file path. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
+In general, any *EnergyPlus®* weather data set can be used in GenSim as long as it is in the EPW file format. Often a DDY file is created alongside the EPW file. As of v2.16, this file is no longer required and the necessary data is automatically calculated. It can optionally still be used, but this requires the use of the GenSim CLI, which is not covered by this manual. The EPW file (+DDY) must be saved subfolder "Wetter" in the GenSim base directory. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
 
-Ready-to-use weather data sets (epw + ddy) for worldwide locations can be downloaded free of charge from the following websites: 
+Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downloaded free of charge from the following websites: 
 
 [https://energyplus.net/weather](https://energyplus.net/weather)    
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EnergyPlus weather data sets using the [EnergyPlus Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html). A tool facilitating this workflow is currently under development and will be released soon.
+Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
 
 
 ### 2.2 Building geometry
@@ -132,7 +133,7 @@ Besides the actual geometry, window areas of the building also need to be define
 
 **Adiabatic external components**
 
-Optionally, individual facade components or the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the component does not allow heat transfer. This allows the simulation of e.g. coupled terraced houses or other sub-volumes of a whole building by defining component boundaries facing to heated zones as adiabatic. The procedure for the imported geometry model is explained in more detail in Section 2.2.4 Adiabatic External Components below. 
+Optionally, individual facade components or the roof and floor plate of the building can be defined as adiabatic. Adiabatic means that the component does not allow heat transfer. This allows the simulation of e.g. coupled terraced houses or other sub-volumes of a whole building by defining component boundaries facing to heated zones as adiabatic. The procedure for the imported geometry model is explained in more detail below in chapter 5 in the section on adiabatic external components.
 
 
 #### 2.2.2 Imported geometry model
@@ -203,18 +204,18 @@ The air temperature setpoint for heating and cooling are set in the same way as 
 
 ### 2.6 Ventilation system
 
-To represent the ventilation system, the system type and the heat recovery (HR) option must be selected in two drop-down menus (see figure below). If the HR is activated, a return heat or return humidity value must also be specified. The operating times of the ventilation system are defined in the same way as the usage profiles (see chapter 3.3) using a drop-down list either from predefined profiles or by selecting a user-defined profile. The actual air flow rate of the ventilation system is determined by specifying the "air change rate" parameter and a "conditioned room height". 
+To represent the ventilation system, the system type and the heat recovery (HR) option must be selected in two drop-down menus (see figure below). If the HR is activated, a return heat or return humidity value must also be specified. The operating times of the ventilation system are defined in the same way as the usage profiles (see chapter 2.3) using a drop-down list either from predefined profiles or by selecting a user-defined profile. The actual air flow rate of the ventilation system is determined by specifying the "air change rate" parameter and a "conditioned room height". 
 
 ![definition ventilation system](fig/231025_definition_ventilation_system.PNG)
 
 The electrical power demand of the ventilation system and therefore the resulting heat input into the ventilation system considered in the simulation is based on the standard SFP (specific fan power) factors of DIN EN 16798-3. The specific fan power is set to 750 \(W/(m³/s)\) for supply and extract air corresponding to SFP 2. 
 
 
-### 2.7 Further more
+### 2.7 Furthermore
 
 There are a number of optional model features that can be activated which are explained below.
 
-**Window ventialtion in case of overheating (cooling)**
+**Window ventilation in case of overheating (cooling)**
 
 In order to simplify window ventilation (for cooling) in case of overheating of the rooms, the function "window ventilation in case of overheating" can be activated (see following figure). This requires the specification of "air changes per hour" (typically 1...2/h) and a threshold for the room temperature at which occupants may open the windows. Actual window ventilation of the overheated rooms will only occur if, as a further condition, the temperature difference between the indoor air and the outdoor air meets a minimum value. If a value of 1 Kelvin is set for this parameter, then the temperature of the outdoor air must be at least 1 K below the temperature of the indoor air for the window ventilation to actually become active during the simulation. This parameter can be set to 0 Kelvin as the default setting.
 
