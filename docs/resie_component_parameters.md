@@ -456,7 +456,7 @@ The profile values can also be treated as volume flow. Then, a density and therm
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
-### Grid Input
+### Grid input
 | | |
 | --- | --- |
 | **Type name** | `GridInput`|
@@ -477,7 +477,7 @@ Used as a source with no limit, which gives off energy from outside the system b
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
-### GridOutput
+### Grid output
 | | |
 | --- | --- |
 | **Type name** | `GridOutput`|
