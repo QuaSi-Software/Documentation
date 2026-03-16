@@ -456,27 +456,45 @@ The profile values can also be treated as volume flow. Then, a density and therm
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
-### Grid connection
+### Grid Input
 | | |
 | --- | --- |
-| **Type name** | `GridConnection`|
+| **Type name** | `GridInput`|
 | **File** | `energy_systems/connections/grid_connection.jl` |
-| **System function** | `flexible_source`, `flexible_sink` |
+| **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
-| **Input media** | `None`/`auto` |
+| **Input media** | |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum`, `Temperature` |
+| **Tracked values** | `OUT`, `Output_sum`, `Temperature` |
 
-Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file).
-
-If parameter `is_source` is true, acts as a `flexible_source` with only one output connection. Otherwise a `flexible_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulative value.
+Used as a source with no limit, which gives off energy from outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file). The amount of energy supplied since the beginning of the simulation is tracked as a cumulative value.
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
-| `is_source` | `Boolean` | Y/Y | `True` |  [-] | If true, the grid connection acts as a source. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the output temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the output to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+### GridOutput
+| | |
+| --- | --- |
+| **Type name** | `GridOutput`|
+| **File** | `energy_systems/connections/grid_connection.jl` |
+| **System function** | `flexible_sink` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | |
+| **Tracked values** | `IN`, `Input_sum`, `Temperature` |
+
+Used as a sink with no limit, which receives energy and removes it from the system. Optionally, temperatures can be taken into account (constant, from profile or from weather file). The amount of energy taken in since the beginning of the simulation is tracked as a cumulative value.
+
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input (or output) to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
@@ -1381,7 +1399,7 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
+| `probe_type` | `String` | Y/Y | `double U-pipe` | [-] | Options: `single U-pipe`, `double U-pipe` |
 | `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
 | `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(Km)] | heat conductivity of inner pipes |
@@ -1436,7 +1454,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
     "___SIMPLIFIED MODEL___": "",
     "borehole_thermal_resistance": 0.1,
     "___DETAILED MODEL___": "",
-    "probe_type": 2,
+    "probe_type": "double U-pipe",
     "pipe_diameter_outer": 0.032,
     "pipe_diameter_inner": 0.0262,
     "pipe_heat_conductivity": 0.42,
