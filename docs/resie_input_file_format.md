@@ -71,7 +71,8 @@ The overall structure of the project file is split into three general sections a
 		...
 	},
     "plot_weather_data": true,
-    "step_info_interval": 500
+    "step_info_interval": 500,
+    "show_detailed_errors": false,
 },
 ```
 * `base_path`: (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
@@ -92,6 +93,7 @@ The overall structure of the project file is split into three general sections a
 * `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
 * `plot_weather_data` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is plotted to the line plot. Defaults to `false`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
+* `show_detailed_errors` (`Boolean`): If true, some errors will show a more detailed message. Defaults to `false`.
 
 
 ### Output specification (Sankey)
