@@ -53,7 +53,9 @@ nav:
   - 'ReSiE: Examples':
       - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - 'GenSim: Generic Building Simulation':
+      - 'What is GenSim?': 'gensim_overview.md'
       - 'User manual': 'gensim_user_manual.md'
+      - 'Building typology': 'gensim_building_typology.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
