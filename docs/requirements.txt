@@ -3,88 +3,94 @@
 # To update:
 #
 #    create file "requirements.in" with the following content (may adjust the versions): 
-#           mkdocs==1.4.3
-#           sphinx_rtd_theme==1.2.0
-#           Jinja2<3.1.0
-#           pymdown-extensions==9.11
+#           mkdocs==1.5.3
+#           sphinx_rtd_theme
+#           Jinja2
+#           pymdown-extensions
 #    run: "pip-compile requirements.in" to generate "requirements.txt"
 #
 alabaster==0.7.13
     # via sphinx
-babel==2.12.1
+babel==2.14.0
     # via sphinx
-certifi==2023.5.7
+certifi==2026.2.25
     # via requests
-charset-normalizer==3.1.0
+charset-normalizer==3.4.7
     # via requests
-click==8.1.3
+click==8.1.8
     # via mkdocs
 colorama==0.4.6
     # via
     #   click
     #   mkdocs
     #   sphinx
-docutils==0.18.1
+docutils==0.19
     # via
     #   sphinx
     #   sphinx-rtd-theme
 ghp-import==2.1.0
     # via mkdocs
-idna==3.4
+idna==3.10
     # via requests
-imagesize==1.4.1
+imagesize==1.5.0
     # via sphinx
-importlib-metadata==6.6.0
+importlib-metadata==6.7.0
     # via
     #   click
     #   markdown
     #   mkdocs
     #   sphinx
-jinja2==3.0.3
+jinja2==3.1.6
     # via
     #   -r requirements.in
     #   mkdocs
     #   sphinx
-markdown==3.3.7
+markdown==3.4.4
     # via
     #   mkdocs
     #   pymdown-extensions
-markupsafe==2.1.2
-    # via jinja2
+markupsafe==2.1.5
+    # via
+    #   jinja2
+    #   mkdocs
 mergedeep==1.3.4
     # via mkdocs
-mkdocs==1.4.3
+mkdocs==1.5.3
     # via -r requirements.in
-packaging==23.1
+packaging==24.0
     # via
     #   mkdocs
     #   sphinx
-pygments==2.15.1
+pathspec==0.11.2
+    # via mkdocs
+platformdirs==4.0.0
+    # via mkdocs
+pygments==2.17.2
     # via sphinx
-pymdown-extensions==9.11
+pymdown-extensions==10.2.1
     # via -r requirements.in
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via ghp-import
-pytz==2023.3
+pytz==2026.1.post1
     # via babel
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   mkdocs
     #   pymdown-extensions
     #   pyyaml-env-tag
 pyyaml-env-tag==0.1
     # via mkdocs
-requests==2.30.0
+requests==2.31.0
     # via sphinx
-six==1.16.0
+six==1.17.0
     # via python-dateutil
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==5.3.0
     # via
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-rtd-theme==1.2.0
+sphinx-rtd-theme==2.0.0
     # via -r requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -100,11 +106,12 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-typing-extensions==4.5.0
+typing-extensions==4.7.1
     # via
     #   importlib-metadata
     #   mkdocs
-urllib3==2.0.2
+    #   platformdirs
+urllib3==2.0.7
     # via requests
 watchdog==3.0.0
     # via mkdocs
