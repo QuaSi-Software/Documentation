@@ -40,6 +40,7 @@ nav:
   - 'ReSiE: Getting started':
       - 'Installation and usage': 'resie_installation.md'
       - 'Examples': 'resie_exemplary_energy_systems.md'
+      - 'SUSI and SIMON': 'resie_susi_simon.md'
   - 'ReSiE: Input specification':
       - 'Input file format': 'resie_input_file_format.md'
       - 'Time, time zones and weather files': 'resie_time_definition.md'

@@ -1,11 +1,11 @@
-# Exemplary energy systems
+# Examples
 
 In this chapter, some exemplary energy systems will be described and discussed. This may help to understand the capabilities, limitations and usage of ReSiE.
 
 For all examples the required input files are shipped together with ReSiE as JSON files in the subdirectory `examples`. The project files may link to profile files (as `.prf`), which are also shipped alongside ReSiE in the `profiles` subdirectory. The examples can be executed with
 
 ```bash
-julia --project=. src/resie-cli.jl run examples/name_of_example.json --exit-after-run
+julia --project=. src/resie-cli.jl run --exit-after-run examples/name_of_example.json
 ```
 
 in the ReSiE directory. More information on how to use the CLI can be found [in this chapter](resie_installation.md). The outputs are written to the `output` subdirectory by default. Please note that output files from multiple simulation runs (including different examples) are not deleted, but are overwritten.
