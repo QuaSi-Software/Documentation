@@ -37,8 +37,10 @@ extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX
 nav:
   - Home:
       - 'QuaSi - Overview': 'index.md'
-  - 'ReSiE: Simulation engine':
+  - 'ReSiE: Getting started':
       - 'Installation and usage': 'resie_installation.md'
+      - 'Examples': 'resie_exemplary_energy_systems.md'
+  - 'ReSiE: Input specification':
       - 'Input file format': 'resie_input_file_format.md'
       - 'Time, time zones and weather files': 'resie_time_definition.md'
       - 'Logging': 'resie_logging.md'
@@ -50,8 +52,6 @@ nav:
       - 'Energy system components': 'resie_energy_system_components.md'
       - 'General effects & traits': 'resie_transient_effects.md'
       - 'Validation - Components': 'resie_validation_components.md'
-  - 'ReSiE: Examples':
-      - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - 'GenSim: Generic Building Simulation':
       - 'What is GenSim?': 'gensim_overview.md'
       - 'User manual': 'gensim_user_manual.md'
