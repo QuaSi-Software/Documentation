@@ -65,11 +65,13 @@
 | SCOP         | Seasonal Coefficient of Performance                                         |
 | SEER         | Seasonal Energy Efficiency Ratio                                            |
 | SFP          | Specific fan power                                                          |
+| SIMON        | Simulation Input and Management Over Network [GUI tool]                     |
 | STES         | Seasonal Thermal Energy Storage                                             |
 | STTES        | Short-Therm Thermal Energy Storage                                          |
+| SUSI         | Simple UI for Simulation Input [GUI tool]                                   |
 | SUT          | Start-Up Time                                                               |
 | SoDeLe       | Solar Simulation as easy as can be [simulation tool]                        |
-| TB       | Thermal Booster                                                                |
+| TB           | Thermal Booster                                                             |
 | TRNSYS       | TRaNsient SYstems Simulation [simulation tool]                              |
 | TRY          | Test Reference Year                                                         |
 | TMY          | Typical Meteorological Year                                                 |

@@ -61,9 +61,11 @@
 *[SCOP]:    Seasonal Coefficient of Performance
 *[SEER]:    Seasonal Energy Efficiency Ratio 
 *[SFP]:     Specific Fan Power
+*[SIMON]:   Simulation Input and Management Over Network [GUI tool]
 *[SoDeLe]:  Solar Simulation as easy as can be [simulation tool]
 *[STES]:    Seasonal Thermal Energy Storage 
 *[STTES]:   Short-Therm Thermal Energy Storage
+*[SUSI]:    Simple UI for Simulation Input [GUI tool]
 *[SUT]:     Start-Up Time 
 *[TB]:      Thermal Booster
 *[TMY]:     Typical Meteorological Year
