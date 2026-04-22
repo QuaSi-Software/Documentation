@@ -1,79 +1,76 @@
-*[abbrev]:  abbreviation
-*[QuaSi]:   Quarter Simulation [project name]
-*[ReSiE]:   Computational Engine for the Simulation of Energy Systems [simulation tool]
-*[GenSim]:  Generic Building Simulation [simulation tool]
-*[SoDeLe]:  Solar Simulation as easy as can be [simulation tool]
-*[BMWK]:    German Federal Ministry for Economic Affairs and Climate Action
-*[REPL]:    Read-Eval-Print Loop of Julia
-*[UAC]:     User Address Code
-*[UACs]:     User Address Codes
-*[ID]:      Identifier
-*[HVAC]:    Heating, Ventilation and Air Conditioning 
-*[CHPP]:    Combined Heat and Power Plant
-*[HP]:      Heat Pump
-*[HEL]:     Hydrogen Electrolyser
-*[COP]:     Coefficient of Performance 
-*[EER]:     Energy Efficiency Ratio
-*[PLF]:     Part Load Factor
-*[PLR]:     Part Load Ratio
-*[GB]:      Gas Boiler
-*[NCV]:     Net Calorific Value, also known as Lower Heating Value (LHV)
-*[LHV]:     Lower Heating Value, also known as Net Calorific Value (NCV)
-*[GCV]:     Gross Calorific Value, also known as Higher Heating Value (HHV)
-*[HHV]:     Higher Heating Value, also known as Gross Calorific Value (GCV)
-*[OH]:      Oil Heating
-*[ER]:      Electric Heating Rod
-*[BB]:      Biomass Boiler
-*[SCC]:     Simple Compression Chiller
-*[CC]:      Compression Chiller
-*[SEER]:    Seasonal Energy Efficiency Ratio 
-*[SCOP]:    Seasonal Coefficient of Performance
 *[AAC]:     Absorption/Adsorption Chiller 
-*[STTES]:   Short-Therm Thermal Energy Storage
-*[STES]:    Seasonal Thermal Energy Storage 
-*[C-rate]:  Charging rate (of storage)
-*[TTES]:    Tank Thermal Energy Storage
-*[PTES]:    Pit Thermal Energy Storage
-*[TRNSYS]:  TRaNsient SYstems Simulation [simulation tool]
-*[BETS]:    Borehole Thermal Energy Storage
-*[ATES]:    Aquifer Thermal Energy Storage
-*[IS]:      Ice Storage 
-*[FC]:      Hydrogen Fuel Cell
-*[PV]:      Photovoltaic
-*[SAM]:     System Advisor Model 
-*[DC]:      Direct Current
+*[abbrev]:  abbreviation
 *[AC]:      Alternating Current
-*[WP]:      Wind Power
+*[ATES]:    Aquifer Thermal Energy Storage
 *[BA]:      Battery (electrical)
-*[EPW]:     Energy Plus Weather
-*[HC]:      Hydrogen Compressor
-*[SUT]:     Start-Up Time 
-*[CDT]:     Cool-Down Time 
-*[MOT]:     Minimum Operation Time 
+*[BB]:      Biomass Boiler
+*[BETS]:    Borehole Thermal Energy Storage
 *[BIM]:     Building Information Modeling 
-*[CSV]:     Comma-Separated Values [data format] 
-*[JSON]:    JavaScript Object Notation [data format]
-*[NFA]:     Net Floor Area (NRF)
-*[GFA]:     Gross Floor Area (BGF)
-*[BRF]:     Gross Room Volume
 *[BKI]:     Buiding Cost Index
-*[DWD]:     German weather service (Deutscher Wetterdienst)
-*[HR]:      Heat Recovery
-*[K]:       Kelvin
-*[SFP]:     Specific Fan Power
-*[K]:       Kelvin
-*[GUI]:     Graphical User Interface
-*[TMY]:     Typical Meteorological Year
-*[TRY]:     Test Reference Year
-*[VS Code]: Visual Studio Code
-*[EED]:     Energy Earth Designer (software)
-*[MB]:      Middle Bus
-*[MT]:      Middle Transformer
-*[PB]:      Parallel Branch
+*[BMWK]:    German Federal Ministry for Economic Affairs and Climate Action
+*[BRF]:     Gross Room Volume
+*[C-rate]:  Charging rate (of storage)
+*[CC]:      Compression Chiller
+*[CDT]:     Cool-Down Time 
+*[CHPP]:    Combined Heat and Power Plant
+*[CLI]:     Command-line interface
+*[COP]:     Coefficient of Performance 
+*[CSV]:     Comma-Separated Values [data format] 
+*[DC]:      Direct Current
 *[DHW]:     Domestic Hot Water
 *[DST]:     Daylight Saving Time
+*[DWD]:     German weather service (Deutscher Wetterdienst)
+*[EED]:     Energy Earth Designer (software)
+*[EER]:     Energy Efficiency Ratio
+*[EPW]:     Energy Plus Weather
+*[ER]:      Electric Heating Rod
+*[FC]:      Hydrogen Fuel Cell
+*[GB]:      Gas Boiler
+*[GCV]:     Gross Calorific Value, also known as Higher Heating Value (HHV)
+*[GenSim]:  Generic Building Simulation [simulation tool]
+*[GFA]:     Gross Floor Area (BGF)
+*[GUI]:     Graphical User Interface
+*[HC]:      Hydrogen Compressor
+*[HEL]:     Hydrogen Electrolyser
+*[HHV]:     Higher Heating Value, also known as Gross Calorific Value (GCV)
+*[HP]:      Heat Pump
+*[HR]:      Heat Recovery
+*[HVAC]:    Heating, Ventilation and Air Conditioning 
 *[IANA]:    Internet Assigned Numbers Authority
-*[CLI]:     Command-line interface
-*[TB]:     Thermal Booster
-
-
+*[ID]:      Identifier
+*[IS]:      Ice Storage 
+*[JSON]:    JavaScript Object Notation [data format]
+*[K]:       Kelvin
+*[LHV]:     Lower Heating Value, also known as Net Calorific Value (NCV)
+*[MB]:      Middle Bus
+*[MOT]:     Minimum Operation Time 
+*[MT]:      Middle Transformer
+*[NCV]:     Net Calorific Value, also known as Lower Heating Value (LHV)
+*[NFA]:     Net Floor Area (NRF)
+*[OH]:      Oil Heating
+*[PB]:      Parallel Branch
+*[PLF]:     Part Load Factor
+*[PLR]:     Part Load Ratio
+*[PTES]:    Pit Thermal Energy Storage
+*[PV]:      Photovoltaic
+*[QuaSi]:   Quarter Simulation [project name]
+*[REPL]:    Read-Eval-Print Loop of Julia
+*[ReSiE]:   Computational Engine for the Simulation of Energy Systems [simulation tool]
+*[SAM]:     System Advisor Model 
+*[SCC]:     Simple Compression Chiller
+*[SCOP]:    Seasonal Coefficient of Performance
+*[SEER]:    Seasonal Energy Efficiency Ratio 
+*[SFP]:     Specific Fan Power
+*[SoDeLe]:  Solar Simulation as easy as can be [simulation tool]
+*[STES]:    Seasonal Thermal Energy Storage 
+*[STTES]:   Short-Therm Thermal Energy Storage
+*[SUT]:     Start-Up Time 
+*[TB]:      Thermal Booster
+*[TMY]:     Typical Meteorological Year
+*[TRNSYS]:  TRaNsient SYstems Simulation [simulation tool]
+*[TRY]:     Test Reference Year
+*[TTES]:    Tank Thermal Energy Storage
+*[UAC]:     User Address Code
+*[UACs]:    User Address Codes
+*[VS Code]: Visual Studio Code
+*[WP]:      Wind Power
