@@ -37,6 +37,8 @@ extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX
 nav:
   - Home:
       - 'QuaSi - Overview': 'index.md'
+      - 'Publications': 'publications.md'
+      - 'Abbreviations': 'abbreviations_list.md'
   - 'ReSiE: Getting started':
       - 'Installation and usage': 'resie_installation.md'
       - 'Examples': 'resie_exemplary_energy_systems.md'
@@ -61,7 +63,5 @@ nav:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
       - 'Workflow for code contributions': 'workflow_code_contributions.md'
-  - Abbreviations:
-      - 'abbreviations_list.md'
   - About:
       - 'License': 'license.md'
