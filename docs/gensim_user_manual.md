@@ -19,7 +19,7 @@ Quickstart:
 See chapter 2 & 3 for detailed description on how to use GenSim. 
 
 ### *Microsoft Excel®* (and possible alternatives)
-The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy access to the functionalities of GenSim. GenSim could also be used without the provided GUI. This will not be described further here, but you can find more information on how to do so in the `CONTRIBUTING.md` in the GitHub repository of GenSim.
+The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy access to the functionalities of GenSim. GenSim can also be used without the provided GUI via the CLI, which is described [in this section](gensim_user_manual.md#5-tutorial-using-the-gensim-cli-to-run-a-simulation).
 
 GenSim has been tested with the following versions of *Microsoft Excel®*:
 
@@ -249,9 +249,20 @@ The user is continuously informed about the progress of the model generation and
 
 The results of the simulation are given as annual values and profiles. Annual values can be found on the *HOMEPAGE* and under the menu item *BUILDING BALANCE*. The main profiles are displayed under *ENERGY DEMAND*. More profiles can be found at *e+ Outputs*. A graphical representation of the main profiles can be found under the menu item *PROFILES VIEW*. The output of the results is assumed to be intuitive so no further explanation is provided here. 
 
+## 5 Tutorial: Using the GenSim CLI to run a simulation
+GenSim also has a CLI written in Ruby, which is especially useful to run simulation without using the GUI. However, in this case the required input OSW-file needs to be created in some other manner. The GenSim CLI uses the same OpenStudio® CLI calls as the GUI does, therefore with the same inputs it should produce the same results as the workflow using the GUI.
 
+While OpenStudio® also uses Ruby and ships with internal binaries, these cannot be used outside of OpenStudio®. You will need to have Ruby installed separately and the CLI has been tested with version 3.4.7. In the following it is assumed that `ruby` and `gem` point to a working installation of Ruby and the package manager. To use the CLI to you need to (once) install its dependencies with: `gem install thor`
 
-## 5 Short tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in
+In the following are the steps of how to run a simulation, assuming you have a valid OSW input file called `Model.osw`:
+
+1. Switch to the GenSim directory: `cd /path/to/GenSim`
+    1. In the following it is assumed that the shortcut `.` stands for this path. Although using relative paths using `.` *should* work, this cannot be guarranteed on all platforms. If the commands are not working, try using absolute paths instead.
+1. Create an empty OSM-file: `ruby ./Measures/gensim_cli.rb create_empty_osm --output_folder=./Output Model.osm`
+1. Run the simulation: `ruby ./Measures/gensim_cli.rb run_workflow --output_folder=./Output --os_bin_path=C:\openstudio-3.10.0\bin\openstudio.exe Model.osw`
+1. The results are saved as CSV files in `./Output/reports`. They are available as absolute values, relative to the NFA, relative to the GBA and as yearly sums. You typically only need to use one of these files, as they are all derived from the absolute values and saved in different files for convenience.
+
+## 6 Tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in
 
 **Create a new empty model**    
 In order to correctly create a custom, non-generic geometry model for a thermal building simlation in GenSim, the model has to be created from scratch without any predefinitions, as shown in the following figure.
