@@ -11,7 +11,7 @@ SUSI is the tool to create the energy system input file as described in detail [
 
 At time of writing the profiles (time series data) used by various components and the weather data are external to the input file and are linked via file paths. It is currently not possible to create these profiles, as described [in this chapter](resie_input_file_format.md#profile-file-format), within SUSI. This feature might be developed in the future.
 
-## Simulation Input and Management Over Network (SIMON)
+## Simulation Interface and Management Over Network (SIMON)
 
 **Note: SIMON is currently in development and no instance is publically available. We do not intend to run a public instance due to the high computing resources required. However we will gladly help other organisations and individuals to run their own instance.**
 
