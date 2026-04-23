@@ -30,8 +30,11 @@ GenSim has been tested with the following versions of *Microsoft Excel®*:
 
 There is also the option to always allow macros to be run, **however please note that these settings may increase the risk of malware if left on "allow all" permanently.** If you regularly open *Microsoft Excel®* files from untrusted sources, allowing all macros to be run may lead to malware infecting your computer. To prevent this, please be mindful about when to enable and disable the use of macros.
 
-![Microsoft Excel® Trust Center settings](fig/231123_trust_center_settings.png)
+![Microsoft Excel® Trust Center settings for macros](fig/231123_trust_center_settings.png)
 
+In addition, you might need to activate ActiveX elements, which is used by some input elements of the GUI. As with the settings for macros, be sure to not activate the elements unconditionally, as this might be dangerous.
+
+![Microsoft Excel® Trust Center settings for ActiveX elements](fig/260423_trust_center_settings_2.png)
 ### SketchUp (optional)
 SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 2.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
 
