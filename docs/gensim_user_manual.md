@@ -9,9 +9,9 @@ The latest stable GenSim release can be downloaded from the GitHub repository [h
 
 Quickstart:
 
-- Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel-VBA!
+- Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel®-VBA!
 - Unpack the zip-file
-- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
+- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio® (see below for details!)
 - Allow file `GenSim.xlsm` to be accessed in the file property settings
 - Start GenSim by opening file `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
 - Enable macros and access to the VBA Object Model in the *Microsoft Excel®* Trust Center
@@ -36,37 +36,37 @@ In addition, you might need to activate ActiveX elements, which is used by some 
 
 ![Microsoft Excel® Trust Center settings for ActiveX elements](fig/260423_trust_center_settings_2.png)
 ### SketchUp (optional)
-SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 2.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
+SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 2.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio® later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio® such that the OpenStudio®-SketchUp-plugin will be installed automatically.
 
 We recommend using SketchUp 2017, however this version is no longer publicly available. We still need to test the use of newer versions of SketchUp for the use with GenSim. Until then it may not be possible to acquire a version that works with GenSim. Sorry!
 
-### OpenStudio
-As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently required version is 3.10.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases/tag/v3.10.0). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
+### OpenStudio®
+As GenSim is based on OpenStudio®, it must be installed in order to run simulations. The currently required version is 3.10.0, which you can find on the [official GitHub page for releases of OpenStudio®](https://github.com/NREL/OpenStudio/releases/tag/v3.10.0). The installer should guide you through the installation of OpenStudio®. Please take note of the following while doing so:
 
 * The default installation folder should be `C:\openstudio-3.10.0`. You can use a different folder, in which case you should note the installation path to specify it later in the `GenSim.xlsm` GUI. We recommend a folder on the same disk as GenSim.
-* On the installer page where you can select which components of OpenStudio to install, please select all components.
+* On the installer page where you can select which components of OpenStudio® to install, please select all components.
 
 ### Configuring GenSim
 After the previous steps have been performed, you need to mark the file `GenSim.xlsm` to be allowed to be run and modified. Open the file property settings by right-clicking the file in a file explorer and select settings. In the settings there is an option to allow access to the file as shown in the following figure. The setting is only shown if the operating system recognises the file as an external file. If it is not there, you can skip this step.
 
 ![option to enable access to the file GenSim.xlsm](fig/231123_enable_file_permissions.png)
 
-As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio®. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio® has been installed, as shown in the following figure:
 
-![path to OpenStudio installation](fig/231117_openstudio_path.png)
+![path to OpenStudio® installation](fig/231117_openstudio_path.png)
 
-Make sure it matches the installation folder of OpenStudio and change it if not. The `Application path` field is designed to automatically detect and display the directory where the `GenSim.xlsm` file is located. This path should be set automatically when you open the file. If for any reason the path isn't set automatically, you need to manually enter the folder path.
+Make sure it matches the installation folder of OpenStudio® and change it if not. The `Application path` field is designed to automatically detect and display the directory where the `GenSim.xlsm` file is located. This path should be set automatically when you open the file. If for any reason the path isn't set automatically, you need to manually enter the folder path.
 
 ## 2 Model functions and parameters
 ### 2.1 Location
 
 The modelling process starts on the *HOMEPAGE* of the GenSim Excel® GUI with the selection of the building location and the weather file.
 
-![selection of the weather data in Excel](fig/231023_selection_weather_data.png)
+![selection of the weather data in Excel®](fig/231023_selection_weather_data.png)
 
 Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
 
-[^2]: File format "epw" - EnergyPlus weather data
+[^2]: File format "epw" - EnergyPlus® weather data
 [^3]: Reference period 1995 to 2012
 [^4]: Forecast period 2031 to 2060
 
@@ -80,7 +80,7 @@ Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downlo
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
+Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus® Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
 
 
 ### 2.2 Building geometry
@@ -311,7 +311,7 @@ After drawing the floor plan of the building, it is recommended to first save th
 
 ![surface matching](fig/231120_surface_matching.PNG)
 
-Once the final steps have been completed the file can be saved as an OpenStudio file (.osm). This file is then linked in GenSim (Excel interface) - see chapter 2.2.2.  
+Once the final steps have been completed the file can be saved as an OpenStudio® file (.osm). This file is then linked in GenSim (Excel® interface) - see chapter 2.2.2.  
 
 ![save model](fig/231120_save_model.png)
 
@@ -323,7 +323,7 @@ Select the model or rooms of interest. If not all rooms have a constant proporti
 
 ![window to wall ratio](fig/231120_window_to_wall_2.png)
 
-**Save final model as an OpenStudion model (.osm)**
+**Save final model as an OpenStudio® model (.osm)**
 
 ![save final model](fig/231120_save_final_model.png)
 
