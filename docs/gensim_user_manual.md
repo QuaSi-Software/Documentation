@@ -64,15 +64,15 @@ The modelling process starts on the *HOMEPAGE* of the GenSim Excel® GUI with th
 
 ![selection of the weather data in Excel®](fig/231023_selection_weather_data.png)
 
-Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
+Corresponding *EnergyPlus™* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
 
-[^2]: File format "epw" - EnergyPlus® weather data
+[^2]: File format "epw" - EnergyPlus™ weather data
 [^3]: Reference period 1995 to 2012
 [^4]: Forecast period 2031 to 2060
 
 **Custom weather data sets**
 
-In general, any *EnergyPlus®* weather data set can be used in GenSim as long as it is in the EPW file format. Often a DDY file is created alongside the EPW file. As of v2.16, this file is no longer required and the necessary data is automatically calculated. It can optionally still be used, but this requires the use of the GenSim CLI, which is not covered by this manual. The EPW file (+DDY) must be saved subfolder "Wetter" in the GenSim base directory. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
+In general, any *EnergyPlus™* weather data set can be used in GenSim as long as it is in the EPW file format. Often a DDY file is created alongside the EPW file. As of v2.16, this file is no longer required and the necessary data is automatically calculated. It can optionally still be used, but this requires the use of the GenSim CLI, which is not covered by this manual. The EPW file (+DDY) must be saved subfolder "Wetter" in the GenSim base directory. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
 
 Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downloaded free of charge from the following websites: 
 
@@ -80,7 +80,7 @@ Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downlo
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus® Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
+Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus™ Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
 
 
 ### 2.2 Building geometry
@@ -89,7 +89,7 @@ The building geometry can be defined in two ways. Either a generic cubic geometr
 
 ![selection of the method for geometry generation in the Excel® GUI](fig/231023_selection_method.png)
 
-Basically, in *EnergyPlus®*, the geometrical model of a building is represented by its external dimensions without any component thicknesses or volumes (e.g. wall or ceiling thicknesses). As a result, the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible given the low level of model detail. The user-defined net floor area (NFA) (or rather the ratio GFA/NFA, see below) is later used to convert the simulation results to area-specific quantities related to the NFA. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
+Basically, in *EnergyPlus™*, the geometrical model of a building is represented by its external dimensions without any component thicknesses or volumes (e.g. wall or ceiling thicknesses). As a result, the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible given the low level of model detail. The user-defined net floor area (NFA) (or rather the ratio GFA/NFA, see below) is later used to convert the simulation results to area-specific quantities related to the NFA. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
 
 #### 2.2.1 Generic building model
 
@@ -114,7 +114,7 @@ The "length" and "width" of the building are indicated as external dimensions. T
 **Orientation**
 
 The orientation of the building can also be changed using a drop down menu (see following figure) if the building is not orientated in the axes of the main cardinal points. A positive rotation of the building corresponds to a clockwise rotation[^7].
-[^7]: See EnergyPlus® parameter "north axis": [https://bigladdersoftware.com](https://bigladdersoftware.com/epx/docs/8-0/input-output-reference/page-006.html#field-north-axis)    
+[^7]: See EnergyPlus™ parameter "north axis": [https://bigladdersoftware.com](https://bigladdersoftware.com/epx/docs/8-0/input-output-reference/page-006.html#field-north-axis)    
 
 ![definition orientation](fig/231025_definition_orientation.png)
 
@@ -122,7 +122,7 @@ The orientation of the building can also be changed using a drop down menu (see 
 
 **Ratio NFA/GFA**
 
-As already mentioned, only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\), the user needs to specify the ratio of GFA/NFA. This can either be entered as an individual value (if known) or it can be determined from various predefined building typologies included as presets in the GUI.
+As already mentioned, only gross areas or volumes are represented in the EnergyPlus™ model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\), the user needs to specify the ratio of GFA/NFA. This can either be entered as an individual value (if known) or it can be determined from various predefined building typologies included as presets in the GUI.
 
 
 **Window areas**
@@ -237,11 +237,11 @@ Daylight-dependent lighting control can be activated to realistically simulate u
 
 ## 3 Simulation
 
-Once all the parameters have been entered, the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process, the *EnergyPlus®* model is generated in the first step. This turns the generic model into a customised *EnergyPlus®* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
+Once all the parameters have been entered, the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process, the *EnergyPlus™* model is generated in the first step. This turns the generic model into a customised *EnergyPlus™* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
 
 ![start of the simulation](fig/231106_start_simulation.png)
 
-The user is continuously informed about the progress of the model generation and simulation, as exemplary shown in the figure below. At the end of the simulation process, the results of the *EnergyPlus®* simulation are imported into the *Excel®* user interface.
+The user is continuously informed about the progress of the model generation and simulation, as exemplary shown in the figure below. At the end of the simulation process, the results of the *EnergyPlus™* simulation are imported into the *Excel®* user interface.
 
 ![simulation status information](fig/231117_sim_status.png)
 
