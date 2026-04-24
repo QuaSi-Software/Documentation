@@ -460,7 +460,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | | |
 | --- | --- |
 | **Type name** | `GridInput`|
-| **File** | `energy_systems/connections/grid_connection.jl` |
+| **File** | `energy_systems/connections/grid_input.jl` |
 | **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -481,7 +481,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 | | |
 | --- | --- |
 | **Type name** | `GridOutput`|
-| **File** | `energy_systems/connections/grid_connection.jl` |
+| **File** | `energy_systems/connections/grid_input.jl` |
 | **System function** | `flexible_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
