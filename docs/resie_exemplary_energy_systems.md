@@ -21,7 +21,7 @@ A fairly minimal example of operating a heat pump to supply a heat demand by usi
 
 This example demonstrates how an energy system with a heat pump can be structured on a basic level. Heat pumps are an important and versatile component, however also provide some modelling challenges in combination with other components that handle heat in a complex way. Therefore this example is a known baseline from which energy systems using a heat pump can extend.
 
-For a slightly more advanced version you can remove the line `"constant_cop": 3.0` from the subconfig of the heat pump. The varying temperatures of input and output are then considered in a simplified Carnot-efficiency calculation and result in a dynamic COP.
+For a slightly more advanced version you can change the line `"cop_function": "const:3.0"` from the subconfig of the heat pump to `"cop_function": "carnot:0.4"`. The varying temperatures of input and output are then considered in a simplified Carnot-efficiency calculation and result in a dynamic COP.
 
 ## Heating and cooling demands
 ![Heating and cooling demands in one energy system](fig/examples/240610_heating_and_cooling.svg)
@@ -47,7 +47,7 @@ The following figure shows a sankey plot of the yearly sums of energy. All compo
 
 ![Sankey plot of yearly sums of energy](fig/examples/260421_multisector_district_sankey.png)
 
-The example has also been set up in a specific way such that the energy balance is not upheld in every time step. Distributed over the span of the two heating periods and the beginning and end of the year, the heating demand 2 is not fully met. This can happen because there is no source of heat in the energy system which can produce an arbitrary amount of heat without possibly being limited by an input or output. The CHP comes close, but fails to cover peaks in demand when the buffer tanks are empty as it is not sufficiently sized for peak load coverage. The gas boiler does act as peak load supplier, but is connected only to heating demand 1.
+The example has also been set up in a specific way such that the energy balance is not upheld in every time step. Distributed over the span of the two heating periods at the beginning and end of the year, the heating demand 2 is not fully met. This can happen because there is no source of heat in the energy system which can produce an arbitrary amount of heat without possibly being limited by an input or output. The CHP comes close, but fails to cover peaks in demand when the buffer tanks are empty as it is not sufficiently sized for peak load coverage. The gas boiler does act as peak load supplier, but is connected only to heating demand 1.
 
 [^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
 
