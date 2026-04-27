@@ -50,9 +50,14 @@ The overall structure of the project file is split into three general sections a
     "auxiliary_plots_path": "./output",
     "auxiliary_plots_formats": ["png", "svg"],
     "sankey_plot_file": "./output/output_sankey.html",
-    "sankey_plot": "default",
+    "sankey_plot": "custom",
+    "sankey_plot_spec": {
+        "m_e_ac_230v": "darkyellow",
+        ...
+    },
     "csv_output_file": "./output/out.csv",
     "csv_time_unit": "hours",
+    "csv_output": "custom",
     "csv_output_keys": {
         "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"],
         ...
@@ -61,7 +66,8 @@ The overall structure of the project file is split into three general sections a
     "write_csv_continuously": false,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
-	"output_plot": {
+    "output_plot": "custom",
+	"output_plot_spec": {
 		"1": {
 			"key": {"TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT"]},
 			"axis": "left",
@@ -72,35 +78,39 @@ The overall structure of the project file is split into three general sections a
 	},
     "plot_weather_data": true,
     "step_info_interval": 500,
-    "show_detailed_errors": false,
+    "show_detailed_errors": false
 },
 ```
-* `base_path`: (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
+* `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
 * `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
-* `csv_time_unit` (`String`): Time unit for the time stamp of the CSV file. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
-* `csv_output_keys` (`Union{String, Dict{String, List{String}}}`): Specifications for CSV output file. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
-* `csv_output_weather` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is exported to the CSV file. Defaults to `false`.
-* `write_csv_continuously` (`Boolean`): (Optional) If true, CSV output will be written continuously, meaning in every time step. Activating this function will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
-* `auxiliary_info` (`Boolean`): If true, will write additional information about the current run to a markdown file.
-* `auxiliary_info_file` (`String`): (Optional) File path to where the additional information will be written. Defaults to `./output/auxiliary_info.md`.
-* `auxiliary_plots` (`Boolean`): If true, ReSiE will create additional plots of components, if available (currently only available for geothermal probe). Defaults to `false`.
-* `auxiliary_plots_path` (`String`): (Optional) File path to where the additional plots will be saved. Defaults to `./output/`.
-* `auxiliary_plots_formats` (`Array{String}`): Array of file formats that should be created. Can be one or multiple of `["html", "pdf", "png", "ps", "svg"]`. Defaults to [".png"].
+* `csv_time_unit` (`String`): (Optional) Time unit for the timestamp of the CSV output. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
+* `csv_output` (`String`): (Optional) Sets the mode of the CSV output, switching between several default and custom behaviour modes as well an option of not creating a CSV file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `nothing`.
+* `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
+* `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
+* `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
+* `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
+* `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
+* `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
+* `auxiliary_plots_path` (`String`): (Optional) Directory path to where the additional plots will be saved. Defaults to `./output/`.
+* `auxiliary_plots_formats` (`Array{String}`): (Optional) Multiple selection of which file formats are used to create the auxiliary plots. Allowed formats are: `html`, `pdf`, `png`, `ps`, `svg`. Defaults to `[".png"]`.
 * `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
-* `sankey_plot` (`Union{String, Dict{String, String}`): Specifications for sankey plot. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details.
+* `sankey_plot` (`String`): (Optional) Sets the mode of the sankey plot output, switching between default and custom behaviour as well an option of not creating a sankey plot file. Has to be one of: `default`, `custom`, `nothing`. Defaults to `default`.
+* `sankey_plot_spec` (`Dict{String, String}`): (Optional) Specifications for the colors of the sankey plot in custom mode. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. Only required if a custom sankey plot is set.
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
-* `output_plot_time_unit`: Unit for x-axis of output plot. Can be one of `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
-* `output_plot` (`Union{String, Dict{Int, Dict{String, Any}}`): Specifications for output line plot. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
-* `plot_weather_data` (`Boolean`): (Optional) If true, the weather data read in from a given weather file is plotted to the line plot. Defaults to `false`.
+* `output_plot_time_unit` (`String`): (Optional) Unit for x-axis of the output plot. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
+* `output_plot` (`String`): (Optional) Sets the mode of the output plot, switching between several default and custom behaviour modes as well an option of not creating a plot file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `all_incl_flows`.
+* `output_plot_spec` (`Dict{Int, Dict{String, Any}}`): (Optional) Specifications for the output line plot in custom mode. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
+* `plot_weather_data` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the line plot. Defaults to `false`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
-* `show_detailed_errors` (`Boolean`): If true, some errors will show a more detailed message. Defaults to `false`.
+* `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
+* `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting. It is intended for making the output perfectly repeatable, which is useful for testing but not in normal simuation.
 
 
 ### Output specification (Sankey)
 
-The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be super helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
+The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
-In the `io_settings`, `sankey_plot` can be either ```"nothing"``` if no sankey should be created, ```"default"``` that creates a sankey plot with default colors or an array mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
+In the `io_settings`, `sankey_plot` can be either `nothing` if no sankey should be created, `default` that creates a sankey plot with default colors or a dictionary mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" and "Gains" must be specified as well, even if it is not defined in the input file.
 
 Below is an example of a custom color list for an energy system with common media (plus "Losses" and "Gains"):
@@ -120,15 +130,16 @@ Below is an example of a custom color list for an energy system with common medi
 
 The resulting plot will be saved by default in `./output/output_sankey.html`. The plot can be opened with any browser and offers some interactivity for the positions of elements.
 
-### Output specification (CSV-file)
+### Output specification (CSV file)
 
-The output values of each component and the energy (and temperature if present) transferred between components can be written to a CSV-file. Therefore, the parameter `csv_output_keys` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"csv_output_keys": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be written, while   ```"csv_output_keys": "all_excl_flows"``` writes all component outputs, but no flow outputs to the CSV-file, and for ```"nothing"``` no file will be created. 
+The output values of each component and the energy (and temperature if present) transferred between components can be written to a CSV file. The parameter `csv_output` controls the extent of the output and can either be `all_incl_flows`, `all_excl_flows`, `nothing` or a list of entries as described below. For `all_incl_flows`, all possible output channels of all components and all energy/temperature flows between components across busses will be written, while `all_excl_flows` writes all component outputs, but no flow outputs to the CSV file, and for `nothing` no file will be created. 
  
-If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the list of outputs is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only contain values during the times when energy is being transferred, otherwise they are `NaN`, as the temperatures may not be defined outside of these times.
+If one of `all_incl_flows` or `all_excl_flows` is set, the list of outputs is sorted alphabetically. With `all_incl_flows`, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only contain values during the times when energy is being transferred, otherwise they are `NaN`, as the temperatures may not be defined outside of these times.
 
-A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax:
+A custom output does not filter or sort, but uses the order specified in the input file. To specify a custom selection of outputs, use the following syntax for parameter `csv_output_keys`:
 
 ```json
+"csv_output": "custom",
 "csv_output_keys": {
     "TST_01_HZG_01_CHP": ["m_h_w_ht1:OUT", "m_e_ac_230v:OUT", "LossesGains"],
     "TST_01_ELT_01_BAT": ["Load"],
@@ -146,7 +157,7 @@ The second part of the entry describes which of the available variables of the c
 
 **Flow output**
 
-Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. Currently, always both energy and temperature are output, even for non-thermal media. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of "source_component_uac->target_component_uac". Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
+Energy and temperature flows can only be output if a connection between two components across one or more busses exists without any other component in between. Currently, always both energy and temperature are output, even for non-thermal media. To specify a specific flow between two components,  the key  has to be the medium of the bus between the components as specified in the component parameters. The second part of the entry is a vector of strings, each with the syntax of `source_component_uac->target_component_uac`. Here, multiple connections can be specified, separated by a comma. The UACs have to match the the name of the components. For example: `"m_h_w_ht1":  ["TST_STC_01->TST_HP_01", "TST_STC_01->TST_DEM_02"]` defines two energy flows in medium `m_h_w_ht1`.
 
 **Weather output**
 
@@ -154,16 +165,16 @@ To output the weather data read in from a provided weather file, the flag `csv_o
 
 ### Output specification (interactive .html plot)
 
-The output values of each component and the energy (and temperature if present) transferred between components  can be plotted to an interactive HTML-based line plot. Therefore, the parameter `output_plot` can either be ```"all_incl_flows"```, ```"all_excl_flows"```, ```"nothing"``` or a list of entries as described below. For ```"output_plot": "all_incl_flows"```, all possible output channels of all components and all energy/temperature flows between components across busses will be plotted in the line plot, while   ```"output_plot": "all_excl_flows"``` plots all component outputs, but no flows, and for ```"nothing"``` no plot will be created. 
- 
-If one of ```"all_incl_flows"``` or ```"all_excl_flows"``` is set, the order of lines in the plot is sorted alphabetically. With ```"all_incl_flows"```, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only display values during the times when energy is being transferred, as they may not be defined outside of these times.
+The output values of each component and the energy (and temperature if present) transferred between components can be plotted to an interactive HTML-based line plot. The parameter `output_plot` controls the extent of the output and can either be `all_incl_flows`, `all_excl_flows`, `nothing` or a list of entries as described below. For `all_incl_flows`, all possible output channels of all components and all energy/temperature flows between components across busses will be plotted in the line plot, while   `all_excl_flows` plots all component outputs, but no flows, and for `nothing` no plot will be created.
+
+If one of `all_incl_flows` or `all_excl_flows` is set, the order of lines in the plot is sorted alphabetically. With `all_incl_flows`, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only display values during the times when energy is being transferred, as they may not be defined outside of these times.
 
 The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
 
-A custom output does not sort alphabetically, but uses the order specified in the input file. It filters temperature flows if they contain no data, e.g. for non-thermal media or if no energy has been transferred. To specify a custom selection of outputs, use the following syntax:
+A custom output does not sort alphabetically, but uses the order specified in the input file. It filters temperature flows if they contain no data, e.g. for non-thermal media or if no energy has been transferred. To specify a custom selection of outputs, use the following syntax for the parameter `output_plot_spec`:
 
 ```json
-"output_plot": {
+"output_plot_spec": {
     "1": {
         "key": {"TST_HP_01": ["m_h_w_lt1:IN"]},
         "axis": "left",
@@ -185,17 +196,17 @@ A custom output does not sort alphabetically, but uses the order specified in th
     ...
 }
 ```
-As for the CSV-output, the plot can both display component outputs as defined in the [component parameters section](resie_component_parameters.md) (first and second block in the example above) and energy or temperature flows between components across busses (third block  in the example above). 
+As for the CSV output, the plot can both display component outputs as defined in the [component parameters section](resie_component_parameters.md) (first and second block in the example above) and energy or temperature flows between components across busses (third block  in the example above). 
 
-The name of each object of this entry is a consecutive number starting from 1. Each value is a list of objects containing the fields ```"key"``` , ```"axis"``` that can be either "left" or "right" to choose on which y-axis the data should be plotted, ```"unit"``` as string displayed in the label of the output and ```"scale_factor"``` to scale the output data. Differing from ```"csv_output_keys"```, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that ```"unit"``` refers to the scaled data! If not handled differently, the default units are `Watt-hours` **during the current time step** and `°C` for temperatures. If `kilo-Watt-hours` should be plotted, a `"scale_factor": 0.001`  has to be applied to convert the `Wh` (default) to `kWh`.
+The name of each object of this entry is a unique number, that also defines the order of outputs in the legend of the plot. Each value is a list of objects containing the fields `key` , `axis` that can be either `left` or `right` to choose on which y-axis the data should be plotted, `unit` as string displayed in the label of the output and `scale_factor` to scale the output data. Differing from `csv_output_keys`, here every output UAC has to be set as individual entry. Compare also to the example given above that displays the input and output thermal energy of one heat pump. Note that `unit` refers to the scaled data! If not handled differently, the default units are `Watt-hours` **during the current time step** and `°C` for temperatures. If `kilo-Watt-hours` should be plotted, a `"scale_factor": 0.001`  has to be applied to convert the `Wh` (default) to `kWh`.
 
 **Component output**
 
-To specify component outputs, the ```"key"```  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component as defined in the [component parameters section](resie_component_parameters.md). See also the example above, first and second block. The ```"axis"```, ```"unit"``` and  ```"scale_factor"``` are scalar values that are applied to this single output parameter.
+To specify component outputs, the `key`  has to match the UAC-name of the component, followed by a string defining the name of the output parameter requested from this component as defined in the [component parameters section](resie_component_parameters.md). See also the example above, first and second block. The `axis`, `unit` and  `scale_factor` are scalar values that are applied to this single output parameter.
 
 **Flow output**
 
-To specify an energy and temperature flow output, the ```"key"``` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as "source_component_uac->target_component_uac". See also the example above, third block. Here, ```"axis"```, ```"unit"``` and  ```"scale_factor"``` can be vector elements that contain either one entry for the energy or two entries for energy and temperature flow, if the temperature should be plotted additionally. Then, exactly two values have to be given, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that even if two entries in the the meta information are given, the temperature might be filtered and not displayed if either no energy flow was present or a non-thermal media was requested.
+To specify an energy and temperature flow output, the `key` has to match the medium of the bus that transports the energy and temperature flow from the source to the target component. As for the CSV output, the actual connection is defined as `source_component_uac->target_component_uac`. See also the example above, third block. Here, `axis`, `unit` and  `scale_factor` can be vector elements that contain either one entry for the energy or two entries for energy and temperature flow, if the temperature should be plotted additionally. Then, exactly two values have to be given, representing the meta information for the energy (first entry) and the temperature flow (second entry) between the two components specified. Note that even if two entries in the the meta information are given, the temperature might be filtered and not displayed if either no energy flow was present or a non-thermal media was requested.
 
 **Weather output**
 
@@ -224,19 +235,19 @@ To plot the weather data read in from a provided weather file to the interactive
 ```
 
 * `start` (`String`): Start time of the simulation as datetime format. 
-* `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are output. The energies in the sankey, output CSV and output plot are starting at the start_output time specified.
-* `end` (`String`): End time (inclusive) of the simulation as datetime format, will be rounded down to the nearest multiple of time_step.
-* `start_end_unit` (`String`): Datetime format specifier for start, start_output and end time.
-* `time_step` (`Integer`): Time step in the given `time_step_unit` format. Defaults to 900 seconds.
-* `time_step_unit` (`String`): Format of the `time_step`, can be one of `seconds`, `minutes`, `hours`.
+* `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are printed. The energies in the various output files are starting at the time specified in `start_output`.
+* `end` (`String`): End time (inclusive) of the simulation as datetime format. Will be rounded down to the nearest multiple of the time step.
+* `start_end_unit` (`String`): Datetime format specifier for parameters `start`, `start_output` and `end`.
+* `time_step` (`Integer`, optional): Time step for the simulation. The parameter `time_step_unit` determines what the value in `time_step` means. Defaults to 900.
+* `time_step_unit` (`String`, optional): Unit for the value given in parameter `time_step`. Has to be one of: `seconds`, `minutes`, `hours`. Defaults to `seconds`.
 * `weather_file_path` (`String`, optional): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
-* `weather_interpolation_type_general` (`String`, optional): Interpolation type for weather data from weather file, except for solar radiation data. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_classic". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `weather_interpolation_type_solar` (`String`, optional): Interpolation method for solar radiation data from weather file. Can be one of: `"stepwise"`, `"linear_classic"`, `"linear_time_preserving"`, `"linear_solar_radiation"`. Defaults to "linear_solar_radiation". For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
-* `latitude` (`Float`, optional): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
-* `longitude` (`Float`, optional): The longitude of location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `weather_interpolation_type_general` (`String`, optional): Interpolation type for weather data from the weather file, except for solar radiation data. Can be one of: `stepwise`, `linear_classic`, `linear_time_preserving`, `linear_solar_radiation`. Defaults to `linear_classic`. For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `weather_interpolation_type_solar` (`String`, optional): Interpolation method for solar radiation data from the weather file. Can be one of: `stepwise`, `linear_classic`, `linear_time_preserving`, `linear_solar_radiation`. Defaults to `linear_solar_radiation`. For details, see [this chapter](resie_time_definition.md#aggregation-segmentation-and-time-shifting-of-profile-data).
+* `latitude` (`Float`, optional, unit `°`): The latitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
+* `longitude` (`Float`, optional, unit `°`): The longitude of the location in WGS84. If given, it overwrites the coordinates read out of the weather file!
 * `time_zone` (`Float`, optional): The time zone used in the current simulation in relation to UTC. If given, it overwrites the coordinates read out of the weather file! DWD-dat files are assumed to be in GMT+1.
-* `epsilon` (`Float`, optional): The absolute tolerance for all floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to 1e-9.
-* `force_profiles_to_repeat` (`Bool`, optional): If set to true, all utilized profiles are allowed to be repeated, even if denied or not specified in the profile header! Attention: This parameter disables the profile parameter in the profile header! Defaults to false.
+* `epsilon` (`Float`, optional): The absolute tolerance for many floating-point comparisons in the simulation. Two values whose difference falls below this threshold are treated as equal. Defaults to `1e-9`.
+* `force_profiles_to_repeat` (`Bool`, optional): If set to true, all utilized profiles are allowed to be repeated, even if denied or not specified in the profile header! Attention: This parameter disables the profile parameter in the profile header! Defaults to `false`.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
 
