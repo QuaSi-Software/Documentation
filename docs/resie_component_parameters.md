@@ -311,6 +311,553 @@ An example of this control module used for an electricity bus to switch the prio
 ]
 ```
 
+### Economic parameters
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter name</th>
+            <th>Type</th>
+            <th>Req.?</th>
+            <th>Unit</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>lifetime_years</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Lifetime of the component until replacement is required</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 15 a</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 20 a</code>
+                <code>GridOutput: 20 a</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>capex_specific</code></td>
+            <td><code>String</code></td>
+            <td>Yes</td>
+            <td>Depends</td>
+        </tr>
+        <tr>
+            <td colspan=4>Function for specific invest costs. Please check the documentation on function parameters of which <br/>options are available. The variable for the function depends on the component, typically either power <br/>or volume/storage capacity. For components that rely on profiles to set the produced/requested energies, <br/>the scale factor of the profile must be relative to the same measure that the capex is. For example if the <br/>profile is measured in <code>Wh/m^2</code> and the scale factor is an area, then the capex function must be of <br/>unit <code>€/m^2</code>.</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: - €/W</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 €</code>
+                <code>GridOutput: 0 €</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>capex_price_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly price change rate of the capex</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 0.005 1/a</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 1/a</code>
+                <code>GridOutput: 0 1/a</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>maintenance_inspection_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td>Depends</td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly rate of maintenance and inspection costs with respect to the initial capex</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 0.02 1/W</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 1/€</code>
+                <code>GridOutput: 0 1/€</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>maintenance_inspection_price_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly change rate of the maintenance and inspection costs</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 0.005 1/a</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 1/a</code>
+                <code>GridOutput: 0 1/a</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>repair_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td>Depends</td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly rate of repair costs with respect to the initial capex</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 0.06 1/W</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 1/€</code>
+                <code>GridOutput: 0 1/€</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>repair_price_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly change rate of the repair costs</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 0.005 1/a</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 1/a</code>
+                <code>GridOutput: 0 1/a</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>operational_labour_hours_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>h/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Hours of labour per year for operation</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: 100 h/a</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: 0 h/a</code>
+                <code>GridOutput: 0 h/a</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>subsidy_rate_of_capex</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td>Depends</td>
+        </tr>
+        <tr>
+            <td colspan=4>Subsidy rate of initial capex</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: - 1/W</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: - 1/€</code>
+                <code>GridOutput: - 1/€</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>subsidy_max</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>€</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Maximum of subsidy for this component</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>Battery: 15 a</code>
+                <code>BufferTank: 15 a</code>
+                <code>CHPP: - €</code>
+                <code>Electrolyser: 20 a</code>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code><br/>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>FuelBoiler: 15 a</code>
+                <code>GridInput: - €</code>
+                <code>GridOutput: - €</code><br/>
+                <code>GenericHeatSource: 15 a</code>
+                <code>GeothermalHeatCollector: 15 a</code>
+                <code>GeothermalProbes: 15 a</code>
+                <code>HeatPump: 20 a</code><br/>
+                <code>PVPlant: 20 a</code>
+                <code>SeasonalThermalStorage: 15 a</code>
+                <code>SolarthermalCollector: 15 a</code>
+                <code>Storage: 15 a</code><br/>
+                <code>ThermalBooster: 15 a</code>
+                <code>UTIR: 15 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>energy_price_profile_file_path</code></td>
+            <td><code>String</code></td>
+            <td>No</td>
+            <td><code>€/Wh</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Path to an energy price profile file. <b>Please note</b> that <b>either</b> <code>energy_price_profile_file_path</code> <b>or</b><br/> <code>constant_energy_price</code> should be given!</td>
+        </tr>
+        <tr>
+            <td colspan=4>No defaults</td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>energy_price_profile_scale</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>-</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Scale factor for energy price profile. Only required if <code>energy_price_profile_file_path</code> is given.</td>
+        </tr>
+        <tr>
+            <td colspan=4>Default <code>1.0</code> for all components</td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>constant_energy_price</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>€/Wh</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Constant energy price. <b>Please note</b> that <b>either</b> <code>energy_price_profile_file_path</code> <b>or</b> <br/><code>constant_energy_price</code> should be given!</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>GridInput: -</code><br/>
+                <code>GridOutput: -</code>
+                <code>GenericHeatSource: 15 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>energy_price_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly change rate of the energy price</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>GridInput: 0.02</code><br/>
+                <code>GridOutput: 0.02</code>
+                <code>GenericHeatSource: 15 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>base_cost_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>€</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly base cost (independent of energies)</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>GridInput: 0 €</code><br/>
+                <code>GridOutput: 0 €</code>
+                <code>GenericHeatSource: 15 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>base_cost_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly change rate of the base cost</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>FlexibleSink: 20 a</code>
+                <code>FlexibleSupply: 20 a</code>
+                <code>GridInput: 0 1/a</code><br/>
+                <code>GridOutput: 0 1/a</code>
+                <code>GenericHeatSource: 15 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>unmet_energy_price_profile_file_path</code></td>
+            <td><code>String</code></td>
+            <td>No</td>
+            <td><code>€/Wh</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Path to an price profile file for unmet energies. <b>Please note</b> that <b>either</b> <br/>`unmet_energy_price_profile_file_path` <b>or</b> `constant_unmet_energy_price` should be given!</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>unmet_energy_price_profile_scale</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>-</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Scale factor for unmet energy price profile. Only required if <code>unmet_energy_price_profile_file_path<code> <br/>is given.</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>constant_unmet_energy_price</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>€/Wh</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Constant unmet energy price. <b>Please note</b> that <b>either</b> <code>unmet_energy_price_profile_file_path</code> <b>or</b><br/> <code>constant_unmet_energy_price</code> should be given!</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+        <tr><td colspan=4></td></tr>
+        <tr>
+            <td><code>unmet_energy_price_change_rate_per_year</code></td>
+            <td><code>Float</code></td>
+            <td>No</td>
+            <td><code>1/a</code></td>
+        </tr>
+        <tr>
+            <td colspan=4>Yearly change rate of the unmet energy price</td>
+        </tr>
+        <tr>
+            <td colspan=4>
+                <code>FixedSink: 20 a</code>
+                <code>FixedSupply: 20 a</code>
+                <code>PVPlant: 20 a</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+### Emissions parameters
 
 ## Boundary and connection components
 
