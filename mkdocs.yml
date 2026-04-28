@@ -54,6 +54,7 @@ nav:
       - 'Operation and control': 'resie_operation_control.md'
       - 'Energy system components': 'resie_energy_system_components.md'
       - 'General effects & traits': 'resie_transient_effects.md'
+      - 'Costs and emissions': 'resie_costs_and_emissions.md'
       - 'Validation - Components': 'resie_validation_components.md'
   - 'GenSim: Generic Building Simulation':
       - 'What is GenSim?': 'gensim_overview.md'

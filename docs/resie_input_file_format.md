@@ -29,12 +29,14 @@ The specification of components and outputs often mention a medium, such as `m_h
 
 ## Project file structure
 
-The overall structure of the project file is split into three general sections and one specific one, each of which is discussed in more detail in the following sections.
+The overall structure of the project file is split several sections, each of which is discussed in more detail in this chapter.
 
 ```json
 {
     "io_settings": {...},
     "simulation_parameters": {...},
+    "economic_parameters": {...},
+    "emissions_parameters": {...},
     "components": {...},
     "order_of_operation": {...}
 }
@@ -250,6 +252,44 @@ To plot the weather data read in from a provided weather file to the interactive
 * `force_profiles_to_repeat` (`Bool`, optional): If set to true, all utilized profiles are allowed to be repeated, even if denied or not specified in the profile header! Attention: This parameter disables the profile parameter in the profile header! Defaults to `false`.
 
 **A note on time:** Internally, the simulation engine works with timestamps in seconds relative to the reference point specified as `start`. To ensure consistent data, all specified profiles are read in with a predefined or created datetime index, which must cover the simulation period from `start` to `end` (inclusive). Internally, all profile datetime indexes are converted to local standard time without daylight savings, which is also used for the output timestamp! Leap days are filtered out in all inputs and outputs to ensure consistency with weather data sets. See the chapter profiles below and [Time, time zones and weather files](resie_time_definition.md) for more information.
+
+## Economic parameters
+
+The calculation of economic results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-parameters), while the former is described in the following.
+
+```json
+"economic_parameters": {
+    "calculate_economy": true,
+    "observation_period_in_years": 20,
+    "interest_rate": 0.02,
+    "labour_costs_per_hour": 100,
+    "labour_costs_price_change_rate_per_year": 0.035,
+    "repeat_method": "last_year"
+}
+```
+* `calculate_economy` (`Boolean`, optional): If set to true, performs the calculation of economic results, requiring the input parameters for all components. Defaults to `false`.
+* `observation_period_in_years` (`Integer`, optional, unit `a`): The period in consideration for the calculation of economic results. Defaults to `20`.
+* `interest_rate` (`Float`, optional): Interest rate for the calculation of annuities. Defaults to `0.02`.
+* `labour_costs_per_hour` (`Float`, optional, unit `€/h`): Cost of labour for the operation of components. Defaults to `100`.
+* `labour_costs_price_change_rate_per_year` (`Float`, optional): Rate of change of labour costs per year. Defaults to `0.035`.
+* `repeat_method` (`String`, optional): Defines which period of the result data is repeated to fill up the remainder of the observation period. This can be equal or less than the simulation period, for example simulating three years, but only repeating the last year for the entire observation period. Has to be one of: `all`, `last_year`, `last_month`, `last_week`. Defaults to `last_year`.
+
+## Emissions parameters
+
+The calculation of GHG emissions results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#emissions-parameters), while the former is described in the following.
+
+```json
+"emissions_parameters": {
+    "calculate_emissions": true,
+    "observation_period_in_years": 20,
+    "include_embodied_emissions": true,
+    "repeat_method": "last_year"
+}
+```
+* `calculate_emissions` (`Boolean`, optional): If set to true, performs the calculation of GHG emissions results, requiring the input parameters for all components. Defaults to `false`.
+* `observation_period_in_years` (`Integer`, optional, unit `a`): The period in consideration for the calculation of GHG emissions. Defaults to `20`.
+* `include_embodied_emissions` (`Boolean`, optional): If set to true, includes embodied emissions in the calculation. Defaults to `true`.
+* `repeat_method` (`String`, optional): Defines which period of the result data is repeated to fill up the remainder of the observation period. This can be equal or less than the simulation period, for example simulating three years, but only repeating the last year for the entire observation period. Has to be one of: `all`, `last_year`, `last_month`, `last_week`. Defaults to `last_year`.
 
 ## Components
 
