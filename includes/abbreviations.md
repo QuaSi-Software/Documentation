@@ -76,3 +76,4 @@
 *[UACs]:    User Address Codes
 *[VS Code]: Visual Studio Code
 *[WP]:      Wind Power
+*[GHG emissions]:  Greenhouse Gas Emissions

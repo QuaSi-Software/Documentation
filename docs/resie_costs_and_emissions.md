@@ -293,5 +293,193 @@ If the simulation period is shorter than the economic observation period, the pr
 
 The current implementation does not include possible effects of storage state differences between the beginning and end of the economic observation period.
 
-## Emissions
+## Greenhouse Gas Emissions
 
+The emissions evaluation calculates GHG emissions and emission credits for an energy system simulation based on simulated energy flows and component-specific embodied emissions.
+
+The result is calculated over a defined emissions observation period. If the simulated output period is shorter than the emissions observation period, the relevant time series are extended by repeating the configured repeat period until the full observation period is covered. Leap days are ignored.
+
+**GHG emissions released to the environment are reported as positive values. Credits or avoided emissions are reported as negative values.**
+
+Emission credits should be assigned with care. In general, emission credits represent avoided emissions outside the considered energy system boundary. They may be used, for example, if an energy flow into a sink component is interpreted as a useful output that replaces an external reference process. Assigning such credits is optional and depends on the intended balance boundary. If credits are assigned, it has to be checked whether the credited avoided emissions are already considered elsewhere in the model or in another downstream process.
+
+The emissions assigned to energy flows depend on the emission factors provided by the user. Therefore, the interpretation of the resulting emission balance also depends on the scope represented by these factors. For example, an emission factor may represent only direct emissions during energy conversion, upstream emissions from fuel or energy provision, or a broader life-cycle emission factor. 
+The model does not distinguish these scopes internally. It multiplies the simulated energy flows with the provided emission factors and aggregates the resulting emissions or credits. Users are therefore responsible for selecting emission factors that are consistent with the intended balance boundary and for documenting whether the reported results represent direct emissions, upstream emissions, life-cycle emissions, or another defined scope.
+
+The total emissions \(G_\mathrm{tot}\) of the energy system are calculated as
+
+$$
+G_\mathrm{tot}
+=
+G_\mathrm{en}
++
+G_\mathrm{emb}
+$$
+
+where \(G_\mathrm{en}\) are the emissions from energy flows, and \(G_\mathrm{emb}\) are the embodied emissions.
+
+### Energy-related emissions
+
+Energy-related GHG emissions and emission credits are calculated from the simulated energy profiles of source and sink components. For source components, the output energy is interpreted as supplied energy and is assigned to emissions. For sink components, the input energy is interpreted as accepted energy and is assigned to emission credits.
+
+For each time step, the energy amount is multiplied by an emission factor. The emission factor may either be given as a constant value or as a time-dependent emission profile. The resulting time-step values are aggregated to yearly emissions and scaled with an annual emission factor change rate.
+
+For one component, the nominal yearly energy-related emissions  \(G_{\mathrm{en},y}\) in year \(y\) are calculated as
+
+$$
+G_{\mathrm{en},y}
+=
+s
+\left(
+\sum_{t \in T_y}
+E_t \, g_t
+\right)
+\cdot
+r_\mathrm{en}^{\,y-1}
+$$
+
+where \(E_t\) is the energy amount in time step \(t\), \(g_t\) is the emission factor in time step \(t\), \(T_y\) is the set of time steps assigned to year \(y\), \(r_\mathrm{en}\) is the annual change factor of the energy emission factor, and \(s\) is the sign factor.
+
+The annual change factor is calculated as
+
+$$
+r_\mathrm{en}
+=
+1
++
+\Delta g_\mathrm{en}
+$$
+
+where \(\Delta g_\mathrm{en}\) is the annual change rate of the energy emission factor.
+
+The sign factor is defined as
+
+$$
+s =
+\begin{cases}
++1, & \text{for source components} \\
+-1, & \text{for sink components}
+\end{cases}
+$$
+
+Thus, energy flows from source components lead to positive emissions, while energy flows into sink components lead to negative emission credits.
+
+The total energy-related emissions are calculated by summing all yearly energy-related emissions over all relevant components:
+
+$$
+G_\mathrm{en}
+=
+\sum_c
+\sum_{y=1}^{N}
+G_{\mathrm{en},c,y}
+$$
+
+where \(G_{\mathrm{en},c,y}\) are the energy-related emissions of component \(c\) in year \(y\), and \(N\) is the emissions observation period in years.
+
+### Embodied emissions
+
+Embodied emissions describe emissions associated with the provision of a component, for example from manufacturing, transport, installation, and end-of-life processes if these are included in the configured embodied emission factor. Embodied emissions are calculated for all non-bus components if embodied emissions are enabled in the emissions parameters.
+
+The initial embodied emissions \(G_0\) are calculated from a component-specific embodied emission function and a component-specific reference quantity, for example installed power, storage capacity, or area:
+
+$$
+G_0
+=
+f_\mathrm{emb}(x_\mathrm{ref})
+$$
+
+where \(f_\mathrm{emb}\) is the component-specific embodied emission function, and \(x_\mathrm{ref}\) is the component-specific reference quantity.
+
+Replacement emissions are included if the component lifetime is shorter than the emissions observation period. The embodied emissions of a replacement  \(G_j\)  at replacement time \(t_j\) are calculated as
+
+$$
+G_j
+=
+G_0
+\,
+r_\mathrm{emb}^{\,t_j}
+$$
+
+where \(r_\mathrm{emb}\) is the annual change factor of embodied emissions, and \(t_j\) is the replacement time in years after the beginning of the observation period.
+
+For non-integer component lifetimes, replacement times are mapped to yearly emission buckets by rounding the replacement time \(t_j\) to the nearest integer year. The replacement emission amount is scaled using the exact value of \(t_j\), but the yearly assignment is based on the rounded year index used internally. Replacements whose rounded year index lies outside the observation period are not included.
+
+The annual change factor of embodied emissions is calculated as
+
+$$
+r_\mathrm{emb}
+=
+1
++
+\Delta g_\mathrm{emb}
+$$
+
+where \(\Delta g_\mathrm{emb}\) is the annual change rate of embodied emissions.
+
+A residual emission credit is considered at the end of the observation period if the last installed component still has a remaining technical lifetime. The residual credit \(G_{\mathrm{res},N}\) in the final year \(N\) is calculated proportionally to the unused lifetime share:
+
+$$
+G_{\mathrm{res},N}
+=
+-
+G_\mathrm{last}
+\frac{L_\mathrm{rem}}{L}
+$$
+
+where \(G_\mathrm{last}\) are the embodied emissions of the last installation or replacement, \(L_\mathrm{rem}\) is the remaining lifetime after the observation period, and \(L\) is the technical lifetime.
+
+The total embodied emissions \(G_{\mathrm{emb},c}\) of component \(c\) are calculated as
+
+$$
+G_{\mathrm{emb},c}
+=
+G_0
++
+\sum_{j=1}^{n}
+G_j
++
+G_{\mathrm{res},N}
+$$
+
+where \(n\) is the number of replacements within the observation period.
+
+The total embodied emissions of the energy system are calculated as
+
+$$
+G_\mathrm{emb}
+=
+\sum_c
+G_{\mathrm{emb},c}
+$$
+
+### Emissions result
+
+The emissions result contains the total emissions and the contributions of the main emissions categories:
+
+$$
+G_\mathrm{tot}
+=
+G_\mathrm{en}
++
+G_\mathrm{emb}
+$$
+
+The following emissions KPIs are reported:
+
+| Symbol | Description | Unit |
+|---|---|---|
+| \(G_\mathrm{tot}\) | total emissions of the energy system | [kgCO₂e] |
+| \(G_\mathrm{en}\) | emissions and credits from energy flows | [kgCO₂e] |
+| \(G_\mathrm{emb}\) | embodied emissions including replacements and residual credits | [kgCO₂e] |
+
+The result also contains a component-wise breakdown. For each component, the yearly emission series and aggregated emission values are stored where applicable. This breakdown is used for exporting tabular emissions results and for plotting yearly and cumulative emissions.
+
+### Notes / Conventions
+
+Positive values represent emissions to the environment. Negative values represent credits or avoided emissions.
+
+Energy emission factors may be constant or time-dependent. Time-dependent emission profiles are extended to the full emissions observation period in the same way as the corresponding energy profiles.
+
+No explicit end-of-life emissions are calculated separately. If end-of-life emissions shall be considered, they have to be included in the configured embodied emissions.
+
+Internally, emissions are calculated in grams of CO₂-equivalent. For plots and CSV exports, the values are converted to kilograms of CO₂-equivalent.

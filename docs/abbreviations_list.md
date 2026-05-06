@@ -32,6 +32,7 @@
 | GCV          | Gross Calorific Value, also known as Higher Heating Value (HHV)             |
 | GenSim       | Generic Building Simulation [simulation tool]                               |
 | GFA          | Gross floor area (BGF) of a building                                        |
+| GHG emissions | Greenhouse Gas Emissions               |
 | GUI          | Graphical User Interface                                                    |
 | HC           | Hydrogen Compressor                                                         |
 | HEL          | Hydrogen Electrolyser                                                       |
