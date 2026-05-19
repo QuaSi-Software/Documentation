@@ -71,6 +71,8 @@ For the configuration of components a selected number of different cases are imp
 * `offset_lin`: Takes one number and uses as the slope of a linear function with an offset of its complement (in regards to 1.0). E.g. `offset_lin:0.5` means \(e(x)=1.0-0.5*(1.0-x)\)
 * `logarithmic`: Takes two numbers and uses them as the coefficients of a quasi-logarithmic function. E.g. `logarithmic:0.5,0.3` means \(e(x)=\frac{0.5x}{0.3x+(1-0.3)}\)
 * `inv_poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. The inverse of the polynomial, multiplied with the PLR, is used as the efficiency function. E.g. `inv_poly:0.5,2.0,0.1` means \(e(x)=\frac{x}{0.5x²+2x+0.1}\)
+* `power_func`: A power function of the form \(e(x) = a * x^b\) with two coefficients a and b. E.g. `power_func:100,0.95` is equal to \(e(x) = 100.0 * x^{0.95}\) 
+* `linear`: A linear function of the form \(e(x) = a * x + b\) with two coefficient a and b. E.g. `lin:25.0,3.0` means \(e(x) = 25.0 * x + 3.0\).  b can also be empty, E.g. `lin:25.0` is equivalent to \(e(x) = 25.0 * x + 0.0\). 
 * `exp`: Takes three numbers and uses them as the coefficients of an exponential function. E.g. `exp:0.1,0.2,0.3` means \(e(x)=0.1+0.2*exp(0.3x)\)
 * `unified_plf`: Takes four numbers and uses them as the coefficients of a composite function of a logarithmic and linear function as described in the documentation on the [unified formulation for PLR-dependent efficiencies of heat pumps](resie_energy_system_components.md#part-load-efficiency). The first two numbers are the optimal PLR and the PLF at that PLR. The third number is a scaling factor for the logarithmic part and the fourth number is the PLF at PLR=1.0.
 
@@ -110,6 +112,19 @@ Used by heat pumps and similar components to calculate the minimum and maximum p
 * `const`: Takes one number and uses it as a constant fraction. E.g. `const:1.0`.
 * `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 
+#### Functions for specific investment costs and GHG emissions
+
+Specific investment costs and embodied GHG emissions can be defined as functions of a component reference size \(x\). The reference size depends on the component type and may represent, for example, nominal power, volume, storage capacity, or energy capacity. This is useful for parameter variations and optimisation studies where costs or emissions should scale with component size.
+
+Use `const` for values that are independent of the component reference size.
+
+**Implemented function prototypes**
+
+All function types described in the [section on efficiency functions](resie_component_parameters.md#efficiency-functions) can also be used for specific investment costs and embodied GHG emissions. The following prototypes are typically used:
+
+- `const`: Constant value independent of \(x\). For example, `const:1.0` defines \(e(x) = 1.0\).
+- `linear`: Linear function of the form \(e(x) = a * x + b\). For example, `lin:25.0,3.0` defines \(e(x) = 25.0 * x + 3.0\). The offset \(b\) is optional; `lin:25.0` is equivalent to \(e(x) = 25.0 * x + 0.0\).
+- `power_func`: Power function of the form \(e(x) = a * x^b\). For example, `power_func:100.0,0.95` defines \(e(x) = 100.0 * x^{0.95}\).
 
 ### Control modules
 For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
