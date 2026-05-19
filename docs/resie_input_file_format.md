@@ -68,6 +68,7 @@ The overall structure of the project file is split several sections, each of whi
     "write_csv_continuously": false,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
+    "plot_weather_data": true,
     "output_plot": "custom",
 	"output_plot_spec": {
 		"1": {
@@ -78,7 +79,18 @@ The overall structure of the project file is split several sections, each of whi
 		},
 		...
 	},
-    "plot_weather_data": true,
+    "plot_economic_cashflows": true,
+    "economic_plot_cashflows_file_path": "./output/economic_results_cashflows.html",
+    "plot_economic_present_values": true,
+    "economic_plot_present_values_file_path": "./output/economic_results_present_values.html",
+    "output_economic_CSV": true,
+    "economic_CSV_file_path": "./output/economic_results.csv",
+    "plot_emission_results": true,
+    "emissions_plot_file_path": "./output/emissions_plot.html",
+    "output_emissions_CSV": true,
+    "emissions_CSV_file_path": "./output/emissions_results.csv",
+    "plot_price_and_emission_profiles": false,
+    "price_and_emission_profile_file_path":  "./output/price_and_emissions_profiles.html",
     "step_info_interval": 500,
     "show_detailed_errors": false
 },
@@ -100,12 +112,24 @@ The overall structure of the project file is split several sections, each of whi
 * `sankey_plot_spec` (`Dict{String, String}`): (Optional) Specifications for the colors of the sankey plot in custom mode. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. Only required if a custom sankey plot is set.
 * `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
 * `output_plot_time_unit` (`String`): (Optional) Unit for x-axis of the output plot. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
+*  `plot_weather_data` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the line plot. Defaults to `false`.
 * `output_plot` (`String`): (Optional) Sets the mode of the output plot, switching between several default and custom behaviour modes as well an option of not creating a plot file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `all_incl_flows`.
 * `output_plot_spec` (`Dict{Int, Dict{String, Any}}`): (Optional) Specifications for the output line plot in custom mode. See [section "Output specification (interactive .html plot)"](resie_input_file_format.md#output-specification-interactive-html-plot) for details.
-* `plot_weather_data` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the line plot. Defaults to `false`.
+  * `plot_economic_cashflows` (`Boolean`): (Optional) Toggle if the economic results as cashflows should be plotted. Defaults to `true`.
+* `economic_plot_cashflows_file_path` (`String`): (Optional) File path to where the economic cashflow plot will be written. Defaults to `./output/economic_results_cashflows.html`.
+* `plot_economic_present_values` (`Boolean`): (Optional) Toggle if the economic results as present values should be plotted. Defaults to `true`.
+* `economic_plot_present_values_file_path` (`String`): (Optional) File path to where the economic present value plot will be written. Defaults to `./output/economic_results_present_values.html`.
+* `output_economic_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
+* `economic_CSV_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
+* `plot_emission_results` (`Boolean`): (Optional) Toggle if the emission results should be plotted. Defaults to `true`.
+* `emissions_plot_file_path` (`String`): (Optional) File path to where the emissions plot will be written. Defaults to `./output/emissions_result.html`.
+* `output_emissions_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
+* `emissions_CSV_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
+* `plot_price_and_emission_profiles` (`Boolean`): (Optional) Toggle if a plot with the utilized price and emission profiles should be created. This can be used to double check if everything is scaled and imported correctly.  Note that this file can be very large! Therefore it defaults to `false`.
+* `price_and_emission_profile_file_path` (`String`): (Optional) File path to where the plot with price and emission profiles will be written. Defaults to `./output/price_and_emissions_profiles.html`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 * `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
-* `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting. It is intended for making the output perfectly repeatable, which is useful for testing but not in normal simuation.
+* `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting. It is intended for making the output perfectly repeatable, which is useful for testing but not in normal simulation.
 
 
 ### Output specification (Sankey)
