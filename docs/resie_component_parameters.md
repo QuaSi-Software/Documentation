@@ -336,7 +336,7 @@ Note: Many parameters have to be given as rates, e.g. the `capex_price_change_ra
 
 For some parameters, no defaults are provided, for example for (embodied) GHG emissions, energy prices, or specific investment costs, as these values are highly project-specific. For component-specific investment costs and energy-related GHG emission factors, the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] is a suitable data source for Germany.
 
-Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W]. For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
+Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m]. For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
  The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition.
 
 For connection components, the reference value for capex and embodied emissions may differ depending on how the component size is defined.
