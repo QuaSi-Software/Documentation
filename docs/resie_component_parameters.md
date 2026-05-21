@@ -1503,7 +1503,7 @@ To simplify the use of this model multiple battery chemistries are provided with
 
 #### Exemplary input file definition for Battery
 
-Minimal definition of a battery in the input file:
+Minimal definition of a battery in the input file, including economic calculations and emissions:
 
 ```JSON
 "TST_BAT_01": {
@@ -1515,6 +1515,23 @@ Minimal definition of a battery in the input file:
     "charge_efficiency": 0.99,
     "discharge_efficiency": 0.99,
     "capacity": 8280,
+    "economic_parameters": {
+        "lifetime_years": 12.0,
+        "capex_specific": "linear:0.2",
+        "capex_price_change_rate_per_year": -0.031,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 12.0,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
