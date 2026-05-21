@@ -1121,6 +1121,23 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
     "heat_losses_factor": 0.95,
     "allow_boost_solely": true,
     "allow_boost_additional": true,
+    "economic_parameters": {
+        "lifetime_years": 18,
+        "capex_specific": "power_func:1.428,0.75",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 18,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1209,7 +1226,7 @@ The heat pump model implemented can serve different temperature layers in the in
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 #### Exemplary input file definition for HeatPump
-**Simple heat pump with constant COP, fixed output temperature and no losses**
+**Simple heat pump with constant COP, fixed output temperature and no losses, including economy and emissions**
 ```json
 "TST_TH_HP_01": {
     "type": "HeatPump",
@@ -1219,7 +1236,24 @@ The heat pump model implemented can serve different temperature layers in the in
     "cop_function": "const:3.0",
     "output_temperature": 70.0,
     "power_losses_factor": 1.0,
-    "heat_losses_factor": 1.0
+    "heat_losses_factor": 1.0,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "power_func:5.909,0.71",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.015,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 5.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1293,7 +1327,7 @@ This can be used to model eletric components that transform from one type of ele
 
 #### Exemplary input file definition for UTIR
 
-**Inverter converting PV output to household AC**
+**Inverter converting PV output to household AC, including economy and emissions**
 ```json
 "TST_INV_01": {
     "type": "UTIR",
@@ -1304,7 +1338,24 @@ This can be used to model eletric components that transform from one type of ele
     "efficiency_el_in": "const:1.0",
     "efficiency_el_out": "const:0.92",
     "linear_interface": "el_in",
-    "min_power_fraction": 0.0
+    "min_power_fraction": 0.0,
+    "economic_parameters": {
+        "lifetime_years": 10,
+        "capex_specific": "const:2500",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.05,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.05,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 10,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1606,7 +1657,7 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
 
 **Exemplary input file definition for buffer tank**
 
-Minimal definition of a buffer tank in the input file:
+Minimal definition of a buffer tank in the input file, including economy and emissions:
 
 ```JSON
 "TST_BFT_TH_01": {
@@ -1616,7 +1667,24 @@ Minimal definition of a buffer tank in the input file:
         "TST_DEM_01"
     ],
     "model_type": "ideally_stratified",
-    "capacity": 10000
+    "capacity": 10000,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "power_func:18000,0.92",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1774,7 +1842,7 @@ Higher accuracy increases the number of ground cells (especially near the wall a
 
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
-| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
+| `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^3] or [g CO2] | Function for specific embodied emissions with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
@@ -1824,7 +1892,25 @@ Higher accuracy increases the number of ground cells (especially near the wall a
     "has_top_insulation_overlap": true,
     "top_insulation_overlap_width": 5.0,
     "thermal_transmission_overlap": 0.1,
-    "ground_bottom_boundary": "Neumann"}
+    "ground_bottom_boundary": "Neumann",
+    "economic_parameters": {
+        "lifetime_years": 50,
+        "capex_specific": "linear:130.0",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.02,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 50,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
+    }
 ```
 
 ## Heat sources and sinks
@@ -1916,7 +2002,30 @@ Energy-related parameters:
     "temperature_reduction_model": "lmtd",
     "min_source_in_temperature": 5,
     "max_source_in_temperature": 35,
-    "scale": 2000
+    "scale": 2000,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "const:0.0",
+        "capex_price_change_rate_per_year": 0.0,
+        "maintenance_inspection_rate_per_year": 0.0,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.0,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0,
+        "constant_energy_price": 0.3e-3,
+        "energy_price_change_rate_per_year": 0.02,
+        "base_cost_per_year": 0.0,
+        "base_cost_change_rate_per_year": 0.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0,
+        "constant_energy_emissions": 230e-3,
+        "energy_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -2232,7 +2341,24 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
     "fluid_kinematic_viscosity": 3.9e-6,
     "fluid_heat_conductivity": 0.48,
     "fluid_prandtl_number": 31.3,
-    "grout_heat_conductivity": 2
+    "grout_heat_conductivity": 2,
+    "economic_parameters": {
+        "lifetime_years": 50,
+        "capex_specific": "linear:100",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.02,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 50,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -2390,7 +2516,24 @@ To perform this calculation in every timestep, the following input parameters ar
     "fluid_heat_conductivity": 0.499,
     "fluid_density": 1025,
     "fluid_kinematic_viscosity": 3.6e-6,
-    "fluid_prantl_number": 30
+    "fluid_prantl_number": 30,
+    "economic_parameters": {
+        "lifetime_years": 30,
+        "capex_specific": "linear:20",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.02,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 30,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -2467,7 +2610,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^2] or [g CO2] | Function for specific embodied emissions with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
-**Exemplary input file definition for flat plate solarthermal collector:**
+**Exemplary input file definition for flat plate solarthermal collector, including economy and emissions:**
 
 ```JSON
 "TST_STC_01": {
@@ -2495,7 +2638,25 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "vol_heat_capacity": 3921470,
     "wind_speed_reduction": 1.0,
     "delta_T": 4,
-    "spec_flow_rate_min": 3.0E-08
+    "spec_flow_rate_min": 3.0E-08,
+    
+    "economic_parameters": {
+        "lifetime_years": 18.0,
+        "capex_specific": "power_func:2.887,0.69",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.005,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 5.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 18.0,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
