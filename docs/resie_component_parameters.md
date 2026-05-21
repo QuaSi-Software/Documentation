@@ -806,7 +806,7 @@ See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy
 
 **Exemplary input file definition for battery**
 
-Minimal definition of a buffer tank in the input file:
+Minimal definition of a battery in the input file:
 
 ```JSON
 "TST_BAT_01": {
@@ -832,7 +832,7 @@ Extended definition of a battery in the input file:
     "___GENERAL PARAMETER___"
     "model_type": "detailed",
     "capacity": 8280,
-    "load": 828,
+    "initial_load": 0.5,
     "self_discharge_rate": 0.03,
     "max_charge_C_rate": 0.1,
     "max_discharge_C_rate": 0.1,
