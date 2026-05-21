@@ -393,7 +393,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -413,10 +413,10 @@ Energy-related parameters:
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible sink component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant power or scaling factor. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
-| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emission credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emission credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emission credits profile. Only applies to profiles. |
-| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emission credits. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ### General flexible supply
 | | |
@@ -463,7 +463,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -559,7 +559,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -583,10 +583,10 @@ Energy-related parameters:
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed sink component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_demand or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant demand or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
-| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emission credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emission credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emission credits profile. Only applies to profiles. |
-| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emission credits. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ### General demand
 | | |
@@ -645,7 +645,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -714,7 +714,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -779,7 +779,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -799,10 +799,10 @@ Energy-related parameters:
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid output component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2] | Function for embodied emissions of the grid output component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
-| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emission credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emission credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
-| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emission credits profile. Only applies to profiles. |
-| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emission credits. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ## Other sources and sinks
 
@@ -847,7 +847,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -917,7 +917,7 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 100.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation** 
 
@@ -983,7 +983,7 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 50.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 | `water_price` | `Float` | N/Y | 3.5 | [€/m^3 water] | Price per cubic meter of fresh water. |
 | `water_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the water price. |
 | `water_demand_ratio` | `Float` | N/Y | 0.36 | [l/kWh H2] | Water demand per kWh of produced hydrogen. |
@@ -1040,7 +1040,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 20.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1094,7 +1094,7 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1215,7 +1215,7 @@ The heat pump model implemented can serve different temperature layers in the in
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 5.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1274,7 +1274,7 @@ The heat pump model implemented can serve different temperature layers in the in
 }
 ```
 
-### Unified eletric transformer, inverter and rectifier (UTIR)
+### Unified electric transformer, inverter and rectifier (UTIR)
 | | |
 | --- | --- |
 | **Type name** | `UTIR`|
@@ -1287,7 +1287,7 @@ The heat pump model implemented can serve different temperature layers in the in
 
 A unified model for electric transformers, inverters and rectifiers.
 
-This can be used to model eletric components that transform from one type of electricity, at one voltage level, to another type or voltage level.
+This can be used to model electric components that transform from one type of electricity, at one voltage level, to another type or voltage level.
 
 **General parameter**
 
@@ -1315,7 +1315,7 @@ This can be used to model eletric components that transform from one type of ele
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1410,7 +1410,7 @@ A generic implementation for energy storage technologies.
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.5 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1453,12 +1453,14 @@ To simplify the use of this model multiple battery chemistries are provided with
 
 **Parameter for the "detailed" model:**
 
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `V_n_bat` | `Float` | Y/N | 153.6 |  [V] | The total nominal battery voltage. |
 | `cell_cutoff_current` | `Float` | Y/Y | 0.3 % of `capacity_cell_Ah` |  [A] | If the charge current falls below this value the battery is defined as full in Constant Voltage charging. |
 | `cycles` | `Float` | Y/Y | 1 |  [-] | The number of full battery cycles at the start of the simulation. Minimum is 1 |
 | `Temp` | `Float` | Y/Y | 25 |  [°C] | The battery temperature. Is set to constant since adequate temperature control is assumed. |
 
-**Parameter for the "detailed" model if not specific chemistry is chosen:**
+**Parameter for the "detailed" model if no specific chemistry is chosen:**
 
 | Name        | Type    | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ------- | ---- | ----------- |
@@ -1491,7 +1493,7 @@ To simplify the use of this model multiple battery chemistries are provided with
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1662,7 +1664,7 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1853,7 +1855,7 @@ Higher accuracy increases the number of ground cells (especially near the wall a
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -1979,7 +1981,7 @@ Capex-related parameters:
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 Energy-related parameters:
 
@@ -2302,7 +2304,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -2477,7 +2479,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
@@ -2617,7 +2619,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
 | `operational_labour_hours_per_year` | `Float` | N/Y | 5.0 | [h/a] | Hours of labour per year for operation. |
 | `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
-| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are threated as infinity. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
 
 **Parameter for GHG emissions calculation**
 
