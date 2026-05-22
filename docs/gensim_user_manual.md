@@ -9,9 +9,9 @@ The latest stable GenSim release can be downloaded from the GitHub repository [h
 
 Quickstart:
 
-- Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel-VBA!
+- Download the zip-file and save it **locally** to your computer (don't use remote disks for better performance). **Note:** Strictly avoid umlaute in the file path as this can cause a crash of Excel®-VBA!
 - Unpack the zip-file
-- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio (see below for details!)
+- Install the required dependencies, at least *Microsoft Excel®* and OpenStudio® (see below for details!)
 - Allow file `GenSim.xlsm` to be accessed in the file property settings
 - Start GenSim by opening file `GenSim.xlsm` and check the correct file paths in the *INSTALLATION* tab
 - Enable macros and access to the VBA Object Model in the *Microsoft Excel®* Trust Center
@@ -19,7 +19,7 @@ Quickstart:
 See chapter 2 & 3 for detailed description on how to use GenSim. 
 
 ### *Microsoft Excel®* (and possible alternatives)
-The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy access to the functionalities of GenSim. GenSim could also be used without the provided GUI. This will not be described further here, but you can find more information on how to do so in the `CONTRIBUTING.md` in the GitHub repository of GenSim.
+The graphical user interface (GUI) of GenSim is based on *Microsoft Excel®*, which is required for easy access to the functionalities of GenSim. GenSim can also be used without the provided GUI via the CLI, which is described [in this section](gensim_user_manual.md#5-tutorial-using-the-gensim-cli-to-run-a-simulation).
 
 GenSim has been tested with the following versions of *Microsoft Excel®*:
 
@@ -30,46 +30,49 @@ GenSim has been tested with the following versions of *Microsoft Excel®*:
 
 There is also the option to always allow macros to be run, **however please note that these settings may increase the risk of malware if left on "allow all" permanently.** If you regularly open *Microsoft Excel®* files from untrusted sources, allowing all macros to be run may lead to malware infecting your computer. To prevent this, please be mindful about when to enable and disable the use of macros.
 
-![Microsoft Excel® Trust Center settings](fig/231123_trust_center_settings.png)
+![Microsoft Excel® Trust Center settings for macros](fig/231123_trust_center_settings.png)
 
+In addition, you might need to activate ActiveX elements, which is used by some input elements of the GUI. As with the settings for macros, be sure to not activate the elements unconditionally, as this might be dangerous.
+
+![Microsoft Excel® Trust Center settings for ActiveX elements](fig/260423_trust_center_settings_2.png)
 ### SketchUp (optional)
-SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 2.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio such that the OpenStudio-SketchUp-plugin will be installed automatically.
+SketchUp is a software for modelling buildings (among other things) and can be used to design a custom building model instead of using the generic approach (compare chapter 2.2). You can skip this step if you do not wish to use custom models in GenSim, however it may necessitate reinstalling OpenStudio® later if you then wish to use the functionality after all. Make sure to install SketchUp before installing OpenStudio® such that the OpenStudio®-SketchUp-plugin will be installed automatically.
 
 We recommend using SketchUp 2017, however this version is no longer publicly available. We still need to test the use of newer versions of SketchUp for the use with GenSim. Until then it may not be possible to acquire a version that works with GenSim. Sorry!
 
-### OpenStudio
-As GenSim is based on OpenStudio, it must be installed in order to run simulations. The currently required version is 3.10.0, which you can find on the [official GitHub page for releases of OpenStudio](https://github.com/NREL/OpenStudio/releases/tag/v3.10.0). The installer should guide you through the installation of OpenStudio. Please take note of the following while doing so:
+### OpenStudio®
+As GenSim is based on OpenStudio®, it must be installed in order to run simulations. The currently required version is 3.10.0, which you can find on the [official GitHub page for releases of OpenStudio®](https://github.com/NREL/OpenStudio/releases/tag/v3.10.0). The installer should guide you through the installation of OpenStudio®. Please take note of the following while doing so:
 
 * The default installation folder should be `C:\openstudio-3.10.0`. You can use a different folder, in which case you should note the installation path to specify it later in the `GenSim.xlsm` GUI. We recommend a folder on the same disk as GenSim.
-* On the installer page where you can select which components of OpenStudio to install, please select all components.
+* On the installer page where you can select which components of OpenStudio® to install, please select all components.
 
 ### Configuring GenSim
 After the previous steps have been performed, you need to mark the file `GenSim.xlsm` to be allowed to be run and modified. Open the file property settings by right-clicking the file in a file explorer and select settings. In the settings there is an option to allow access to the file as shown in the following figure. The setting is only shown if the operating system recognises the file as an external file. If it is not there, you can skip this step.
 
 ![option to enable access to the file GenSim.xlsm](fig/231123_enable_file_permissions.png)
 
-As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio has been installed, as shown in the following figure:
+As the last step before using GenSim, you should make sure GenSim has correctly identified the installation path of itself and that of OpenStudio®. Open the GenSim user interface (by opening file `GenSim.xlsm`) and navigate to the first tab *INSTALLATION*. Here you can configure where OpenStudio® has been installed, as shown in the following figure:
 
-![path to OpenStudio installation](fig/231117_openstudio_path.png)
+![path to OpenStudio® installation](fig/231117_openstudio_path.png)
 
-Make sure it matches the installation folder of OpenStudio and change it if not. The `Application path` field is designed to automatically detect and display the directory where the `GenSim.xlsm` file is located. This path should be set automatically when you open the file. If for any reason the path isn't set automatically, you need to manually enter the folder path.
+Make sure it matches the installation folder of OpenStudio® and change it if not. The `Application path` field is designed to automatically detect and display the directory where the `GenSim.xlsm` file is located. This path should be set automatically when you open the file. If for any reason the path isn't set automatically, you need to manually enter the folder path.
 
 ## 2 Model functions and parameters
 ### 2.1 Location
 
 The modelling process starts on the *HOMEPAGE* of the GenSim Excel® GUI with the selection of the building location and the weather file.
 
-![selection of the weather data in Excel](fig/231023_selection_weather_data.png)
+![selection of the weather data in Excel®](fig/231023_selection_weather_data.png)
 
-Corresponding *EnergyPlus®* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
+Corresponding *EnergyPlus™* weather datasets[^2] have been generated for the 25 largest German cities using the current DWD test reference years (TRY 2015/2045). Both the current TRY2015[^3] and the future scenario TRY2045[^4] have been stored in order to be able to consider the climatic requirements for heating, air conditioning and ventilation systems over a longer period of operation. The required weather data set can be selected from a dropdown list. 
 
-[^2]: File format "epw" - EnergyPlus weather data
+[^2]: File format "epw" - EnergyPlus™ weather data
 [^3]: Reference period 1995 to 2012
 [^4]: Forecast period 2031 to 2060
 
 **Custom weather data sets**
 
-In general, any *EnergyPlus®* weather data set can be used in GenSim as long as it is in the EPW file format. Often a DDY file is created alongside the EPW file. As of v2.16, this file is no longer required and the necessary data is automatically calculated. It can optionally still be used, but this requires the use of the GenSim CLI, which is not covered by this manual. The EPW file (+DDY) must be saved subfolder "Wetter" in the GenSim base directory. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
+In general, any *EnergyPlus™* weather data set can be used in GenSim as long as it is in the EPW file format. Often a DDY file is created alongside the EPW file. As of v2.16, this file is no longer required and the necessary data is automatically calculated. It can optionally still be used, but this requires the use of the GenSim CLI, which is not covered by this manual. The EPW file (+DDY) must be saved subfolder "Wetter" in the GenSim base directory. The refresh button can be used to update the selection of weather files in the dropdown list within the GUI.
 
 Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downloaded free of charge from the following websites: 
 
@@ -77,7 +80,7 @@ Ready-to-use weather data sets (EPW + DDY) for worldwide locations can be downlo
 [http://climate.onebuilding.org/](http://climate.onebuilding.org/) 
 
 
-Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
+Furthermore, the TRY data provided by the DWD can be used to generate location-specific weather data sets for the whole of Germany which can then be converted into valid EPW files using the [EnergyPlus™ Weather Converter](https://bigladdersoftware.com/epx/docs/8-3/auxiliary-programs/using-the-weather-converter.html).
 
 
 ### 2.2 Building geometry
@@ -86,7 +89,7 @@ The building geometry can be defined in two ways. Either a generic cubic geometr
 
 ![selection of the method for geometry generation in the Excel® GUI](fig/231023_selection_method.png)
 
-Basically, in *EnergyPlus®*, the geometrical model of a building is represented by its external dimensions without any component thicknesses or volumes (e.g. wall or ceiling thicknesses). As a result, the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible given the low level of model detail. The user-defined net floor area (NFA) (or rather the ratio GFA/NFA, see below) is later used to convert the simulation results to area-specific quantities related to the NFA. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
+Basically, in *EnergyPlus™*, the geometrical model of a building is represented by its external dimensions without any component thicknesses or volumes (e.g. wall or ceiling thicknesses). As a result, the entire gross floor area (GFA) or gross room volume (GRV) is simulated as the volume to be conditioned. The inaccuracy resulting from this simplification is negligible given the low level of model detail. The user-defined net floor area (NFA) (or rather the ratio GFA/NFA, see below) is later used to convert the simulation results to area-specific quantities related to the NFA. This means that the absolute results of the simulation are related to a typical NFA corresponding to the simulated GFA.
 
 #### 2.2.1 Generic building model
 
@@ -111,7 +114,7 @@ The "length" and "width" of the building are indicated as external dimensions. T
 **Orientation**
 
 The orientation of the building can also be changed using a drop down menu (see following figure) if the building is not orientated in the axes of the main cardinal points. A positive rotation of the building corresponds to a clockwise rotation[^7].
-[^7]: See EnergyPlus® parameter "north axis": [https://bigladdersoftware.com](https://bigladdersoftware.com/epx/docs/8-0/input-output-reference/page-006.html#field-north-axis)    
+[^7]: See EnergyPlus™ parameter "north axis": [https://bigladdersoftware.com](https://bigladdersoftware.com/epx/docs/8-0/input-output-reference/page-006.html#field-north-axis)    
 
 ![definition orientation](fig/231025_definition_orientation.png)
 
@@ -119,7 +122,7 @@ The orientation of the building can also be changed using a drop down menu (see 
 
 **Ratio NFA/GFA**
 
-As already mentioned, only gross areas or volumes are represented in the EnergyPlus® model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\), the user needs to specify the ratio of GFA/NFA. This can either be entered as an individual value (if known) or it can be determined from various predefined building typologies included as presets in the GUI.
+As already mentioned, only gross areas or volumes are represented in the EnergyPlus™ model. In order to convert the absolute results of the simulation into area specific results with the unit \(Wh/m²_{NFA}\), the user needs to specify the ratio of GFA/NFA. This can either be entered as an individual value (if known) or it can be determined from various predefined building typologies included as presets in the GUI.
 
 
 **Window areas**
@@ -234,11 +237,11 @@ Daylight-dependent lighting control can be activated to realistically simulate u
 
 ## 3 Simulation
 
-Once all the parameters have been entered, the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process, the *EnergyPlus®* model is generated in the first step. This turns the generic model into a customised *EnergyPlus®* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
+Once all the parameters have been entered, the simulation is started using the "Model generation and Simulation" button (see following figure). During the following completely automatised process, the *EnergyPlus™* model is generated in the first step. This turns the generic model into a customised *EnergyPlus™* building model. In the second step, the generated building model is simulated with the specified time step width (according to the parameter in the following figure). 
 
 ![start of the simulation](fig/231106_start_simulation.png)
 
-The user is continuously informed about the progress of the model generation and simulation, as exemplary shown in the figure below. At the end of the simulation process, the results of the *EnergyPlus®* simulation are imported into the *Excel®* user interface.
+The user is continuously informed about the progress of the model generation and simulation, as exemplary shown in the figure below. At the end of the simulation process, the results of the *EnergyPlus™* simulation are imported into the *Excel®* user interface.
 
 ![simulation status information](fig/231117_sim_status.png)
 
@@ -246,9 +249,20 @@ The user is continuously informed about the progress of the model generation and
 
 The results of the simulation are given as annual values and profiles. Annual values can be found on the *HOMEPAGE* and under the menu item *BUILDING BALANCE*. The main profiles are displayed under *ENERGY DEMAND*. More profiles can be found at *e+ Outputs*. A graphical representation of the main profiles can be found under the menu item *PROFILES VIEW*. The output of the results is assumed to be intuitive so no further explanation is provided here. 
 
+## 5 Tutorial: Using the GenSim CLI to run a simulation
+GenSim also has a CLI written in Ruby, which is especially useful to run simulation without using the GUI. However, in this case the required input OSW-file needs to be created in some other manner. The GenSim CLI uses the same OpenStudio® CLI calls as the GUI does, therefore with the same inputs it should produce the same results as the workflow using the GUI.
 
+While OpenStudio® also uses Ruby and ships with internal binaries, these cannot be used outside of OpenStudio®. You will need to have Ruby installed separately and the CLI has been tested with version 3.4.7. In the following it is assumed that `ruby` and `gem` point to a working installation of Ruby and the package manager. To use the CLI to you need to (once) install its dependencies with: `gem install thor`
 
-## 5 Short tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in
+In the following are the steps of how to run a simulation, assuming you have a valid OSW input file called `Model.osw`:
+
+1. Switch to the GenSim directory: `cd /path/to/GenSim`
+    1. In the following it is assumed that the shortcut `.` stands for this path. Although using relative paths using `.` *should* work, this cannot be guarranteed on all platforms. If the commands are not working, try using absolute paths instead.
+1. Create an empty OSM-file: `ruby ./Measures/gensim_cli.rb create_empty_osm --output_folder=./Output Model.osm`
+1. Run the simulation: `ruby ./Measures/gensim_cli.rb run_workflow --output_folder=./Output --os_bin_path=C:\openstudio-3.10.0\bin\openstudio.exe Model.osw`
+1. The results are saved as CSV files in `./Output/reports`. They are available as absolute values, relative to the NFA, relative to the GBA and as yearly sums. You typically only need to use one of these files, as they are all derived from the absolute values and saved in different files for convenience.
+
+## 6 Tutorial: Creating a geometry model with the OpenStudio® Sketchup®-plug-in
 
 **Create a new empty model**    
 In order to correctly create a custom, non-generic geometry model for a thermal building simlation in GenSim, the model has to be created from scratch without any predefinitions, as shown in the following figure.
@@ -297,7 +311,7 @@ After drawing the floor plan of the building, it is recommended to first save th
 
 ![surface matching](fig/231120_surface_matching.PNG)
 
-Once the final steps have been completed the file can be saved as an OpenStudio file (.osm). This file is then linked in GenSim (Excel interface) - see chapter 2.2.2.  
+Once the final steps have been completed the file can be saved as an OpenStudio® file (.osm). This file is then linked in GenSim (Excel® interface) - see chapter 2.2.2.  
 
 ![save model](fig/231120_save_model.png)
 
@@ -309,7 +323,7 @@ Select the model or rooms of interest. If not all rooms have a constant proporti
 
 ![window to wall ratio](fig/231120_window_to_wall_2.png)
 
-**Save final model as an OpenStudion model (.osm)**
+**Save final model as an OpenStudio® model (.osm)**
 
 ![save final model](fig/231120_save_final_model.png)
 

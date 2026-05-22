@@ -1,5 +1,6 @@
 # How to work on the documentation
 Here's how to work with the documentation and in particular how to change something. The general workflow is:
+
 1. Install a local copy of the documentation repository
 2. Make changes in the local copy, previewing them as you go
 3. Push the changes to the main repository on a branch **OR** push to a forked repository on the main branch
@@ -7,7 +8,7 @@ Here's how to work with the documentation and in particular how to change someth
 5. When the changes have been merged, you can pull the new state to your local repository
 
 ## Installation and usage instruction
-**Requirements: Python 3.9 or later,** e.g. from [https://www.python.org/downloads/](https://www.python.org/downloads/)
+**Requirements: Python 3.12 or later**, e.g. from [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
 ### 1. Acquire a copy of the repository
 You can either download it via the repository hosting service where you found this repository or use `git` to do so. For example: `git clone git@repository.domain.tld` will fetch a copy of the repository. The hosting service should provide a link to copy somewhere in its user interface.
