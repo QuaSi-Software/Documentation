@@ -1,6 +1,6 @@
 # Handling of time, time zones and weather data
 
-As the [pvlib documentation](https://pvlib-python.readthedocs.io/en/stable/user_guide/timetimezones.html) perfectly summarises, "dealing with time and time zones can be a frustrating experience in any programming language and for any application". We try to be as clear as possible about how ReSiE deals with time and timestamps.
+As the [pvlib documentation](https://pvlib-python.readthedocs.io/en/stable/user_guide/modeling_topics/timetimezones.html) perfectly summarises, "dealing with time and time zones can be a frustrating experience in any programming language and for any application". We try to be as clear as possible about how ReSiE deals with time and timestamps.
 
 Internally, ReSiE works with timestamps in seconds relative to the starting date of the simulation. Along to the timestamp in seconds, a datetime for each simulation step is used to read out the related data of the given profiles. For all profile data, a corresponding datetime index is either read out of the profile file or is created with the given metadata during initialization.
 
