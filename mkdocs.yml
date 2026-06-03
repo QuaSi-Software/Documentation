@@ -3,9 +3,9 @@ site_name: QuaSi Software
 version: 2
 
 build:
-  os: "ubuntu-20.04"
+  os: "ubuntu-24.04"
   tools:
-    python: "3.7"
+    python: "3.12"
 
 # Explicitly set the version of Python and its requirements
 python:
@@ -37,8 +37,13 @@ extra_javascript: ['https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX
 nav:
   - Home:
       - 'QuaSi - Overview': 'index.md'
-  - 'ReSiE: Simulation engine':
+      - 'Publications': 'publications.md'
+      - 'Abbreviations': 'abbreviations_list.md'
+  - 'ReSiE: Getting started':
       - 'Installation and usage': 'resie_installation.md'
+      - 'Examples': 'resie_exemplary_energy_systems.md'
+      - 'SUSI and SIMON': 'resie_susi_simon.md'
+  - 'ReSiE: Input specification':
       - 'Input file format': 'resie_input_file_format.md'
       - 'Time, time zones and weather files': 'resie_time_definition.md'
       - 'Logging': 'resie_logging.md'
@@ -49,16 +54,15 @@ nav:
       - 'Operation and control': 'resie_operation_control.md'
       - 'Energy system components': 'resie_energy_system_components.md'
       - 'General effects & traits': 'resie_transient_effects.md'
+      - 'Costs and emissions': 'resie_costs_and_emissions.md'
       - 'Validation - Components': 'resie_validation_components.md'
-  - 'ReSiE: Examples':
-      - 'Exemplary Energy Systems': 'resie_exemplary_energy_systems.md'
   - 'GenSim: Generic Building Simulation':
+      - 'What is GenSim?': 'gensim_overview.md'
       - 'User manual': 'gensim_user_manual.md'
+      - 'Building typology': 'gensim_building_typology.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'
       - 'Workflow for code contributions': 'workflow_code_contributions.md'
-  - Abbreviations:
-      - 'abbreviations_list.md'
   - About:
       - 'License': 'license.md'

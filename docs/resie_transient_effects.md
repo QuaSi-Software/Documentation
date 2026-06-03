@@ -3,6 +3,9 @@
 Some effects of energy system components can be described in a manner applicable to a variety of components. For example all components transforming energy between media incur losses with an efficiency rate that might be dependent on the load on the component. This chapter describes these effects and introduces traits. If the description of a component is listed as implementing a trait, you can find the generalised description of the effects here.
 
 ## Reduction of usable heat during start-up of each component
+
+**This feature is not implemented yet!**
+
 To account for transient effects, the reduction of the usable heat output during start-up of a component can be described using either linear oder exponential start-up and cool-down ramps. Both are described in the following.
 
 ### Linear start-up
@@ -193,7 +196,5 @@ If several outputs on a component exist, like with a combined heat and power pla
 ## Minimum operation time
 
 To force the simulation engine to turn on a component for a defined minimum operation time, the partial load ratio is limited to allow the component to run for the defined turn-on time. The limit is determined by the maximum potential of the energy sink (e.g. free storage capacity) divided by the minimum operating time with a consideration of the maximum deliverable power of the component. This method does not take into account an unexpected decrease of the available energy input into the component, since no prediction is possible in this model. Therefore, the minimum operating time cannot be guaranteed.
-
-**ToDo: elaborate further**
 
 

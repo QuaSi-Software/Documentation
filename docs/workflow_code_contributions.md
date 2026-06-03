@@ -78,6 +78,7 @@ as it would lead to merge conflicts in the changelog. This merge should not caus
 conflicts.
 
 Some other things that may follow the merge of the code changes:
+
 * Deleting the feature branch as it no longer needed
 * Tagging the merge commit as a new release within GitHub and other systems
 * Updating the documentation for new functionality

@@ -71,6 +71,8 @@ For the configuration of components a selected number of different cases are imp
 * `offset_lin`: Takes one number and uses as the slope of a linear function with an offset of its complement (in regards to 1.0). E.g. `offset_lin:0.5` means \(e(x)=1.0-0.5*(1.0-x)\)
 * `logarithmic`: Takes two numbers and uses them as the coefficients of a quasi-logarithmic function. E.g. `logarithmic:0.5,0.3` means \(e(x)=\frac{0.5x}{0.3x+(1-0.3)}\)
 * `inv_poly`: Takes a list of numbers and uses them as the coefficients of a polynomial with order n-1 where n is the length of coefficients. The list starts with coefficients of the highest order. The inverse of the polynomial, multiplied with the PLR, is used as the efficiency function. E.g. `inv_poly:0.5,2.0,0.1` means \(e(x)=\frac{x}{0.5x²+2x+0.1}\)
+* `power_func`: A power function of the form \(e(x) = a * x^b\) with two coefficients a and b. E.g. `power_func:100,0.95` is equal to \(e(x) = 100.0 * x^{0.95}\) 
+* `linear`: A linear function of the form \(e(x) = a * x + b\) with two coefficient a and b. E.g. `lin:25.0,3.0` means \(e(x) = 25.0 * x + 3.0\).  b can also be empty, E.g. `lin:25.0` is equivalent to \(e(x) = 25.0 * x + 0.0\). 
 * `exp`: Takes three numbers and uses them as the coefficients of an exponential function. E.g. `exp:0.1,0.2,0.3` means \(e(x)=0.1+0.2*exp(0.3x)\)
 * `unified_plf`: Takes four numbers and uses them as the coefficients of a composite function of a logarithmic and linear function as described in the documentation on the [unified formulation for PLR-dependent efficiencies of heat pumps](resie_energy_system_components.md#part-load-efficiency). The first two numbers are the optimal PLR and the PLF at that PLR. The third number is a scaling factor for the logarithmic part and the fourth number is the PLF at PLR=1.0.
 
@@ -110,6 +112,19 @@ Used by heat pumps and similar components to calculate the minimum and maximum p
 * `const`: Takes one number and uses it as a constant fraction. E.g. `const:1.0`.
 * `poly-2`: A 2D-polynomial of order three. Takes a list of ten values for the constants in \(f(x,y) = c_1 + c_2 \ x + c_3 \ y + c_4 \ x^2 + c_5 \ x \ y + c_6 \ y^2 + c_7 \ x^3 + c_8 \ x^2 \ y + c_9 \ x \ y^2 + c_{10} \ y^3\). E.g. `poly-2:0.3,0.4,0.1,0.2,0.0,0.0,0.0,0.0,0.0,0.0`.
 
+#### Functions for specific investment costs and GHG emissions
+
+Specific investment costs and embodied GHG emissions can be defined as functions of a component reference size \(x\). The reference size depends on the component type and may represent, for example, nominal power, volume, storage capacity, or energy capacity. This is useful for parameter variations and optimisation studies where costs or emissions should scale with component size.
+
+Use `const` for values that are independent of the component reference size. See the  [section on economic parameters](resie_component_parameters.md#economic-and-emission-parameters) for sources of prices.
+
+**Implemented function prototypes**
+
+All function types described in the [section on efficiency functions](resie_component_parameters.md#efficiency-functions) can also be used for specific investment costs and embodied GHG emissions. The following prototypes are typically used:
+
+- `const`: Constant value independent of \(x\). For example, `const:1.0` defines \(e(x) = 1.0\).
+- `linear`: Linear function of the form \(e(x) = a * x + b\). For example, `lin:25.0,3.0` defines \(e(x) = 25.0 * x + 3.0\). The offset \(b\) is optional; `lin:25.0` is equivalent to \(e(x) = 25.0 * x + 0.0\).
+- `power_func`: Power function of the form \(e(x) = a * x^b\). For example, `power_func:100.0,0.95` defines \(e(x) = 100.0 * x^{0.95}\).
 
 ### Control modules
 For a general overview of what control modules do and how they work, see [this chapter](resie_operation_control.md). In the following the currently implemented control modules and their required parameters are listed.
@@ -154,7 +169,7 @@ A definition of a control module with its control parameter can be done for exam
 #### Profile limited
 Sets the maximum PLR of a component to values from a profile. Used to set the operation of a component to a fixed schedule while allowing circumstances to override the schedule in favour of a lower PLR.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster` (with respect to power_el)
 
 | | |
 | --- | --- |
@@ -164,7 +179,7 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 #### Storage-driven
 Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -175,11 +190,11 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **storage_uac** | The UAC of the storage component linked to the module.
 
 #### Temperature sorting
-Controls a component so that the availabe energies of the inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
+Controls a component so that the availabe energies of the thermal inputs/outputs during calculation of the `potential` and `process` operations are sorted by the temperatures they provide/request. This is useful for components where the temperature differences matter for the calculation. For example a heat pump can use the heat source with the highest temperature first for improved efficiency.
 
 **Note:** This will overwrite the order defined in the bus!
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump`, `ThermalBooster`
 
 | | |
 | --- | --- |
@@ -261,7 +276,7 @@ This module is implemented for the following component types:
 #### Forbid source to sink
 Forbids that a defined source is used to supply a defined sink. As this uses the callback `check_src_to_snk`, this is specifically used for components with a layered approach to energy flow calculation, e.g. a heat pump. A bus has this functionality built-in and does not need a control module.
 
-This module is implemented for the following component types: `HeatPump`
+This module is implemented for the following component types: `HeatPump` and `ThermalBooster`, both for `heat_in` and `heat_out`
 
 | | |
 | --- | --- |
@@ -311,6 +326,25 @@ An example of this control module used for an electricity bus to switch the prio
 ]
 ```
 
+### Economic and emission parameters
+
+The general economic and emissions parameters are defined in a separate section of the input file, which is described [here](resie_input_file_format.md#economic-parameters) and [here](resie_input_file_format.md#emissions-parameters). Here, the general calculation of them can be activated.
+
+Component-specific economic and emission parameters are described separately for each component in the component parameter section. Default values are provided for most parameters. These values are based on data from the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] from 2025. For components not listed in the catalogue, suitable parameters were selected. Note that these values may not be appropriate for every project and should therefore be checked for the specific use case. Especially price change rates were mostly set to zero. For energy costs, a change rate of 2 % per year was set as default. For the investment costs, the change rates were taken from the source above, where given.
+
+Note: Many parameters have to be given as rates, e.g. the `capex_price_change_rate_per_year`. A value of `0.03` represents an increase of the capex of 3 % per year for future replacement calculations. Or the `repair_rate_per_year` with respect of the inital capex, where a value of `0.01` represents 1 % repair costs per year with respect to the inital capex of the first year.
+
+For some parameters, no defaults are provided, for example for (embodied) GHG emissions, energy prices, or specific investment costs, as these values are highly project-specific. For component-specific investment costs and energy-related GHG emission factors, the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] is a suitable data source for Germany.
+
+Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m]. For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
+ The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition.
+
+For connection components, the reference value for capex and embodied emissions may differ depending on how the component size is defined.
+If a constant demand or supply is given, this value is used as the reference. In this case, capex and embodied emissions can be provided as functions of this power, e.g in [€/W]. If a profile is given, the capex and embodied emissions are related to the scale factor of the profile. Therefore, the scale factor and the specific investment costs or emissions must refer to the same physical quantity. For example, a thermal heating demand of a building can be scaled either by its absolute power, if a constant power is given, or by the scale factor of a profile. If the profile contains energy demand per square meter building and the scale factor is used to adjust the profile to the actual building size, the capex should also be given with respect to square meters in [€/m^2].
+
+Note that emission coefficients and energy-related costs have to be defined with [Wh] as reference and not, as typically known, with [kWh]!
+
+[^TechnikkatalogWärmeplanung]: KWW-Technikkatalog Wärmeplanung (Technical Catalogue for Heating Design). Deutsche Energie-Agentur GmbH (Hrsg.) (dena). 2025. Available at [https://www.kww-halle.de/praxis-kommunale-waermewende/bundesgesetz-zur-waermeplanung](https://www.kww-halle.de/praxis-kommunale-waermewende/bundesgesetz-zur-waermeplanung) (German only).
 
 ## Boundary and connection components
 
@@ -329,6 +363,8 @@ Generalised implementation of a flexible sink.
 
 Can be given a profile for the maximum power it can take in, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W] or [Wh] | Path to the max power profile. Define unit in profile header. |
@@ -339,6 +375,48 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero.
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible sink component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scale)] or [€] | Function for specific investment costs with respect to the constant power or scaling factor. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible sink component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant power or scaling factor. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ### General flexible supply
 | | |
@@ -355,6 +433,8 @@ Generalised implementation of a flexible source.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W]  or [Wh]| Path to the max power profile. Define unit in profile header.  |
@@ -365,6 +445,48 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero.
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible supply component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scale)] or [€] | Function for specific investment costs with respect to the constant power or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible supply component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant power or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
+| `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
 
 ### Bus
 | | |
@@ -379,11 +501,13 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 The only implementation of special component `Bus`, used to connect multiple components with a shared medium.
 
+A description of the available parameters and their usage can be found in the chapter about the [input file format](resie_input_file_format.md#bus).
+
 Note that the tracked value `Transfer->UAC` refers to an output value that corresponds to how much energy the bus has transfered to the bus with the given UAC.
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
-| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md) for details. |
+| `connections` | `Dict{String,Any}` | N/N |  | [-] | Connection config for the bus. See [chapter on the input file format](resie_input_file_format.md#bus) for details. |
 
 ### General fixed sink
 | | |
@@ -400,6 +524,10 @@ Generalised implementation of a fixed sink.
 
 Can be given a profile for the energy it requests, which is scaled by the given scale factor. Alternatively a static load can be given. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSink is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/demand.prf` | [W] or [Wh] | Path to the input energy profile. Define unit in profile header. |
@@ -408,8 +536,57 @@ Can be given a profile for the energy it requests, which is scaled by the given 
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant demand, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero. Fixed sinks also offer the possibility to set prices for unmet energies. This can be understood as additional costs that  have to be paid for energy that is not delivered by the energy system, although is was requested by the demand. 
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed sink component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_demand or scale)] or [€] | Function for specific investment costs with respect to the constant demand or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+| `constant_unmet_energy_price` | `Float` | N/Y | 0.0 | [€/Wh] | Constant unmet energy price. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| OR: `unmet_energy_price_profile_file_path` | `String` | N/N | `profiles/economy/unmet_energy_price.prf` | [€/Wh] | Path to an unmet energy price profile file. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| `unmet_energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the unmet energy price profile. Only applies to profiles. |
+| `unmet_energy_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the unmet energy price. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed sink component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_demand or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant demand or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ### General demand
 | | |
@@ -433,6 +610,10 @@ Generalised implementation of a fixed source.
 
 Can be given a profile for the energy it can provide, which is scaled by the given scale factor. If the medium supports it, a temperature can be given, either as profile from a .prf file or from the ambient temperature of the project-wide weather file or a constant temperature can be set.
 
+The profile values can also be treated as volume flow. Then, a density and thermal capacity of the medium have to be given as well. Note that this only works if the FixedSupply is directly connected to a component that provides a return flow temperature, which is currently only a STES!
+
+**General parameter** 
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | N/N | `profiles/district/energy_source.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
@@ -441,32 +622,187 @@ Can be given a profile for the energy it can provide, which is scaled by the giv
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°c] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°c] | If given, sets the temperature of the output to a constant value. |
 | OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant supply, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
+| `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
+| `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
 
-### Grid connection
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero. Fixed supplies also offer the possibility to set prices for unmet energies. This can be understood as additional costs that  have to be paid for energy that is not taken by the energy system, although is was requested to be taken by the supply. 
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed supply component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_supply or scale)] or [€]| Function for specific investment costs with respect to the constant supply or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+| `constant_unmet_energy_price` | `Float` | N/Y | 0.0 | [€/Wh] | Constant unmet energy price. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| OR: `unmet_energy_price_profile_file_path` | `String` | N/N | `profiles/economy/unmet_energy_price.prf` | [€/Wh] | Path to an unmet energy price profile file. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| `unmet_energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the unmet energy price profile. Only applies to profiles. |
+| `unmet_energy_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the unmet energy price. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed supply component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_supply or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant supply or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
+| `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
+
+### Grid input
 | | |
 | --- | --- |
-| **Type name** | `GridConnection`|
-| **File** | `energy_systems/connections/grid_connection.jl` |
-| **System function** | `flexible_source`, `flexible_sink` |
+| **Type name** | `GridInput`|
+| **File** | `energy_systems/connections/grid_input.jl` |
+| **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
-| **Input media** | `None`/`auto` |
+| **Input media** | |
 | **Output media** | `None`/`auto` |
-| **Tracked values** | `IN`, `OUT`, `Input_sum`, `Output_sum`, `Temperature` |
+| **Tracked values** | `OUT`, `Output_sum`, `Temperature` |
 
-Used as a source or sink with no limit, which receives or gives off energy from/to outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file).
+Used as a source with no limit, which gives off energy from outside the system boundary. Optionally, temperatures can be taken into account (constant, from profile or from weather file). The amount of energy supplied since the beginning of the simulation is tracked as a cumulative value.
 
-If parameter `is_source` is true, acts as a `flexible_source` with only one output connection. Otherwise a `flexible_sink` with only one input connection. In both cases the amount of energy supplied/taken in is tracked as a cumulative value.
+**General parameter** 
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
-| `is_source` | `Boolean` | Y/Y | `True` |  [-] | If true, the grid connection acts as a source. |
-| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
-| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input (or output) to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input (or output) to the ambient air temperature of the global weather file. |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the output temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the output to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the output to the ambient air temperature of the global weather file. |
 
 Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero. 
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid input component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€] | Function for investment costs of the grid input component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid input component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2] | Function for embodied emissions of the grid input component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
+| `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
+
+### Grid output
+| | |
+| --- | --- |
+| **Type name** | `GridOutput`|
+| **File** | `energy_systems/connections/grid_input.jl` |
+| **System function** | `flexible_sink` |
+| **Medium** | `medium`/`None` |
+| **Input media** | `None`/`auto` |
+| **Output media** | |
+| **Tracked values** | `IN`, `Input_sum`, `Temperature` |
+
+Used as a sink with no limit, which receives energy and removes it from the system. Optionally, temperatures can be taken into account (constant, from profile or from weather file). The amount of energy taken in since the beginning of the simulation is tracked as a cumulative value.
+
+**General parameter**
+
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
+| `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
+| OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input to a constant value. |
+| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. They default both to zero. 
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid output component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€] | Function for investment costs of the grid output component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid output component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2] | Function for embodied emissions of the grid output component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
+| `energy_emissions_credits_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions credits profile. Only applies to profiles. |
+| `energy_emissions_credits_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions credits. |
 
 ## Other sources and sinks
 
@@ -485,10 +821,60 @@ A photovoltaic (PV) power plant producing electricity.
 
 The energy it produces in each time step must be given as a profile, but can be scaled by a fixed value.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `energy_profile_file_path` | `String` | Y/N | `profiles/district/pv_output.prf` | [W] or [Wh] | Path to the output energy profile. Define unit in profile header. |
 | `scale` | `Float` | Y/N | 4000.0 | [-] | Factor by which the profile values are multiplied. |
+
+**Parameter for economic calculation**
+
+Capex and/or energy-related prices can be defined. Both default to zero. For the PV plant, capex-related costs include the plant within the economic boundary of the energy system. Energy-related prices, by contrast, represent a plant outside of the economic boundary, where the generated power is purchased through a power purchase agreement (PPA), for example. It may not be appropriate to take into account both capital costs and energy-related costs.
+
+The PV plant also offer the possibility to set prices for unmet energies. This can be understood as additional costs that have to be paid for energy that is not taken by the energy system, although is was generated by the PV plant. In the case this energy is sold elsewhere and is not modelled within the simulated energy system, the unmet energy price could also be set to a negative value resulting into additional revenue.
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the PV plant component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/scale] or [€] | Function for specific investment costs with respect to the scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+| `constant_unmet_energy_price` | `Float` | N/Y | 0.0 | [€/Wh] | Constant unmet energy price. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| OR: `unmet_energy_price_profile_file_path` | `String` | N/N | `profiles/economy/unmet_energy_price.prf` | [€/Wh] | Path to an unmet energy price profile file. Either `unmet_energy_price_profile_file_path` or `constant_unmet_energy_price` can be given. |
+| `unmet_energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the unmet energy price profile. Only applies to profiles. |
+| `unmet_energy_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the unmet energy price. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the PV plant component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/scale] or [g CO2] | Function for specific embodied emissions with respect to the scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
+| `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
 
 ## Transformers
 
@@ -505,6 +891,8 @@ The energy it produces in each time step must be given as a profile, but can be 
 
 A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electricity.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `power_el` | `Float` | Y/N | 4000.0 | [W] | The design power of electrical output. |
@@ -515,6 +903,29 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | `efficiency_heat_out` | `String` | Y/Y | `pwlin:0.8,0.69,0.63,0.58,0.55,0.52,0.5,0.49,0.49` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `linear_interface` | `String` | Y/Y | `fuel_in` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `nr_discretization_steps` | `UInt` | Y/Y | `8` | [-] | See [description of efficiency functions](#efficiency-functions). |
+
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 15.0 | [a] | Lifetime of the CHPP component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:7.304,0.66` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.005 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.06 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 100.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation** 
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 15.0 | [a] | Lifetime of the CHPP component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Electrolyser
 | | |
@@ -537,6 +948,8 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 * `equal_with_mpf`: Same as an equal distribution, however if the total PLR is lower than `min_power_fraction`, then a number of units are activated at a calculated PLR to ensure the minimum restriction is observed and the demand is met.
 * `try_optimal`: Attempts to activate a number of units close to their optimal PLR to meet the demand. If no optimal solution exists, typically at very low PLR or close to the nominal power, falls back to activating only one or all units.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `power_el` | `Float` | Y/N | 4000.0 | [W] | The maximum electrical design power input. |
@@ -557,6 +970,35 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | `efficiency_o2_out` | `String` | Y/Y | `const:0.6` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `nr_discretization_steps` | `UInt` | Y/Y | `1` |  [-] | See [description of efficiency functions](#efficiency-functions). |
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the electrolyser component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `linear:0.9` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | -0.02 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.025 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 50.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+| `water_price` | `Float` | N/Y | 3.5 | [€/m^3 water] | Price per cubic meter of fresh water. |
+| `water_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the water price. |
+| `water_demand_ratio` | `Float` | N/Y | 0.36 | [l/kWh H2] | Water demand per kWh of produced hydrogen. |
+| `oxygen_price` | `Float` | N/Y | 0.14 | [€/kg O2] | Price per kg of produced oxygen. |
+| `oxygen_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the oxygen price. |
+| `oxygen_production_ratio` | `Float` | N/Y | 0.239 | [kg O2/kWh H2] | Oxygen production per kWh of produced hydrogen. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the electrolyser component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
 ### Fuel boiler
 | | |
 | --- | --- |
@@ -572,6 +1014,8 @@ A boiler that transforms chemical fuel into heat.
 
 This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
 
+**General parameter** 
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | [-] | The medium of the fuel intake. |
@@ -582,6 +1026,120 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | `efficiency_heat_out` | `String` | Y/Y | `const:1.0` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `linear_interface` | `String` | Y/Y | `heat_out` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `nr_discretization_steps` | `UInt` | Y/Y | `30` | [-] | See [description of efficiency functions](#efficiency-functions). |
+
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fuel boiler component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:4.634,0.46` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 20.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fuel boiler component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
+### Thermal booster (TB)
+| | |
+| --- | --- |
+| **Type name** | `ThermalBooster` |
+| **File** | `energy_systems/heat_producers/thermal_booster.jl` |
+| **System function** | `transformer` |
+| **Medium** |  |
+| **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
+| **Output media** | `m_heat_out`/`m_h_w_ht1` |
+| **Tracked values** | `IN`,  `OUT`, `LossesGains`, `Losses_power`, `Losses_heat`, `mean_intermediate_temperature` |
+
+The thermal booster combines low-temperature heat and additional boost energy (e.g. electricity) to raise a thermal demand (`m_heat_in`) from its return (input) temperature to a higher supply (output) temperature. It first uses low-temperature heat (`m_heat_in`) to preheat the flow and then adds boost energy (`m_el_in`) to reach the desired outlet temperature, subject to configured loss factors and power limits. It can be used to model an electrical booster e.g. to get domestic hot water from a low-temperature district heating network. Two boolean flags control whether the device may operate purely from boost energy and whether boost energy may compensate a lack of low-temperature heat in order to deliver the requested heat demand.
+
+**General parameter**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `power_el` | `Float` | Y/N | `5000.0` | [W] | Maximum additional boost power of the booster (e.g. electrical rated power). Is also the reference power for part-load dependent control modules. |
+| `cp_medium_out` | `Float` | Y/Y | `4180.0` | [J/(kg·K)] | Specific heat capacity of the output medium. |
+| `terminal_dT` | `Float` | Y/Y | `2.0` | [K] | Minimal terminal temperature difference of the heat exchanger of low-temperature heat in and pre-heating of the demand (pre-heating to max. `input_temperature` - `terminal_dT`) |
+| `power_losses_factor` | `Float` | Y/Y | `0.97` | [-] | Efficiency factor of the boost energy, e.g. conversion losses with respect to the boost input energy. |
+| `heat_losses_factor` | `Float` | Y/Y | `0.95` | [-] | Efficiency factor of the low-temperature heat, e.g. thermal loses with respect to the  low-temperature heat input energy. |
+| `output_temperature` | `Temperature` | N/N | `60.0` | [°C] | Optional fixed outlet temperature. If set, the booster provides this temperature at `m_heat_out`. If not given, the desired outlet temperature is determined by the connected component(s). |
+| `input_temperature` | `Temperature` | N/N | `35.0` | [°C] | Optional fixed source-side input temperature. If set, only input layers compatible with this temperature band are used as low-temperature sources. If not given, the source temperature is determined from the connected component(s). |
+| `demand_input_temperature` | `Temperature` | Y/N | `12.0` | [°C] | Constant demand return (input) temperature into the boosters output. Either this or `demand_input_temperature_profile_file_path` must be provided. |
+|  OR: `demand_input_temperature_profile_file_path` | `String` | Y/N | `"profiles/demand_return.prf"` | [–] | Path to a profile file for a time-varying demand return (input) temperature into the boosters output. Either this or `demand_input_temperature` must be provided. |
+| `allow_boost_solely` | `Bool` | Y/Y | `true` | [-] | Controls boost-only operation. If `true`, the thermal booster may deliver heat even when no low-temperature heat input is available. If `false`, the component requires a non-zero low-temperature contribution and if non is available, no heat output is supplied, even if boost energy would be available. Default is `true`. |
+| `allow_boost_additional` | `Bool` | Y/Y | `true` | [-] | Controls additional boosting. If `false`, the low-temperature side must always heat the demand as far as possible (up to its maximum intermediate temperature), and the booster is only allowed to do the remaining temperature lift. In this case, the delivered heat is essentially limited by the available low-temperature heat. If `true`, the low-temperature side is not forced to provide the maximum possible temperature lift; whenever low-temperature heat is not sufficient, the model can use additional boost energy to cover the missing part and still deliver the required heat output energy. Default is `true`. |
+
+Note: at least **one** of `demand_input_temperature` or `demand_input_temperature_profile_file_path` must be given. 
+
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the thermal booster component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:1.428,0.75` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the thermal booster component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
+**Exemplary input file definition for ThermalBooster**
+
+```json
+"TRF_TB_01": {
+    "type": "ThermalBooster",
+    "m_el_in": "m_e_ac_230v",
+    "m_heat_in": "m_h_w_lt1",
+    "m_heat_out": "m_h_w_ht1",
+    "output_refs": ["DEM_01"],
+    "power_el": 5000.0,
+    "cp_medium_out": 4180.0,
+    "constant_demand_input_temperature": 12,
+    "terminal_dT": 2.0,
+    "power_losses_factor": 0.97,
+    "heat_losses_factor": 0.95,
+    "allow_boost_solely": true,
+    "allow_boost_additional": true,
+    "economic_parameters": {
+        "lifetime_years": 18,
+        "capex_specific": "power_func:1.428,0.75",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 18,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
+}
+```
 
 ### Heat pump
 | | |
@@ -595,6 +1153,8 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `LossesGains` |
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
+
+**General parameter**
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
@@ -626,6 +1186,14 @@ For model types `inverter` and `on-off` an optimisation is performed, which can 
 | `x_abstol` | `float` | N/Y | 0.01 | [-] | Absolute tolerance of PLR values during optimisation. |
 | `f_abstol` | `float` | N/Y | 0.001 | [-] | Absolute tolerance of `evaluate()` return values during optimisation. |
 
+For the use of secondary interfaces on the thermal output of the heat pump, the following parameters are additionally required. See  [this section](resie_input_file_format.md#secondary-interfaces) for the general usage and purpose of these secondary interfaces.
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
+| `has_secondary_interface` | `Bool` | N/Y | false | [-] | A bool to activate the secondary interface on the thermal output of the heat pump
+| `primary_el_sources` | `Vector{String}` | N/N | ["SRC_GOOD_1", "SRC_GOOD_2"] | [-] | A vector of source names that are connected to the heat pump and should be mapped to the primary heat output interface
+| `secondary_el_sources` | `Vector{String}` | N/N | ["SRC_BAD"] | [-] | A vector of source names that are connected to the heat pump and should be mapped to the secondary heat output interface
+
 **Bypass:**
 
 If the heat pump is operated in bypass mode (input temperature is higher than the requested output temperature), the output temperature is limited to the requested temperature, in other words, the input temperature is cooled down to the requested output temperature or the specified `output_temperature` of the heat pump. The energy required during bypass operation can be specified with the `bypass_cop` parameter, that is used in bypass mode (not for a constant COP, here always the constant COP is used!). If a cool-down is not wanted, the heat pump has to be connected in parallel and not in series, meaning that the energy system provides an actual bypass around the heat pump. Note that this may lead to an incorrect determination of the order of operation and may require manual adjustment (see:  [Order of operation](resie_input_file_format.md#order-of-operation))!
@@ -634,8 +1202,31 @@ If the heat pump is operated in bypass mode (input temperature is higher than th
 
 The heat pump model implemented can serve different temperature layers in the input and output during one timestep. If a heat pump is connected to multiple sources and multiple sinks, each source serves a sink until one of them is satisfied, then the next one is used. So several different COPs are used *within one timestep* and aggregated to one total COP in the timestep. See [this Chapter](resie_energy_system_components.md#steps-to-perform-in-the-simulation-model-of-the-heat-pump) for details.
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the heat pump component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:5.909,0.71` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.015 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 5.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the heat pump component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
 #### Exemplary input file definition for HeatPump
-**Simple heat pump with constant COP, fixed output temperature and no losses**
+**Simple heat pump with constant COP, fixed output temperature and no losses, including economy and emissions**
 ```json
 "TST_TH_HP_01": {
     "type": "HeatPump",
@@ -645,7 +1236,24 @@ The heat pump model implemented can serve different temperature layers in the in
     "cop_function": "const:3.0",
     "output_temperature": 70.0,
     "power_losses_factor": 1.0,
-    "heat_losses_factor": 1.0
+    "heat_losses_factor": 1.0,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "power_func:5.909,0.71",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.015,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 5.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -666,7 +1274,7 @@ The heat pump model implemented can serve different temperature layers in the in
 }
 ```
 
-### Unified eletric transformer, inverter and rectifier (UTIR)
+### Unified electric transformer, inverter and rectifier (UTIR)
 | | |
 | --- | --- |
 | **Type name** | `UTIR`|
@@ -679,7 +1287,9 @@ The heat pump model implemented can serve different temperature layers in the in
 
 A unified model for electric transformers, inverters and rectifiers.
 
-This can be used to model eletric components that transform from one type of electricity, at one voltage level, to another type or voltage level.
+This can be used to model electric components that transform from one type of electricity, at one voltage level, to another type or voltage level.
+
+**General parameter**
 
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
@@ -692,9 +1302,32 @@ This can be used to model eletric components that transform from one type of ele
 | `linear_interface` | `String` | Y/Y | `el_in` | [-] | See [description of efficiency functions](#efficiency-functions). |
 | `nr_discretization_steps` | `UInt` | Y/Y | `30` | [-] | See [description of efficiency functions](#efficiency-functions). |
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 10.0 | [a] | Lifetime of the UTIR component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:100000` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.05 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.05 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 10.0 | [a] | Lifetime of the UTIR component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
 #### Exemplary input file definition for UTIR
 
-**Inverter converting PV output to household AC**
+**Inverter converting PV output to household AC, including economy and emissions**
 ```json
 "TST_INV_01": {
     "type": "UTIR",
@@ -705,7 +1338,24 @@ This can be used to model eletric components that transform from one type of ele
     "efficiency_el_in": "const:1.0",
     "efficiency_el_out": "const:0.92",
     "linear_interface": "el_in",
-    "min_power_fraction": 0.0
+    "min_power_fraction": 0.0,
+    "economic_parameters": {
+        "lifetime_years": 10,
+        "capex_specific": "const:2500",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.05,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.05,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 10,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -740,10 +1390,35 @@ This can be used to model eletric components that transform from one type of ele
 
 A generic implementation for energy storage technologies.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `capacity` | `Float` | Y/N | 12000.0 | [Wh] |The overall capacity of the storage. |
-| `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the  battery. |
+| `load` | `Float` | Y/N | 6000.0 | [Wh] | The initial load state of the storage. |
+
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the storage component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/Wh] or [€] | Function for specific investment costs with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.01 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.05 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.5 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the storage component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/Wh] or [g CO2] | Function for specific embodied emissions with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Battery
 | | |
@@ -758,14 +1433,13 @@ A generic implementation for energy storage technologies.
 
 A storage for electricity.
 
-Multiple model types are available. The model `simplified` is a very basic energy storage with no chemistry processes being modelled and a fixed charge and discharge efficiency must be given. The model `detailed`  models the chemical process with a parametrised voltage-capacity curve for a battery cell. The battery cycle and temperature dependency are also modelled.
+Multiple model types are available. The model `simplified` is a very basic energy storage with no chemistry processes being modelled and a fixed charge and discharge efficiency must be given. The model `detailed`  models the chemical process with a parametrised voltage-capacity curve for a battery cell. The battery cycle and temperature dependency are also modelled, although the temperature is a fixed value that must be given and it is assumed the battery has a thermal management system to keep that temperature stable over the simulation.
 To simplify the use of this model multiple battery chemistries are provided with default parameters. To choose the lithium iron phosphate battery use the model type `Li-LFP`. Other battery chemistry presets will follow with future updates.
-See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy-storage-sttes-buffertank) for more details how the parameters are defined and more details to the `detailed` model.
 
-**General parameter:**
+**General parameter**
 
-| Name        | Type    | R/D | Example | Unit | Description |
-| ----------- | ------- | --- | ------- | ---- | ----------- |
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `model_type` | `String` | Y/Y | "simplified" | [-] | type of the battery model: `simplified`, `detailed`, `Li-LFP` |
 | `capacity` | `Float` | Y/N | 12000.0 | [Wh] | The overall capacity of the battery. |
 | `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the  battery. |
@@ -779,12 +1453,14 @@ See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy
 
 **Parameter for the "detailed" model:**
 
+| Name | Type | R/D |  Example | Unit | Description |
+| ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `V_n_bat` | `Float` | Y/N | 153.6 |  [V] | The total nominal battery voltage. |
 | `cell_cutoff_current` | `Float` | Y/Y | 0.3 % of `capacity_cell_Ah` |  [A] | If the charge current falls below this value the battery is defined as full in Constant Voltage charging. |
 | `cycles` | `Float` | Y/Y | 1 |  [-] | The number of full battery cycles at the start of the simulation. Minimum is 1 |
 | `Temp` | `Float` | Y/Y | 25 |  [°C] | The battery temperature. Is set to constant since adequate temperature control is assumed. |
 
-**Parameter for the "detailed" model if not specific chemistry is chosen:**
+**Parameter for the "detailed" model if no specific chemistry is chosen:**
 
 | Name        | Type    | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ------- | ---- | ----------- |
@@ -804,9 +1480,32 @@ See chapter [here](./resie_energy_system_components.md#short-term-thermal-energy
 | `I_ref` | `Float` | Y/Y | 100.0 |  [A] | Reference current used in parametrisation |
 | `T_ref` | `Float` | Y/Y | 25.0 |  [°C] | Reference temperature used in parametrisation |
 
-**Exemplary input file definition for battery**
+**Parameter for economic calculation**
 
-Minimal definition of a battery in the input file:
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 12.0 | [a] | Lifetime of the battery component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `linear:0.2` | [€/Wh] or [€] | Function for specific investment costs with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | -0.031 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 12.0 | [a] | Lifetime of the battery component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/Wh] or [g CO2] | Function for specific embodied emissions with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
+#### Exemplary input file definition for Battery
+
+Minimal definition of a battery in the input file, including economic calculations and emissions:
 
 ```JSON
 "TST_BAT_01": {
@@ -818,6 +1517,23 @@ Minimal definition of a battery in the input file:
     "charge_efficiency": 0.99,
     "discharge_efficiency": 0.99,
     "capacity": 8280,
+    "economic_parameters": {
+        "lifetime_years": 12.0,
+        "capex_specific": "linear:0.2",
+        "capex_price_change_rate_per_year": -0.031,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 12.0,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -862,6 +1578,7 @@ Extended definition of a battery in the input file:
 }
 ```
 
+
 ### Buffer Tank
 | | |
 | --- | --- |
@@ -897,7 +1614,7 @@ For the size of the buffer tank, either the `volume` or the `capacity` can be gi
 the density and thermal capacity of the medium, `rho_medium` and `cp_medium`, are not required. 
 Note that no losses are applied when the storage is completely empty, meaning at `low_temperature`.
 
-**General parameter:**
+**General parameter**
 
 | Name        | Type    | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ------- | ---- | ----------- |
@@ -905,7 +1622,7 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | `capacity` | `Float` | Y/N | 12000.0 |  [Wh] | capacity of the BT: Note that either volume or capacity should be given. |
 | OR: `volume` | `Float` | Y/N | 15.5 |  [\(m³\)] | volume of the BT: Note that either volume or capacity should be given.  |
 | `rho_medium` | `Float` | Y/Y | 1000.0 |  [kg/\(m³\)] | density of the heat carrier medium |
-| `cp_medium` | `Float` | Y/Y | 4.18 |  [kJ/(kg K)] |specific thermal capacity of the heat carrier medium |
+| `cp_medium` | `Float` | Y/Y | 4180 |  [J/(kg K)] |specific thermal capacity of the heat carrier medium |
 | `high_temperature` | `Temperature` | Y/Y | 75.0 | [°C] | the upper temperature of the buffer tank, equals the required input temperature |
 | `low_temperature` | `Temperature` | Y/Y | 20.0 | [°C] | the lower temperature of the buffer tank defining the empty state |
 | `initial_load` | `Float` | Y/Y | 0.0 |  [%/100] [0:1] |the initial load state of the buffer tank |
@@ -934,10 +1651,32 @@ Note that no losses are applied when the storage is completely empty, meaning at
 
 Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the buffer tank component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:18000,0.92` | [€/m^3] or [€] | Function for specific investment costs with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the buffer tank component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^3] or [g CO2] | Function for specific embodied emissions with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for buffer tank**
 
-Minimal definition of a buffer tank in the input file:
+Minimal definition of a buffer tank in the input file, including economy and emissions:
 
 ```JSON
 "TST_BFT_TH_01": {
@@ -947,7 +1686,24 @@ Minimal definition of a buffer tank in the input file:
         "TST_DEM_01"
     ],
     "model_type": "ideally_stratified",
-    "capacity": 10000
+    "capacity": 10000,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "power_func:18000,0.92",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -964,7 +1720,7 @@ Extended definition of a buffer tank in the input file:
     "model_type": "ideally_stratified",
     "capacity": 300000,
     "rho_medium": 1000,
-    "cp_medium": 4.18,
+    "cp_medium": 4180,
     "high_temperature": 80.0,
     "low_temperature": 15.0,
     "initial_load": 0.5,
@@ -983,57 +1739,131 @@ Extended definition of a buffer tank in the input file:
 }
 ```
 
-### Seasonal thermal storage
+### Seasonal thermal storage / universal stratified (ground-coupled) thermal storage
 | | |
 | --- | --- |
-| **Type name** | `SeasonalThermalStorage`|
+| **Type name** | `SeasonalThermalStorage` |
 | **File** | `energy_systems/storage/seasonal_thermal_storage.jl` |
+| **Available models** | `ground_model="simplified"` (default), `ground_model="FVM"` |
 | **System function** | `storage` |
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower`  |
-| **Auxiliary Plots** | 3D-Model of the geometry, Cross-sectional drawing, temperature distribution over time  |
+| **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `LossesGains_top`, `LossesGains_sidewalls`, `LossesGains_bottom`,`CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower` (additional temperature outputs for ground and STES if `reproduce_IEA_ES_Task39` is activated) |
+| **Auxiliary Plots** | 3D-Model of the geometry of the STES, cross-sectional drawing of the STES, temperature distribution over time within the STES, temperature difference to ambient for each STES layer, ground mesh & time-shiftable ground temperature field for `FVM` |
 
-A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
+A stratified seasonal thermal energy storage (STES) represented by a 1D multi-layer model of the storage medium. Thermal stratification is represented via diffusion and buoyancy effects. Loading is modelled with a thermal lance (charging into the layer matching the inlet temperature), while unloading is taken from the topmost layer with a return temperature at `low_temperature`. Currently, no indirect loading or unloading is included. 
 
-The seasonal thermal storage is a multi-layer water storage, either as pit (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, as shown in the following figure:
+Heat losses are modelled through lid, side walls, and base. The interaction with the surrounding ground can be represented either by:
+
+- `ground_model="simplified"`: prescribed ground temperature (profile or constant), no thermal capacity of the ground, or
+- `ground_model="FVM"`: axisymmetric transient ground conduction model (finite volume), providing dynamic effective ambient temperatures for buried wall layers and the base of the STES.
+
+The seasonal thermal storage can be modelled either as pit  (truncated quadratic pyramid or truncated cone) or as tank with round or square cross-sectional shape, depending on the given `shape` and the `sidewall_angle`, as shown in the following figure:
 
 ![Possible geometries for STES](fig/250722_STES_geometries.jpg)
 
- The 1D-PDE model includes losses to the ambient (air and ground) as well as thermal stratification including thermal diffusion and buoyancy effects. Loading the storage is modelled with a thermal lance, so energy can be loaded at different temperatures in the thermal layer that has the same temperature. Unloading is always from the uppermost layer assuming a return temperature at the user-defined `low_temperature` of the storage. Currently, no indirect loading or unloading is included. 
+A note on the 3D-model of the geometry: The current Plotly version used to create the figures does not always use an equal aspect ratio, although it is specified! Therefore, the STES may look distorted with one set of parameters, but be fine with another set of parameters. This is a known bug. You can still use the cross-section drawing (2D) to get a reliable feel for the geometry of the STES.
 
- Important: Currently, the energy exchange with the ground is implemented in a simplified way. The ground does not have a thermal capacity in this model, instead a constant ground temperature is assumed! This can lead to wrong results! A ground temperature profile (e.g. monthly) could be used to mitigate this effect. With a soil temperature of constant 10 °C throughout the year, the losses are significantly too high.
+**General Parameter for geometry, stratification, limits and losses**
 
 | Name | Type | R/D | Example | Unit | Description |
-| ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `volume` | `Float` | Y/N | 12000.0 | [m^3] | The overall volume of the STES. |
-| `initial_load` | `Float` | Y/Y | 0.0 | [%/100] | The initial load of the STES, given in the range from [0.0 - 1.0]. Note that the temperature distribution will be set to an equal temperature in all layers at the beginning of the simulation.  |
-| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | The upper temperature of the STES, equals the highest temperature for loading. |
-| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C]  | The lower temperature of the STES, equals the assumed return flow temperature during unloading. Note that the temperature may become lower due to thermal losses to the ambient. |
-| `shape` | `String` | Y/Y | `quadratic` | [-] | The shape of the cross-section of the STES. Can either be `round` for cylinder/truncated cone or `quadratic` for tank or truncated quadratic pyramid (pit). |
-| `hr_ratio` | `Float` | Y/Y | 0.8 | [-] | The ratio of storage height to the mean radius (round shape) respective half the sidewall length (quadratic shape). |
-| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | The angle of the sidewall of the STES with respect to the horizon in range 0...90°. |
-| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m^3] | The density of the storage medium (typically water). |
-| `cp_medium` | `Float` | Y/Y | 4.186 | [kJ/(kgK)] | The specific thermal capacity of the storage medium (typically water). |
-| `diffusion_coefficient` | `Float` | Y/Y | 0.143 * 10^-6 | [m^2/s] | The diffusion coefficient of the storage medium (typically water). |
-| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | The number of thermal layers in the STES model. |
-| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | The number of thermal layers that are above the ground, meaning their losses are to the ambient air and not to the ground. |
-| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related loading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
-| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | The maximum energy-related unloading rate, given as energy per hour related to the total energy capacity of the STES, also known as C-rate. |
-| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related loading rate, given as mass per hour **per input interface** related to the total mass in the STES. |
-| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | The maximum mass-related unloading rate, given as **total** mass per hour related to the total mass in the STES. |
-| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m^2K)] | The thermal transmission through the lid of the STES`, always into the air. |
-| `thermal_transmission_barrel` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the barrel of the STES, into the air or into the ground, depending on `number_of_layer_above_ground`. |
-| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m^2K)] |The thermal transmission through the bottom of the STES, always into the ground. |
-| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ambient_temperature.prf` | [°C] | Path to the profile for the surrounding air temperature. |
-| OR: `constant_ambient_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding air temperature to a constant value. |
-| OR: `ambient_temperature_from_global_file` | `String` | Y/N | ` temp_ambient_air` | [-] | If given, sets the surrounding air temperature to the ambient air temperature of the global weather file. |
-| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/district/ground_temperature.prf` | [°C] | Path to the profile for the surrounding ground temperature. |
-| OR: `constant_ground_temperature` | `Float` | Y/N | 18.0 | [°C] | If given, sets the surrounding ground temperature to a constant value. |
+| ----------- | ------- | --- | --- | --- | --- |
+| `volume` | `Float` | Y/N | 12000.0 | [m³] | total storage volume |
+| `initial_load` | `Float` | Y/Y | 0.0 | [-] | initial state of charge in the range 0…1 |
+| `high_temperature` | `Temperature` | Y/Y | 90.0 | [°C] | upper/rated storage temperature (maximum charging temperature) |
+| `low_temperature` | `Temperature` | Y/Y | 15.0 | [°C] | lower/rated storage temperature (assumed return temperature during unloading; storage may drop below due to losses) |
+| `shape` | `String` | Y/Y | `quadratic` | [-] | cross-section shape: `round` for cone or (truncated) cylinder or `quadratic` for (truncated) quadratic pyramid or cuboid  |
+| `hr_ratio` | `Float` | Y/Y | 0.5 | [-] | height-to-mean-radius ratio (round) or height-to-mean-half-side ratio (quadratic) |
+| `sidewall_angle` | `Float` | Y/Y | 40.0 | [°] | wall slope angle w.r.t. the horizon (0…90°); 90° corresponds to vertical wall |
+| `ground_model` | `String` | Y/Y | `simplified` | [-] | choose `simplified` (prescribed ground temperature) or `FVM` (transient axisymmetric ground conduction model) |
+| `rho_medium` | `Float` | Y/Y | 1000.0 | [kg/m³] | density of the storage medium |
+| `cp_medium` | `Float` | Y/Y | 4180.0 | [J/(kg·K)] | specific heat capacity of the storage medium |
+| `diffusion_coefficient` | `Float` | Y/Y | 1.43e-7 | [m²/s] | effective thermal diffusion coefficient used for stratification/diffusion modelling |
+| `number_of_layer_total` | `Int` | Y/Y | 25 | [-] | number of thermal layers in the storage model (from bottom to top) |
+| `number_of_layer_above_ground` | `Int` | Y/Y | 5 | [-] | number of top layers located above ground (losses to ambient air instead of ground model) |
+| `max_load_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max charging C-rate (energy per hour relative to storage energy capacity) |
+| `max_unload_rate_energy` | `Float` | N/N | 0.01 | [1/h] | optional max discharging C-rate (energy per hour relative to storage energy capacity) |
+| `max_load_rate_mass` | `Float` | N/N | 0.04 | [1/h] | optional max charging mass-flow rate **per input interface**, relative to total storage mass |
+| `max_unload_rate_mass` | `Float` | N/N | 0.04 | [1/h] | optional max discharging mass-flow rate (**total**), relative to total storage mass |
+| `thermal_transmission_lid` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective U-value through the lid (always to ambient air) |
+| `thermal_transmission_barrel_above_ground` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the side walls for above-ground layers (to ambient air) |
+| `thermal_transmission_barrel_below_ground` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the side walls for buried layers (to ground) |
+| `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the base (always to the ground) |
+| `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/ambient_temperature.prf` | [°C] | ambient temperature time series profile (choose only one ambient option) |
+| OR: `constant_ambient_temperature` | `Temperature` | Y/N | 18.0 | [°C] | constant ambient temperature (choose only one ambient option) |
+| OR: `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | ambient dry-bulb temperature from the global weather file (choose only one ambient option) |
+| `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simplified` and as reference/deep boundary temperature in `FVM` ground model) |
+| OR: `constant_ground_temperature` | `Temperature` | Y/N | 10.0 | [°C] | constant ground temperature (same usage as above) |
+| `output_layer_from_top` | `Int` | Y/Y | 1 | [-] | layer index for extraction, counted from the top (1 = topmost layer) |
+| `reproduce_IEA_ES_Task39` | `String` | N/N | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
 
-Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+
+Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
 Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
+
+**Ground coupling model `FVM` (only if `ground_model="FVM"`)**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ----------- | ------- | --- | --- | --- | --- |
+| `ground_domain_radius_factor` | `Float` | Y/Y | 1.5 | [-] | factor for derived domain radius (multiplied by storage radius at ground surface); ignored if `ground_domain_radius` is set |
+| `ground_domain_depth_factor` | `Float` | Y/Y | 2.0 | [-] | factor for derived domain depth (multiplied by total storage height); ignored if `ground_domain_depth` is set |
+| `ground_domain_radius` | `Float` | N/N | 60.0 | [m] | ground domain radius; if not provided, derived from storage size using `ground_domain_radius_factor` |
+| `ground_domain_depth` | `Float` | N/N | 40.0 | [m] | ground domain depth; if not provided, derived from storage height using `ground_domain_depth_factor` |
+| `ground_accuracy_mode` | `String` | Y/Y | `normal` | [-] | mesh preset: `very_rough`, `rough`, `normal`, `high`, `very_high`. See below for details. |
+| `ground_layers_depths` | `Vector{Float}` | N/N | `[0.0, 2.0, 10.0]` | [m] | layer interface depths from surface; defines intervals `[d[i], d[i+1])` that are mapped to `ground_layers_k`, `ground_layers_roh` and `ground_layers_cp` (will be extended to `ground_domain_depth` if not already covered) |
+| `ground_layers_k` | `Vector{Float}` | Y/Y | `[1.5]` | [W/(m·K)] | thermal conductivity per ground layer; if shorter than the number of defined ground layers, the last value is repeated |
+| `ground_layers_rho` | `Vector{Float}` | Y/Y | `[2000.0]` | [kg/m³] | mass density per ground layer; broadcasting rule as above |
+| `ground_layers_cp` | `Vector{Float}` | Y/Y | `[1000.0]` | [J/(kg·K)] | specific heat capacity per ground layer; broadcasting rule as above |
+| `soil_surface_hconv` | `Float` | Y/Y | 14.7 | [W/(m²·K)] | convective heat transfer coefficient at the ground surface outside the overlap ring |
+| `has_top_insulation_overlap` | `Bool` | Y/Y | false | [-] | enables an optional insulation overlap ring at the ground surface around the storage |
+| `top_insulation_overlap_width` | `Float` | Y/Y | 5.0 | [m] | radial width of the surface overlap ring (only used if `has_top_insulation_overlap=true`) |
+| `thermal_transmission_overlap` | `Float` | Y/Y | 0.25 | [W/(m²·K)] | effective surface U-value of the overlap ring (only used if `has_top_insulation_overlap=true`) |
+| `ground_bottom_boundary` | `String` | Y/Y | `Neumann` | [-] | bottom boundary condition: `Neumann` (adiabatic, zero flux) or `Dirichlet` (fixed temperature using ground temperature input) |
+
+
+**Ground accuracy mode**
+
+The parameter `ground_accuracy_mode` selects a predefined mesh resolution for the axisymmetric FVM ground domain used for ground coupling. Internally it maps to four mesh controls:
+
+- `min_w`: minimum cell width in refined regions, defined relative to the height of the STES layers (`mindz`).
+- `max_w`: maximum allowed cell width in the far-field / deep ground.
+- `n_wall`: number of radial cells across the near-wall refinement band per vertical STES layer step, only  if `sidewall_angle < 90°` (higher values better resolve wall heat exchange).
+- `ef`: geometric expansion factor for grading from fine to coarse cells (growth ratio between adjacent cells).
+
+The available presets are:
+
+- `very_rough`: `min_w = mindz/1`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+- `rough`: `min_w = mindz/2`, `max_w = 8 m`, `n_wall = 1`, `ef = 2.0`
+- `normal`: `min_w = mindz/3`, `max_w = 4 m`, `n_wall = 1`, `ef = 2.0`
+- `high`: `min_w = mindz/4`, `max_w = 2 m`, `n_wall = 2`, `ef = 2.0`
+- `very_high`: `min_w = mindz/8`, `max_w = 1 m`, `n_wall = 3`, `ef = 2.0`
+- `IEA_ES_39`: `min_w = mindz/2.74`, `max_w = 16 m`, `n_wall = 1`, `ef = 2.0`
+
+Higher accuracy increases the number of ground cells (especially near the wall and in the refined regions),  improving resolution of ground temperature gradients and storage heat losses, at the cost of higher runtime and memory use. In most cases, `rough` or `normal` should be good enough!
+
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `linear:130.0` | [€/m^3] or [€] | Function for specific investment costs with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^3] or [g CO2] | Function for specific embodied emissions with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for SeasonalThermalStorage**
 
@@ -1042,31 +1872,64 @@ Also either `ground_temperature_profile_file_path` **or** `constant_ground_tempe
     "type": "SeasonalThermalStorage",
     "m_heat_in": "m_h_w_ht1",
     "m_heat_out": "m_h_w_lt1",
-    "output_refs": [
-        "TST_HP_01"
-    ],
-    "volume": 3000,
-    "initial_load": 0.2,
-    "high_temperature": 95,
-    "low_temperature": 10,
-    "shape": "round",
-    "hr_ratio": 1.5,
-    "sidewall_angle": 60,
-    "rho_medium": 1000,
-    "cp_medium": 4.18,
-    "diffusion_coefficient": 0.000000143,
-    "number_of_layer_total": 25,
-    "number_of_layer_above_ground": 1,
-    "max_load_rate_energy": 0.01,
-    "max_unload_rate_energy": 0.01,
-    "max_load_rate_mass": 0.04,
-    "max_unload_rate_mass": 0.04,
-    "thermal_transmission_lid": 0.25,
-    "thermal_transmission_barrel": 0.375,
-    "thermal_transmission_bottom": 0.375,
+    "output_refs": ["TST_DEM_01"],		
+    "volume": 50000,
+    "initial_load": 0.0,
     "ambient_temperature_from_global_file": "temp_ambient_air",
-    "constant_ground_temperature": 18.0,
-}
+    "constant_ground_temperature": 10.0,
+    "___GEOMETRY_AND_PHYSICS___": "",
+    "hr_ratio": 0.55,
+    "sidewall_angle": 27.5,
+    "shape": "round",
+    "rho_medium": 988.1,
+    "cp_medium": 4181,
+    "diffusion_coefficient": 1.43e-7,
+    "number_of_layer_total": 30,
+    "number_of_layer_above_ground": 0,
+    "output_layer_from_top": 1,
+    "thermal_transmission_lid": 0.1,
+    "thermal_transmission_barrel_above_ground": 0.2,
+    "thermal_transmission_barrel_below_ground": 0.2,
+    "thermal_transmission_bottom": 0.2,											   
+    "___TEMPERATURES_AND_LIMITS___": "",
+    "high_temperature": 90,
+    "low_temperature": 10,
+    "max_load_rate_energy": 1,
+    "max_unload_rate_energy": 1,
+    "max_load_rate_mass": 1,
+    "max_unload_rate_mass": 1,
+    "___FOR_GROUND_MODEL_FVM_ONLY___": "",
+    "ground_model": "FVM",
+    "ground_accuracy_mode": "rough",
+    "ground_domain_radius_factor": 1.5,
+    "ground_domain_depth_factor": 2.0,
+    "ground_layers_depths": [0.0, 2.0, 10.0],
+    "ground_layers_k": [1.5, 2.0], 
+    "ground_layers_rho": [ 2100 ],
+    "ground_layers_cp": [ 1330 ],
+    "soil_surface_hconv": 15.5,
+    "has_top_insulation_overlap": true,
+    "top_insulation_overlap_width": 5.0,
+    "thermal_transmission_overlap": 0.1,
+    "ground_bottom_boundary": "Neumann",
+    "economic_parameters": {
+        "lifetime_years": 50,
+        "capex_specific": "linear:130.0",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.02,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 50,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
+    }
 ```
 
 ## Heat sources and sinks
@@ -1086,6 +1949,8 @@ A generic heat source for various sources of heat.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
 
+**General parameter**
+
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `max_power_profile_file_path` | `String` | N/N | `profiles/district/max_power.prf` | [W] or [Wh] | Path to the max power profile. Define unit in profile header. |
@@ -1098,6 +1963,48 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `min_source_in_temperature` | `Float` | N/N | -10.0 | [°C] | Minimum source input temperature. |
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | [°C] | Maximum source input temperature. |
 | `minimal_reduction` | `Float` | N/Y | 2.0 | [K] | Minimal reduction temperature. For the `constant` model this exact value is used, for `lmtd` a slight correction is applied. |
+
+**Parameter for economic calculation**
+
+Capex and/or energy related prices can be defined. 
+
+Capex-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the generic heat source component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scaling_factor)] or [€] | Function for specific investment costs with respect to the constant power `constant_power` or scaling factor `scale`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+Energy-related parameters:
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `constant_energy_price` | `Float` | N/N | 0.3e-3 | [€/Wh] | Constant energy price. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| OR: `energy_price_profile_file_path` | `String` | N/N | `profiles/economy/energy_price.prf` | [€/Wh] | Path to an energy price profile file. Either `energy_price_profile_file_path` or `constant_energy_price` must be given. |
+| `energy_price_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy price profile. Only applies to profiles. |
+| `energy_price_change_rate_per_year` | `Float` | N/Y | 0.02 | [1/a] | Yearly change rate of the energy price. |
+| `base_cost_per_year` | `Float` | N/Y | 0.0 | [€] | Yearly base cost independent of energies. |
+| `base_cost_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the base cost. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the generic heat source component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scaling_factor)] or [g CO2] | Function for specific embodied emissions with respect to the constant power `constant_power` or scaling factor `scale`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+| `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
+| `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
+| `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
 
 **Exemplary input file definition for GenericHeatSource**
 
@@ -1114,7 +2021,30 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
     "temperature_reduction_model": "lmtd",
     "min_source_in_temperature": 5,
     "max_source_in_temperature": 35,
-    "scale": 2000
+    "scale": 2000,
+    "economic_parameters": {
+        "lifetime_years": 20,
+        "capex_specific": "const:0.0",
+        "capex_price_change_rate_per_year": 0.0,
+        "maintenance_inspection_rate_per_year": 0.0,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.0,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0,
+        "constant_energy_price": 0.3e-3,
+        "energy_price_change_rate_per_year": 0.02,
+        "base_cost_per_year": 0.0,
+        "base_cost_change_rate_per_year": 0.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 20,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0,
+        "constant_energy_emissions": 230e-3,
+        "energy_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1343,7 +2273,7 @@ To perform this calculation in every timestep, the following input parameters ar
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
-| `probe_type` | `Int` | Y/Y | 2 | [-] | probe type: 1: single U-pipe in one probe, 2: double U-pipe in one probe |
+| `probe_type` | `String` | Y/Y | `double U-pipe` | [-] | Options: `single U-pipe`, `double U-pipe` |
 | `pipe_diameter_outer` | `Float` | Y/Y | 0.032 | [m] | outer pipe diameter |
 | `pipe_diameter_inner` | `Float` | Y/Y | 0.026 | [m] | inner pipe diameter |
 | `pipe_heat_conductivity` | `Float` | Y/Y | 0.42 | [W/(Km)] | heat conductivity of inner pipes |
@@ -1361,6 +2291,28 @@ To perform this calculation in every timestep, the following input parameters ar
 The geothermal probe provides internal control methods. The parameter `limit_max_output_energy_to_avoid_pulsing` can be used to activate an algorithm that tries to prevent pulsing (if set to `true`). Here, a kind of *variable-speed fluid pump* is imitated and the output energy is limited to provide the current temperature also in the next timestep. Note that in certain cases, this can lead to no energy being drawn from the geothermal probe at all. If the parameter is set to `false`, the maximum energy in the current time step is set to the `max_output_power` if the temperatures allow an energy extraction. This represents kind of an *on-off fluid pump* and requires less computational effort.
 Note: If the control module `negotiate_temperature` is active, this parameter will be overwritten by the control module! 
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the geothermal probes component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `linear:100` | [€/m] or [€] | Function for specific investment costs with respect to the total probe length of all probes. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the geothermal probes component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m] or [g CO2] | Function for specific embodied emissions with respect to the total probe length of all probes. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for GeothermalProbe:**
 
@@ -1398,7 +2350,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
     "___SIMPLIFIED MODEL___": "",
     "borehole_thermal_resistance": 0.1,
     "___DETAILED MODEL___": "",
-    "probe_type": 2,
+    "probe_type": "double U-pipe",
     "pipe_diameter_outer": 0.032,
     "pipe_diameter_inner": 0.0262,
     "pipe_heat_conductivity": 0.42,
@@ -1408,7 +2360,24 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
     "fluid_kinematic_viscosity": 3.9e-6,
     "fluid_heat_conductivity": 0.48,
     "fluid_prandtl_number": 31.3,
-    "grout_heat_conductivity": 2
+    "grout_heat_conductivity": 2,
+    "economic_parameters": {
+        "lifetime_years": 50,
+        "capex_specific": "linear:100",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.02,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 50,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1497,6 +2466,29 @@ To perform this calculation in every timestep, the following input parameters ar
 | `fluid_kinematic_viscosity` | `Float` | Y/Y | 3.9e-6 | [m²/s] | kinematic viscosity of the fluid |
 | `fluid_prandtl_number` | `Float` | Y/Y | 30 | [-] | Prandtl-number of the fluid |
 
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 30.0 | [a] | Lifetime of the geothermal heat collector component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `linear:20` | [€/m] or [€] | Function for specific investment costs with respect to the total pipe length of the collector. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 0.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 30.0 | [a] | Lifetime of the geothermal heat collector component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m] or [g CO2] | Function for specific embodied emissions with respect to the total pipe length of the collector. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
 **Exemplary input file definition for geothermal collector:**
 
 ```JSON
@@ -1543,7 +2535,24 @@ To perform this calculation in every timestep, the following input parameters ar
     "fluid_heat_conductivity": 0.499,
     "fluid_density": 1025,
     "fluid_kinematic_viscosity": 3.6e-6,
-    "fluid_prantl_number": 30
+    "fluid_prantl_number": 30,
+    "economic_parameters": {
+        "lifetime_years": 30,
+        "capex_specific": "linear:20",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.02,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 0.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 30,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
@@ -1561,6 +2570,8 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Tracked values** | `OUT`, `Temperature_Output`, `Temperature_Mean_Collector` , `direct_normal_irradiance`, `beam_solar_irradiance_in_plane`, `diffuse_solar_irradiance_in_plane`, `delta_T`, `spec_flow_rate` |
 
 Solarthermal collector producing heat depending on weather conditions. The collector works in two modes depending if the collector should regulate the specific flow rate  `spec_flow_rate`  or temperature difference between input and output temperature `delta_T`. For this exclusively either `delta_T` or `spec_flow_rate` can be set to a fixed value.  If `delta_T` is set `spec_flow_rate_min` can be given, to make sure the collector doesn't turn on when only a very small flow rate and therefore small energy can be extracted from the collector. They same works for `spec_flow_rate` and `delta_T_min`.
+
+**General parameter**
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ---|--------------------- | ------------------------ |
@@ -1595,7 +2606,30 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s/m² | Minimal spec_flow_rate to start producing energy; used together with delta_T |
 | OR:`delta_T_min` | `Float` | N/Y | 2.0 | K | Minimal delta_T to start producing energy; used together with spec_flow_rate |
 
-**Exemplary input file definition for flat plate solarthermal collector:**
+**Parameter for economic calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the solarthermal collector component until replacement is required. |
+| `capex_specific` | `String` | Y/N | `power_func:2.887,0.69` | [€/m^2] or [€] | Function for specific investment costs with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
+| `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
+| `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
+| `repair_rate_per_year` | `Float` | N/Y | 0.005 | [-] | Yearly rate of repair costs with respect to the initial capex. |
+| `repair_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the repair costs. |
+| `operational_labour_hours_per_year` | `Float` | N/Y | 5.0 | [h/a] | Hours of labour per year for operation. |
+| `subsidy_rate_of_capex` | `Float` | N/Y | 0.0 | [-] | Subsidy rate of initial capex. |
+| `subsidy_max` | `Float` | N/Y | -1.0 | [€] | Maximum subsidy for this component, e.g. 100,000 €. Negative values are treated as infinity. |
+
+**Parameter for GHG emissions calculation**
+
+| Name | Type | R/D | Example | Unit | Description |
+| ---- | ---- | --- | ------- | ---- | ----------- |
+| `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the solarthermal collector component until replacement is required. |
+| `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^2] or [g CO2] | Function for specific embodied emissions with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
+**Exemplary input file definition for flat plate solarthermal collector, including economy and emissions:**
 
 ```JSON
 "TST_STC_01": {
@@ -1623,7 +2657,25 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "vol_heat_capacity": 3921470,
     "wind_speed_reduction": 1.0,
     "delta_T": 4,
-    "spec_flow_rate_min": 3.0E-08
+    "spec_flow_rate_min": 3.0E-08,
+    
+    "economic_parameters": {
+        "lifetime_years": 18.0,
+        "capex_specific": "power_func:2.887,0.69",
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.01,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.005,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 5.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 18.0,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
 }
 ```
 
