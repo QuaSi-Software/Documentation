@@ -337,7 +337,7 @@ Note: Many parameters have to be given as rates, e.g. the `capex_price_change_ra
 For some parameters, no defaults are provided, for example for (embodied) GHG emissions, energy prices, or specific investment costs, as these values are highly project-specific. For component-specific investment costs and energy-related GHG emission factors, the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] is a suitable data source for Germany.
 
 Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m]. For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
- The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition.
+ The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition. Note that ReSiE uses base units for component sizing, like [W] or [m^3], while mostly, the specific const functions are provided with [kW] or [l] as reference. As power functions can not be scaled linearly, the additional parameter `*_scale` can be used to scale the reference value before it is evaluated in the given function, e.g.: `investments costs = power_func(scale [kW/W] * component size [W])`. So a scale factor of `1e-3` can be used to input a cost function in [€/kW] while the reference unit in ReSiE is [W], or a scale factor of `1e3` can be used to input a cost function in [€/l] while the reference unit in ReSiE is [m^3].
 
 For connection components, the reference value for capex and embodied emissions may differ depending on how the component size is defined.
 If a constant demand or supply is given, this value is used as the reference. In this case, capex and embodied emissions can be provided as functions of this power, e.g in [€/W]. If a profile is given, the capex and embodied emissions are related to the scale factor of the profile. Therefore, the scale factor and the specific investment costs or emissions must refer to the same physical quantity. For example, a thermal heating demand of a building can be scaled either by its absolute power, if a constant power is given, or by the scale factor of a profile. If the profile contains energy demand per square meter building and the scale factor is used to adjust the profile to the actual building size, the capex should also be given with respect to square meters in [€/m^2].
@@ -386,6 +386,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible sink component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scale)] or [€] | Function for specific investment costs with respect to the constant power or scaling factor. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -412,6 +413,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible sink component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant power or scaling factor. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
 | OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
@@ -456,6 +458,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible supply component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scale)] or [€] | Function for specific investment costs with respect to the constant power or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -482,6 +485,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the flexible supply component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant power or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
 | OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
@@ -552,6 +556,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed sink component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_demand or scale)] or [€] | Function for specific investment costs with respect to the constant demand or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -582,6 +587,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed sink component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_demand or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant demand or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
 | OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
@@ -638,6 +644,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed supply component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_supply or scale)] or [€]| Function for specific investment costs with respect to the constant supply or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -668,6 +675,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fixed supply component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_supply or scale)] or [g CO2] | Function for specific embodied emissions with respect to the constant supply or scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
 | OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
@@ -707,6 +715,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid input component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€] | Function for investment costs of the grid input component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -733,6 +742,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid input component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2] | Function for embodied emissions of the grid input component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
 | OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
@@ -772,6 +782,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid output component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€] | Function for investment costs of the grid output component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -798,6 +809,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the grid output component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2] | Function for embodied emissions of the grid output component. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions_credits` | `Float` | N/N | 400e-3 | [g CO2/Wh] | Constant specific emissions credits for the sink component. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
 | OR: `energy_emissions_credits_profile_file_path` | `String` | N/N | `profiles/emissions/emissions_credits.prf` | [g CO2/Wh] | Path to a specific emissions credits profile file. Either `energy_emissions_credits_profile_file_path` or `constant_energy_emissions_credits` must be given. |
@@ -840,6 +852,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the PV plant component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/scale] or [€] | Function for specific investment costs with respect to the scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -870,6 +883,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the PV plant component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/scale] or [g CO2] | Function for specific embodied emissions with respect to the scale. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
 | OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
@@ -909,7 +923,8 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 15.0 | [a] | Lifetime of the CHPP component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:7.304,0.66` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:76.48,0.66` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.005 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -925,6 +940,7 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 15.0 | [a] | Lifetime of the CHPP component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Electrolyser
@@ -976,6 +992,7 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the electrolyser component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `linear:0.9` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | -0.02 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.025 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -997,6 +1014,7 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the electrolyser component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Fuel boiler
@@ -1032,7 +1050,8 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fuel boiler component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:4.634,0.46` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:193.2,0.46` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1048,6 +1067,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fuel boiler component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Thermal booster (TB)
@@ -1086,7 +1106,8 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the thermal booster component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:1.428,0.75` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:8.03,0.75` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1102,6 +1123,7 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the thermal booster component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_el`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for ThermalBooster**
@@ -1123,7 +1145,7 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
     "allow_boost_additional": true,
     "economic_parameters": {
         "lifetime_years": 18,
-        "capex_specific": "power_func:1.428,0.75",
+        "capex_specific": "power_func:8.03,0.75",
         "capex_price_change_rate_per_year": 0.012,
         "maintenance_inspection_rate_per_year": 0.01,
         "maintenance_inspection_price_change_rate_per_year": 0.0,
@@ -1207,7 +1229,8 @@ The heat pump model implemented can serve different temperature layers in the in
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the heat pump component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:5.909,0.71` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:43.8,0.71` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.015 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1223,6 +1246,7 @@ The heat pump model implemented can serve different temperature layers in the in
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the heat pump component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 #### Exemplary input file definition for HeatPump
@@ -1239,7 +1263,7 @@ The heat pump model implemented can serve different temperature layers in the in
     "heat_losses_factor": 1.0,
     "economic_parameters": {
         "lifetime_years": 20,
-        "capex_specific": "power_func:5.909,0.71",
+        "capex_specific": "power_func:43.8,0.71",
         "capex_price_change_rate_per_year": 0.012,
         "maintenance_inspection_rate_per_year": 0.015,
         "maintenance_inspection_price_change_rate_per_year": 0.0,
@@ -1308,6 +1332,7 @@ This can be used to model electric components that transform from one type of el
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 10.0 | [a] | Lifetime of the UTIR component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:100000` | [€/W] or [€] | Function for specific investment costs with respect to the nominal power `power`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.05 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1323,6 +1348,7 @@ This can be used to model electric components that transform from one type of el
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 10.0 | [a] | Lifetime of the UTIR component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 #### Exemplary input file definition for UTIR
@@ -1403,6 +1429,7 @@ A generic implementation for energy storage technologies.
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the storage component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/Wh] or [€] | Function for specific investment costs with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.01 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1418,6 +1445,7 @@ A generic implementation for energy storage technologies.
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the storage component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/Wh] or [g CO2] | Function for specific embodied emissions with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 ### Battery
@@ -1486,6 +1514,7 @@ To simplify the use of this model multiple battery chemistries are provided with
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 12.0 | [a] | Lifetime of the battery component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `linear:0.2` | [€/Wh] or [€] | Function for specific investment costs with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | -0.031 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1501,6 +1530,7 @@ To simplify the use of this model multiple battery chemistries are provided with
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 12.0 | [a] | Lifetime of the battery component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/Wh] or [g CO2] | Function for specific embodied emissions with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 #### Exemplary input file definition for Battery
@@ -1656,7 +1686,8 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the buffer tank component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:18000,0.92` | [€/m^3] or [€] | Function for specific investment costs with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:10358,0.92` | [€/m^3] or [€] | Function for specific investment costs with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1672,6 +1703,7 @@ Note that either `ambient_temperature_profile_path`, `constant_ambient_temperatu
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the buffer tank component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^3] or [g CO2] | Function for specific embodied emissions with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for buffer tank**
@@ -1689,7 +1721,7 @@ Minimal definition of a buffer tank in the input file, including economy and emi
     "capacity": 10000,
     "economic_parameters": {
         "lifetime_years": 20,
-        "capex_specific": "power_func:18000,0.92",
+        "capex_specific": "power_func:10358,0.92",
         "capex_price_change_rate_per_year": 0.012,
         "maintenance_inspection_rate_per_year": 0.01,
         "maintenance_inspection_price_change_rate_per_year": 0.0,
@@ -1848,6 +1880,7 @@ Higher accuracy increases the number of ground cells (especially near the wall a
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `linear:130.0` | [€/m^3] or [€] | Function for specific investment costs with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -1863,6 +1896,7 @@ Higher accuracy increases the number of ground cells (especially near the wall a
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the seasonal thermal storage component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^3] or [g CO2] | Function for specific embodied emissions with respect to the storage volume `volume`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for SeasonalThermalStorage**
@@ -1974,6 +2008,7 @@ Capex-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the generic heat source component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `const:0.0` | [€/(constant_power or scaling_factor)] or [€] | Function for specific investment costs with respect to the constant power `constant_power` or scaling factor `scale`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.0 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -2000,6 +2035,7 @@ Energy-related parameters:
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the generic heat source component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/(constant_power or scaling_factor)] or [g CO2] | Function for specific embodied emissions with respect to the constant power `constant_power` or scaling factor `scale`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 | `constant_energy_emissions` | `Float` | N/N |  230e-3| [g CO2/Wh] | Constant specific emissions for the source component. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
 | OR: `energy_emissions_profile_file_path` | `String` | N/N | `profiles/emissions/energy_emissions.prf` | [g CO2/Wh] | Path to a specific emissions profile file. Either `energy_emissions_profile_file_path` or `constant_energy_emissions` must be given. |
@@ -2297,6 +2333,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the geothermal probes component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `linear:100` | [€/m] or [€] | Function for specific investment costs with respect to the total probe length of all probes. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -2312,6 +2349,7 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 50.0 | [a] | Lifetime of the geothermal probes component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m] or [g CO2] | Function for specific embodied emissions with respect to the total probe length of all probes. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for GeothermalProbe:**
@@ -2472,6 +2510,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 30.0 | [a] | Lifetime of the geothermal heat collector component until replacement is required. |
 | `capex_specific` | `String` | Y/N | `linear:20` | [€/m] or [€] | Function for specific investment costs with respect to the total pipe length of the collector. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.02 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -2487,6 +2526,7 @@ To perform this calculation in every timestep, the following input parameters ar
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 30.0 | [a] | Lifetime of the geothermal heat collector component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m] or [g CO2] | Function for specific embodied emissions with respect to the total pipe length of the collector. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for geothermal collector:**
@@ -2611,7 +2651,8 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | Name | Type | R/D | Example | Unit | Description |
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the solarthermal collector component until replacement is required. |
-| `capex_specific` | `String` | Y/N | `power_func:2.887,0.69` | [€/m^2] or [€] | Function for specific investment costs with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific` | `String` | Y/N | `power_func:620,0.92` | [€/m^2] or [€] | Function for specific investment costs with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `capex_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for specific invest costs. This factor is multiplied with the reference value before the function given in `capex_specific` is evaluated.  |
 | `capex_price_change_rate_per_year` | `Float` | N/Y | 0.012 | [1/a] | Yearly price change rate of the capex. |
 | `maintenance_inspection_rate_per_year` | `Float` | N/Y | 0.01 | [-] | Yearly rate of maintenance and inspection costs with respect to the initial capex. |
 | `maintenance_inspection_price_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of the maintenance and inspection costs. |
@@ -2627,6 +2668,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | ---- | ---- | --- | ------- | ---- | ----------- |
 | `lifetime_years` | `Float` | N/Y | 18.0 | [a] | Lifetime of the solarthermal collector component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/m^2] or [g CO2] | Function for specific embodied emissions with respect to the `collector_gross_area`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
+| `embodied_emissions_specific_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the specific embodied emissions.  This factor is multiplied with the reference value before the function given in `embodied_emissions_specific` is evaluated. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
 **Exemplary input file definition for flat plate solarthermal collector, including economy and emissions:**
@@ -2661,7 +2703,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     
     "economic_parameters": {
         "lifetime_years": 18.0,
-        "capex_specific": "power_func:2.887,0.69",
+        "capex_specific": "power_func:620,0.92",
         "capex_price_change_rate_per_year": 0.012,
         "maintenance_inspection_rate_per_year": 0.01,
         "maintenance_inspection_price_change_rate_per_year": 0.0,
