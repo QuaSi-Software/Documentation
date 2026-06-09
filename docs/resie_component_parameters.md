@@ -1094,12 +1094,12 @@ The thermal booster combines low-temperature heat and additional boost energy (e
 | `heat_losses_factor` | `Float` | Y/Y | `0.95` | [-] | Efficiency factor of the low-temperature heat, e.g. thermal loses with respect to the  low-temperature heat input energy. |
 | `output_temperature` | `Temperature` | N/N | `60.0` | [°C] | Optional fixed outlet temperature. If set, the booster provides this temperature at `m_heat_out`. If not given, the desired outlet temperature is determined by the connected component(s). |
 | `input_temperature` | `Temperature` | N/N | `35.0` | [°C] | Optional fixed source-side input temperature. If set, only input layers compatible with this temperature band are used as low-temperature sources. If not given, the source temperature is determined from the connected component(s). |
-| `demand_input_temperature` | `Temperature` | Y/N | `12.0` | [°C] | Constant demand return (input) temperature into the boosters output. Either this or `demand_input_temperature_profile_file_path` must be provided. |
-|  OR: `demand_input_temperature_profile_file_path` | `String` | Y/N | `"profiles/demand_return.prf"` | [–] | Path to a profile file for a time-varying demand return (input) temperature into the boosters output. Either this or `demand_input_temperature` must be provided. |
+| `constant_demand_input_temperature` | `Temperature` | Y/N | `12.0` | [°C] | Constant demand return (input) temperature into the boosters output. Either this or `demand_input_temperature_profile_file_path` must be provided. |
+|  OR: `demand_input_temperature_profile_file_path` | `String` | Y/N | `"profiles/demand_return.prf"` | [–] | Path to a profile file for a time-varying demand return (input) temperature into the boosters output. Either this or `constant_demand_input_temperature` must be provided. |
 | `allow_boost_solely` | `Bool` | Y/Y | `true` | [-] | Controls boost-only operation. If `true`, the thermal booster may deliver heat even when no low-temperature heat input is available. If `false`, the component requires a non-zero low-temperature contribution and if non is available, no heat output is supplied, even if boost energy would be available. Default is `true`. |
 | `allow_boost_additional` | `Bool` | Y/Y | `true` | [-] | Controls additional boosting. If `false`, the low-temperature side must always heat the demand as far as possible (up to its maximum intermediate temperature), and the booster is only allowed to do the remaining temperature lift. In this case, the delivered heat is essentially limited by the available low-temperature heat. If `true`, the low-temperature side is not forced to provide the maximum possible temperature lift; whenever low-temperature heat is not sufficient, the model can use additional boost energy to cover the missing part and still deliver the required heat output energy. Default is `true`. |
 
-Note: at least **one** of `demand_input_temperature` or `demand_input_temperature_profile_file_path` must be given. 
+Note: at least **one** of `constant_demand_input_temperature` or `demand_input_temperature_profile_file_path` must be given. 
 
 **Parameter for economic calculation**
 
