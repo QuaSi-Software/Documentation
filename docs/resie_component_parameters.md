@@ -829,6 +829,8 @@ Energy-related parameters:
 | **Output media** | `m_el_out`/`m_e_ac_230v` |
 | **Tracked values** | `OUT`, `Supply` |
 
+The mathematical description of the photovoltaic plant is provided [here](resie_energy_system_components.md/#photovoltaic-pv).
+
 A photovoltaic (PV) power plant producing electricity.
 
 The energy it produces in each time step must be given as a profile, but can be scaled by a fixed value.
@@ -903,6 +905,8 @@ Energy-related parameters:
 | **Output media** | `m_heat_out`/`m_h_w_ht1`, `m_el_out`/`m_e_ac_230v` |
 | **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
+The mathematical description of the combined hat and power plant is provided [here](resie_energy_system_components.md/#combined-heat-and-power-plant-chpp).
+
 A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electricity.
 
 **General parameter**
@@ -953,6 +957,8 @@ A Combined Heat and Power Plant (CHPP) that transforms fuel into heat and electr
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_heat_ht_out`/`m_h_w_ht1`, `m_heat_lt_out`/`m_h_w_lt1`, `m_h2_out`/`m_c_g_h2`, `m_o2_out`/`m_c_g_o2` |
 | **Tracked values** | `IN`, `OUT`, `LossesGains`, `Losses_heat`, `Losses_hydrogen` |
+
+The mathematical description of the electrolyser is provided [here](resie_energy_system_components.md/#hydrogen-electrolyser-hel).
 
 Implementation of an electrolyser splitting pute water into hydrogen and oxygen while providing the waste heat as output.
 
@@ -1028,6 +1034,8 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
+The mathematical description of the fuel boiler is provided [here](resie_energy_system_components.md/#fuel-boiler-fb).
+
 A boiler that transforms chemical fuel into heat.
 
 This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
@@ -1080,6 +1088,8 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | **Input media** | `m_el_in`/`m_e_ac_230v`, `m_heat_in`/`m_h_w_lt1` |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`,  `OUT`, `LossesGains`, `Losses_power`, `Losses_heat`, `mean_intermediate_temperature` |
+
+The mathematical description of the thermal booster is provided [here](resie_energy_system_components.md/#thermal-booster-tb).
 
 The thermal booster combines low-temperature heat and additional boost energy (e.g. electricity) to raise a thermal demand (`m_heat_in`) from its return (input) temperature to a higher supply (output) temperature. It first uses low-temperature heat (`m_heat_in`) to preheat the flow and then adds boost energy (`m_el_in`) to reach the desired outlet temperature, subject to configured loss factors and power limits. It can be used to model an electrical booster e.g. to get domestic hot water from a low-temperature district heating network. Two boolean flags control whether the device may operate purely from boost energy and whether boost energy may compensate a lack of low-temperature heat in order to deliver the requested heat demand.
 
@@ -1174,9 +1184,11 @@ Note: at least **one** of `constant_demand_input_temperature` or `demand_input_t
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`, `OUT`, `COP`, `Effective_COP`, `Avg_PLR`, `Time_active`, `MixingTemperature_Input`, `MixingTemperature_Output`, `Losses_power`, `Losses_heat`, `LossesGains` |
 
+The mathematical description of the heat pump is provided [here](resie_energy_system_components.md/#heat-pump-hp).
+
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
-The heat pump can be used in three different model types: `simplified`, `inverter`, `on-off`. For a description of the different models and how part load effects are taken into account, see [this Chapter.](resie_energy_system_components/#part-load-operation-and-optimisation-of-plr) 
+The heat pump can be used in three different model types: `simplified`, `inverter`, `on-off`. For a description of the different models and how part load effects are taken into account, see [this Chapter.](resie_energy_system_components.md/#part-load-operation-and-optimisation-of-plr) 
 
 **General parameter**
 
@@ -1312,6 +1324,8 @@ The heat pump model implemented can serve different temperature layers in the in
 | **Input media** | `m_el_in` |
 | **Output media** | `m_el_out` |
 | **Tracked values** | `IN`, `OUT`, `LossesGains` |
+
+The mathematical description of the unified electric transformer is based on the fuel boiler which is available [here](resie_energy_system_components.md/#fuel-boiler-fb).
 
 A unified model for electric transformers, inverters and rectifiers.
 
@@ -1462,6 +1476,8 @@ A generic implementation for energy storage technologies.
 | **Input media** | `m_el_in`/`m_e_ac_230v` |
 | **Output media** | `m_el_out`/`m_e_ac_230v`, `m_heat_lt_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `charge_efficiency`, `discharge_efficiency`, `CellVoltage`, `SOC`, `ExtractedCharge`, `Cycles`, `Temperature` |
+
+The mathematical description of the battery is provided [here](resie_energy_system_components.md/#battery-ba).
 
 A storage for electricity.
 
@@ -1625,6 +1641,8 @@ Extended definition of a battery in the input file:
 | **Output media** | `None`/`auto` |
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `CurrentMaxOutTemp` |
 
+The mathematical description of the buffer tank is provided [here](resie_energy_system_components.md/#short-term-thermal-energy-storage-sttes-buffertank).
+
 A short-term storage for heat, stored with a thermal heat carrier fluid, typically water.
 
 Three model types are available. The model `ideally_stratified` assumes two adiabatically separated temperature layers, 
@@ -1787,6 +1805,8 @@ Extended definition of a buffer tank in the input file:
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `Load`, `Load%`, `Capacity`, `LossesGains`, `LossesGains_top`, `LossesGains_sidewalls`, `LossesGains_bottom`,`CurrentMaxOutTemp`, `GroundTemperature`, `MassInput`, `MassOutput`, `Temperature_upper`, `Temperature_three_quarter`, `Temperature_middle`, `Temperature_one_quarter`, `Temperature_lower` (additional temperature outputs for ground and STES if `reproduce_IEA_ES_Task39` is activated) |
 | **Auxiliary Plots** | 3D-Model of the geometry of the STES, cross-sectional drawing of the STES, temperature distribution over time within the STES, temperature difference to ambient for each STES layer, ground mesh & time-shiftable ground temperature field for `FVM` |
+
+The mathematical description of the universal stratified (ground-coupled) thermal storage is provided [here](resie_energy_system_components.md/#seasonal-thermal-energy-storage-stes).
 
 A stratified seasonal thermal energy storage (STES) represented by a 1D multi-layer model of the storage medium. Thermal stratification is represented via diffusion and buoyancy effects. Loading is modelled with a thermal lance (charging into the layer matching the inlet temperature), while unloading is taken from the topmost layer with a return temperature at `low_temperature`. Currently, no indirect loading or unloading is included. 
 
@@ -1983,6 +2003,8 @@ Higher accuracy increases the number of ground cells (especially near the wall a
 | **Output media** | `None`/`auto` |
 | **Tracked values** | `OUT`, `Max_Energy`, `Temperature_src_in`, `Temperature_snk_out` |
 
+The mathematical description of the generic heat source is provided [here](resie_energy_system_components.md/#generic-heat-source).
+
 A generic heat source for various sources of heat.
 
 Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
@@ -2100,6 +2122,8 @@ Energy-related parameters:
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
 | **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_max_output_temperature`, `current_min_input_temperature`, `fluid_reynolds_number` |
 | **Auxiliary Plots** | G-function values for probe field, Geometry/layout of probe field  |
+
+The mathematical description of the geothermal probes is provided [here](resie_energy_system_components.md/#geothermal-probes).
 
 A model of a geothermal probe field or a single geothermal probe. Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal borehole resistance. This avoids the need of defining 11 additional parameters.
 
@@ -2436,9 +2460,13 @@ Note: If the control module `negotiate_temperature` is active, this parameter wi
 | **Tracked values** | `IN`, `OUT`, `fluid_temperature`, `ambient_temperature`, `global_radiation_power`. Detailed only: `fluid_reynolds_number`, `alpha_fluid_pipe`|
 | **Auxiliary Plots** | Simulation mesh of the model, Interactive temperature distribution over time  |
 
-A model of a geothermal collector that can also be used to simulate a cold district heating network (5th generation). Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
+The mathematical description of the geothermal collector is provided [here](resie_energy_system_components.md/#geothermal-heat-collector).
+
+Two models are available, one `detailed` and a `simplified` version that uses a constant user-defined thermal pipe resistance (fluid to soil). This avoids the need of defining 7 additional parameters. To simulate a single pipe, make sure that you use an appropriate width of the simulation area (‘pipe_spacing’), as no explicit model for single pipes is currently available and the boundary of the simulation volume facing the side is assumed to be adiabatic (Neumann boundary condition) and not constant (Dirichlet boundary condition). Check the temperature distribution over time by activating the additional plots in the io_settings.
 
 The parameters characterising the soil and its moisture content, such as heat capacity, density, thermal conductivity and enthalpy of fusion, as well as the parameters describing the boundary conditions on the ground surface, have a significant influence on the simulation results. Make sure that you select suitable values, e.g. from VDI 4640. The default values are not necessarily correct or consistent.
+
+In theory, the model of the geothermal collector could also be used to simulate a cold district heating network (5th generation). Currently, this is not supported.
 
 **General parameter**
 
@@ -2612,6 +2640,8 @@ To perform this calculation in every timestep, the following input parameters ar
 | **Input media** | |
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `OUT`, `Temperature_Output`, `Temperature_Mean_Collector` , `direct_normal_irradiance`, `beam_solar_irradiance_in_plane`, `diffuse_solar_irradiance_in_plane`, `delta_T`, `spec_flow_rate` |
+
+The mathematical description of the solarthermal collector is provided [here](resie_energy_system_components.md/#solarthermal-collector).
 
 Solarthermal collector producing heat depending on weather conditions. The collector works in two modes depending if the collector should regulate the specific flow rate  `spec_flow_rate`  or temperature difference between input and output temperature `delta_T`. For this exclusively either `delta_T` or `spec_flow_rate` can be set to a fixed value.  If `delta_T` is set `spec_flow_rate_min` can be given, to make sure the collector doesn't turn on when only a very small flow rate and therefore small energy can be extracted from the collector. They same works for `spec_flow_rate` and `delta_T_min`.
 
