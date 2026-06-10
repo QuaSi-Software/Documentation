@@ -51,7 +51,7 @@ The example has also been set up in a specific way such that the energy balance 
 
 [^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
 
-## Multi-family house with PV, battery and heat pump including economy and GHG emissions
+## Multi-family house including economy and GHG emissions
 
 ![Multi-family house energy system: overview](fig/examples/260610_multi_family_house.svg)
 
@@ -79,7 +79,7 @@ The GHG emissions are modelled without emission credits and without embodied emi
 
 The example can be used to investigate the influence of PV and battery sizing, heat pump operation, temperature levels, dynamic electricity prices and grid emission factors on self-consumption, grid exchange, operational costs and GHG emissions.
 
-## District with river-water heat pump and central electricity system including economy and GHG emissions
+## District with river-water heat pump including economy and GHG emissions
 
 ![District energy system with river-water heat pump: overview](fig/examples/260610_river-water_district.svg)
 
