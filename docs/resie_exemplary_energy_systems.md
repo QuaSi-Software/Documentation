@@ -34,23 +34,6 @@ There is no additional heat supplier in the system, which is only possible as th
 
 The heat pumps works on multiple temperature layer, resulting in different COPs for different combinations of input and output temperatures. The heat pump 1 can cover the demand directly, or load the the buffer tank on a higher temperature, or both is done within the same timestep. This results in a mean COP and mean output temperature over the whole timestep. The defined prioritization (usable energy of heat pump 1 has a higher priority as heat pump 2) works as expected.
 
-## District with sector coupling
-![Complex district energy system with multiple sectors](fig/examples/240411_multisector_district.svg)
-
-File: `examples/multisector_district.json`
-
-This example demonstrates complex behaviour of an energy system covering multiple sectors over the span of a year. Heating and electricity demands in two different subdivisons (e.g. for two groups of buildings) are supplied with a variety of producers. Interesting components include a hydrogen electrolyser feeding into a hydrogen grid and a seasonal thermal energy storage.
-
-This example is also discussed in depth in Ott2023[^Ott2023], however the results discussed in the publication are based on the simplified component models from the time of publication. The example file in the ReSiE repository will use the currently implemented models, therefore results differ.
-
-The following figure shows a sankey plot of the yearly sums of energy. All components play a role in the operation of the energy system to different degrees, which can be seen by following the flow of energy in the plot.
-
-![Sankey plot of yearly sums of energy](fig/examples/260421_multisector_district_sankey.png)
-
-The example has also been set up in a specific way such that the energy balance is not upheld in every time step. Distributed over the span of the two heating periods at the beginning and end of the year, the heating demand 2 is not fully met. This can happen because there is no source of heat in the energy system which can produce an arbitrary amount of heat without possibly being limited by an input or output. The CHP comes close, but fails to cover peaks in demand when the buffer tanks are empty as it is not sufficiently sized for peak load coverage. The gas boiler does act as peak load supplier, but is connected only to heating demand 1.
-
-[^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
-
 ## Multi-family house including economy and GHG emissions
 
 ![Multi-family house energy system: overview](fig/examples/260610_multi_family_house.svg)
@@ -106,3 +89,20 @@ The emissions are modelled without embodied emissions. Emission credits are acco
 ![District energy system with river-water heat pump: emission results](fig/examples/260610_river-water_district_emissions.png)
 
 The example can be used to investigate the interaction between central PV and battery operation, dynamic electricity prices, a river-water heat pump, fossil peak load coverage, local domestic hot water boosting, grid exchange, operating costs and time-dependent greenhouse gas emissions.
+
+## District with sector coupling
+![Complex district energy system with multiple sectors](fig/examples/240411_multisector_district.svg)
+
+File: `examples/multisector_district.json`
+
+This example demonstrates complex behaviour of an energy system covering multiple sectors over the span of a year. Heating and electricity demands in two different subdivisons (e.g. for two groups of buildings) are supplied with a variety of producers. Interesting components include a hydrogen electrolyser feeding into a hydrogen grid and a seasonal thermal energy storage.
+
+This example is also discussed in depth in Ott2023[^Ott2023], however the results discussed in the publication are based on the simplified component models from the time of publication. The example file in the ReSiE repository will use the currently implemented models, therefore results differ.
+
+The following figure shows a sankey plot of the yearly sums of energy. All components play a role in the operation of the energy system to different degrees, which can be seen by following the flow of energy in the plot.
+
+![Sankey plot of yearly sums of energy](fig/examples/260421_multisector_district_sankey.png)
+
+The example has also been set up in a specific way such that the energy balance is not upheld in every time step. Distributed over the span of the two heating periods at the beginning and end of the year, the heating demand 2 is not fully met. This can happen because there is no source of heat in the energy system which can produce an arbitrary amount of heat without possibly being limited by an input or output. The CHP comes close, but fails to cover peaks in demand when the buffer tanks are empty as it is not sufficiently sized for peak load coverage. The gas boiler does act as peak load supplier, but is connected only to heating demand 1.
+
+[^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
