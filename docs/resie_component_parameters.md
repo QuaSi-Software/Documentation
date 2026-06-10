@@ -328,7 +328,9 @@ An example of this control module used for an electricity bus to switch the prio
 
 ### Economic and emission parameters
 
-The general economic and emissions parameters are defined in a separate section of the input file, which is described [here](resie_input_file_format.md#economic-parameters) and [here](resie_input_file_format.md#emissions-parameters). Here, the general calculation of them can be activated.
+The general economic and emissions parameters are defined in a separate section of the input file, which is described [here](resie_input_file_format.md#economic-parameters) and [here](resie_input_file_format.md#emissions-parameters). There, the general calculation of them can be activated.
+
+#### Component-specific parameters and default values
 
 Component-specific economic and emission parameters are described separately for each component in the component parameter section. Default values are provided for most parameters. These values are based on data from the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] from 2025. For components not listed in the catalogue, suitable parameters were selected. Note that these values may not be appropriate for every project and should therefore be checked for the specific use case. Especially price change rates were mostly set to zero. For energy costs, a change rate of 2 % per year was set as default. For the investment costs, the change rates were taken from the source above, where given.
 
@@ -336,8 +338,14 @@ Note: Many parameters have to be given as rates, e.g. the `capex_price_change_ra
 
 For some parameters, no defaults are provided, for example for (embodied) GHG emissions, energy prices, or specific investment costs, as these values are highly project-specific. For component-specific investment costs and energy-related GHG emission factors, the "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] is a suitable data source for Germany.
 
-Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m]. For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
- The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition. Note that ReSiE uses base units for component sizing, like [W] or [m^3], while mostly, the specific const functions are provided with [kW] or [l] as reference. As power functions can not be scaled linearly, the additional parameter `*_scale` can be used to scale the reference value before it is evaluated in the given function, e.g.: `investments costs = power_func(scale [kW/W] * component size [W])`. So a scale factor of `1e-3` can be used to input a cost function in [€/kW] while the reference unit in ReSiE is [W], or a scale factor of `1e3` can be used to input a cost function in [€/l] while the reference unit in ReSiE is [m^3].
+#### Specific cost / emission functions and scaling
+
+Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m] (analogous for embodied emissions). For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
+ The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition. 
+ 
+ Note that ReSiE uses base units for component sizing, like [W] or [m^3], while mostly, the specific cost functions are provided with [kW] or [l] as reference. As power functions can not be scaled linearly, the additional parameter `*_scale` can be used to scale the reference value before it is evaluated in the given function, e.g.: `investment costs = power_func(scale [kW/W] * component size [W])`. So a scale factor of `1e-3` can be used to input a cost function in [€/kW] while the reference unit in ReSiE is [W], or a scale factor of `1e3` can be used to input a cost function in [€/l] while the reference unit in ReSiE is [m^3].
+
+#### Reference values and units
 
 For connection components, the reference value for capex and embodied emissions may differ depending on how the component size is defined.
 If a constant demand or supply is given, this value is used as the reference. In this case, capex and embodied emissions can be provided as functions of this power, e.g in [€/W]. If a profile is given, the capex and embodied emissions are related to the scale factor of the profile. Therefore, the scale factor and the specific investment costs or emissions must refer to the same physical quantity. For example, a thermal heating demand of a building can be scaled either by its absolute power, if a constant power is given, or by the scale factor of a profile. If the profile contains energy demand per square meter building and the scale factor is used to adjust the profile to the actual building size, the capex should also be given with respect to square meters in [€/m^2].
