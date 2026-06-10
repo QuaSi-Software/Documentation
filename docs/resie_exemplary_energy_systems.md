@@ -51,3 +51,58 @@ The example has also been set up in a specific way such that the energy balance 
 
 [^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
 
+## Multi-family house with PV, battery and heat pump including economy and GHG emissions
+
+![Multi-family house energy system: overview](fig/examples/260610_multi_family_house.svg)
+
+File: `examples/multi_family_house.json`
+
+This example represents the energy system of a multi-family house with electricity, space heating and domestic hot water demands. Electricity is supplied by a photovoltaic plant, a battery and the public electricity grid, where the battery is not allowed to take energy from or deliver energy to the grid. Heat is supplied by an air-source heat pump using ambient air as a heat source. Two buffer tanks are used to separate space heating and domestic hot water at different temperature levels. The connections from the hotter domestic hot water buffer tank to the colder heating buffer tank and the heating demand are disabled, as ReSiE automatically cools down thermal energy and would therefore transfer energy between these components. The connections from the heating buffer tank to the DHW demand and the DHW buffer tank can be allowed, as the temperature is lower and no energy will be delivered. 
+
+The heat pump is modelled as an inverter heat pump with a Carnot-based COP, part-load dependencies, icing behaviour and losses. It supplies heat at two different temperature levels through one heat output interface and one shared thermal bus, in order to serve the thermal energy for space heating at a lower temperature than for domestic hot water. This improves the COP compared to supplying all heat at the higher domestic hot water temperature level.
+
+The example demonstrates a building-scale sector-coupled system including local electricity generation, electrical storage, grid exchange and heat pump operation. Surplus PV electricity can be used by the demands, stored in the battery or exported to the grid. Remaining electricity demand is supplied by the grid.
+
+The resulting energy-flow Sankey plot can be seen here:
+
+![Multi-family house energy system: Sankey plot](fig/examples/260610_multi_family_house_sankey.png)
+
+A particular focus of this example is the combined evaluation of operation, economy and greenhouse gas emissions over an observation period of 20 years. Grid electricity uses dynamic price and emission profiles for Germany in 2024, while exported electricity receives a constant feed-in price. In addition to the standard result plots, the example produces economic cashflow and present value plots as well as emission plots and CSV outputs.
+
+In the economic evaluation, this example is mainly interpreted from the perspective of the building owner, as internal electricity and heat demands are not assigned energy prices, while investment costs, grid electricity costs and feed-in revenues are considered:
+
+![Multi-family house energy system: economic results](fig/examples/260610_multi_family_house_economy.png)
+
+The GHG emissions are modelled without emission credits and without embodied emissions. Grid electricity as the only GHG emission uses a dynamic, hourly emission profile with a yearly change rate:
+
+![Multi-family house energy system: emission results](fig/examples/260610_multi_family_house_emissions.png)
+
+The example can be used to investigate the influence of PV and battery sizing, heat pump operation, temperature levels, dynamic electricity prices and grid emission factors on self-consumption, grid exchange, operational costs and GHG emissions.
+
+## District with river-water heat pump and central electricity system including economy and GHG emissions
+
+![District energy system with river-water heat pump: overview](fig/examples/260610_river-water_district.svg)
+
+File: `examples/river_water_district.json`
+
+This example represents a small district with two buildings, photovoltaic plants, electricity demands, space heating demands and domestic hot water demands. The buildings are connected to a central electricity bus and a central thermal bus. Heat is supplied by a river-water heat pump, a central buffer tank and a gas boiler for peak load coverage. The central battery is not allowed to take energy from or deliver energy to the grid.
+
+The example demonstrates how central and decentral structures can be combined in one energy system. Heat is distributed from the central thermal bus to both buildings at a comparatively low temperature level for space heating. Domestic hot water is prepared locally in each building by using thermal boosters, which raise the temperature only where the higher domestic hot water temperature is required. This reduces the temperature level of the central heat supply and can improve the operation of the heat pump.
+
+On the electrical side, the PV plants of both buildings, a central battery, grid import and grid export are connected to one central electricity bus. The locally generated electricity can supply the building electricity demands, the thermal boosters, the river-water heat pump and the battery. Remaining electricity demand is supplied by the grid, while excess electricity can be exported.
+
+The resulting energy-flow Sankey plot can be seen here:
+
+![District energy system with river-water heat pump: Sankey plot](fig/examples/260610_river-water_district_sankey.png)
+
+A particular focus of this example is the combined evaluation of operation, economy and greenhouse gas emissions over an observation period of 20 years. Electricity imports use dynamic price and emission profiles for Germany in 2024, exported electricity receives a constant feed-in price and natural gas is modelled with yearly changing  price and emission assumptions. In addition to the standard result plots, the example produces economic cashflow and present value plots, emission plots, price and emission profile plots and CSV outputs.
+
+In the economic evaluation, this example is mainly interpreted from the perspective of an integrated district energy operator. Electricity and heat supplied to the buildings are modelled as revenues, while grid electricity, natural gas, investment costs, maintenance and repair are modelled as expenses. In the results, a return of invest after 6 years can be observed:
+
+![District energy system with river-water heat pump: economic results](fig/examples/260610_river-water_district_economy.png)
+
+The emissions are modelled without embodied emissions. Emission credits are accounted for feed-in of unused PV electricity. Grid electricity and natural gas use dynamic emission profiles:
+
+![District energy system with river-water heat pump: emission results](fig/examples/260610_river-water_district_emissions.png)
+
+The example can be used to investigate the interaction between central PV and battery operation, dynamic electricity prices, a river-water heat pump, fossil peak load coverage, local domestic hot water boosting, grid exchange, operating costs and time-dependent greenhouse gas emissions.
