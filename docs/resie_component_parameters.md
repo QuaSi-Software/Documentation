@@ -1176,6 +1176,8 @@ Note: at least **one** of `constant_demand_input_temperature` or `demand_input_t
 
 Elevates supplied low temperature heat to a higher temperature with input electricity.
 
+The heat pump can be used in three different model types: `simplified`, `inverter`, `on-off`. For a description of the different models and how part load effects are taken into account, see [this Chapter.](resie_energy_system_components/#part-load-operation-and-optimisation-of-plr) 
+
 **General parameter**
 
 | Name | Type | R/D | Example | Unit | Description |
@@ -1185,7 +1187,7 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `cop_function` | `String` | Y/Y | `carnot:0.4` | [-] |  See [description of function definitions](#cop-functions). The function for the the dynamic COP depending on input and output temperatures.
 | `bypass_cop` | `Float` | Y/Y | 15.0 | [-] | A constant COP value used for bypass operation. Note: If a constant COP is given, the bypass_cop is ignored! |
 | `max_power_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the maximum power as fraction of nominal power. |
-| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. |
+| `min_power_function` | `String` | Y/Y | `const:0.2` | [-] | See [description of function definitions](#power-functions). The function for the minimum power as fraction of nominal power. Note that this parameter works on slice-base. In order to set a general minimal part load, use the parameter `min_usage_fraction` instead!
 | `plf_function` | `String` | Y/Y | `const:1.0` | [-] | See [description of function definitions](#power-functions). The function for the part load factor, modifying the COP based on the part load ratio. For model type `simplified` this must be a constant value and for model types `inverter` and `on-off` this must not be a constant value. |
 | `min_usage_fraction` | `Float` | N/Y | 0.0 | [-] | If a non-zero value is set and the actual usage fraction falls below it, the heat pump won't run. The usage fraction is based on how much energy the pump could produce during each slice (given the temperatures in this slice), not on its design power. These slice values are then combined into a total usage fraction that is compared to the given `min_usage_fraction`. |
 | `consider_icing` | `Bool` | N/Y | false | [-] | If true, enables the calculation of icing losses. |
@@ -1195,6 +1197,8 @@ Elevates supplied low temperature heat to a higher temperature with input electr
 | `power_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate losses on the side of the power electronics. If no losses should be considered, set this to `1.0`. |
 | `heat_losses_factor` | `Float` | N/Y | 0.97 | [-] | A factor used to calculate heat losses that do not result in additional heat output, i.e. radiative heat losses. If no losses should be considered, set this to `1.0`. |
 | `constant_loss_power` | `float` | N/N | 200 | [W] | A constant power draw of electricity even when the heat pump is not running. |
+
+Please note  that the parameters `input_temperature`  and  `output_temperature`  should only be set in special cases, e.g. for heat pump cascades! In regular cases, the heat pump get the temperature from the connected components. Only if they do not have a set temperature, these parameter should be used, as they overwrite all temperature information from the connected components.
 
 For model types `inverter` and `on-off` an optimisation is performed, which can be configured with the following parameters if default values are unsatisfactory. Be aware that changing these can impact both correctness and performance.
 
