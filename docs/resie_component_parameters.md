@@ -1010,7 +1010,7 @@ If parameter `heat_lt_is_usable` is false, the output interface `m_heat_lt_out` 
 | **Output media** | `m_heat_out`/`m_h_w_ht1` |
 | **Tracked values** | `IN`, `OUT`, `LossesGains` |
 
-A boiler that transforms chemical fuel into heat.
+A boiler that transforms fuel into heat.
 
 This needs to be parameterized with the medium of the fuel intake as the implementation is agnostic towards the kind of fuel under the assumption that the fuel does not influence the behaviour or require/produce by-products such as pure oxygen or ash (more to the point, the by-products do not need to be modelled for an energy simulation.)
 
@@ -1049,6 +1049,38 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | `lifetime_years` | `Float` | N/Y | 20.0 | [a] | Lifetime of the fuel boiler component until replacement is required. |
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/W] or [g CO2] | Function for specific embodied emissions with respect to the nominal power `power_th`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
+
+**Exemplary input file definition for Fuel boiler**
+
+```json
+"TST_FB_01": {
+    "type": "FuelBoiler",
+    "m_fuel_in": "m_c_g_natgas",
+    "output_refs": ["DEM_01"],
+    "power_th":  4000.0,
+    "min_power_fraction": 0.1,
+    "efficiency_fuel_in": "const:1.1",
+    "efficiency_heat_out": "const:1.0",
+    "linear_interface":  "heat_out",
+    "economic_parameters": {
+        "lifetime_years": 25,
+        "capex_specific":  "power_func:1283 ,0.37",    
+        "capex_price_change_rate_per_year": 0.012,
+        "maintenance_inspection_rate_per_year": 0.02,
+        "maintenance_inspection_price_change_rate_per_year": 0.0,
+        "repair_rate_per_year": 0.01,
+        "repair_price_change_rate_per_year": 0.0,
+        "operational_labour_hours_per_year": 20.0,
+        "subsidy_rate_of_capex": 0.0,
+        "subsidy_max": -1.0
+    },
+    "emissions_parameters": {
+        "lifetime_years": 25,
+        "embodied_emissions_specific": "const:0.0",
+        "embodied_emissions_change_rate_per_year": 0.0
+    }
+}
+```
 
 ### Thermal booster (TB)
 | | |
@@ -1107,7 +1139,7 @@ Note: at least **one** of `demand_input_temperature` or `demand_input_temperatur
 **Exemplary input file definition for ThermalBooster**
 
 ```json
-"TRF_TB_01": {
+"TST_TB_01": {
     "type": "ThermalBooster",
     "m_el_in": "m_e_ac_230v",
     "m_heat_in": "m_h_w_lt1",
