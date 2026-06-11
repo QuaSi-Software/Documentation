@@ -66,6 +66,7 @@ The overall structure of the project file is split several sections, each of whi
     },
     "csv_output_weather": true,
     "write_csv_continuously": false,
+    "write_summary_CSV": true,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
     "plot_weather_data": true,
@@ -102,6 +103,7 @@ The overall structure of the project file is split several sections, each of whi
 * `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
+* `write_summary_CSV` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
@@ -188,6 +190,14 @@ Energy and temperature flows can only be output if a connection between two comp
 **Weather output**
 
 To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
+
+**Summary output**
+
+Using the toggle `write_summary_CSV`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
+
+Energy-related outputs, such as `Demand`, `IN`, `OUT`, `Supply`, `Losses`, `Gains`, `EnergyFlow` and `Balance`, are summed. Columns containing `_sum` are treated as cumulative values and the last valid value is written. All other numeric outputs, such as temperatures, efficiencies or states of charge, are averaged.
+
+The summary file also contains the number of values used for the aggregation as well as the minimum and maximum valid value. Empty values, non-numeric values and `NaN` values are ignored. For selected outputs such as COP, zero values are ignored as well, since they represent inactive operation.
 
 ### Output specification (interactive .html plot)
 
