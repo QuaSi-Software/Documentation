@@ -386,7 +386,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 **Parameter for economic calculation**
 
-Capex and/or energy related prices can be defined. They default both to zero.
+Capex and/or energy related prices can be defined. They default both to zero. The energy-related prices (`energy_price`) are handled as revenues if they are positive, or as costs if they are negative for sinks.
 
 Capex-related parameters:
 
@@ -458,7 +458,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 **Parameter for economic calculation**
 
-Capex and/or energy related prices can be defined. They default both to zero.
+Capex and/or energy related prices can be defined. They default both to zero. The energy-related prices (`energy_price`) are handled as costs if they are positive, or as revenues if they are negative for supplies.
 
 Capex-related parameters:
 
@@ -556,7 +556,9 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 **Parameter for economic calculation**
 
-Capex and/or energy related prices can be defined. They default both to zero. Fixed sinks also offer the possibility to set prices for unmet energies. This can be understood as additional costs that  have to be paid for energy that is not delivered by the energy system, although is was requested by the demand. 
+Capex and/or energy-related prices can be defined, which both defaults to zero. Fixed sinks also allow defining prices for unmet energies. Unmet energy represents energy that was requested by the demand but not delivered by the energy system. The corresponding unmet energy price is therefore interpreted as a cost (`unmet_energy_price` > 0) for non-supplied demand. Note that revenues (`energy_price` > 0) or costs (`energy_price` < 0)  defined by the regular `energy_price` parameters only apply to the energy that is actually delivered to the sink. They are not applied to unmet energy. Therefore, the unmet energy price should be understood as a cost without any associated revenue!
+
+The energy-related prices (`energy_price`) are handled as revenues if they are positive, or as costs if they are negative for sinks.
 
 Capex-related parameters:
 
@@ -644,7 +646,9 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 **Parameter for economic calculation**
 
-Capex and/or energy related prices can be defined. They default both to zero. Fixed supplies also offer the possibility to set prices for unmet energies. This can be understood as additional costs that  have to be paid for energy that is not taken by the energy system, although is was requested to be taken by the supply. 
+Capex and/or energy-related prices can be defined, which both default to zero. Fixed supplies also allow defining prices for unmet energies. For fixed supplies, unmet energy represents energy that was provided by the supply but not taken by the energy system. The corresponding unmet energy price is therefore interpreted as a cost (`unmet_energy_price` > 0) for non-accepted supply. Note that revenues (`energy_price` < 0) or costs (`energy_price` > 0) defined by the regular `energy_price` parameters only apply to the energy that is actually taken by the energy system. They are not applied to unmet energy. Therefore, the unmet energy price should be understood as a cost without any additional costs!
+
+The energy-related prices (`energy_price`) are handled as costs if they are positive, or as revenues if they are negative for supplies.
 
 Capex-related parameters:
 
@@ -716,6 +720,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 **Parameter for economic calculation**
 
 Capex and/or energy related prices can be defined. They default both to zero. 
+The energy-related prices (`energy_price`) are handled as costs if they are positive, or as revenues if they are negative for supplies.
 
 Capex-related parameters:
 
@@ -782,7 +787,7 @@ Note that either `temperature_profile_file_path`, `constant_temperature` **or** 
 
 **Parameter for economic calculation**
 
-Capex and/or energy related prices can be defined. They default both to zero. 
+Capex and/or energy related prices can be defined. They default both to zero.  The energy-related prices (`energy_price`) are handled as revenues if they are positive, or as costs if they are negative for sinks.
 
 Capex-related parameters:
 
@@ -855,6 +860,8 @@ The energy it produces in each time step must be given as a profile, but can be 
 Capex and/or energy-related prices can be defined. Both default to zero. For the PV plant, capex-related costs include the plant within the economic boundary of the energy system. Energy-related prices, by contrast, represent a plant outside of the economic boundary, where the generated power is purchased through a power purchase agreement (PPA), for example. It may not be appropriate to take into account both capital costs and energy-related costs.
 
 The PV plant also offer the possibility to set prices for unmet energies. This can be understood as additional costs that have to be paid for energy that is not taken by the energy system, although is was generated by the PV plant. In the case this energy is sold elsewhere and is not modelled within the simulated energy system, the unmet energy price could also be set to a negative value resulting into additional revenue.
+
+The energy-related prices (`energy_price`) are handled as costs if they are positive, or as revenues if they are negative for supplies.
 
 Capex-related parameters:
 
