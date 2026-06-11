@@ -289,7 +289,7 @@ To plot the weather data read in from a provided weather file to the interactive
 
 ## Economic parameters
 
-The calculation of economic results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-parameters), while the former is described in the following.
+The calculation of economic results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-and-emission-parameters), while the former is described in the following.
 
 ```json
 "economic_parameters": {
@@ -310,7 +310,7 @@ The calculation of economic results, as described [in this chapter](resie_costs_
 
 ## Emissions parameters
 
-The calculation of GHG emissions results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#emissions-parameters), while the former is described in the following.
+The calculation of GHG emissions results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-and-emission-parameters), while the former is described in the following.
 
 ```json
 "emissions_parameters": {
