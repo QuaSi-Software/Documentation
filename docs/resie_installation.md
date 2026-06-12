@@ -14,7 +14,9 @@ ReSiE is written in Julia and shipped as a Julia codebase. This means that it ca
 3. Start the julia REPL with `julia`
 4. Switch to the package REPL with `]` (no enter necessary)
 5. Activate the local environment: `activate .`
-6. Install and precompile required packages: `instantiate`. This should create a file called `Manifest.toml` in the ReSiE root directory and may take a while to complete.
+    * The dot stands for the current directory and is important to denote, that the activated environment relates to the ReSiE directory
+6. Install and precompile required packages: `instantiate`
+    * This should create a file called `Manifest.toml` in the ReSiE root directory and may take a while to complete.
 7. Exit out of the package REPL with shortcut `Ctrl+c`
 8. Exit out of the julia REPL with `exit()` or shortcut `Ctrl+d`
 
