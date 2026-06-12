@@ -138,12 +138,13 @@ The overall structure of the project file is split several sections, each of whi
 
 The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
-In the `io_settings`, `sankey_plot` can be either `nothing` if no sankey should be created, `default` that creates a sankey plot with default colors or a dictionary mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
+In the `io_settings`, `sankey_plot` can be either `nothing` if no sankey plot should be created, `default` to create a sankey plot with default colors, or `custom` to define user-specific colors for all media. If `sankey_plot` is set to `custom`, the dictionary `sankey_plot_spec` should be used to define colors for all medium names used in the energy system. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" and "Gains" must be specified as well, even if it is not defined in the input file.
 
 Below is an example of a custom color list for an energy system with common media (plus "Losses" and "Gains"):
 ```json
- "sankey_plot": {
+ "sankey_plot": "custom",
+ "sankey_plot_spec": {
     "m_h_w_lt1": "red",
     "m_h_w_lt2": "red",
     "m_h_w_ht1": "darkred",
@@ -153,7 +154,7 @@ Below is an example of a custom color list for an energy system with common medi
     "m_c_g_o2": "firebrick1",
     "Losses": "grey40",
     "Gains": "grey40"
-}
+ }
 ```					
 
 The resulting plot will be saved by default in `./output/output_sankey.html`. The plot can be opened with any browser and offers some interactivity for the positions of elements.
