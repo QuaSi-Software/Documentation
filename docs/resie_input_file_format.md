@@ -66,6 +66,7 @@ The overall structure of the project file is split several sections, each of whi
     },
     "csv_output_weather": true,
     "write_csv_continuously": false,
+    "write_summary_CSV": true,
     "output_plot_file": "./output/output_plot.html",
     "output_plot_time_unit": "date",
     "plot_weather_data": true,
@@ -102,6 +103,7 @@ The overall structure of the project file is split several sections, each of whi
 * `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
+* `write_summary_CSV` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
@@ -136,12 +138,13 @@ The overall structure of the project file is split several sections, each of whi
 
 The energy system and the energy flows between its components can be displayed in a sankey plot. This plot shows not only the connections between all components but also the sums of energy transferred between them within in the simulation time span. This can be helpful to check the overall functionality of the energy system, its structure and the overall energy balance.
 
-In the `io_settings`, `sankey_plot` can be either `nothing` if no sankey should be created, `default` that creates a sankey plot with default colors or a dictionary mapping all medium names used in the energy system to a color. This can be useful to better represent the various media, as the default colors may be confusing.
+In the `io_settings`, `sankey_plot` can be either `nothing` if no sankey plot should be created, `default` to create a sankey plot with default colors, or `custom` to define user-specific colors for all media. If `sankey_plot` is set to `custom`, the dictionary `sankey_plot_spec` should be used to define colors for all medium names used in the energy system. This can be useful to better represent the various media, as the default colors may be confusing.
 For a list of available named colors, refer to the [Julia Colors documentation](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/). Note that the color for the medium "Losses" and "Gains" must be specified as well, even if it is not defined in the input file.
 
 Below is an example of a custom color list for an energy system with common media (plus "Losses" and "Gains"):
 ```json
- "sankey_plot": {
+ "sankey_plot": "custom",
+ "sankey_plot_spec": {
     "m_h_w_lt1": "red",
     "m_h_w_lt2": "red",
     "m_h_w_ht1": "darkred",
@@ -151,7 +154,7 @@ Below is an example of a custom color list for an energy system with common medi
     "m_c_g_o2": "firebrick1",
     "Losses": "grey40",
     "Gains": "grey40"
-}
+ }
 ```					
 
 The resulting plot will be saved by default in `./output/output_sankey.html`. The plot can be opened with any browser and offers some interactivity for the positions of elements.
@@ -188,6 +191,14 @@ Energy and temperature flows can only be output if a connection between two comp
 **Weather output**
 
 To output the weather data read in from a provided weather file, the flag `csv_output_weather` in the `io_settings` can be set to `true`.
+
+**Summary output**
+
+Using the toggle `write_summary_CSV`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
+
+Energy-related outputs, such as `Demand`, `IN`, `OUT`, `Supply`, `Losses`, `Gains`, `EnergyFlow` and `Balance`, are summed. Columns containing `_sum` are treated as cumulative values and the last valid value is written. All other numeric outputs, such as temperatures, efficiencies or states of charge, are averaged.
+
+The summary file also contains the number of values used for the aggregation as well as the minimum and maximum valid value. Empty values, non-numeric values and `NaN` values are ignored. For selected outputs such as COP, zero values are ignored as well, since they represent inactive operation.
 
 ### Output specification (interactive .html plot)
 
@@ -279,7 +290,7 @@ To plot the weather data read in from a provided weather file to the interactive
 
 ## Economic parameters
 
-The calculation of economic results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-parameters), while the former is described in the following.
+The calculation of economic results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-and-emission-parameters), while the former is described in the following.
 
 ```json
 "economic_parameters": {
@@ -300,7 +311,7 @@ The calculation of economic results, as described [in this chapter](resie_costs_
 
 ## Emissions parameters
 
-The calculation of GHG emissions results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#emissions-parameters), while the former is described in the following.
+The calculation of GHG emissions results, as described [in this chapter](resie_costs_and_emissions.md), is controlled both by general parameters in this top-level section of the input file, as well as parameters set in the sub-config for each component. The latter is described in [the chapter on component parameters](resie_component_parameters.md#economic-and-emission-parameters), while the former is described in the following.
 
 ```json
 "emissions_parameters": {
