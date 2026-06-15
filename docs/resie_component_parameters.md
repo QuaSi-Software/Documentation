@@ -341,7 +341,7 @@ For some parameters, no defaults are provided, for example for (embodied) GHG em
 #### Specific cost / emission functions and scaling
 
 Component-specific investment costs can be defined either as constant values in [€] using `const:100` or as functions of the component size, e.g. [€/W], [€/m^3] or [€/m] (analogous for embodied emissions). For the latter, function parameters can be used. The available function definitions are described [here](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions).
- The "KWW-Technikkatalog Wärmeplanung" provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition. 
+ The "KWW-Technikkatalog Wärmeplanung"[^TechnikkatalogWärmeplanung] provides technology-specific investment costs as functions of component size, which can be transferred directly to ReSiE function parameters using the `power_func` function definition. 
  
  Note that ReSiE uses base units for component sizing, like [W] or [m^3], while mostly, the specific cost functions are provided with [kW] or [l] as reference. As power functions can not be scaled linearly, the additional parameter `*_scale` can be used to scale the reference value before it is evaluated in the given function, e.g.: `investment costs = power_func(scale [kW/W] * component size [W])`. So a scale factor of `1e-3` can be used to input a cost function in [€/kW] while the reference unit in ReSiE is [W], or a scale factor of `1e3` can be used to input a cost function in [€/l] while the reference unit in ReSiE is [m^3].
 
