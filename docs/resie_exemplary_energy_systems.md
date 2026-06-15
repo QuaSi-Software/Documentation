@@ -2,7 +2,7 @@
 
 In this chapter, some exemplary energy systems will be described and discussed. This may help to understand the capabilities, limitations and usage of ReSiE.
 
-For all examples the required input files are shipped together with ReSiE as JSON files in the subdirectory `examples`. The project files may link to profile files (as `.prf`), which are also shipped alongside ReSiE in the `profiles` subdirectory. The examples can be executed with
+For all examples the required input files are shipped together with ReSiE as JSON files in the [subdirectory `examples`](https://github.com/QuaSi-Software/resie/tree/master/examples). The project files may link to profile files (as `.prf`), which are also shipped alongside ReSiE in the [`profiles` subdirectory](https://github.com/QuaSi-Software/resie/tree/master/profiles). The examples can be executed with
 
 ```bash
 julia --project=. src/resie-cli.jl run --exit-after-run examples/name_of_example.json
@@ -15,7 +15,7 @@ All examples will produce an interactive plot of interesting result data (defaul
 ## Minimal example of a heat pump
 ![Simple heat pump energy system](fig/examples/240410_simple_heat_pump.svg)
 
-File: `examples/simple_heat_pump.json`
+File: [`examples/simple_heat_pump.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
 A fairly minimal example of operating a heat pump to supply a heat demand by using electricity from the grid and a heat source. The heat source provides temperatures in the range of 19 °C to 27 °C. The demand takes in heat at temperatures varying from 49 °C to 66 °C. The heat pump works with a fixed COP of 3.0.
 
@@ -26,7 +26,7 @@ For a slightly more advanced version you can change the line `"cop_function": "c
 ## Heating and cooling demands
 ![Heating and cooling demands in one energy system](fig/examples/240610_heating_and_cooling.svg)
 
-File: `examples/heating_and_cooling.json`
+File: [`examples/heating_and_cooling.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
 In this example a heating and a cooling demand are satisfied by making use of the low temperature heat as the source for the heat pump supplying high temperature heat, while only the excess is removed as waste heat. The excess is elevated to a higher level so that heat exchangers can effectively remove the heat from the system. This demonstrates that a cooling demand is in fact a heat source in disguise and can be modelled as a fixed supply of low temperature heat.
 
@@ -38,7 +38,7 @@ The heat pumps works on multiple temperature layer, resulting in different COPs 
 
 ![Multi-family house energy system: overview](fig/examples/260610_multi_family_house.svg)
 
-File: `examples/multi_family_house.json`
+File: [`examples/multi_family_house.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
 This example represents the energy system of a multi-family house with electricity, space heating and domestic hot water demands. Electricity is supplied by a photovoltaic plant, a battery and the public electricity grid, where the battery is not allowed to take energy from or deliver energy to the grid. Heat is supplied by an air-source heat pump using ambient air as a heat source. Two buffer tanks are used to separate space heating and domestic hot water at different temperature levels. The connections from the hotter domestic hot water buffer tank to the colder heating buffer tank and the heating demand are disabled, as ReSiE automatically cools down thermal energy and would therefore transfer energy between these components. The connections from the heating buffer tank to the DHW demand and the DHW buffer tank can be allowed, as the temperature is lower and no energy will be delivered. 
 
@@ -66,7 +66,7 @@ The example can be used to investigate the influence of PV and battery sizing, h
 
 ![District energy system with river-water heat pump: overview](fig/examples/260610_river-water_district.svg)
 
-File: `examples/river_water_district.json`
+File: [`examples/river_water_district.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
 This example represents a small district with two buildings, photovoltaic plants, electricity demands, space heating demands and domestic hot water demands. The buildings are connected to a central electricity bus and a central thermal bus. Heat is supplied by a river-water heat pump, a central buffer tank and a gas boiler for peak load coverage. The central battery is not allowed to take energy from or deliver energy to the grid.
 
@@ -93,7 +93,7 @@ The example can be used to investigate the interaction between central PV and ba
 ## District with sector coupling
 ![Complex district energy system with multiple sectors](fig/examples/240411_multisector_district.svg)
 
-File: `examples/multisector_district.json`
+File: [`examples/multisector_district.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
 This example demonstrates complex behaviour of an energy system covering multiple sectors over the span of a year. Heating and electricity demands in two different subdivisons (e.g. for two groups of buildings) are supplied with a variety of producers. Interesting components include a hydrogen electrolyser feeding into a hydrogen grid and a seasonal thermal energy storage.
 
