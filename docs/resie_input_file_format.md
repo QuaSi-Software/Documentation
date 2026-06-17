@@ -131,7 +131,7 @@ The overall structure of the project file is split several sections, each of whi
 * `price_and_emission_profile_file_path` (`String`): (Optional) File path to where the plot with price and emission profiles will be written. Defaults to `./output/price_and_emissions_profiles.html`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 * `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
-* `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting. It is intended for making the output perfectly repeatable, which is useful for testing but not in normal simulation.
+* `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many significant digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting in normal simulation. It's intended for making the output perfectly repeatable, which is useful for testing but changes the results.
 
 
 ### Output specification (Sankey)
