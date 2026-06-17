@@ -2677,7 +2677,7 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 | OR:`infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation) |
 | OR:`constant_infrared_sky_radiation` | `Float` | Y/N | 350.0 | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path) |
 | `wind_speed_from_global_file` | `String` | Y/N | `wind_speed` | m/s | profile for wind speed (provide either this or wind_speed_file_path or constant_wind_speed) |
-| OR:`wind_speed_file_path` | `String` | Y/N | `path/to/file` | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or constant_wind_speed) |
+| OR:`wind_speed_profile_file_path` | `String` | Y/N | `path/to/file` | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or constant_wind_speed) |
 | OR:`constant_wind_speed` | `Float` | Y/N | 5.2 | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or wind_speed_file_path) |
 | `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
 | `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
