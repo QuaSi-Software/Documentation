@@ -31,7 +31,7 @@ Basic workflow:
 
 Do not add or delete cells in the Excel files and do not rename worksheets. The VBA interface expects the workbook structure to remain unchanged. If interactive plots are shown, close the plot windows to complete the result-writing process.
 
-## Use SoDeLe via command-line and JSON input file
+## Use SoDeLe.exe via command-line and JSON input file
 
 The 'SoDeLe.exe' can also be accessed using a command-line interface. The relevant command for simulations is `simulatePv`.
 
@@ -150,20 +150,8 @@ For EPW files, radiation values are interpreted as values for the previous time 
 
 The DWD `.dat` import expects the format of the DWD climate consulting module: 8760 hourly values, no leap year, GMT+1/CET without daylight-saving-time handling, first data point on January 1 at 01:00, and a measurement section beginning with `***`. Current and future test reference years can be used.
 
-PV module and inverter parameters are based mainly on the CEC database from the [System Advisor Model (SAM) by NREL](https://github.com/NREL/SAM/tree/develop/deploy/libraries) and data provided with [pvlib](https://github.com/pvlib/pvlib-python/tree/main/pvlib/data).
-
-To regenerate internal module and inverter name lists from CEC CSV files, use:
-
-```bash
-python bin/app.py generatePVDatabase -p path/to/database/folder
-```
-
-The folder passed via `-p` or `--path` must contain:
-
-```text
-CEC_Modules.csv
-CEC_Inverters.csv
-```
+PV module and inverter parameters are based mainly on the California Energy Commission (CEC) database from the [System Advisor Model (SAM) by NREL](https://github.com/NREL/SAM/tree/develop/deploy/libraries) and data provided with [pvlib](https://github.com/pvlib/pvlib-python/tree/main/pvlib/data).
+See section [Updating the module and inverter database](sodele_user_manual.md#updating-the-module-and-inverter-database) for how to update them.
 
 ## Output and limitations
 
@@ -187,13 +175,32 @@ SoDeLe is intended for PV yield-profile generation, not detailed PV plant engine
 
 For facade PV and other sensitive cases, check the plausibility of the weather-data time-stamp convention, for example by comparing east- and west-facing vertical systems, especially if you use EPW files that are not strictly created following the [EPW file standard](https://designbuilder.co.uk/cahelp/Content/EnergyPlusWeatherFileFormat.htm).
 
-## Running from Python
 
-Running SoDeLe from Python is mainly useful for development, debugging, batch simulations, or workflows where a Python environment is already available. Compared to the SoDeLe.exe via CLI, directly accessing SoDeLe in Python is much faster.
+## Running SoDeLe from Python with Anaconda
 
-```bash
-cd path/to/local/sodele/repository
-python bin/app.py simulatePv -i path/to/input.json
+SoDeLe can be run directly from Python instead of using `SoDeLe.exe`. This is mainly useful for development, debugging, and batch simulations. Compared to the SoDeLe.exe via CLI, directly accessing SoDeLe in Python is much faster. A Python environment with **Python 3.12 or newer** is required.
+
+The recommended setup is to install SoDeLe as an editable package into a dedicated Conda environment:
+
+```cmd
+conda create -n sodele python=3.12
+conda activate sodele
+cd /d path\to\SoDeLe
+python -m pip install poetry
+poetry config virtualenvs.create false --local
+poetry install
+```
+
+After installation, run a simulation from the repository root:
+
+```cmd
+python .\bin\app.py simulatePv -i path\to\input.json
+```
+
+The database-generation command (for details see [below](sodele_user_manual.md#updating-the-module-and-inverter-database)) can be called in the same environment:
+
+```cmd
+python .\bin\app.py generatePVDatabase -p path\to\database\folder
 ```
 
 ## Updating the module and inverter database
@@ -201,16 +208,16 @@ python bin/app.py simulatePv -i path/to/input.json
 SoDeLe uses PV module and inverter data from established public databases. CEC module and inverter data can be obtained from the National Renewable Energy Laboratory's [System Advisor Model (SAM)](https://github.com/NREL/SAM/tree/develop/deploy/libraries). Sandia module data can be obtained from the [pvlib data repository](https://github.com/pvlib/pvlib-python/tree/main/pvlib/data).
 
 
-To update the local module and inverter database:
+To update the local module and inverter database (CEC database only):
 
-1. Download the updated module and inverter database files from the selected source.
+1. Download the updated module and inverter database files from the source linked above.
 2. Check the CSV files for duplicate entries. Duplicate entries can cause errors when the data is loaded by pvlib.
 3. Place the updated database files in the database directory used by SoDeLe.
-4. Run the SoDeLe database-generation command to generate the text files with the internal module and inverter names:
-   `  python bin/app.py generatePVDatabase --path path/to/database/folder`.
-5. Update the hidden database sheets in the Excel input files with the generated internal names and the corresponding user-facing descriptions.
+4. Run the SoDeLe database-generation command in python (for detail see [above](sodele_user_manual.md#running-sodele-from-python-with-anaconda)) to generate the text files with the internal module and inverter names:
+   `  python bin/app.py generatePVDatabase --path path/to/database/folder`. The folder must contain the `CEC_Modules.csv` and
+`CEC_Inverters.csv` databases.
+5. Use the results to update the hidden database sheets in the Excel input files with the generated internal names and the corresponding user-facing descriptions.
 6. Check and, if necessary, extend the Excel formulas and dropdown ranges so that the full updated database is available in the input interface.
-7. Run a small test simulation with representative module and inverter selections to verify that the updated database is read correctly.
 
 The internal names used in the JSON input file must match the names generated from the database. This applies to both `moduleName` and `inverterName`. When the inverter database is not used and a constant inverter efficiency is specified instead, a valid inverter name is still required for compatibility with the pvlib workflow.
 
@@ -249,11 +256,11 @@ Please note that the CSV files containing the module and inverter databases must
 
 ## Validation
 
-SoDeLe has been checked against established PV simulation tools to assess the plausibility of the calculated annual PV yields. The comparison included simulations with a detailed inverter model and simulations with a constant electrical DC-AC efficiency of 92 %. The annual energy yield was compared for one PV module, four different orientations, and four different locations.
+SoDeLe has been checked against established PV simulation tools to assess the plausibility of the calculated annual PV yields. The comparison included simulations with a detailed inverter model and simulations with a constant electrical DC-AC efficiency of 92 %. The annual energy yield was compared for one PV module, four different orientations, and four different locations. The comparison should be interpreted as a tool-to-tool verification and plausibility check, not as a complete certification of the model. It is also only describe briefly here. 
 
 For common roof-oriented PV systems, the deviation of the annual yield compared with the commercially available `PV*SOL`[^PVSOL] was below 5 %. For façade-oriented systems in east-west orientation, deviations of up to 15 % in extreme scenarios were observed compared with `PVGIS`[^PVGIS], while the results from `PV*SOL` remain close to the one of SoDeLe. The daily profiles showed small but visible differences.
 
-The comparison should be interpreted as a tool-to-tool verification and plausibility check, not as a complete certification of the model. Differences mainly result from different irradiance-processing methods, different assumptions for diffuse radiation, and potentially non-identical module or inverter parameter sets in the compared databases.
+Differences mainly result from different irradiance-processing methods, different assumptions for diffuse radiation, different weather data (especially for PVGIS) and potentially different module or inverter parameter sets in the compared databases (PV*SOL)
 
 [^PVSOL]: Valentin Software - PV*SOL premium: Design and simulation software for photovoltaic systems. Available [here](https://valentin-software.com/en/products/pvsol-premium/).
 
