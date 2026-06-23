@@ -1,10 +1,10 @@
 # SoDeLe User Manual
 
-This manual describes how to run SoDeLe with the Excel interfaces and how to use the command-line/JSON workflow. For the general concept and modelling scope, see [What is SoDeLe?](sodele_overview.md).
+This manual describes how to run SoDeLe with the Excel interfaces and how to use the command-line workflow with JSON input files. For the general concept and modelling scope, see [What is SoDeLe?](sodele_overview.md).
 
 ## Use SoDeLe with Excel
 
-For use **without** a Python installation, download or clone the [SoDeLe repository](https://github.com/QuaSi-Software/SoDeLe/tree/main) and use the folder:
+For use **without** a Python installation or usage of a command-line interface, download or clone the [SoDeLe repository](https://github.com/QuaSi-Software/SoDeLe/tree/main) and use the folder:
 
 ```text
 precompiled_with_frontend
@@ -14,8 +14,8 @@ Keep the contents of this folder together. In particular, `SoDeLe.exe` and the `
 
 The folder contains two Excel interfaces:
 
-- `Sodele_Input_DE_simplified.xlsm`: Simplified input for fast PV yield estimation. It uses a reduced module selection and a constant DC-to-AC efficiency instead of detailed inverter modelling.
-- `Sodele_Input_DE_extended.xlsm`: Extended input for experienced users. It allows specific module and inverter selection, module string configuration, number of inverters, and optional use of a constant inverter efficiency.
+- `Sodele_Input_DE_simplified.xlsm`: Simplified input for fast PV yield estimation. It uses a reduced module selection and a constant DC-to-AC efficiency instead of detailed inverter modelling. This simplified input is suitable for most early-stage planning.
+- `Sodele_Input_DE_extended.xlsm`: Extended input for experienced users. It allows specific module and inverter selection, module string configuration, number of inverters, and optional use of a constant inverter efficiency. Note that the string layout has to match the inverter specifications! 
 
 The Excel interfaces are currently provided in German and require Microsoft Excel with macro support on Windows. Excel 2016 and Excel 365 are tested. If macros are blocked after downloading, unblock the `.xlsm` file in the Windows file properties and then enable macros in Excel.
 
@@ -25,17 +25,17 @@ Basic workflow:
 2. Enable macros.
 3. Select an `.epw` or DWD `.dat` weather file with the browse button.
 4. Enter orientation, tilt, module quantity, module type, inverter assumptions, and output settings.
-5. Start the simulation with the Excel button. Note that this can take some time at the first time.
-6. Check the console output for the selected weather file and location.
-7. Use the generated result folder for time series, key values, and plots.
+5. Start the simulation with the Excel button. Note that this can take some time at the first run.
+6. Check the console output for simulation progress.
+7. Results, like time series data, key values, and plots are stored in the result folder.
 
 Do not add or delete cells in the Excel files and do not rename worksheets. The VBA interface expects the workbook structure to remain unchanged. If interactive plots are shown, close the plot windows to complete the result-writing process.
 
 ## Use SoDeLe.exe via command-line and JSON input file
 
-The 'SoDeLe.exe' can also be accessed using a command-line interface. The relevant command for simulations is `simulatePv`.
+The `SoDeLe.exe` can also be accessed using a command-line interface. The relevant command for simulations is `simulatePv`.
 
-Run the executable from the `precompiled_with_frontend` folderfrom a command line:
+Run the executable from the `precompiled_with_frontend` folder from a command line:
 
 ```bash
 cd path/to/precompiled_with_frontend
@@ -76,8 +76,6 @@ A representative input file for local weather-file based simulations is shown be
   "showPlots": false
 }
 ```
-
-For Windows paths in JSON, either use forward slashes or escape backslashes, for example `"C:\\path\\to\\weather.epw"`.
 
 ### Input parameters
 
@@ -144,11 +142,11 @@ where \(N_\mathrm{inv}\) is `numberOfInverters`, \(N_\mathrm{strings/inv}\) is `
 SoDeLe supports two local weather-file types:
 
 - `.epw`: EnergyPlus weather files,
-- `.dat`: DWD weather files from the German Weather Service climate consulting module [available here](https://kunden.dwd.de/obt/index.jsp).
+- `.dat`: DWD weather files from the German Weather Service climate consulting module [available here](https://kunden.dwd.de/obt/) (for Germany only, free submission required).
 
-For EPW files, radiation values are interpreted as values for the previous time step. The internal time stamp is shifted by 30 minutes so that radiation data are assigned to the corresponding solar position. For DWD `.dat` files, direct normal irradiance is not provided directly and is calculated internally before the PV yield calculation.
+Both in DWD `.dat` and EPW files, solar radiation values are interpreted as sum/mean values over the previous time step[^EPW_file_standard]. The internal time stamp is therefore shifted by 30 minutes so that radiation data are assigned to the corresponding solar position. For DWD `.dat` files, the direct normal irradiance is not provided directly and is calculated internally before the PV yield calculation.
 
-The DWD `.dat` import expects the format of the DWD climate consulting module: 8760 hourly values, no leap year, GMT+1/CET without daylight-saving-time handling, first data point on January 1 at 01:00, and a measurement section beginning with `***`. Current and future test reference years can be used.
+The DWD `.dat` import expects the format of the DWD climate consulting module: 8760 hourly values, no leap year, GMT+1/CET without daylight-saving-time handling, first data point on January 1 at 01:00, and a value section beginning with `***`. Current and future test reference years can be used.
 
 PV module and inverter parameters are based mainly on the California Energy Commission (CEC) database from the [System Advisor Model (SAM) by NREL](https://github.com/NREL/SAM/tree/develop/deploy/libraries) and data provided with [pvlib](https://github.com/pvlib/pvlib-python/tree/main/pvlib/data).
 See section [Updating the module and inverter database](sodele_user_manual.md#updating-the-module-and-inverter-database) for how to update them.
@@ -173,8 +171,7 @@ The folder contains `result.json` and generated plot files. The JSON result cont
 
 SoDeLe is intended for PV yield-profile generation, not detailed PV plant engineering. Shading is not modelled, the time step is limited by the weather file, and result quality depends on the selected weather data, module entry, inverter entry, and electrical configuration.
 
-For facade PV and other sensitive cases, check the plausibility of the weather-data time-stamp convention, for example by comparing east- and west-facing vertical systems, especially if you use EPW files that are not strictly created following the [EPW file standard](https://designbuilder.co.uk/cahelp/Content/EnergyPlusWeatherFileFormat.htm).
-
+For facade PV and other sensitive cases, check the plausibility of the weather-data time-stamp convention, for example by comparing east- and west-facing vertical systems, especially if you use EPW files that are not strictly created following the EPW file standard[^EPW_file_standard].
 
 ## Running SoDeLe from Python with Anaconda
 
@@ -256,7 +253,7 @@ Please note that the CSV files containing the module and inverter databases must
 
 ## Validation
 
-SoDeLe has been checked against established PV simulation tools to assess the plausibility of the calculated annual PV yields. The comparison included simulations with a detailed inverter model and simulations with a constant electrical DC-AC efficiency of 92 %. The annual energy yield was compared for one PV module, four different orientations, and four different locations. The comparison should be interpreted as a tool-to-tool verification and plausibility check, not as a complete certification of the model. It is also only describe briefly here. 
+SoDeLe has been checked against established PV simulation tools to assess the plausibility of the calculated PV yields. The comparison included simulations with a detailed inverter model and simulations with a constant electrical DC-AC efficiency of 92 %. The annual energy yield was compared for one PV module, four different orientations, and four different locations. The comparison should be interpreted as a tool-to-tool verification and plausibility check, not as a complete certification of the model. It is also only describe briefly here. 
 
 For common roof-oriented PV systems, the deviation of the annual yield compared with the commercially available `PV*SOL`[^PVSOL] was below 5 %. For façade-oriented systems in east-west orientation, deviations of up to 15 % in extreme scenarios were observed compared with `PVGIS`[^PVGIS], while the results from `PV*SOL` remain close to the one of SoDeLe. The daily profiles showed small but visible differences.
 
@@ -265,3 +262,5 @@ Differences mainly result from different irradiance-processing methods, differen
 [^PVSOL]: Valentin Software - PV*SOL premium: Design and simulation software for photovoltaic systems. Available [here](https://valentin-software.com/en/products/pvsol-premium/).
 
 [^PVGIS]: European Commission Joint Research Centre - Photovoltaic Geographical Information System (PVGIS), available [here](https://re.jrc.ec.europa.eu/pvg_tools/en/tools.html).
+
+[^EPW_file_standard]: Designbuilder Climate Analytics: EnergyPlus Weather File (EPW) Format. Available [here](https://designbuilder.co.uk/cahelp/Content/EnergyPlusWeatherFileFormat.htm).

@@ -48,15 +48,15 @@ This folder also contains the precompiled `SoDeLe.exe` and the required `src` fo
 
 ## Data basis and limitations
 
-SoDeLe supports EnergyPlus weather files (`.epw`) and DWD weather files (`.dat`) from the German Weather Service climate consulting module, available [here](https://kunden.dwd.de/obt/index.jsp). Weather files are preprocessed internally before the pvlib calculation is performed, including time-stamp handling and, for DWD files, calculation of direct normal irradiance.
+SoDeLe supports EnergyPlus weather files (`.epw`) and DWD weather files (`.dat`) from the German Weather Service climate consulting module, available [here](https://kunden.dwd.de/obt/). Weather files are preprocessed internally before the pvlib calculation is performed, including time-stamp handling and, for DWD files, calculation of direct normal irradiance.
 
-PV module and inverter parameters are read from public pvlib-compatible databases, including the CEC database from the System Advisor Model by NREL and data provided with pvlib. For scripted workflows, the internal database names must be used exactly.
+PV module and inverter parameters are read from public pvlib-compatible databases, including the CEC database from the [System Advisor Model (SAM) by NREL](https://github.com/NREL/SAM/tree/develop/deploy/libraries) and data provided with [pvlib](https://github.com/pvlib/pvlib-python/tree/main/pvlib/data).  For scripted workflows, the internal database names must be used exactly.
 
 Relevant modelling limitations are:
 
 - shading is not modelled,
 - the simulation time step is determined by the weather file, typically one hour,
 - result quality depends on the weather file, module entry, inverter entry, and electrical configuration,
-- facade-mounted PV systems can be sensitive to weather-data conventions and diffuse-radiation assumptions.
+- facade-mounted PV systems can be sensitive to weather-data conventions and diffuse-radiation assumptions (applies to all PV simulation tools).
 
 Detailed instructions are provided in the [SoDeLe User Manual](sodele_user_manual.md).
