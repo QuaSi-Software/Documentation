@@ -60,6 +60,9 @@ nav:
       - 'What is GenSim?': 'gensim_overview.md'
       - 'User manual': 'gensim_user_manual.md'
       - 'Building typology': 'gensim_building_typology.md'
+  - 'SoDeLe: Solar simulation as easy as can be':
+      - 'What is SoDeLe?': 'sodele_overview.md'
+      - 'User manual': 'sodele_user_manual.md'
   - Contributions:
       - 'How to help': 'contributions.md'
       - 'Working on the documentation': 'changing_documentation.md'

@@ -15,6 +15,7 @@
 | C-rate       | Charging rate (of storage)                                                  |
 | CC           | Compression Chiller                                                         |
 | CDT          | Cool-Down Time                                                              |
+| CEC       |  California Energy Commission                                         |
 | CHPP         | Combined Heat and Power Plant                                               |
 | CLI          | Command-line interface                                                      |
 | COP          | Coefficient of Performance                                                  |
