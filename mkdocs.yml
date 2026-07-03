@@ -40,6 +40,7 @@ nav:
       - 'Publications': 'publications.md'
       - 'Abbreviations': 'abbreviations_list.md'
   - 'ReSiE: Getting started':
+      - 'What is ReSiE?': 'resie_overview.md'
       - 'Installation and usage': 'resie_installation.md'
       - 'Examples': 'resie_exemplary_energy_systems.md'
       - 'SUSI and SIMON': 'resie_susi_simon.md'
