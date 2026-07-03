@@ -2,6 +2,8 @@
 
 ReSiE is a simulation engine for the analysis of energy supply systems in multi-sectoral district-scale projects. It is used to simulate the power, heat and general energy flow between energy system components, such as heat pumps, PV installations or ground-coupled heat storages. ReSiE also allows for economical analysis of results, calculation of GHG emissions and offers options for black-box optimisation. The name is derived from *Rechenkern für die Simulation von Energiesystemen* in German, meaning *calculation engine for the simulation of energy systems*.
 
+![Inputs and outputs of ReSiE](fig/260703_screen_resie.png)
+
 ## Purpose and scope
 
 The main use case of ReSiE is aiding the creation and evaluation of concepts for the energy supply system of buildings and districts in the early planning stage of construction and renovation projects. At such a stage only limited information is available, yet decisions on the energy system have to be made, that are carried forward into more advanced planning stages where more details have to be considered. ReSiE aims to facilitate a workflow that transitions from these early to later stages.
@@ -11,7 +13,10 @@ The engine implements a novel mathematical approach based on aspects of systems 
 ReSiE calculates the energy that flows between components based on the demands and available energy sources in each time step, taking into account which constraints the connections between them impose. Temperatures are considered where necessary to calculate an amount of energy, however mass flow and the hydraulic system in general is not modeled directly. Where the energy balance cannot be maintained, this is also an output of the simulation, as this is important information on the operation of the energy system.
 
 ## Next steps
-- more info on simulation method and input file
-- installation
-- examples
-- UI tools SIMON and SUSI
+
+We hope you find ReSiE interesting and useful for your work. Your next steps might be:
+
+- Install ReSiE on your local machine, by following [the installation instructions](resie_installation.md)
+- Browse [the examples](resie_exemplary_energy_systems.md) and simulate them
+- Use [the UI tools SUSI and SIMON](resie_susi_simon.md) to create your own input file with SUSI or learn how to simulate on a server environment with SIMON
+- Dive deep into the detailed descriptions of [the input file](resie_input_file_format.md) or [the simulation method](resie_fundamentals.md) in general or [the component models](resie_energy_system_components.md) in particular
