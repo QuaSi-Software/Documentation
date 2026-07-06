@@ -66,7 +66,7 @@ The overall structure of the project file is split several sections, each of whi
     },
     "csv_output_weather": true,
     "write_csv_continuously": false,
-    "write_summary_CSV": true,
+    "write_summary_csv": true,
     "output_plot_file_path": "./output/output_plot.html",
     "output_plot_time_unit": "date",
     "plot_weather_data": true,
@@ -84,12 +84,12 @@ The overall structure of the project file is split several sections, each of whi
     "economic_plot_cashflows_file_path": "./output/economic_results_cashflows.html",
     "plot_economic_present_values": true,
     "economic_plot_present_values_file_path": "./output/economic_results_present_values.html",
-    "output_economic_CSV": true,
-    "economic_CSV_file_path": "./output/economic_results.csv",
+    "output_economic_csv": true,
+    "economic_csv_file_path": "./output/economic_results.csv",
     "plot_emission_results": true,
     "emissions_plot_file_path": "./output/emissions_plot.html",
-    "output_emissions_CSV": true,
-    "emissions_CSV_file_path": "./output/emissions_results.csv",
+    "output_emissions_csv": true,
+    "emissions_csv_file_path": "./output/emissions_results.csv",
     "plot_price_and_emission_profiles": false,
     "price_and_emission_profile_file_path":  "./output/price_and_emissions_profiles.html",
     "step_info_interval": 500,
@@ -103,7 +103,7 @@ The overall structure of the project file is split several sections, each of whi
 * `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
-* `write_summary_CSV` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
+* `write_summary_csv` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
@@ -121,12 +121,12 @@ The overall structure of the project file is split several sections, each of whi
 * `economic_plot_cashflows_file_path` (`String`): (Optional) File path to where the economic cashflow plot will be written. Defaults to `./output/economic_results_cashflows.html`.
 * `plot_economic_present_values` (`Boolean`): (Optional) Toggle if the economic results as present values should be plotted. Defaults to `true`.
 * `economic_plot_present_values_file_path` (`String`): (Optional) File path to where the economic present value plot will be written. Defaults to `./output/economic_results_present_values.html`.
-* `output_economic_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
-* `economic_CSV_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
+* `output_economic_csv` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
+* `economic_csv_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
 * `plot_emission_results` (`Boolean`): (Optional) Toggle if the emission results should be plotted. Defaults to `true`.
 * `emissions_plot_file_path` (`String`): (Optional) File path to where the emissions plot will be written. Defaults to `./output/emissions_result.html`.
-* `output_emissions_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
-* `emissions_CSV_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
+* `output_emissions_csv` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
+* `emissions_csv_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
 * `plot_price_and_emission_profiles` (`Boolean`): (Optional) Toggle if a plot with the utilized price and emission profiles should be created. This can be used to double check if everything is scaled and imported correctly.  Note that this file can be very large! Therefore it defaults to `false`.
 * `price_and_emission_profile_file_path` (`String`): (Optional) File path to where the plot with price and emission profiles will be written. Defaults to `./output/price_and_emissions_profiles.html`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
@@ -194,7 +194,7 @@ To output the weather data read in from a provided weather file, the flag `csv_o
 
 **Summary output**
 
-Using the toggle `write_summary_CSV`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
+Using the toggle `write_summary_csv`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
 
 Energy-related outputs, such as `Demand`, `IN`, `OUT`, `Supply`, `Losses`, `Gains`, `EnergyFlow` and `Balance`, are summed. Columns containing `_sum` are treated as cumulative values and the last valid value is written. All other numeric outputs, such as temperatures, efficiencies or states of charge, are averaged.
 
