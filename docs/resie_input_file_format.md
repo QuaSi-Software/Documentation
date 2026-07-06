@@ -51,13 +51,13 @@ The overall structure of the project file is split several sections, each of whi
     "auxiliary_plots": true,
     "auxiliary_plots_path": "./output",
     "auxiliary_plots_formats": ["png", "svg"],
-    "sankey_plot_file": "./output/output_sankey.html",
+    "sankey_plot_file_path": "./output/output_sankey.html",
     "sankey_plot": "custom",
     "sankey_plot_spec": {
         "m_e_ac_230v": "darkyellow",
         ...
     },
-    "csv_output_file": "./output/out.csv",
+    "csv_output_file_path": "./output/out.csv",
     "csv_time_unit": "hours",
     "csv_output": "custom",
     "csv_output_keys": {
@@ -67,7 +67,7 @@ The overall structure of the project file is split several sections, each of whi
     "csv_output_weather": true,
     "write_csv_continuously": false,
     "write_summary_CSV": true,
-    "output_plot_file": "./output/output_plot.html",
+    "output_plot_file_path": "./output/output_plot.html",
     "output_plot_time_unit": "date",
     "plot_weather_data": true,
     "output_plot": "custom",
@@ -97,7 +97,7 @@ The overall structure of the project file is split several sections, each of whi
 },
 ```
 * `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
-* `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
+* `csv_output_file_path` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
 * `csv_time_unit` (`String`): (Optional) Time unit for the timestamp of the CSV output. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output` (`String`): (Optional) Sets the mode of the CSV output, switching between several default and custom behaviour modes as well an option of not creating a CSV file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `nothing`.
 * `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
@@ -109,10 +109,10 @@ The overall structure of the project file is split several sections, each of whi
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
 * `auxiliary_plots_path` (`String`): (Optional) Directory path to where the additional plots will be saved. Defaults to `./output/`.
 * `auxiliary_plots_formats` (`Array{String}`): (Optional) Multiple selection of which file formats are used to create the auxiliary plots. Allowed formats are: `html`, `pdf`, `png`, `ps`, `svg`. Defaults to `[".png"]`.
-* `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
+* `sankey_plot_file_path` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`String`): (Optional) Sets the mode of the sankey plot output, switching between default and custom behaviour as well an option of not creating a sankey plot file. Has to be one of: `default`, `custom`, `nothing`. Defaults to `default`.
 * `sankey_plot_spec` (`Dict{String, String}`): (Optional) Specifications for the colors of the sankey plot in custom mode. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. Only required if a custom sankey plot is set.
-* `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
+* `output_plot_file_path`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
 * `output_plot_time_unit` (`String`): (Optional) Unit for x-axis of the output plot. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 *  `plot_weather_data` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the line plot. Defaults to `false`.
 * `output_plot` (`String`): (Optional) Sets the mode of the output plot, switching between several default and custom behaviour modes as well an option of not creating a plot file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `all_incl_flows`.
