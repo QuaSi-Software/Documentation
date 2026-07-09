@@ -1535,7 +1535,7 @@ To simplify the use of this model multiple battery chemistries are provided with
 | `embodied_emissions_specific` | `String` | N/Y | `const:0.0` | [g CO2/Wh] or [g CO2] | Function for specific embodied emissions with respect to the storage capacity `capacity`. See [this section](resie_component_parameters.md#functions-for-specific-investment-costs-and-ghg-emissions) for further details. |
 | `embodied_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of embodied emissions. |
 
-#### Exemplary input file definition for Battery
+**Exemplary input file definition for Battery**
 
 Minimal definition of a battery in the input file, including economic calculations and emissions:
 

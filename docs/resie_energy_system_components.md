@@ -73,7 +73,7 @@ For the simulation of energy systems in an early design phase, for which QuaSi i
 
 There are several aspects to be considered when simulating a heat pump based on equation-fitting, which will be briefly described in the following:
 
-The COP of a heat pump, representing the efficiency in a current timestep, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
+The COP of a heat pump, representing the efficiency in a current time step, depends highly on the temperature of the source and the requested temperature of the heat demand. Generally speaking, the efficiency and thus the COP decreases with larger temperature differences between source and sink.
 
 Additionally, the maximum thermal power of the heat pump is not constant for different operational temperatures. The available thermal power is decreasing with lower source temperature, an effect that mainly occurs in heat pumps with air as the source medium. The rated power given in the literature for a specific heat pump is usually only valid for a specified combination of sink and source temperature. The specification for the declaration of the rated power is described in DIN EN 14511[^DINEN14511].
 
@@ -442,7 +442,7 @@ $$ \text{with} \quad v_{O_2,H_2} = \frac{atomic \ mass \ O_2}{2 \cdot atomic \ m
 
 ### Unit dispatch
 
-Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{unit}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The electricity input of the overall electrolyser is split across the active units in a single timestep with no losses occuring before the split. Rather, each unit individually calculates its losses from the available energy. In a similar manner the hydrogen, oxygen and heat outputs are summed over the active units with losses being considered by each.
+Depending on the sizing and technology of realised electrolysers, the whole plant often consists of more than one stack and/or more than one set of power supply equipment. This is modeled as the electrolyser consisting of \(N_{unit}\) units, which are all the same in regards to design power and efficiencies. The efficiency functions given as input parameters thus relate to a single unit with its own power supply subsystem. The electricity input of the overall electrolyser is split across the active units in a single time step with no losses occuring before the split. Rather, each unit individually calculates its losses from the available energy. In a similar manner the hydrogen, oxygen and heat outputs are summed over the active units with losses being considered by each.
 
 Different options exist for how to dispatch the units to meet a demand, in particular as the minimum power fraction \(\kappa_{min,unit}\) of each unit tends to be fairly high and a lower overall \(\kappa_{min}\) can only be achieved by not activating all units. In addition, the efficiencies of each unit are not necessarily optimal at full load and a performance increase can be achieved by choosing the right number of units to activate close to the optimal PLR.
 
@@ -872,7 +872,7 @@ The soil is assumed to be homogeneous with uniform and constant physical propert
 [^VDI4640-1]: Verein Deutscher Ingenieure, VDI 4640 Blatt 1, Thermische Nutzung des Untergrunds - Grundlagen, Genehmigungen, Umweltaspekte: = Thermal use of the underground - fundamentals, approvals, environmental aspects. Berlin: Beuth Verlag GmbH, 2021.
 
 #### g-function approach
-The general g-function approach was introduced by Eskilson.[^Eskilson] The current temperature at the borehole wall \(T_B\) as response to a specific heat extraction or injection \(\tilde{q}_{in,out}\) within one timestep can be determined using the following equation: 
+The general g-function approach was introduced by Eskilson.[^Eskilson] The current temperature at the borehole wall \(T_B\) as response to a specific heat extraction or injection \(\tilde{q}_{in,out}\) within one time step can be determined using the following equation: 
 
 [^Eskilson]: P. Eskilson, Thermal Analysis of Heat Extraction Boreholes. University of Lund, 1987. Available: [https://buildingphysics.com/download/Eskilson1987.pdf](https://buildingphysics.com/download/Eskilson1987.pdf)
 
@@ -1432,7 +1432,7 @@ When energy is delivered to multiple components in one time step at different te
 
 
 #### Solar irradiance
-To get the irradiance on the collector plane the beam horizontal irradiance \(G_{\text{b,hor}}\) and diffuse horizontal irradiance \(G_{\text{d,hor}}\) from the weather data must be converted. For both conversions the incidence angle \(\theta\) and therefore the position of the sun in the sky is needed. For calculation of the sun position Algorithm 5 from [^GrenaFiveNewAlg] is used, as an good compromise between calculation speed and accuracy. To get the best estimation of the sun position over a timestep the middle of the timestep is used with consideration of the sunrise and sunset. The output is the sun zenith \(\Theta_s\) and sun azimuth \(\Phi_s\) which can be used to calculate the angle of incidence on the collector with  
+To get the irradiance on the collector plane the beam horizontal irradiance \(G_{\text{b,hor}}\) and diffuse horizontal irradiance \(G_{\text{d,hor}}\) from the weather data must be converted. For both conversions the incidence angle \(\theta\) and therefore the position of the sun in the sky is needed. For calculation of the sun position Algorithm 5 from [^GrenaFiveNewAlg] is used, as an good compromise between calculation speed and accuracy. To get the best estimation of the sun position over a time step the middle of the time step is used with consideration of the sunrise and sunset. The output is the sun zenith \(\Theta_s\) and sun azimuth \(\Phi_s\) which can be used to calculate the angle of incidence on the collector with  
 
 $$ \Theta = arccos(cos(\beta)cos(\Theta_s) + sin(\beta)sin(\Theta_s)cos(\Phi_s - \gamma)). $$
 
@@ -1535,15 +1535,15 @@ This model was chosen to keep the computational effort and number of input param
 The rated thermal energy content \(Q_{rated}\) of the STTES can be calculated using the volume \(V\), the density \(\rho\), the specific thermal capacity of the medium in the storage \(cp\) and the temperature span within the STTES:
 $$ Q_{rated} = V \ \rho \ cp \ (T_{hot} - T_{cold}) $$
 
-The amount of the total input (\(Q_{in,t}\)) and output energy (\(Q_{out,t}\)) in every timestep is defined as
+The amount of the total input (\(Q_{in,t}\)) and output energy (\(Q_{out,t}\)) in every time step is defined as
 $$  Q_{in,t} = \dot{Q}_{in,t} \ \Delta t = \dot{m}_{in} \ cp \ (T_{hot} - T_{cold}) \ \Delta t $$
 and
 $$  Q_{out,t} = \dot{Q}_{out,t} \ \Delta t = \dot{m}_{out} \ cp \ (T_{hot} - T_{cold}) \ \Delta t. $$
 
-The current charging state \(x_{t+1}\) can be calculated using the following equation and the charging state of the previous timestep (\(x_{t}\)) as well as the input and output energy
+The current charging state \(x_{t+1}\) can be calculated using the following equation and the charging state of the previous time step (\(x_{t}\)) as well as the input and output energy
 $$ x_{t+1} = x_{t} + \frac{Q_{in,t} - Q_{out,t}}{Q_{rated}}   $$
 
-leading to the total energy content in every timestep as
+leading to the total energy content in every time step as
 $$ Q_{current,t} = Q_{rated} \ x_{t}. $$
 
 The limits of the thermal power in- and output (\(\dot{Q}_{in}\) and \(\dot{Q}_{out}\)) due to the current energy content \(Q_{current}\) and maximum c-rate of the STTES are given as
@@ -1704,7 +1704,7 @@ For clarification, the following figure provides a sketch of the truncated quadr
 
 ![Energy flow of STES](fig/221028_STES.svg)
 
-General energy balance in every timestep \(t\):
+General energy balance in every time step \(t\):
 $$ 	
 Q_{STES,t} = Q_{STES,t-1} + (\dot{Q}_{STES,load} - \dot{Q}_{STES,unload} - \dot{Q}_{STES,loss,amb}) \ \Delta t
 $$
@@ -1732,9 +1732,9 @@ $$
 \ \underbrace{\frac{\dot m_{STES} (T_{STES,l,in}-T_{STES,l})}{\rho_{STES} \ V_{STES,l}}}_{\text{direct (un-)loading}}
 $$
 
-The ambient temperature of each layer \(T_{amb,l}\) can be either the ambient air temperature \(T_{amb,air}\) in the specific timestep or the ground temperature \(T_{ground}\) depending on the considered layer \(l\) and the number of layer buried under the ground surface.
+The ambient temperature of each layer \(T_{amb,l}\) can be either the ambient air temperature \(T_{amb,air}\) in the specific time step or the ground temperature \(T_{ground}\) depending on the considered layer \(l\) and the number of layer buried under the ground surface.
 
-Using the explicit Euler method for integration, the previous equation leads to the temperature in every timestep \(t\) and layer \(l\) with respect to the temperatures in the timestep before and the layers around (without the index \(_{STES}\) for better overview)
+Using the explicit Euler method for integration, the previous equation leads to the temperature in every time step \(t\) and layer \(l\) with respect to the temperatures in the time step before and the layers around (without the index \(_{STES}\) for better overview)
 $$
 \begin{aligned} 
 	&T_{t+1,l}  = T_{t,l} + \left( \xi_{STES} \frac{T_{t,l+1} + T_{t,l-1} - 2 T_{t,l}}{\Delta z^2_{l,vol}} +  \sigma_l (T_{amb,l} - T_{t,l}) 	+ \phi_l \dot{m}_{t,l} \left(T_{t,l,in} - T_{t,l}   \right)  \right) \Delta t \\
@@ -1757,7 +1757,7 @@ $$
 
 As the coefficients mentioned above are constant within the simulation time, they can be precomputed for computational efficiency.
 
-To account for buoyancy effects, a check is made in each timestep to determine whether the temperature gradient in the STES corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each timestep for all layers, beginning with \(l=2\):
+To account for buoyancy effects, a check is made in each time step to determine whether the temperature gradient in the STES corresponds to the physically logical state, meaning that the temperatures in the upper layers are higher than in the lower storage layers. If, however, an inverse temperature gradient is present, a mixing process is performed in each time step for all layers, beginning with \(l=2\):
 $$
 T_l = T_l + \theta_l \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1 \text{ and }\\
 T_{l-1} = T_{l-1} - (1-\theta_l) \ \text{max} (0, T_{l-1} - T_l) \text{ for } l > 1
@@ -1771,7 +1771,7 @@ $$ dt_{internal} = \frac{dt_{global}}{5 \ \frac{\text{max}(mass_{in}, mass_{out}
  
 To quantify the losses or gains to the ambient, they are calculated using an energy balance at the end of each global time step comparing the old and new temperature distribution and all energy inputs and outputs in the current time step.
 
-To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES during charging as well as exemplary the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). If the mass inflow within one timestep is larger than the volume of the smallest segment, an algorithm takes care about the correct mass and temperature flows in and out of every layer. As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is currently always in the top and bottom layer. Also, as assumption and simplification, the return mass flow during unloading into the lowermost layer equals the design lower temperature that is set for the STES.
+To illustrate the principle of the implemented model, the following figure shows the mass flow into and out of the STES during charging as well as exemplary the mass flow between the layers within the model. The corresponding temperatures are the temperatures of the source (input flow or layer temperature of the previous layer). If the mass inflow within one time step is larger than the volume of the smallest segment, an algorithm takes care about the correct mass and temperature flows in and out of every layer. As a convention, the lowermost layer is labeled with the number 1. The inflow and outflow is currently always in the top and bottom layer. Also, as assumption and simplification, the return mass flow during unloading into the lowermost layer equals the design lower temperature that is set for the STES.
 
 ![Stratified Model of STES](fig/221103_STES_layer_temp.svg)
 
@@ -1992,30 +1992,109 @@ Inputs can include orientation, tilt, ambient albedo, type of installation (e.g.
 
 ![Energy flow of battery](fig/221025_battery.svg)
 
-Energy balance of battery in every timestep:
-$$  E_{BA,t+1} = E_{BA,t} + \Delta t \ ( \eta_{BA,charge} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharge}} - P_{el,BA,loss,self}) $$
+The battery component is designed to store electric energy as chemical energy. It models losses during charging and discharging as well as self-discharging if no energy exchange is happening. The component is designed to model just the battery without inverters to be flexible enough to implement it in different systems. Inverters can be modelled with the  [UTIR](../resie_component_parameters/#unified-electric-transformer-inverter-and-rectifier-utir) component or with reduced efficiencies in the simplified battery model. 
+Generally the battery component has a simplified and a detailed model. The simplified model uses fixed losses and assumes the battery is a pure energy storage with only a state of charge (SOC). The detailed model on the other hand represents the specific cell chemistry with a generic model based on Song2018[^Song2018], an enhanced version of the model in Tremblay2007[^Tremblay2007] which is in itself based on Shepherd1965[^Shepherd1965].
+The losses of the battery model can optionally be made available as heat which can be integrated in the energy system as a cooling need or heat source for other components.
 
-Self-Discharge losses of battery:
-$$ P_{el,BA,loss,self} = r_{BA,self \ discharge} \ \frac{1 \ h}{\Delta t} \ E_{BA,t} $$
+### Simplified Model
+Energy balance of battery in every time step:
+$$  E_{BA,t+1} = E_{BA,t} + \Delta t \ ( \eta_{BA,charging} \ P_{el,BA,in} - \ \frac{P_{el,BA,out}}{\eta_{BA,discharging}} - P_{el,BA,loss,self}) $$
+
+Self-discharging losses of battery:
+$$ P_{el,BA,loss,self} = r_{BA,self\text-discharging} \ \frac{1 \ h}{\Delta t} \ E_{BA,t} $$
 
 Charging losses of battery:
-$$ P_{el,BA,loss,charge} = (1 - \eta_{BA,charge}) \ P_{el,BA,in} $$
+$$ P_{el,BA,loss,charging} = (1 - \eta_{BA,charging}) \ P_{el,BA,in} $$
 
 Discharging losses of battery:
-$$ P_{el,BA,loss,discharge} = \frac{1 - \eta_{BA,discharge}}{\eta_{BA,discharge}} \ P_{el,BA,out} $$
+$$ P_{el,BA,loss,discharging} = \frac{1 - \eta_{BA,discharging}}{\eta_{BA,discharging}} \ P_{el,BA,out} $$
+
+Limits of electrical power in- and output (limit to current energy content and maximum c-rate of battery):
+$$ \frac{E_{BA,max,current} - E_{BA}}{\Delta t \ \ \eta_{BA,charging} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charging} \ E_{BA,max,current}  $$
+$$ \eta_{BA,discharging} \ \frac{E_{BA}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharging} \ E_{BA,max,current} $$
+
+Relation between current charging state in percent and in energy content:
+$$ E_{BA} = E_{BA,max,current} \ SOC_{BA} $$
+
+### Detailed Model
+
+The detailed model uses the same general calculations as the simplified model. The main differences are charging and discharging efficiencies being calculated every time step by the model and the SOC being calculated based on the stored charge in one cell. 
+
+The general idea is to calculate the cell voltage \(V_{cell}\) based on the charge in the cell using a parametrized equation. We can then use the information about the requested charging (< 0) or discharging power (> 0) \(P_{el,BA}\) to calculate the current in each cell with
+
+$$ I_{cell} = \frac{P_{cell}}{V_{cell}} $$
+and 
+$$ P_{cell} = \frac{P_{el,BA}}{n_{parallel} n_{series}} $$
+
+where \(n_{parallel}\) and \(n_{series}\) are the number of cells in parallel and series in the battery, that get calculated as
+
+$$ n_{parallel} = \frac{V_{n,BA}}{V_{n,cell}};  n_{series} = \frac{E_{n,BA}}{V_{n,BA} Q_n} $$
+
+where \(V_{n,BA}\) is the nominal battery voltage, \(V_{n,cell}\) the nominal cell voltage, \(E_{n,BA}\) the nominal batttery energy and \(Q_n\) the nominal charge capacity.
+
+With the cell current and the internal resistance we can then calculate the efficiency with
+
+$$ \eta_{BA} = \frac{R I_{cell}^2}{|P_{cell}|}. $$
+
+The important part is the calculation of the cell voltage, which will be desriped in the following section. To get a good fit of the cell voltage multiple other dependencies are defined in the equation from Song2018[^Song2018] as
+
+$$ V_{cell}(t,I,N,T) = V_0 - R I - K \frac{m Q(I,N,T)}{m Q(I,N,T)-\int I dt} + A e^{-B \int I dt} $$
+
+where \(V_{cell}(t)\) is the cell voltage in V, \(t\) is the time since simulation start in h, \(V_0\) is the cell voltage constant in V, \(R\) is the internal resistance in \(\Omega\), \(I\) is the cell current in A where a positive value means discharging and negative represents charging, \(K\) is the polarization constant in V/(Ah), \(m\) is the capacity adjustment factor, \(Q(I,N,T)\) is the cell charge capacity in Ah at current \(I\), after \(N\) equivalent full cycles (EFC), at cell temperature \(T\) in °C, \(\int I dt\) is the stored cell charge in Ah, \(A\) is the exponential zone voltage constant in V and \(B\) is the exponential zone inverse time constant in 1/(Ah).
+The biggest difference between Song2018[^Song2018] and Tremblay2007[^Tremblay2007] shows in the charge capacity \(Q\) being dependent on the current, equivalent full cycles and cell temperature as
+
+$$ Q(I,N,T) = Q_0 \left(\frac{|I|}{I_0}\right)^\alpha k_N(N) k_T(T) $$
+
+where \(Q_0\) is the nomial capacity in Ah at a reference current of \(I_0\) in A, \(\alpha\) is the current related degradation factor, \(k_n(N)\) is the cycling related degradation rate and \(k_T(T)\) is the cell temperature related degradation rate. \(k_N(N)\) and \(k_T(T)\) get calculated with
+
+$$ k_T(T) = 1 + k_{QT1} (T-T_0) + k_{QT2}(T-T_0)^2 $$
+and
+$$ k_N(N) = 1 + k_{QN1} \frac{(N-1) N}{2} + k_{QN2} \frac{(N-1) N (2 N-1)}{2}  $$
+
+with the additional degradation constants \(k_{QT1}\), \(k_{QT2}\), \(k_{QN1}\), \(k_{QN2}\) which get calculated during the parametrization of the model and \(T_0\) being a reference Temperature in °C.
+
+Besides defining your own battery cell multiple typical cell chemistries are provided to choose from. Currently the only option is the Lithium Iron Phosphate (LFP) cell, that is also used in Song2018[^Song2018], but lithium nickel manganese cobalt oxide (NMC),  nickel-metal hydride (NiMH) and lead-iron OPzV cells will be added in the future.
+The process to finding the correct parameters for a specific cell is described in detail in Song2018[^Song2018]. If you have found the points desribed in the paper you can use the script in `helper_functions/parametrize_battery_cell.jl` to get the parameters.
+
+#### Charging and discharging strategies
+
+The battery is defined as full when \(\int I dt\) is equal to \(Q(I,N,T)\). The charging power gets limited as soon as \(V_{cell}\) reaches the maximum Voltage \(V_{cell,max}\) by calculating which current keeps the voltage constant, mimicking a CC-CV charging strategy. \(V_{cell,max}\) gets calculated at the beginning of the simulation as
+
+$$ V_{cell,max} = V_{cell}(t=0, I_0, N_{start}, T_{start})  $$
+
+with \(N_{start}\) and \(T_{start}\) are the EFC and the Temperature at the start of the simulation.
+
+The battery is defined as empty when \(V_{cell}\) reaches \(V_{cell,min}\) which is earlier when the battery is discharging at high currents and later if it is discharging at lower currents. This mimiks real-world behaviour where it is harder to keep track of the maximum and removed charge in real batteries. The minimum voltage is calculated with
+
+$$ V_{cell,min} = V_{cell}(t_{empty}, I_{dis,max}, N_{start}, T_{start})  $$
+
+where \(t_{empty}\) is the time for which \(\int I_{dis,max} dt\) equals \(Q(I_{dis,max}, N_{start}, T_{start})\) and \(I_{dis,max}\) is the maximum discharge current set by the user.
+
+If the maximum and minimum SOC gets changed \(V_{cell,min}\) gets calculated accordingly by reducing finding \(t_{empty}\) for  \(\int I_{dis,max} dt\) equals \(SOC_{max} * Q(I_{dis,max}, N_{start}, T_{start})\).
+
+
+- Implementation difficulties
+    - dynamic capacity (especially current dependent) leads to unwanted behaviour in simulation
+    - Handeling of V_cell if current=0 -> ignore V_cell_last if current_last=0 || sign(current_last) != sign(current)
+    - Behaviour close to empty and full
+        - full can be charge until SOC_max @ max voltage and reducing current -> CV charging
+        - empty cuts off as soon as V_cell < V_cell_min, even if SOC > SOC_min close to realistic behaviour and considering how SOC is calculated
 
 Current maximum capacity of the battery:
 $$ E_{BA,max,current} = E_{BA,rated} \ (1-r_{BA,CapReduction}) ^{ n_{cycles \ performed}} $$
 $$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{BA,rated}} $$
 
-Limits of electrical power in- and output (limit to current energy content and maximum c-rate of battery):
-$$ \frac{E_{BA,max,current} - E_{BA}}{\Delta t \ \ \eta_{BA,charge} } \stackrel{!}{\geq}  P_{el,BA,in} \stackrel{!}{\leq}  c_{BA,max,charge} \ E_{BA,max,current}  $$
-$$ \eta_{BA,discharge} \ \frac{E_{BA}}{\Delta t} \stackrel{!}{\geq}  P_{el,BA,out} \stackrel{!}{\leq}  c_{BA,max,discharge} \ E_{BA,max,current} $$
+#### Assumptions and scope
+Current model assumptions and limitations are
+    - Detailed model performs best in between the values used for parametrization regarding temperature, C-rate and cycles
+    - The temperature of the cells is set to a constant value under the assumption that the whole battery is temperature regulated. This might change in the future.
+    - Calendaric aging not considered yet but only cyclic aging
 
-Relation between current charging state in percent and in energy content:
-$$ E_{BA} = E_{BA,max,current} \ x_{BA} $$
+[^Song2018]: D. Song, C. Sun, Q. Wang und D. Jang, "A Generic Battery Model and Its Parameter Identification," EPE, Jg. 10, Nr. 01, S. 10–27, 2018, doi: [10.4236/epe.2018.101002](https://doi.org/10.4236/epe.2018.101002).
+[^Tremblay2007]: O. Tremblay, L.-A. Dessaint und A.-I. Dekkiche, "A Generic Battery Model for the Dynamic Simulation of Hybrid Electric Vehicles," in 2007 IEEE Vehicle Power and Propulsion Conference, Arlington, TX, USA, Sep. 2007 - Sep. 2007, S. 284–289, doi: [10.1109/VPPC.2007.4544139](https://doi.org/10.1109/VPPC.2007.4544139).
+[^Shepherd1965]: C. M. Shepherd, "Design of Primary and Secondary Cells," J. Electrochem. Soc., Jg. 112, Nr. 7, S. 657, 1965, doi: 10.1149/1.2423659.
 
-**Inputs and Outputs of the BA:**
+**Inputs and Outputs of the Battery:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
@@ -2025,7 +2104,7 @@ Symbol | Description | Unit
 \(P_{el,BA,loss,charge}\) | electrical power losses of the BA while charging| [W]
 \(P_{el,BA,loss,discharge}\) | electrical power losses of the BA while discharging| [W]
 
-**Parameter of the BA:**
+**Parameter of the Battery:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
@@ -2039,13 +2118,13 @@ Symbol | Description | Unit
 \({E}_{BA,start}\)  | electrical energy contend of the battery at the beginning of the simulation   | [MWh]
 
 
-**State variables of the BA:**
+**State variables of the Battery:**
 
 Symbol | Description | Unit
 -------- | -------- | --------
 \({E}_{BA}\)  | current amount of energy stored in the battery   | [MWh]
 \({E}_{BA,max,current}\)  | current maximum capacity of the battery depending on the number of charging cycles already performed  | [MWh]
-\(x_{BA}\)  | current charging state of the battery   | [%]
+\(SOC_{BA}\)  | state of charge of the battery   | [%]
 
 
 ## Hydrogen compressor (HC)

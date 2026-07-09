@@ -538,3 +538,44 @@ Overall, ReSiE is fully in line with the other simulation environments for typic
 [^IEA_ES_39]: International Energy Agency - Energy Storage - Task 39:  Large Thermal Energy Storages for District Heating.  Website: [https://iea-es.org/task-39/](https://iea-es.org/task-39/)
 
 [^IEA_ES_39_Testcases]: Wim van Helden et al.: IEA ES Task 39 - Large Thermal Energy Storages for District Heating. Subtask C: Round Robin Simulations. Deliverable C2a: Modelling guidelines - Round robin test case description (for comparative simulations). 2024. Available at [https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf](https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf)
+
+
+## Battery
+To validate the battery model two comparisons where choosen. One is the battery model implemented in the System Advisor Model&trade; (SAM&trade;) by the National Laboratory of the Rockies (NLR) and the second comparison is to mesaured data from the M5BAT[^M5BAT_Webside] project. For the validation a Lithium Iron Phosphate (LFP) cell is chosen and the battery parameters are taken from the M5BAT LFP battery while the specific cell parameters are left to the default LFP parameters for ReSiE and SAM&trade;.
+The comparison to SAM&trade; was chosen since it uses a very similar model which is based on Tremblay2007[^Tremblay2007] and uses a different way to include the effects of cyclic aging. 
+For measurement data from M5BAT the data from Koltermann2024[^Koltermann2024] is used which covers the whole month of April in 2023 with a resolution of one second.
+The ReSiE model uses the model_type `Li-LFP` which sets the cell parameters as described in the following table.
+
+| Parameter                      | Value ReSiE |
+| ----------------------------- | ---------------- |
+| `V_n` |  3.2 V |
+| `r_i` | 0.00016 \(\varOmega\) |
+| `V_0` | 3.36964 V |
+| `K` | 0.03546 V |
+| `A` | 0.08165 V |
+| `B` | 0.1003 1/(Ah) |
+| `capacity_cell_Ah` | 1090 Ah |
+| `m` | 1.0269 |
+| `alpha` | -0.01212 |
+| `k_qn` | [-1.27571e-7, 1.22095e-11] |
+| `k_qT` | [1.32729e-3, -7.9763e-6] |
+| `k_n` | [9.71249e-6, 7.51635e-4, -8.59363e-5, -2.92489e-4] |
+| `k_T` | [1.05135e-3, 1.83721e-2, -7.72438e-3, -4.31833e-2] |
+| `I_ref` | 100 A |
+| `T_ref` | 25 °C |
+
+To compare the models the charging and discharging power from the measurement data ist taken and set for the two models. If the can't be added to the battery because of model limitations (e.g. battery is full/empty) the power is ignored. 
+
+The sizing of the battery is taken from Koltermann2024[^Koltermann2024] which gives two values of the capacity of 738 kWh and 923 kWh which are assumed to be the total and usable capacity where the usable capacity is limited from 10% to 90% of the total capacity. For the models the total capacity is used. All SOC values are recalcuated in relation to the usable capacity of 738 kWh since the SOC for the measurement is related to that value.
+
+Another issue with measurement data of batteries is that they often have jumps in the SOC even if no energy is added or removed. This change in SOC is done to correct for errors that occur in between SOC calculation and expected voltages. Since this effect is not present in the models we need to make clear how to handle those SOC jumps. For this validation two approaches are used. One is not to do any correction and use the values as is which is labeled just as \(SOC\). The second approach is to take the SOC jumps and distribute them across the time range between now and the last SOC jump. The distribution is weighted by the absolute power added or removed. This adjusted SOC is labeled as \(SOC_adj\). While the SOC is an easy to grasp value it is flawed for comparison since the actually charge that a battery has can vary heavily with different C-rates, temperatures and aging and SOC usually just gives an estimate and is not a accurate value.  While we will still you use it in the following comparison the cell voltage  \(V_cell\) is the better estimate of model quality, since it also heavily influences the efficiency.
+
+Additionally we need the battery temperature and the charge cycles that the battery already experienced. It was possible to estimate the charge cycles from other publications of M5BAT as 769 between the 06.2017 and 04.2024. It is assumed to also relate to the usable capacity which means for ReSiE it will be set to 769 * 80% = 615 cycles. 
+The battery temperature wasn't available from the measurement data and since ReSiE currently only supports a constant temperature the temperature was varied to get a good fit to the measurement and a value of 35 °C seamed to get good results, while being in a realistic range.
+
+In the first step ReSiE was run with a time step of one second to show the behaviour if all the peaks and fast changes are present in the data. Additionally ReSiE and SAM&trade; were run with 15 minutes and one hour timesteps to show the behaviour in a more realistic usecase.
+In table xxx you can see the mean error (ME) for the cell voltage \(V_cell\) and the \(SOC\) as well as the round trip efficiency \(\eta_{rte}\) between two points with the same SOC at the beginning and the end of the month.
+
+[^M5BAT_Webside]: [https://battery-charts.de/de/m5bat-de/](https://battery-charts.de/de/m5bat-de/)
+[^Tremblay2007]: O. Tremblay, L.-A. Dessaint und A.-I. Dekkiche, "A Generic Battery Model for the Dynamic Simulation of Hybrid Electric Vehicles," in 2007 IEEE Vehicle Power and Propulsion Conference, Arlington, TX, USA, Sep. 2007 - Sep. 2007, S. 284–289, doi: [10.1109/VPPC.2007.4544139](https://doi.org/10.1109/VPPC.2007.4544139).
+[^Koltermann2024]: L. Koltermann, M. E. Celi Cortés, S. Zurmühlen, J. van Ouwerkerk und D. U. Sauer, "M5BAT Large-Scale Battery Storage System Dataset: Evaluation Operation Report 04/2023," 2024, doi: 10.18154/RWTH-2024-04895.
