@@ -326,6 +326,67 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 * `include_embodied_emissions` (`Boolean`, optional): If set to true, includes embodied emissions in the calculation. Defaults to `true`.
 * `repeat_method` (`String`, optional): Defines which period of the result data is repeated to fill up the remainder of the observation period. This can be equal or less than the simulation period, for example simulating three years, but only repeating the last year for the entire observation period. Has to be one of: `all`, `last_year`, `last_month`, `last_week`. Defaults to `last_year`.
 
+## Optimisation parameters
+
+The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information to the available algorithms can be found in the documentation for each package.
+
+Additionally it is important to understand how the objective and parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_function` defines how the objective parameters are combined. This can either be as a `sum` or linear with factors (e.g. `linear:factor1,factor2`) for single objective optimisation or `multi-objective` if the algorithm supports multi objective optimisation. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file) with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of results of those calculations. For all other output values `sum` and `mean` are used to define how all the outputs over the simulation time are combined into one value.
+
+The parameters to be changed are defined with `optim_params` and follow the general input file definition for parameters. So far every numeric value in the input file can be used here. The only addition is a additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start` or providing a range by giving any 3 out of the 4 kwargs for the `range()` function (`start`, `stop`, `lenght`, `step`). The range is usually used for the type `parametervariation` while bounds and starting value are used by optimisation algorithms.
+
+
+```json
+"optimisation_parameters": {
+    "run_optimisation": true,
+    "run_sensitivity": true,
+    "disable_all_simulation_outputs": false,
+    "type": "Metaheuristics",
+    "algorithm": "ECA",
+    "max_runs": 100,
+    "objective_function": "sum",
+    "objective_params":  {
+        "economic":  ["total_annuity"],
+        "sum": { "GridOut": ["m_e_ac_230v:IN"]}
+        },
+    "optim_params": {
+        "components": {
+            "BufferTank": {
+                "volume": {
+                    "min": 0,
+                    "max": 5.0,
+                    "start": 2.0
+                }
+            },
+            "PV": {
+                "scale": {
+                    "min": 0,
+                    "max": 1000,
+                    "start": 500
+                }
+            }
+        }
+    }
+}
+```
+
+* `run_optimisation` (`Boolean`, optional): If set to true, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `false`.
+* `run_sensitivity` (`Boolean`, optional): If set to true, run global sensitivity analysis based on optimisation results if enough runs are available or additional simulations otherwise. Defaults to `false`.
+* `disable_all_simulation_outputs` (`Boolean`, optional): Disables all outputs from single runs like sankey and line plots. If `true` the outputs will be automatically renamed according to `optim_params`. Defaults to `false`.
+* `type` (`String`, optional): Defines the type or package for the optimisation. Options: `parametervariation`, `monte_carlo_annealing`, `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim],  `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt], `NOMAD`[^NOMAD]. No default.
+* `algorithm` (`String`, optional): Defines the optimisation algorithm. Only needed with type `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim],  `Metaheuristics`[^Metaheuristics] and `NLopt`[^NLopt]. Options can be found in the documentations of the chosen package. No default.
+* `max_runs` (`Integer`, optional): Limits the amount of simulation runs, to stop optimisation algorithms from running to long. Most algorithms strictly respect it, while some do it only partially. No default.
+* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear:factor1,factor2,...`, `multi-objective`. Defaults to `sum`.
+* `objective_params` (`Dict{String, Any}`, optional): Defines the objective parameters. No default.
+* `optim_params` (`Dict{String, Any}`, optional): Defines the parameters to be changed or optimised. No default.
+
+
+[^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
+[^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
+[^Metaheuristics]: [https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/); Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, [https://doi.org/10.21105/joss.04723](https://doi.org/10.21105/joss.04723)
+[^NLopt]: [https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/](https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/)
+[^NOMAD]: [https://bbopt.github.io/NOMAD.jl/stable/](https://bbopt.github.io/NOMAD.jl/stable/)
+
+
 ## Components
 
 The specification for the components involved in the simulation is the most complicated part of the input file. Some of the parameters and values being used relate to the simulation model underlying the simulation engine. If you need to write this part of the input file from scratch, it is advised to read the [chapters on the simulation model](resie_fundamentals.md) first, as this chapter only discusses the structure but not the meaning of the specification.
