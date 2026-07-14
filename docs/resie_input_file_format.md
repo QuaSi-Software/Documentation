@@ -331,7 +331,26 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information to the available algorithms can be found in the documentation for each package.
 
 Additionally it is important to understand how the objective and parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file) with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of results of those calculations. For all other output values `sum` and `mean` are used to define how all the outputs over the simulation time are combined into one value.
-The `objective_function` defines how the objective parameters are combined. For single objective optimisation this can either be as a `sum` or linear with factors (e.g. `linear:factor1,factor2`), where the factors have to be listed in alphabetical order of the `objective_params`. If the algorithm supports multi objective optimisation `multi-objective` can also be used.
+
+The `objective_function` defines how the objective parameters are combined. For single objective optimisation this can either be `sum` or `linear`. For `linear`, the coefficients are defined with `objective_factors`, using the flattened objective parameter names as keys. If the algorithm supports multi objective optimisation, `multi-objective` can also be used.
+
+For example:
+
+```json
+"objective_function": "linear",
+"objective_params": {
+    "economic": ["total_annuity"],
+    "sum": {
+        "GridOut": ["m_e_ac_230v:IN"]
+    }
+},
+"objective_factors": {
+    "economic total_annuity": 1.0,
+    "sum GridOut m_e_ac_230v IN": -2.0
+}
+```
+
+The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor.
 
 The parameters to be changed are defined with `optim_params` and follow the general input file definition for parameters. So far every numeric value in the input file can be used here. The only addition is a additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start` or providing a range by giving any 3 out of the 4 kwargs for the `range()` function (`start`, `stop`, `lenght`, `step`). The range is usually used for the type `parametervariation` while bounds and starting value are used by optimisation algorithms.
 
@@ -377,10 +396,10 @@ The parameters to be changed are defined with `optim_params` and follow the gene
 * `max_time` (`Integer`, optional): Limits the simulation time, to stop optimisation algorithms from running to long. No default.
 * `x_tol_abs` (`Float`, optional): Absolute tolerance for the objective parameters. Only used for `Optim`[^Optim], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. No default.
 * `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Only used for `Optim`[^Optim] and `NLopt`[^NLopt]. No default.
-* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear:factor1,factor2,...`, `multi-objective`. Defaults to `sum`.
+* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear`, `multi-objective`. Defaults to `sum`.
 * `objective_params` (`Dict{String, Any}`, optional): Defines the objective parameters. No default.
+* `objective_factors` (`Dict{String, Any}`, optional): Defines named factors for `objective_function: "linear"`. Each key must exactly match one flattened objective parameter name, and every objective parameter must have exactly one factor. No default.
 * `optim_params` (`Dict{String, Any}`, optional): Defines the parameters to be changed or optimised. No default.
-
 
 [^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
 [^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
