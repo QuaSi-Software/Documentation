@@ -328,13 +328,11 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 
 ## Optimisation parameters
 
-The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information to the available algorithms can be found in the documentation for each package.
+The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information on the available algorithms can be found in the documentation for each package.
 
-Additionally it is important to understand how the objective and parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file) with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of results of those calculations. For all other output values `sum` and `mean` are used to define how all the outputs over the simulation time are combined into one value.
+Additionally, it is important to understand how the objective and the parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of the results of those calculations. For all other output values, `sum` and `mean` are used to define how the outputs over the simulation period are combined into one value.
 
-The `objective_function` defines how the objective parameters are combined. For single objective optimisation this can either be `sum` or `linear`. For `linear`, the coefficients are defined with `objective_factors`, using the flattened objective parameter names as keys. If the algorithm supports multi objective optimisation, `multi-objective` can also be used.
-
-For example:
+The `objective_function` defines how the objective parameters are combined. For single-objective optimisation, this can either be `sum` or `linear`. For `linear`, the coefficients are defined with `objective_factors`, using the flattened objective parameter names as keys. For example:
 
 ```json
 "objective_function": "linear",
@@ -350,10 +348,31 @@ For example:
 }
 ```
 
-The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor.
+The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor. 
 
-The parameters to be changed are defined with `optim_params` and follow the general input file definition for parameters. So far every numeric value in the input file can be used here. The only addition is a additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start` or providing a range by giving any 3 out of the 4 kwargs for the `range()` function (`start`, `stop`, `lenght`, `step`). The range is usually used for the type `parametervariation` while bounds and starting value are used by optimisation algorithms.
+For `sum` and `mean` objectives, the flattened name is formed by joining the aggregation method, component name, medium and output key with spaces. For example, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN` in the flattened objective parameter name.
 
+If the algorithm supports multi-objective optimisation, `objective_function` can be set to `multi-objective` to treat every entry in `objective_params` as a separate objective. The direction of each objective can be configured with `objective_senses`. If `objective_senses` is omitted, all objectives are minimised.
+
+The keys in `objective_senses` must exactly match the flattened objective parameter names, using the same naming convention as `objective_factors`. Allowed values are `min` and `max`.
+
+```json
+"objective_function": "multi-objective",
+"objective_params": {
+    "economic": ["total_annuity"],
+    "sum": {
+        "PV": ["m_e_ac_230v:OUT"]
+    }
+},
+"objective_senses": {
+    "economic total_annuity": "min",
+    "sum PV m_e_ac_230v OUT": "max"
+}
+```
+
+In this example, ReSiE minimises the total annuity and maximises the total PV output. If `objective_senses` is provided, every objective must have exactly one direction. 
+
+The parameters to be changed are defined with `optim_params` and follow the general input-file definition for parameters. So far, every numeric value in the input file can be used here. The only addition is an additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start`, or by providing a range using any three of the four keyword arguments for the `range()` function (`start`, `stop`, `length`, `step`). A range is usually used for the type `parametervariation`, while bounds and a starting value are used by optimisation algorithms.
 
 ```json
 "optimisation_parameters": {
@@ -364,10 +383,12 @@ The parameters to be changed are defined with `optim_params` and follow the gene
     "algorithm": "ECA",
     "max_runs": 100,
     "objective_function": "sum",
-    "objective_params":  {
-        "economic":  ["total_annuity"],
-        "sum": { "GridOut": ["m_e_ac_230v:IN"]}
-        },
+    "objective_params": {
+        "economic": ["total_annuity"],
+        "sum": {
+            "GridOut": ["m_e_ac_230v:IN"]
+        }
+    },
     "optim_params": {
         "BufferTank": {
             "volume": {
@@ -387,19 +408,20 @@ The parameters to be changed are defined with `optim_params` and follow the gene
 }
 ```
 
-* `run_optimisation` (`Boolean`, optional): If set to true, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `true`.
-* `run_sensitivity` (`Boolean`, optional): If set to true, run global sensitivity analysis based on optimisation results if enough runs are available or additional simulations otherwise. Defaults to `false`.
-* `disable_all_simulation_outputs` (`Boolean`, optional): Disables all outputs from single runs like sankey and line plots. If `true` the outputs will be automatically renamed according to `optim_params`. Defaults to `false`.
-* `type` (`String`, optional): Defines the type or package for the optimisation. Options: `parametervariation`, `monte_carlo_annealing`, `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim],  `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt], `NOMAD`[^NOMAD]. No default.
-* `algorithm` (`String`, optional): Defines the optimisation algorithm. Not needed with type `NOMAD`[^NOMAD]. For parametervariation algorithm defines the iterator to combine `optim_params` as one of `product`, `zip` or `random_*` where the star is the number of randomly chosen combinations. Options for the external packages can be found in the documentations of the chosen package. No default.
-* `max_runs` (`Integer`, optional): Limits the amount of simulation runs, to stop optimisation algorithms from running to long. Most algorithms strictly respect it, while some do it only partially. No default.
-* `max_time` (`Integer`, optional): Limits the simulation time, to stop optimisation algorithms from running to long. No default.
-* `x_tol_abs` (`Float`, optional): Absolute tolerance for the objective parameters. Only used for `Optim`[^Optim], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. No default.
+* `run_optimisation` (`Boolean`, optional): If set to `true`, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `false`.
+* `run_sensitivity` (`Boolean`, optional): If set to `true`, runs a global sensitivity analysis based on optimisation results if enough runs are available, or performs additional simulations otherwise. Defaults to `false`.
+* `disable_all_simulation_outputs` (`Boolean`, optional): Disables outputs from individual simulation runs, such as Sankey diagrams and line plots. Defaults to `true`.
+* `type` (`String`, optional): Defines the type or package used for the optimisation. Options: `parametervariation`, `monte_carlo_annealing`, `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt], `NOMAD`[^NOMAD]. Defaults to `nothing`.
+* `algorithm` (`String`, optional): Defines the optimisation algorithm. It is not needed with type `NOMAD`[^NOMAD]. For `parametervariation`, `algorithm` defines the iterator used to combine `optim_params` as one of `product`, `zip` or `random_*`, where the star is the number of randomly selected combinations. Options for external packages can be found in the documentation of the chosen package. Defaults to `NelderMead`.
+* `max_runs` (`Integer`, optional): Limits the number of simulation runs to stop optimisation algorithms from running too long. Most algorithms strictly respect this limit, while some respect it only partially. No default.
+* `max_time` (`Integer`, optional): Limits the optimisation runtime in seconds. No default.
+* `x_tol_abs` (`Float`, optional): Absolute tolerance for the optimisation parameters. Only used for `Optim`[^Optim], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. No default.
 * `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Only used for `Optim`[^Optim] and `NLopt`[^NLopt]. No default.
-* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear`, `multi-objective`. Defaults to `sum`.
-* `objective_params` (`Dict{String, Any}`, optional): Defines the objective parameters. No default.
-* `objective_factors` (`Dict{String, Any}`, optional): Defines named factors for `objective_function: "linear"`. Each key must exactly match one flattened objective parameter name, and every objective parameter must have exactly one factor. No default.
-* `optim_params` (`Dict{String, Any}`, optional): Defines the parameters to be changed or optimised. No default.
+* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear` or `multi-objective`. For `linear`, named factors must be provided with `objective_factors`. For `multi-objective`, the direction of each objective can be provided with `objective_senses`. Defaults to `sum`.
+* `objective_params` (`Dict{String,Any}`, optional): Defines the objective parameters. No default.
+* `objective_factors` (`Dict{String,Any}`, conditionally required): Defines named factors for `objective_function: "linear"`. Each key must exactly match one flattened objective parameter name, and every objective parameter must have exactly one factor. Only permitted when `objective_function` is `linear`. No default.
+* `objective_senses` (`Dict{String,Any}`, optional): Defines whether each objective is minimised or maximised when `objective_function` is `multi-objective`. Keys must exactly match the flattened objective parameter names, and values must be either `min` or `max`. If omitted, all objectives are minimised. If provided, every objective must have exactly one direction. Only permitted when `objective_function` is `multi-objective`.
+* `optim_params` (`Dict{String,Any}`, optional): Defines the parameters to be changed or optimised. No default.
 
 [^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
 [^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
