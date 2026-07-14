@@ -359,7 +359,7 @@ The parameters to be changed are defined with `optim_params` and follow the gene
 "optimisation_parameters": {
     "run_optimisation": true,
     "run_sensitivity": true,
-    "disable_all_simulation_outputs": false,
+    "disable_all_simulation_outputs": true,
     "type": "Metaheuristics",
     "algorithm": "ECA",
     "max_runs": 100,
@@ -387,7 +387,7 @@ The parameters to be changed are defined with `optim_params` and follow the gene
 }
 ```
 
-* `run_optimisation` (`Boolean`, optional): If set to true, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `false`.
+* `run_optimisation` (`Boolean`, optional): If set to true, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `true`.
 * `run_sensitivity` (`Boolean`, optional): If set to true, run global sensitivity analysis based on optimisation results if enough runs are available or additional simulations otherwise. Defaults to `false`.
 * `disable_all_simulation_outputs` (`Boolean`, optional): Disables all outputs from single runs like sankey and line plots. If `true` the outputs will be automatically renamed according to `optim_params`. Defaults to `false`.
 * `type` (`String`, optional): Defines the type or package for the optimisation. Options: `parametervariation`, `monte_carlo_annealing`, `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim],  `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt], `NOMAD`[^NOMAD]. No default.
