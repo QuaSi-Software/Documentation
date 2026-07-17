@@ -332,7 +332,7 @@ The optimisation parameters can be used if multiple simulations should be run to
 
 Additionally, it is important to understand how the objective and the parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of the results of those calculations. For all other output values, `sum` and `mean` are used to define how the outputs over the simulation period are combined into one value.
 
-The `objective_function` defines how the objective parameters are combined. For single-objective optimisation, this can either be `sum` or `linear`. For `linear`, the coefficients are defined with `objective_factors`, using the flattened objective parameter names as keys. For example:
+The `objective_function` defines how the objective parameters are combined. For single-objective optimisation, this can either be `sum` or `linear`. For `linear`, the coefficients for each objective parameter are defined with `objective_factors`, using the flattened objective parameter names as keys. The objective function is built as the sum of the factors multiplied with the values. The whole objective function will be minimized. So adding a positive factor means this parameter will be minimized, adding a negative value means this parameter will be maximized. For example:
 
 ```json
 "objective_function": "linear",
@@ -348,7 +348,7 @@ The `objective_function` defines how the objective parameters are combined. For 
 }
 ```
 
-The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor. 
+Here, the objective function that is minimized would be `1 * total_annuity + (- 2) * m_e_ac_230v:IN`. The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor. 
 
 For `sum` and `mean` objectives, the flattened name is formed by joining the aggregation method, component name, medium and output key with spaces. For example, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN` in the flattened objective parameter name.
 
