@@ -151,15 +151,15 @@ A definition of a control module with its control parameter can be done for exam
     "control_modules": [
         {
             "name": "storage_driven",
-           " control_mode": "charge",
+            "control_mode": "charge",
             "high_threshold": 0.95,
             "low_threshold": 0.3,
             "storage_uac": "TST_TH_BFT_01"
         },
          {
             "name": "storage_driven",
-             " control_mode": "charge",
-            "high_threshold": 0.99,
+             "control_mode": "charge",
+             "high_threshold": 0.99,
             "low_threshold": 0.5,
             "storage_uac": "TST_TH_BFT_02"
         }
