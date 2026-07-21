@@ -446,26 +446,26 @@ This section is intended to help you select a suitable optimization algorithm fo
 
 ### Quick Selection: Single Objective
 
-| Situation | Algorithm |
+| Situation | Type and Algorithm |
 |---|---|
-| Local search, only one variable parameter | `Optim: Brent()` |
+| Local search, only one variable parameter | `Optim: Brent` |
 | Local search, smooth objective | `NLopt: LN_BOBYQA` |
 | Local search, nonsmooth or uncertain objective | `NLopt: LN_SBPLX` |
-| Global, parallel, expensive evaluations | `Metaheuristics: ECA()` |
-| Global, parallel, strong multimodality | `Metaheuristics: DE()` |
-| Global, parallel, with dynamic adaption of important search parameters  | `Metaheuristics: SHADE()` |
+| Global, parallel, expensive evaluations | `Metaheuristics: ECA` |
+| Global, parallel, strong multimodality | `Metaheuristics: DE` |
+| Global, parallel, with dynamic adaption of important search parameters  | `Metaheuristics: SHADE` |
 | Global, serial, deterministic, few or moderate minima | `NLopt: GN_DIRECT_L` |
 | Global, serial, deterministic, many separated minima | `NLopt: GN_DIRECT` |
 | Global, serial, stochastic | `BlackBoxOptim:  adaptive_de_rand_1_bin_radiuslimited` |
 
 ### Quick Selection: Multiple Objectives
 
-| Situation | Algorithm |
+| Situation | Type and Algorithm |
 |---|---|
 | Only one compromise solution needed | Scalarize objectives, then use the single-objective guide |
-| Two or three objectives | `Metaheuristics: NSGA2()` |
-| More than three objectives | `Metaheuristics: NSGA3()` |
-| Two objectives with hypervolume-driven selection | `Metaheuristics: SMS_EMOA()` |
+| Two or three objectives | `Metaheuristics: NSGA2` |
+| More than three objectives | `Metaheuristics: NSGA3` |
+| Two objectives with hypervolume-driven selection | `Metaheuristics: SMS_EMOA` |
 
 
 ### Selection Steps
