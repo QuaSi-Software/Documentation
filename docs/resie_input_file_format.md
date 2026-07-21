@@ -374,6 +374,8 @@ In this example, ReSiE minimises the total annuity and maximises the total PV ou
 
 The parameters to be changed are defined with `optim_params` and follow the general input-file definition for parameters. So far, every numeric value in the input file can be used here. The only addition is an additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start`, or by providing a range using any three of the four keyword arguments for the `range()` function (`start`, `stop`, `length`, `step`). A range is usually used for the type `parametervariation`, while bounds and a starting value are used by optimisation algorithms.
 
+An optional second optimisation stage can be configured with `refinement`. The refinement starts from the best valid result of the primary optimisation and uses the same objective definition, optimisation parameters and parameter bounds. Settings such as `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. Refinement is currently supported only for single-objective optimisation.
+
 ```json
 "optimisation_parameters": {
     "run_optimisation": true,
@@ -382,6 +384,14 @@ The parameters to be changed are defined with `optim_params` and follow the gene
     "type": "Metaheuristics",
     "algorithm": "ECA",
     "max_runs": 100,
+    "refinement": { 
+        "type": "NLopt",
+         "algorithm": "LN_BOBYQA", 
+         "max_runs": 50, 
+         "max_runs": null,
+         "x_tol_abs": 0.001,
+         "f_tol_abs": null
+    },
     "objective_function": "sum",
     "objective_params": {
         "economic": ["total_annuity"],
@@ -422,6 +432,7 @@ The parameters to be changed are defined with `optim_params` and follow the gene
 * `objective_factors` (`Dict{String,Any}`, conditionally required): Defines named factors for `objective_function: "linear"`. Each key must exactly match one flattened objective parameter name, and every objective parameter must have exactly one factor. Only permitted when `objective_function` is `linear`. No default.
 * `objective_senses` (`Dict{String,Any}`, optional): Defines whether each objective is minimised or maximised when `objective_function` is `multi-objective`. Keys must exactly match the flattened objective parameter names, and values must be either `min` or `max`. If omitted, all objectives are minimised. If provided, every objective must have exactly one direction. Only permitted when `objective_function` is `multi-objective`.
 * `optim_params` (`Dict{String,Any}`, optional): Defines the parameters to be changed or optimised. No default.
+* `refinement` (`Dict{String,Any}`, optional): Defines an optional second optimisation stage that starts from the best valid result of the primary optimisation. It can contain the backend settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs`. The objective definition, optimisation parameters and parameter bounds are inherited from the primary optimisation. Refinement is currently supported only for single-objective optimisation. No default.
 
 [^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
 [^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
