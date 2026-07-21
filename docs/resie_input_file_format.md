@@ -448,7 +448,6 @@ This section is intended to help you select a suitable optimization algorithm fo
 
 | Situation | Type and Algorithm |
 |---|---|
-| Local search, only one variable parameter | `Optim: Brent` |
 | Local search, smooth objective | `NLopt: LN_BOBYQA` |
 | Local search, nonsmooth or uncertain objective | `NLopt: LN_SBPLX` |
 | Global, parallel, expensive evaluations | `Metaheuristics: ECA` |
@@ -536,7 +535,6 @@ Refinement can be applied automatically after a global single-objective optimize
 
 | Problem | Refinement |
 |---|---|
-| One variable | `Brent()` |
 | Two to ten variables, locally smooth | `LN_BOBYQA` |
 | Two to ten variables, nonsmooth or uncertain | `LN_SBPLX` |
 
