@@ -330,7 +330,7 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 
 The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information on the available algorithms can be found in the documentation for each package.
 
-Additionally, it is important to understand how the objective and the parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with the additional layer that defines how the values are handled. `economic` and `emissions` are used if the objective is part of the results of those calculations. For all other output values, `sum` and `mean` are used to define how the outputs over the simulation period are combined into one value.
+Additionally, it is important to understand how the objective and the parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with the additional layer that defines how the values are handled. `economic` (available parameters are `total_annuity`, `annuity_capex`, `annuity_opex` and `annuity_energies`) and `emissions` (available parameters are `total_emissions`, `emissions_energies` and `embodied_emissions`) are used if the objective is part of the results of those calculations. For all other output values, `sum` and `mean` are used to define how the outputs over the simulation period are combined into one value.
 
 The `objective_function` defines how the objective parameters are combined. For single-objective optimisation, this can either be `sum` or `linear`. For `linear`, the coefficients for each objective parameter are defined with `objective_factors`, using the flattened objective parameter names as keys. The objective function is built as the sum of the factors multiplied with the values. The whole objective function will be minimized. So adding a positive factor means this parameter will be minimized, adding a negative value means this parameter will be maximized. For example:
 
@@ -440,6 +440,105 @@ An optional second optimisation stage can be configured with `refinement`. The r
 [^NLopt]: [https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/](https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/)
 [^NOMAD]: [https://bbopt.github.io/NOMAD.jl/stable/](https://bbopt.github.io/NOMAD.jl/stable/)
 
+## Choosing an Optimization Algorithm
+
+This section is intended to help you select a suitable optimization algorithm for your model in ReSiE. First, you will find an overview table, which is explained in more detail below.
+
+### Quick Selection: Single Objective
+
+| Situation | Algorithm |
+|---|---|
+| Local search, only one variable parameter | `Optim: Brent()` |
+| Local search, smooth objective | `NLopt: LN_BOBYQA` |
+| Local search, nonsmooth or uncertain objective | `NLopt: LN_SBPLX` |
+| Global, parallel, expensive evaluations | `Metaheuristics: ECA()` |
+| Global, parallel, strong multimodality | `Metaheuristics: DE()` |
+| Global, parallel, with dynamic adaption of important search parameters  | `Metaheuristics: SHADE()` |
+| Global, serial, deterministic, few or moderate minima | `NLopt: GN_DIRECT_L` |
+| Global, serial, deterministic, many separated minima | `NLopt: GN_DIRECT` |
+| Global, serial, stochastic | `BlackBoxOptim:  adaptive_de_rand_1_bin_radiuslimited` |
+
+### Quick Selection: Multiple Objectives
+
+| Situation | Algorithm |
+|---|---|
+| Only one compromise solution needed | Scalarize objectives, then use the single-objective guide |
+| Two or three objectives | `Metaheuristics: NSGA2()` |
+| More than three objectives | `Metaheuristics: NSGA3()` |
+| Two objectives with hypervolume-driven selection | `Metaheuristics: SMS_EMOA()` |
+
+
+### Selection Steps
+
+**1. Single or Multiple Objectives?**
+
+Choose **single-objective optimization** when:
+
+- one performance measure clearly dominates the decision;
+- several metrics can be combined into one meaningful score;
+- only one final design is required;
+- objective priorities or weights are already known.
+
+Choose **multi-objective optimization** when:
+
+- objectives conflict with each other;
+- no defensible weighting is available;
+- trade-offs must remain visible;
+- several alternative solutions should be compared.
+
+Examples of conflicting objectives include:
+
+- cost versus emissions;
+- emissions versus performance;
+- investment cost versus operating cost;
+
+If only one compromise solution is needed, combine the objectives into a scalar objective, then follow the single-objective workflow.
+If the trade-off itself is important, use multi-objective.
+
+**2. Local or Global?**
+
+Choose **local optimization** when:
+
+- a good initial point is available;
+- only nearby improvement is needed;
+- separated optima are unlikely;
+- the evaluation budget is very small.
+
+Choose **global optimization** when:
+
+- the initial point is arbitrary;
+- multiple local minima may exist;
+- thresholds or operating regimes create separated basins;
+- broad exploration is required.
+
+**3. Smooth or Nonsmooth?**
+
+Treat the objective as **approximately smooth** when nearby parameter values produce gradual objective changes.
+
+Treat it as **nonsmooth or uncertain** when it contains:
+
+- thresholds or on/off logic;
+- clipping or saturation;
+- piecewise tariffs;
+- operating-mode changes;
+- large plateaus or sudden jumps;
+
+When uncertain, choose the nonsmooth branch.
+
+**4. Is Parallel Evaluation Available?**
+
+Parallel evaluation means evaluating different candidate vectors simultaneously. This is mainly driven by the hardware you use.
+You can start julia with multiple threads by adding e.g. `julia --threads 16 --project=. src/resie-cli.jl`. Choose the number of threads assigned to julia according to your hardware. Multi-thread optimisation can have significant performance benefits. 
+
+### Optional Refinement
+
+Refinement can be applied automatically after a global single-objective optimizer. Use one of the following algorithm:
+
+| Problem | Refinement |
+|---|---|
+| One variable | `Brent()` |
+| Two to ten variables, locally smooth | `LN_BOBYQA` |
+| Two to ten variables, nonsmooth or uncertain | `LN_SBPLX` |
 
 ## Components
 
