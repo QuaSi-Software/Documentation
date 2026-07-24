@@ -326,13 +326,116 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 * `include_embodied_emissions` (`Boolean`, optional): If set to true, includes embodied emissions in the calculation. Defaults to `true`.
 * `repeat_method` (`String`, optional): Defines which period of the result data is repeated to fill up the remainder of the observation period. This can be equal or less than the simulation period, for example simulating three years, but only repeating the last year for the entire observation period. Has to be one of: `all`, `last_year`, `last_month`, `last_week`. Defaults to `last_year`.
 
-## Optimisation parameters
+## Parameter study / Optimisation
 
-The optimisation parameters can be used if multiple simulations should be run to either explore a parameter space, find the optimal component sizing or run a sensitivity analysis. ReSiE implements already existing optimisation packages as well as custom options for parametervariation and sensitivity analysis. This can be chosen with the `type` parameter and the specific algorithm can be selected with `algorithm` where applicable. Information on the available algorithms can be found in the documentation for each package.
+A parameter study runs multiple simulations with different input parameters. It can be used to:
 
-Additionally, it is important to understand how the objective and the parameters to be changed are defined. The objective is defined by `objective_function` and `objective_params`. The `objective_params` work in a similar way to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with the additional layer that defines how the values are handled. `economic` (available parameters are `total_annuity`, `annuity_capex`, `annuity_opex`, `annuity_opex_including_energies` and `annuity_energies`) and `emissions` (available parameters are `total_emissions`, `emissions_energies` and `embodied_emissions`) are used if the objective is part of the results of those calculations. For all other output values, `sum` and `mean` are used to define how the outputs over the simulation period are combined into one value.
+* evaluate predefined parameter combinations;
+* find an optimal component sizing;
+* calculate global sensitivity indices;
+* calculate local sensitivities around a reference point.
 
-The `objective_function` defines how the objective parameters are combined. For single-objective optimisation, this can either be `sum` or `linear`. For `linear`, the coefficients for each objective parameter are defined with `objective_factors`, using the flattened objective parameter names as keys. The objective function is built as the sum of the factors multiplied with the values. The whole objective function will be minimized. So adding a positive factor means this parameter will be minimized, adding a negative value means this parameter will be maximized. For example:
+ReSiE implements existing optimisation packages as well as custom methods for parameter variation and sensitivity analysis.
+
+A parameter study is configured with the top-level `parameter_study` object. Its configuration consists of three parts:
+
+1. the objective to evaluate;
+2. the parameters to change;
+3. the workflow to perform.
+
+The objective and parameter definitions are shared between the workflows. Workflow-specific settings are placed in:
+
+* `parameter_variation`;
+* `optimisation`;
+* `sensitivity_analysis`.
+
+Parameter variation and optimisation cannot be enabled at the same time. Sensitivity analyses can be added to either workflow or run independently if the required parameter values are available.
+
+The optional setting `disable_all_simulation_outputs` disables outputs from individual simulation runs, such as Sankey diagrams and line plots. This is recommended for parameter studies with many simulations and defaults to `true`.
+
+A complete optimisation followed by global and local sensitivity analyses can be configured as follows:
+
+```json
+"parameter_study": {
+    "disable_all_simulation_outputs": true,
+    "objective_function": "sum",
+    "objective_params": {
+        "economic": ["total_annuity"],
+        "emissions": ["total_emissions"]
+    },
+    "parameters": {
+         "Battery": {
+                "capacity": {
+                    "bounds_min": 0,
+                    "bounds_max": 200000,
+                    "start": 100000,
+                },
+        "PV": {
+            "scale": {
+                "bounds_min": 0,
+                "bounds_max": 1000,
+                "start": 500
+            }
+        }
+    },
+    "optimisation": {
+        "run_optimisation": true,
+        "type": "Metaheuristics",
+        "algorithm": "ECA",
+        "max_runs": 100,
+        "refinement": {
+            "type": "NLopt",
+            "algorithm": "LN_BOBYQA",
+            "max_runs": 50,
+            "x_tol_abs": 0.001
+        }
+    },
+    "sensitivity_analysis": {
+        "run_global_sensitivity": true,
+        "run_local_sensitivity": true,
+        "local_reference": "best_result",
+        "local_variation": 0.1,
+        "max_runs": 100
+    }
+}
+```
+
+### Objective definition
+
+The objective is defined with `objective_function` and `objective_params`. It is used as reporting output for `parameter_variation`, as result value for the `sensitivity_analysis` or as objective to minimise during `optimisation`.
+
+The `objective_params` work similarly to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with an additional layer that defines how the values are handled.
+
+The following categories are available:
+
+* `economic`;
+* `emissions`;
+* `sum`;
+* `mean`.
+
+`economic` and `emissions` are used for results from the corresponding calculations.
+
+Available economic parameters are:
+
+* `total_annuity`;
+* `annuity_capex`;
+* `annuity_opex`;
+* `annuity_opex_including_energies`;
+* `annuity_energies`.
+
+Available emissions parameters are:
+
+* `total_emissions`;
+* `emissions_energies`;
+* `embodied_emissions`.
+
+For all other simulation outputs, `sum` and `mean` define how the values over the simulation period are combined into one objective value.
+
+For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`.
+
+With `sum`, all objective parameters are added together and the resulting value is minimised.
+
+With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
 
 ```json
 "objective_function": "linear",
@@ -348,13 +451,137 @@ The `objective_function` defines how the objective parameters are combined. For 
 }
 ```
 
-Here, the objective function that is minimized would be `1 * total_annuity + (- 2) * m_e_ac_230v:IN`. The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor. 
+The objective function in this example is:
 
-For `sum` and `mean` objectives, the flattened name is formed by joining the aggregation method, component name, medium and output key with spaces. For example, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN` in the flattened objective parameter name.
+```text
+1 * total_annuity + (-2) * sum(GridOut m_e_ac_230v:IN)
+```
 
-If the algorithm supports multi-objective optimisation, `objective_function` can be set to `multi-objective` to treat every entry in `objective_params` as a separate objective. The direction of each objective can be configured with `objective_senses`. If `objective_senses` is omitted, all objectives are minimised.
+During optimisation, the objective function is always minimised. Therefore, a positive factor minimises the corresponding value, while a negative factor maximises it.
 
-The keys in `objective_senses` must exactly match the flattened objective parameter names, using the same naming convention as `objective_factors`. Allowed values are `min` and `max`.
+The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor.
+
+For `sum` and `mean`, the flattened name is formed by joining the aggregation method, component name, medium and output key with spaces. For example:
+
+```text
+sum GridOut m_e_ac_230v IN
+```
+
+Here, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN`.
+
+Optimisation can additionally use multiple separate objectives. This is described in [Multi-objective optimisation](#multi-objective-optimisation).
+
+
+### Definition of parameters to be changed
+
+The parameters to be changed are defined with `parameters` and follow the component structure of the input file. Every numeric input value can generally be used.
+
+The required fields depend on the selected workflow:
+
+* Parameter variation uses `values` or a range.
+* Optimisation uses `bounds_min`, `bounds_max` and `start`.
+* Global sensitivity uses `bounds_min` and `bounds_max`.
+* Standalone local sensitivity uses `start`.
+* Local sensitivity can optionally use `sensitivity_lower` and `sensitivity_upper`.
+
+The available fields are:
+
+* `bounds_min` (`Float`, conditionally required): Lower physical bound used by optimisation and global sensitivity.
+* `bounds_max` (`Float`, conditionally required): Upper physical bound used by optimisation and global sensitivity.
+* `start` (`Float`, conditionally required): Starting value for optimisation or reference value for standalone local sensitivity.
+* `values` (`Array`, optional): Explicit values used for parameter variation.
+* `range_start` (`Float`, conditionally required): First value of a parameter variation range.
+* `range_stop` (`Float`, conditionally required): Last value of a parameter variation range.
+* `range_step` (`Float`, conditionally required): Step size of a parameter variation range. Cannot be combined with `range_length`.
+* `range_length` (`Integer`, conditionally required): Number of values in a parameter variation range. Cannot be combined with `range_step`.
+* `sensitivity_lower` (`Float`, optional): Explicit lower value for local sensitivity. Must be provided together with `sensitivity_upper`.
+* `sensitivity_upper` (`Float`, optional): Explicit upper value for local sensitivity. Must be provided together with `sensitivity_lower`.
+
+
+### Parameter variation
+
+Parameter variation evaluates predefined parameter combinations. Each parameter can use either explicit `values` or a range.
+
+A range is defined with:
+
+* `range_start`;
+* `range_stop`;
+* exactly one of `range_step` or `range_length`.
+
+```json
+"parameters": {
+    "BufferTank": {
+        "volume": {
+            "range_start": 1.0,
+            "range_stop": 5.0,
+            "range_length": 5
+        }
+    },
+    "PV": {
+        "scale": {
+            "values": [250, 500, 750, 1000]
+        }
+    }
+},
+"parameter_variation": {
+    "run_parameter_variation": true,
+    "algorithm": "product"
+}
+```
+
+* `run_parameter_variation` (`Boolean`, optional): Enables parameter variation. Defaults to `false`.
+* `algorithm` (`String`, optional): Defines how the parameter values are combined. Options are `product`, `zip` and `random_*`, where the star is the number of randomly selected combinations. Defaults to `product`.
+
+For example, `random_100` evaluates 100 randomly selected combinations.
+
+Parameter variation and optimisation cannot be enabled at the same time.
+
+### Optimisation
+
+Optimisation searches for the best parameter values within the configured bounds. Every optimised parameter requires `bounds_min`, `bounds_max` and `start`.
+
+```json
+"parameters": {
+    "BufferTank": {
+        "volume": {
+            "bounds_min": 0.5,
+            "bounds_max": 5.0,
+            "start": 2.0
+        }
+    },
+    "PV": {
+        "scale": {
+            "bounds_min": 0,
+            "bounds_max": 1000,
+            "start": 500
+        }
+    }
+},
+"optimisation": {
+    "run_optimisation": true,
+    "type": "Metaheuristics",
+    "algorithm": "ECA",
+    "max_runs": 100
+}
+```
+
+* `run_optimisation` (`Boolean`, optional): Enables optimisation. Defaults to `false`.
+* `type` (`String`, conditionally required): Defines the optimisation package. Options are `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt] and `NOMAD`[^NOMAD].
+* `algorithm` (`String`, optional): Defines the optimisation algorithm. The available algorithms depend on the selected package. It is not required for `NOMAD`. Defaults to `NelderMead`.
+* `max_runs` (`Integer`, optional): Limits the number of simulation runs. Some algorithms may only respect this limit approximately. No default.
+* `max_time` (`Number`, optional): Limits the optimisation runtime in seconds. No default.
+* `x_tol_abs` (`Float`, optional): Absolute tolerance for the decision parameters. Note: All decision parameters are normalised to the range [0,1] for optimisation! Used by supported `Optim`, `NLopt` and `NOMAD` algorithms. No default.
+* `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Used by supported `Optim` and `NLopt` algorithms. No default.
+* `refinement` (`Dict{String,Any}`, optional): Defines a second optimisation stage that starts from the best result of the primary optimisation.
+
+
+#### Multi-objective optimisation
+
+By default, optimisation uses the same scalar objective definition as parameter variation and sensitivity analysis.
+
+If the selected optimisation algorithm supports multiple objectives, `objective_function` can instead be set to `multi-objective`. Every entry in `objective_params` is then treated as a separate objective.
+
+The direction of each objective can be configured with `objective_senses`:
 
 ```json
 "objective_function": "multi-objective",
@@ -370,69 +597,182 @@ The keys in `objective_senses` must exactly match the flattened objective parame
 }
 ```
 
-In this example, ReSiE minimises the total annuity and maximises the total PV output. If `objective_senses` is provided, every objective must have exactly one direction. 
+In this example, ReSiE minimises the total annuity and maximises the total PV output.
 
-The parameters to be changed are defined with `optim_params` and follow the general input-file definition for parameters. So far, every numeric value in the input file can be used here. The only addition is an additional dictionary layer that defines the space for each parameter. This can either be done by providing bounds and a starting value with `min`, `max` and `start`, or by providing a range using any three of the four keyword arguments for the `range()` function (`start`, `stop`, `length`, `step`). A range is usually used for the type `parametervariation`, while bounds and a starting value are used by optimisation algorithms.
+The keys in `objective_senses` must exactly match the flattened objective parameter names. Allowed values are `min` and `max`.
 
-An optional second optimisation stage can be configured with `refinement`. The refinement starts from the best valid result of the primary optimisation and uses the same objective definition, optimisation parameters and parameter bounds. Settings such as `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. Refinement is currently supported only for single-objective optimisation.
+If `objective_senses` is omitted, all objectives are minimised. If it is provided, every objective must have exactly one direction.
+
+Multi-objective optimisation is supported only by compatible optimisation algorithms. It cannot be combined with parameter variation, global sensitivity or local sensitivity.
+
+
+#### Choosing an optimisation algorithm
+
+The following tables provide an overview of suitable algorithms for common optimisation problems.
+
+**Single objective**
+
+| Situation                                                                       | Type and algorithm                                    |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Local search with an approximately smooth objective                             | `NLopt: LN_BOBYQA`                                    |
+| Local search with a nonsmooth or uncertain objective                            | `NLopt: LN_SBPLX`                                     |
+| Global, parallel search with expensive evaluations                              | `Metaheuristics: ECA`                                 |
+| Global, parallel search with strong multimodality                               | `Metaheuristics: DE`                                  |
+| Global, parallel search with adaptive search parameters                         | `Metaheuristics: SHADE`                               |
+| Global, serial and deterministic search with few or moderately separated minima | `NLopt: GN_DIRECT_L`                                  |
+| Global, serial and deterministic search with many separated minima              | `NLopt: GN_DIRECT`                                    |
+| Global, serial and stochastic search                                            | `BlackBoxOptim: adaptive_de_rand_1_bin_radiuslimited` |
+
+**Multiple objectives**
+
+| Situation                                       | Type and algorithm                                                                |
+| ----------------------------------------------- | --------------------------------------------------------------------------------- |
+| Only one compromise solution is required        | Combine the objectives into a scalar objective and use the single-objective guide |
+| Two or three objectives                         | `Metaheuristics: NSGA2`                                                           |
+| More than three objectives                      | `Metaheuristics: NSGA3`                                                           |
+| Two objectives with hypervolume-based selection | `Metaheuristics: SMS_EMOA`                                                        |
+
+Use the following steps to select an algorithm.
+
+**1. Single or multiple objectives?**
+
+Choose single-objective optimisation when:
+
+* one performance measure dominates the decision;
+* several metrics can be combined into one meaningful objective;
+* only one final design is required;
+* objective priorities or weights are known.
+
+Choose multi-objective optimisation when:
+
+* the objectives conflict;
+* no suitable weighting is available;
+* trade-offs should remain visible;
+* several alternative solutions should be compared.
+
+Typical examples are cost versus emissions, investment cost versus operating cost, and emissions versus system performance.
+
+If only one compromise solution is required, combine the objectives with `sum` or `linear`. Use `multi-objective` when the trade-off itself is part of the result.
+
+**2. Local or global optimisation?**
+
+Choose local optimisation when:
+
+* a good starting point is available;
+* only nearby improvement is required;
+* separated local optima are unlikely;
+* the evaluation budget is small.
+
+Choose global optimisation when:
+
+* the starting point is arbitrary;
+* multiple local optima may exist;
+* thresholds or operating modes create separated regions;
+* broad exploration is required.
+
+**3. Smooth or nonsmooth objective?**
+
+Treat an objective as approximately smooth when small changes in the parameter values produce gradual changes in the objective.
+
+Treat it as nonsmooth or uncertain when the model contains:
+
+* thresholds or on/off logic;
+* clipping or saturation;
+* piecewise tariffs;
+* operating-mode changes;
+* large plateaus;
+* sudden jumps.
+
+When uncertain, use an algorithm intended for nonsmooth objectives.
+
+**4. Is parallel evaluation available?**
+
+Parallel evaluation means that several parameter combinations are simulated simultaneously. Population-based algorithms such as `ECA`, `DE`, `SHADE`, `NSGA2` and `NSGA3` generally benefit most from parallel execution.
+
+Julia can be started with multiple threads, for example:
+
+```bash
+julia --threads 16 --project=. src/resie-cli.jl
+```
+
+Choose the number of threads according to the available hardware. Multithreaded optimisation can significantly reduce the runtime when individual simulations are expensive.
+
+#### Optional refinement
+
+A local refinement can be performed automatically after a global single-objective optimisation. It starts from the best valid result of the primary optimisation and uses the same objective, parameters and bounds.
+
+| Problem                                                      | Refinement algorithm |
+| ------------------------------------------------------------ | -------------------- |
+| Two to ten variables with an approximately smooth objective  | `NLopt: LN_BOBYQA`   |
+| Two to ten variables with a nonsmooth or uncertain objective | `NLopt: LN_SBPLX`    |
+
+The settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. See the general description of the optimisation for the details of each setting.
 
 ```json
-"optimisation_parameters": {
+"optimisation": {
     "run_optimisation": true,
-    "run_sensitivity": true,
-    "disable_all_simulation_outputs": true,
     "type": "Metaheuristics",
     "algorithm": "ECA",
     "max_runs": 100,
-    "refinement": { 
+    "refinement": {
         "type": "NLopt",
-         "algorithm": "LN_BOBYQA", 
-         "max_runs": 50, 
-         "max_runs": null,
-         "x_tol_abs": 0.001,
-         "f_tol_abs": null
-    },
-    "objective_function": "sum",
-    "objective_params": {
-        "economic": ["total_annuity"],
-        "sum": {
-            "GridOut": ["m_e_ac_230v:IN"]
-        }
-    },
-    "optim_params": {
-        "BufferTank": {
-            "volume": {
-                "min": 0,
-                "max": 5.0,
-                "start": 2.0
-            }
-        },
-        "PV": {
-            "scale": {
-                "min": 0,
-                "max": 1000,
-                "start": 500
-            }
-        }
+        "algorithm": "LN_BOBYQA",
+        "max_runs": 50
     }
 }
 ```
 
-* `run_optimisation` (`Boolean`, optional): If set to `true`, performs multiple simulation runs according to the definition of the other optimisation parameters. Defaults to `false`.
-* `run_sensitivity` (`Boolean`, optional): If set to `true`, runs a global sensitivity analysis based on optimisation results if enough runs are available, or performs additional simulations otherwise. Defaults to `false`.
-* `disable_all_simulation_outputs` (`Boolean`, optional): Disables outputs from individual simulation runs, such as Sankey diagrams and line plots. Defaults to `true`.
-* `type` (`String`, optional): Defines the type or package used for the optimisation. Options: `parametervariation`, `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt], `NOMAD`[^NOMAD]. Defaults to `nothing`.
-* `algorithm` (`String`, optional): Defines the optimisation algorithm. It is not needed with type `NOMAD`[^NOMAD]. For `parametervariation`, `algorithm` defines the iterator used to combine `optim_params` as one of `product`, `zip` or `random_*`, where the star is the number of randomly selected combinations. Options for external packages can be found in the documentation of the chosen package. Defaults to `NelderMead`.
-* `max_runs` (`Integer`, optional): Limits the number of simulation runs to stop optimisation algorithms from running too long. Most algorithms strictly respect this limit, while some respect it only partially. No default.
-* `max_time` (`Integer`, optional): Limits the optimisation runtime in seconds. No default.
-* `x_tol_abs` (`Float`, optional): Absolute tolerance for the optimisation parameters. Only used for `Optim`[^Optim], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. No default.
-* `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Only used for `Optim`[^Optim] and `NLopt`[^NLopt]. No default.
-* `objective_function` (`String`, optional): Defines how to combine `objective_params`. Can be one of `sum`, `linear` or `multi-objective`. For `linear`, named factors must be provided with `objective_factors`. For `multi-objective`, the direction of each objective can be provided with `objective_senses`. Defaults to `sum`.
-* `objective_params` (`Dict{String,Any}`, optional): Defines the objective parameters. No default.
-* `objective_factors` (`Dict{String,Any}`, conditionally required): Defines named factors for `objective_function: "linear"`. Each key must exactly match one flattened objective parameter name, and every objective parameter must have exactly one factor. Only permitted when `objective_function` is `linear`. No default.
-* `objective_senses` (`Dict{String,Any}`, optional): Defines whether each objective is minimised or maximised when `objective_function` is `multi-objective`. Keys must exactly match the flattened objective parameter names, and values must be either `min` or `max`. If omitted, all objectives are minimised. If provided, every objective must have exactly one direction. Only permitted when `objective_function` is `multi-objective`.
-* `optim_params` (`Dict{String,Any}`, optional): Defines the parameters to be changed or optimised. No default.
-* `refinement` (`Dict{String,Any}`, optional): Defines an optional second optimisation stage that starts from the best valid result of the primary optimisation. It can contain the backend settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs`. The objective definition, optimisation parameters and parameter bounds are inherited from the primary optimisation. Refinement is currently supported only for single-objective optimisation. No default.
+Refinement is currently supported only for single-objective optimisation.
+
+### Sensitivity analysis
+
+Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together.
+
+#### Global sensitivity
+
+Global sensitivity calculates first-order and total-order Sobol indices within the parameter bounds. Every parameter therefore requires `bounds_min` and `bounds_max`.
+
+Existing valid simulation results inside the selected bounds are reused where possible. Additional simulation runs are performed when more samples are required.
+
+#### Local sensitivity
+
+Local sensitivity changes one parameter at a time while keeping all other parameters at a reference point.
+
+The reference is selected with `local_reference`:
+
+* `start` uses the configured parameter starting values;
+* `best_result` uses the best result of the optimisation.
+
+If `sensitivity_lower` and `sensitivity_upper` are provided for a parameter, these values are used directly. Both values must be provided together.
+
+Otherwise, the lower and upper values are calculated using `local_variation`:
+
+```text
+lower = reference - abs(reference) * local_variation
+upper = reference + abs(reference) * local_variation
+```
+
+If the reference value is zero, explicit `sensitivity_lower` and `sensitivity_upper` values are required.
+
+Local sensitivity values are not restricted by `bounds_min` and `bounds_max`.
+
+```json
+"sensitivity_analysis": {
+    "run_global_sensitivity": true,
+    "run_local_sensitivity": true,
+    "local_reference": "best_result",
+    "local_variation": 0.1,
+    "max_runs": 200
+}
+```
+
+* `run_global_sensitivity` (`Boolean`, optional): Enables global sensitivity analysis. Defaults to `false`.
+* `run_local_sensitivity` (`Boolean`, optional): Enables local sensitivity analysis. Defaults to `false`.
+* `local_reference` (`String`, optional): Defines the local-sensitivity reference. Options are `start` and `best_result`. Defaults to `start`.
+* `local_variation` (`Float`, optional): Defines the relative variation above and below the reference when explicit local-sensitivity values are not provided. Defaults to `0.1`.
+* `max_runs` (`Integer`, optional): Limits the number of additional simulations used for global sensitivity. No default.
+
+Sensitivity analysis currently supports only single-objective parameter studies.
 
 [^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
 [^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
@@ -440,103 +780,6 @@ An optional second optimisation stage can be configured with `refinement`. The r
 [^NLopt]: [https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/](https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/)
 [^NOMAD]: [https://bbopt.github.io/NOMAD.jl/stable/](https://bbopt.github.io/NOMAD.jl/stable/)
 
-## Choosing an Optimization Algorithm
-
-This section is intended to help you select a suitable optimization algorithm for your model in ReSiE. First, you will find an overview table, which is explained in more detail below.
-
-### Quick Selection: Single Objective
-
-| Situation | Type and Algorithm |
-|---|---|
-| Local search, smooth objective | `NLopt: LN_BOBYQA` |
-| Local search, nonsmooth or uncertain objective | `NLopt: LN_SBPLX` |
-| Global, parallel, expensive evaluations | `Metaheuristics: ECA` |
-| Global, parallel, strong multimodality | `Metaheuristics: DE` |
-| Global, parallel, with dynamic adaption of important search parameters  | `Metaheuristics: SHADE` |
-| Global, serial, deterministic, few or moderate minima | `NLopt: GN_DIRECT_L` |
-| Global, serial, deterministic, many separated minima | `NLopt: GN_DIRECT` |
-| Global, serial, stochastic | `BlackBoxOptim:  adaptive_de_rand_1_bin_radiuslimited` |
-
-### Quick Selection: Multiple Objectives
-
-| Situation | Type and Algorithm |
-|---|---|
-| Only one compromise solution needed | Scalarize objectives, then use the single-objective guide |
-| Two or three objectives | `Metaheuristics: NSGA2` |
-| More than three objectives | `Metaheuristics: NSGA3` |
-| Two objectives with hypervolume-driven selection | `Metaheuristics: SMS_EMOA` |
-
-
-### Selection Steps
-
-**1. Single or Multiple Objectives?**
-
-Choose **single-objective optimization** when:
-
-- one performance measure clearly dominates the decision;
-- several metrics can be combined into one meaningful score;
-- only one final design is required;
-- objective priorities or weights are already known.
-
-Choose **multi-objective optimization** when:
-
-- objectives conflict with each other;
-- no defensible weighting is available;
-- trade-offs must remain visible;
-- several alternative solutions should be compared.
-
-Examples of conflicting objectives include:
-
-- cost versus emissions;
-- emissions versus performance;
-- investment cost versus operating cost;
-
-If only one compromise solution is needed, combine the objectives into a scalar objective, then follow the single-objective workflow.
-If the trade-off itself is important, use multi-objective.
-
-**2. Local or Global?**
-
-Choose **local optimization** when:
-
-- a good initial point is available;
-- only nearby improvement is needed;
-- separated optima are unlikely;
-- the evaluation budget is very small.
-
-Choose **global optimization** when:
-
-- the initial point is arbitrary;
-- multiple local minima may exist;
-- thresholds or operating regimes create separated basins;
-- broad exploration is required.
-
-**3. Smooth or Nonsmooth?**
-
-Treat the objective as **approximately smooth** when nearby parameter values produce gradual objective changes.
-
-Treat it as **nonsmooth or uncertain** when it contains:
-
-- thresholds or on/off logic;
-- clipping or saturation;
-- piecewise tariffs;
-- operating-mode changes;
-- large plateaus or sudden jumps;
-
-When uncertain, choose the nonsmooth branch.
-
-**4. Is Parallel Evaluation Available?**
-
-Parallel evaluation means evaluating different candidate vectors simultaneously. This is mainly driven by the hardware you use.
-You can start julia with multiple threads by adding e.g. `julia --threads 16 --project=. src/resie-cli.jl`. Choose the number of threads assigned to julia according to your hardware. Multi-thread optimisation can have significant performance benefits. 
-
-### Optional Refinement
-
-Refinement can be applied automatically after a global single-objective optimizer. Use one of the following algorithm:
-
-| Problem | Refinement |
-|---|---|
-| Two to ten variables, locally smooth | `LN_BOBYQA` |
-| Two to ten variables, nonsmooth or uncertain | `LN_SBPLX` |
 
 ## Components
 
