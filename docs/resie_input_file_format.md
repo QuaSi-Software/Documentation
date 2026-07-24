@@ -530,9 +530,10 @@ A range is defined with:
 ```
 
 * `run_parameter_variation` (`Boolean`, optional): Enables parameter variation. Defaults to `false`.
-* `algorithm` (`String`, optional): Defines how the parameter values are combined. Options are `product`, `zip` and `random_*`, where the star is the number of randomly selected combinations. Defaults to `product`.
-
-For example, `random_100` evaluates 100 randomly selected combinations.
+* `algorithm` (`String`, optional): Defines which parameter combinations are simulated:
+    * `product`: Simulates every possible combination of the parameter values (default).
+    * `zip`: Simulates values at the same position together. For example, the first value of each parameter is used in the first simulation.
+    * `random_N`: Randomly selects `N` combinations from all possible combinations. For example, `random_100` selects 100 combinations.
 
 Parameter variation and optimisation cannot be enabled at the same time.
 
