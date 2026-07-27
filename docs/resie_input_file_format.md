@@ -765,23 +765,25 @@ upper = reference + abs(reference) * local_variation
 
 If the reference value is zero, explicit `sensitivity_lower` and `sensitivity_upper` values are required.
 
-Local sensitivity values are not restricted by `bounds_min` and `bounds_max`.
+Local sensitivity values are not restricted by `bounds_min` and `bounds_max` and may therefore distort the optimization results shown in the figures if `include_local_sensitivity_results_in_figures` is enabled. 
 
 ```json
 "sensitivity_analysis": {
     "run_global_sensitivity": true,
+    "max_runs": 200,
     "run_local_sensitivity": true,
     "local_reference": "best_result",
     "local_variation": 0.1,
-    "max_runs": 200
+    "include_local_sensitivity_results_in_figures": true
 }
 ```
 
 * `run_global_sensitivity` (`Boolean`, optional): Enables global sensitivity analysis. Defaults to `false`.
+ * `max_runs` (`Integer`, optional): Limits the number of additional simulations used for global sensitivity. No default.
 * `run_local_sensitivity` (`Boolean`, optional): Enables local sensitivity analysis. Defaults to `false`.
 * `local_reference` (`String`, optional): Defines the local-sensitivity reference. Options are `start` and `best_result`. Defaults to `start`.
-* `local_variation` (`Float`, optional): Defines the relative variation above and below the reference when explicit local-sensitivity values are not provided. Defaults to `0.1`.
-* `max_runs` (`Integer`, optional): Limits the number of additional simulations used for global sensitivity. No default.
+* `local_variation` (`Float`, optional): Defines the relative variation above and below the reference when explicit local-sensitivity values are not provided. Defaults to `0.1` meaning a variation of +/- 10%.
+* `include_local_sensitivity_results_in_figures` (`Boolean`, optional): Defines if simulation results generated during local sensitivity analysis are included in the general parameter-study result figures. Defaults to `true`.
 
 Sensitivity analysis currently supports only single-objective parameter studies.
 
