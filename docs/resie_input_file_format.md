@@ -37,6 +37,7 @@ The overall structure of the project file is split several sections, each of whi
     "simulation_parameters": {...},
     "economic_parameters": {...},
     "emissions_parameters": {...},
+    "parameter_study": {...},
     "components": {...},
     "order_of_operation": {...}
 }
@@ -93,7 +94,12 @@ The overall structure of the project file is split several sections, each of whi
     "plot_price_and_emission_profiles": false,
     "price_and_emission_profile_file_path":  "./output/price_and_emissions_profiles.html",
     "step_info_interval": 500,
-    "show_detailed_errors": false
+    "show_detailed_errors": false,
+    "output_parameter_study_csv": true,
+    "parameter_study_csv_path": "./output/parameter_study",
+    "write_parameter_study_csv_continuously": false,
+    "output_parameter_study_plots": true,
+    "parameter_study_plots_path": "./output/parameter_study_plots"
 },
 ```
 * `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
@@ -132,7 +138,11 @@ The overall structure of the project file is split several sections, each of whi
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 * `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
 * `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many significant digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting in normal simulation. It's intended for making the output perfectly repeatable, which is useful for testing but changes the results.
-
+* `output_parameter_study_csv` (`Boolean`): (Optional) Toggle if CSV files with the parameter-study results should be created. Defaults to `true`.
+* `parameter_study_csv_path` (`String`): (Optional) Directory path to where the parameter-study CSV result files will be written. Defaults to `./output/parameter_study`.
+* `write_parameter_study_csv_continuously` (`Boolean`): (Optional) Toggle if parameter-study CSV output will be written continuously after every completed simulation run. Activating this functionality preserves partial output if the parameter study is stopped during execution. It incurs a slight performance penalty depending on the duration of an individual simulation and the number of parallel runs, since threads may have to wait for write access. Defaults to `false`.
+* `output_parameter_study_plots` (`Boolean`): (Optional) Toggle if plot files with the parameter-study results should be created. Defaults to `true`.
+* `parameter_study_plots_path` (`String`): (Optional) Directory path to where the parameter-study result plots will be written. Defaults to `./output/parameter_study_plots`.
 
 ### Output specification (Sankey)
 
