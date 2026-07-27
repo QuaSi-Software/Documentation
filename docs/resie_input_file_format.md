@@ -567,8 +567,8 @@ Optimisation searches for the best parameter values within the configured bounds
 ```
 
 * `run_optimisation` (`Boolean`, optional): Enables optimisation. Defaults to `false`.
-* `type` (`String`, conditionally required): Defines the optimisation package. Options are `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt] and `NOMAD`[^NOMAD].
-* `algorithm` (`String`, optional): Defines the optimisation algorithm. The available algorithms depend on the selected package. It is not required for `NOMAD`. Defaults to `NelderMead`.
+* `type` (`String`, optional): Defines the optimisation package. Options are `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. Defaults to `NLopt`.
+* `algorithm` (`String`, optional): Defines the optimisation algorithm. The available algorithms depend on the selected package. It is not required for `NOMAD`. Defaults to `LN_SBPLX`.
 * `max_runs` (`Integer`, optional): Limits the number of simulation runs. Some algorithms may only respect this limit approximately. No default.
 * `max_time` (`Number`, optional): Limits the optimisation runtime in seconds. No default.
 * `x_tol_abs` (`Float`, optional): Absolute tolerance for the decision parameters. Note: All decision parameters are normalised to the range [0,1] for optimisation! Used by supported `Optim`, `NLopt` and `NOMAD` algorithms. No default.
