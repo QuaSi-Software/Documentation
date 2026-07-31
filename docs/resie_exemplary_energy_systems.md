@@ -128,7 +128,7 @@ julia --threads=auto --project=. src/resie-cli.jl run --exit-after-run examples/
 
 Replace `auto` with a fixed thread count, such as `16`, if required.
 
-The example uses a 60-minute time step. A 120-minute step and fewer optimisation runs are suitable for initial experiments, while a finer resolution and larger run budget should be used for a final assessment. The sensitivity analyses can also be disabled during initial tests.
+The example uses a 60-minute time step. For initial experiments, the runtime can be reduced by using a 120-minute time step, fewer optimisation runs and looser convergence tolerances for the decision variables, for example `x_tol_abs: 0.01`, and the objective function, for example `f_tol_abs: 500`. The sensitivity analyses can also be disabled during these initial tests. 
 
 The configured parameter ranges are:
 
