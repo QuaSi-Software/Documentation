@@ -40,7 +40,9 @@ The heat pumps works on multiple temperature layer, resulting in different COPs 
 
 File: [`examples/multi_family_house.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
 
-This example represents the energy system of a multi-family house with electricity, space heating and domestic hot water demands. Electricity is supplied by a photovoltaic plant, a battery and the public electricity grid, where the battery is not allowed to take energy from or deliver energy to the grid. Heat is supplied by an air-source heat pump using ambient air as a heat source. Two buffer tanks are used to separate space heating and domestic hot water at different temperature levels. The connections from the hotter domestic hot water buffer tank to the colder heating buffer tank and the heating demand are disabled, as ReSiE automatically cools down thermal energy and would therefore transfer energy between these components. The connections from the heating buffer tank to the DHW demand and the DHW buffer tank can be allowed, as the temperature is lower and no energy will be delivered. 
+This example represents the energy system of a multi-family house with electricity, space heating and domestic hot water demands. In this first example, a single configuration of the components is simulated and described. Further below in [this chapter](resie_exemplary_energy_systems.md/#optimisation-and-sensitivity-analysis-of-the-multi-family-house), an optimisation of the component sizing and a sensitivity analysis is shown. 
+
+In this example, electricity is supplied by a photovoltaic plant, a battery and the public electricity grid, where the battery is not allowed to take energy from or deliver energy to the grid. Heat is supplied by an air-source heat pump using ambient air as a heat source. Two buffer tanks are used to separate space heating and domestic hot water at different temperature levels. The connections from the hotter domestic hot water buffer tank to the colder heating buffer tankW and the heating demand are disabled, as ReSiE automatically cools down thermal energy and would therefore transfer energy between these components. The connections from the heating buffer tank to the DHW demand and the DHW buffer tank can be allowed, as the temperature is lower and no energy will be delivered. 
 
 The heat pump is modelled as an inverter heat pump with a Carnot-based COP, part-load dependencies, icing behaviour and losses. It supplies heat at two different temperature levels through one heat output interface and one shared thermal bus, in order to serve the thermal energy for space heating at a lower temperature than for domestic hot water. This improves the COP compared to supplying all heat at the higher domestic hot water temperature level.
 
@@ -106,3 +108,147 @@ The following figure shows a sankey plot of the yearly sums of energy. All compo
 The example has also been set up in a specific way such that the energy balance is not upheld in every time step. Distributed over the span of the two heating periods at the beginning and end of the year, the heating demand 2 is not fully met. This can happen because there is no source of heat in the energy system which can produce an arbitrary amount of heat without possibly being limited by an input or output. The CHP comes close, but fails to cover peaks in demand when the buffer tanks are empty as it is not sufficiently sized for peak load coverage. The gas boiler does act as peak load supplier, but is connected only to heating demand 1.
 
 [^Ott2023]: Ott, E.; Steinacker, H.; Stickel, M.; Kley, C. and Fisch, M.N.: Dynamic open-source simulation engine for generic modeling of district-scale energy systems with focus on sector coupling and complex operational strategies, 2023, Journal of Physics: Conference Series 2600, 022009
+
+
+## Optimisation and sensitivity analysis of the multi-family house
+
+![Multi-family house energy system: overview](fig/examples/260610_multi_family_house.svg)
+
+File: [`examples/multi_family_house_optim.json`](https://github.com/QuaSi-Software/resie/tree/master/examples)
+
+This example extends the [multi-family house including economy and GHG emissions](#multi-family-house-including-economy-and-ghg-emissions) with parameter variation, component-size optimisation, and global and local sensitivity analyses. The PV scale, battery capacity, heat-pump power and space-heating buffer volume are varied, while the total annuity is minimised.
+
+### Running and modifying the example
+
+Parameter-study simulations can be distributed across multiple Julia threads:
+
+```bash
+julia --threads=auto --project=. src/resie-cli.jl run --exit-after-run examples/multi_family_house_optim.json
+```
+
+Replace `auto` with a fixed thread count, such as `16`, if required.
+
+The example uses a 60-minute time step. A 120-minute step and fewer optimisation runs are suitable for initial experiments, while a finer resolution and larger run budget should be used for a final assessment. The sensitivity analyses can also be disabled during initial tests.
+
+The configured parameter ranges are:
+
+| Parameter                        | Start value | Investigated range |
+| -------------------------------- | ----------: | -----------------: |
+| space-heating buffer-tank volume |      2.0 m³ |        0 to 3.0 m³ |
+| PV scale                         |         500 |          0 to 1000 |
+| battery capacity                 |   59.38 kWh |       0 to 200 kWh |
+| heat-pump thermal power          |       85 kW |        0 to 150 kW |
+
+Predefined parameter ranges are also included for optional parameter variation as an alternative to optimization. With the `product` algorithm, four values per parameter result in 256 combinations, whereas optimisation searches continuously within the bounds.
+
+### Using unmet-energy costs for sizing
+
+Without a penalty for unmet demand, an optimisation could favour inexpensive but undersized components. This example therefore assigns a high unmet-energy price to the electricity and space-heating demands. Insufficient designs remain valid simulation results, but their penalty costs increase the objective and make them unattractive to the optimiser.
+
+The price acts as a soft constraint rather than a strict feasibility condition. It should be high enough to prevent undersizing and must be assigned to every demand whose complete coverage is required. The final design should nevertheless be checked for unmet energy in a detailed single simulation.
+
+### Optimisation
+
+The population-based `ECA` algorithm from `Metaheuristics` performs the global search, followed by an `LN_NELDERMEAD` refinement from `NLopt`. The convergence plot contains 358 optimisation evaluations followed by 100 runs used for global sensitivity analysis while local-sensitivity runs are excluded in the plots.
+
+<div style="margin-bottom: -1rem;">
+    <iframe
+        src="../fig/examples/260731_parameter_study_plots_convergence.html"
+        title="Convergence of the multi-family house optimisation"
+        loading="lazy"
+        style="width: 100%; height: 400px; border: 0;"
+    ></iframe>
+</div>
+
+[Open the convergence plot in a separate page](fig/examples/260731_parameter_study_plots_convergence.html)
+
+The large objective values mainly represent undersized systems with unmet-energy penalties. As the search progresses, ReSiE finds matching component sizes, and the refinement explores the region around the best global result. You can zoom into the plot by holding down the mouse button and dragging a rectangle around the lower-cost region of interest.
+
+For this example, the best evaluated design is approximately:
+
+| Parameter                        |     Result |
+| -------------------------------- | ---------: |
+| space-heating buffer-tank volume |    2.90 m³ |
+| PV scale                         |       1000 |
+| battery capacity                 |  159.3 kWh |
+| heat-pump thermal power          |    66.5 kW |
+| total annuity                    | 27,512 €/a |
+
+The PV scale reaches its upper bound, suggesting that a larger permitted PV system could be investigated. Because the global algorithm is stochastic, repeated runs may return slightly different results.
+
+### Exploring alternative designs
+
+An optimisation produces many evaluated designs in addition to the reported best result. The parallel-coordinates plot provides a useful overview of these alternatives:
+
+<div style="width: 100%; height: 600px; overflow: hidden; margin-bottom: 0rem;">
+    <iframe
+        src="../fig/examples/260731_parameter_study_plots_parallel_coordinates.html"
+        title="Parallel-coordinates plot of the multi-family house parameter study"
+        loading="lazy"
+        style="
+            width: calc(100% / 0.85);
+            height: calc(600px / 0.85);
+            border: 0;
+            transform: scale(0.85);
+            transform-origin: top left;
+        "
+    ></iframe>
+</div>
+
+[Open the parallel-coordinates plot in a separate page](fig/examples/260731_parameter_study_plots_parallel_coordinates.html)
+
+Each line represents one simulation and connects its parameter values with the resulting objective. Because unmet-energy penalties produce very high objective values for some designs, first select the economically relevant range on the objective axis and choose **Zoom to selection**. The remaining lines show which parameter combinations produced favourable results. Narrow ranges on an axis indicate similar values among these designs, while broad ranges indicate greater flexibility.
+
+Useful other outputs of ReSiE are these additional interactive HTML plots that can be used to evaluate the path of the optimiser and the result further:
+
+* [parameter matrix](fig/examples/260731_parameter_study_plots_matrix_plot.html), for inspecting parameter distributions and pairwise relationships
+* [objective-parameter explorer](fig/examples/260731_parameter_study_plots_objective_parameter_explorer.html), for selecting and comparing individual parameters or results
+* [interactive 3D plot](fig/examples/260731_parameter_study_plots_interactive_3d.html), for displaying three selected quantities and colouring the points by another result
+
+### Sensitivity analysis
+
+After optimisation, this example performs a sensitivity analysis. Global sensitivity identifies which parameters control the results over the complete investigated space. Local sensitivity shows how the objective responds near the selected design.
+
+The **global sensitivity** analysis reuses the available optimisation results and performs additional simulations where required. The first-order Sobol index represents the independent contribution of a parameter, while the total-order index also includes interactions.
+
+<div style="margin-bottom: -1rem;">
+    <iframe
+        src="../fig/examples/260731_parameter_study_plots_global_sensitivity.html"
+        title="Global sensitivity of the multi-family house parameter study"
+        loading="lazy"
+        style="width: 100%; height: 750px; border: 0;"
+    ></iframe>
+</div>
+
+[Open the global-sensitivity plot in a separate page](fig/examples/260731_parameter_study_plots_global_sensitivity.html)
+
+Heat-pump power dominates the objective variation, with first- and total-order indices of approximately 92.7 % and 97.3 %. This is mainly caused by the transition between undersized systems with high unmet-energy costs and systems that can satisfy the heat demand. The other parameters therefore appear less influential over the selected ranges.
+
+The **local sensitivity** analysis starts from the best optimisation result and changes one parameter at a time by 10 %. It shows that:
+
+* reducing the heat-pump power by 10 % increases the objective by approximately 1867 %, while increasing it raises the objective by only about 2.2 %;
+* reducing the space-heating buffer volume increases the objective by approximately 151 %, while increasing it has little effect;
+* increasing the PV scale beyond the optimisation bound reduces the objective by approximately 3.8 %;
+* changing the battery capacity by 10 % changes the objective by less than 0.2 % in either direction.
+
+<div style="width: 100%; height: 550px; overflow: hidden; margin-bottom: -1rem;">
+    <iframe
+        src="../fig/examples/260731_parameter_study_plots_local_sensitivity_response_overview.html"
+        title="Local-sensitivity overview of the multi-family house parameter study"
+        loading="lazy"
+        style="
+            width: calc(100% / 0.9);
+            height: calc(550px / 0.9);
+            border: 0;
+            transform: scale(0.9);
+            transform-origin: top left;
+        "
+    ></iframe>
+</div>
+
+[Open the local-sensitivity response overview in a separate page](fig/examples/260731_parameter_study_plots_local_sensitivity_response_overview.html)
+
+Reducing the heat-pump power or buffer volume causes a sharp increase in the objective, indicating that both are close to a sizing boundary. Additional PV  above the upper bound of the optimisation improves the result, suggesting that its upper bound should be extended, while moderate changes in battery capacity have little effect.
+
+The response of each parameter can be examined in more detail in the [local-sensitivity trends plot](fig/examples/260731_parameter_study_plots_local_sensitivity_response_trends.html).
+
