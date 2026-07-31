@@ -338,19 +338,12 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 
 ## Parameter study / Optimisation
 
-A parameter study runs multiple simulations with different input parameters. It can be used to:
-
-* evaluate predefined parameter combinations;
-* find an optimal component sizing;
-* calculate global sensitivity indices;
-* calculate local sensitivities around a reference point.
-
-ReSiE implements existing optimisation packages as well as custom methods for parameter variation and sensitivity analysis.
+A parameter study runs multiple simulations with different input parameters. It can be used to evaluate and compare predefined parameter combinations, find an optimal component sizing, calculate global sensitivity indices or evaluate local sensitivities around a reference point. ReSiE implements existing optimisation packages as well as custom methods for parameter variation and sensitivity analysis.
 
 A parameter study is configured with the top-level `parameter_study` object. Its configuration consists of three parts:
 
-1. the objective to evaluate;
-2. the parameters to change;
+1. the objective to evaluate (`objective_params` together with `objective_function`, `objective_factors` and `objective_senses`)
+2. the parameters to change (`parameters`) and
 3. the workflow to perform.
 
 The objective and parameter definitions are shared between the workflows. Workflow-specific settings are placed in:
@@ -416,36 +409,16 @@ The objective is defined with `objective_function` and `objective_params`. It is
 
 The `objective_params` work similarly to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with an additional layer that defines how the values are handled.
 
-The following categories are available:
+The following objective categories and parameters are available:
 
-* `economic`;
-* `emissions`;
-* `sum`;
-* `mean`.
+| Category    | Description                                                                 | Available Parameters                                                                                            |
+| ----------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `economic`  | Uses results from the economic calculation.                                 | `total_annuity`<br>`annuity_capex`<br>`annuity_opex` (without energy costs)<br>`annuity_opex_including_energies`<br>`annuity_energies` |
+| `emissions` | Uses results from the emissions calculation.                                | `total_emissions`<br>`emissions_energies`<br>`embodied_emissions`                                               |
+| `sum`       | Uses the sum of the selected simulation output<br>over the simulation period.  | Depends on the selected simulation output.                                                                      |
+| `mean`      | Uses the mean of the selected simulation output<br>over the simulation period. | Depends on the selected simulation output.                                                                      |
 
-`economic` and `emissions` are used for results from the corresponding calculations.
-
-Available economic parameters are:
-
-* `total_annuity`;
-* `annuity_capex`;
-* `annuity_opex`;
-* `annuity_opex_including_energies`;
-* `annuity_energies`.
-
-Available emissions parameters are:
-
-* `total_emissions`;
-* `emissions_energies`;
-* `embodied_emissions`.
-
-For all other simulation outputs, `sum` and `mean` define how the values over the simulation period are combined into one objective value.
-
-For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`.
-
-With `sum`, all objective parameters are added together and the resulting value is minimised.
-
-With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
+For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`. With `sum`, all objective parameters are added together and the resulting value is minimised. With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
 
 ```json
 "objective_function": "linear",
@@ -479,7 +452,7 @@ sum GridOut m_e_ac_230v IN
 
 Here, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN`.
 
-Optimisation can additionally use multiple separate objectives. This is described in [Multi-objective optimisation](#multi-objective-optimisation).
+Optimisation can additionally use multiple separate objectives. This is described in [Multi-objective optimisation](#multi-objective-optimisation) below.
 
 
 ### Definition of parameters to be changed
@@ -491,8 +464,7 @@ The required fields depend on the selected workflow:
 * Parameter variation uses `values` or a range.
 * Optimisation uses `bounds_min`, `bounds_max` and `start`.
 * Global sensitivity uses `bounds_min` and `bounds_max`.
-* Standalone local sensitivity uses `start`.
-* Local sensitivity can optionally use `sensitivity_lower` and `sensitivity_upper`.
+* Standalone local sensitivity uses `start` and optionally `sensitivity_lower` and `sensitivity_upper`.
 
 The available fields are:
 
@@ -583,8 +555,39 @@ Optimisation searches for the best parameter values within the configured bounds
 * `max_time` (`Number`, optional): Limits the optimisation runtime in seconds. No default.
 * `x_tol_abs` (`Float`, optional): Absolute tolerance for the decision parameters. Note: All decision parameters are normalised to the range [0,1] for optimisation! Used by supported `Optim`, `NLopt` and `NOMAD` algorithms. No default.
 * `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Used by supported `Optim` and `NLopt` algorithms. No default.
+*  `optim_kwargs` (`Dict{String,Any}`, optional): Additional keyword arguments passed to the selected optimisation algorithm. Defaults to `nothing`.
 * `refinement` (`Dict{String,Any}`, optional): Defines a second optimisation stage that starts from the best result of the primary optimisation.
 
+See  [this chapter](optimisation_and_sensitivity.md#choosing-an-optimisation-algorithm) for a detailed description on how to choose an appropriate optimisation algorithm for your energy system.
+
+#### Optional refinement
+
+A local refinement can be performed automatically after a global single-objective optimisation. It starts from the best valid result of the primary optimisation and uses the same objective, parameters and bounds.
+
+Suggested algorithms are:
+
+| Problem                                                      | Refinement algorithm |
+| ------------------------------------------------------------ | -------------------- |
+| Two to ten variables with an approximately smooth objective  | `NLopt: LN_BOBYQA`   |
+| Two to ten variables with a nonsmooth or uncertain objective | `NLopt: LN_NELDERMEAD`    |
+
+The settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. See the general description of the optimisation for the details of each setting.
+
+```json
+"optimisation": {
+    "run_optimisation": true,
+    "type": "Metaheuristics",
+    "algorithm": "ECA",
+    "max_runs": 100,
+    "refinement": {
+        "type": "NLopt",
+        "algorithm": "LN_BOBYQA",
+        "max_runs": 50
+    }
+}
+```
+
+Refinement is currently supported only for single-objective optimisation.
 
 #### Multi-objective optimisation
 
@@ -614,142 +617,31 @@ The keys in `objective_senses` must exactly match the flattened objective parame
 
 If `objective_senses` is omitted, all objectives are minimised. If it is provided, every objective must have exactly one direction.
 
-Multi-objective optimisation is supported only by compatible optimisation algorithms. It cannot be combined with parameter variation, global sensitivity or local sensitivity.
-
-
-#### Choosing an optimisation algorithm
-
-The following tables provide an overview of suitable algorithms for common optimisation problems.
-
-**Single objective**
-
-| Situation                                                                       | Type and algorithm                                    |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Local search with an approximately smooth objective                             | `NLopt: LN_BOBYQA`                                    |
-| Local search with a nonsmooth or uncertain objective                            | `NLopt: LN_SBPLX`                                     |
-| Global, parallel search with expensive evaluations                              | `Metaheuristics: ECA`                                 |
-| Global, parallel search with strong multimodality                               | `Metaheuristics: DE`                                  |
-| Global, parallel search with adaptive search parameters                         | `Metaheuristics: SHADE`                               |
-| Global, serial and deterministic search with few or moderately separated minima | `NLopt: GN_DIRECT_L`                                  |
-| Global, serial and deterministic search with many separated minima              | `NLopt: GN_DIRECT`                                    |
-| Global, serial and stochastic search                                            | `BlackBoxOptim: adaptive_de_rand_1_bin_radiuslimited` |
-
-**Multiple objectives**
-
-| Situation                                       | Type and algorithm                                                                |
-| ----------------------------------------------- | --------------------------------------------------------------------------------- |
-| Only one compromise solution is required        | Combine the objectives into a scalar objective and use the single-objective guide |
-| Two or three objectives                         | `Metaheuristics: NSGA2`                                                           |
-| More than three objectives                      | `Metaheuristics: NSGA3`                                                           |
-| Two objectives with hypervolume-based selection | `Metaheuristics: SMS_EMOA`                                                        |
-
-Use the following steps to select an algorithm.
-
-**1. Single or multiple objectives?**
-
-Choose single-objective optimisation when:
-
-* one performance measure dominates the decision;
-* several metrics can be combined into one meaningful objective;
-* only one final design is required;
-* objective priorities or weights are known.
-
-Choose multi-objective optimisation when:
-
-* the objectives conflict;
-* no suitable weighting is available;
-* trade-offs should remain visible;
-* several alternative solutions should be compared.
-
-Typical examples are cost versus emissions, investment cost versus operating cost, and emissions versus system performance.
-
-If only one compromise solution is required, combine the objectives with `sum` or `linear`. Use `multi-objective` when the trade-off itself is part of the result.
-
-**2. Local or global optimisation?**
-
-Choose local optimisation when:
-
-* a good starting point is available;
-* only nearby improvement is required;
-* separated local optima are unlikely;
-* the evaluation budget is small.
-
-Choose global optimisation when:
-
-* the starting point is arbitrary;
-* multiple local optima may exist;
-* thresholds or operating modes create separated regions;
-* broad exploration is required.
-
-**3. Smooth or nonsmooth objective?**
-
-Treat an objective as approximately smooth when small changes in the parameter values produce gradual changes in the objective.
-
-Treat it as nonsmooth or uncertain when the model contains:
-
-* thresholds or on/off logic;
-* clipping or saturation;
-* piecewise tariffs;
-* operating-mode changes;
-* large plateaus;
-* sudden jumps.
-
-When uncertain, use an algorithm intended for nonsmooth objectives.
-
-**4. Is parallel evaluation available?**
-
-Parallel evaluation means that several parameter combinations are simulated simultaneously. Population-based algorithms such as `ECA`, `DE`, `SHADE`, `NSGA2` and `NSGA3` generally benefit most from parallel execution.
-
-Julia can be started with multiple threads, for example:
-
-```bash
-julia --threads 16 --project=. src/resie-cli.jl
-```
-
-Choose the number of threads according to the available hardware. Multithreaded optimisation can significantly reduce the runtime when individual simulations are expensive.
-
-#### Optional refinement
-
-A local refinement can be performed automatically after a global single-objective optimisation. It starts from the best valid result of the primary optimisation and uses the same objective, parameters and bounds.
-
-| Problem                                                      | Refinement algorithm |
-| ------------------------------------------------------------ | -------------------- |
-| Two to ten variables with an approximately smooth objective  | `NLopt: LN_BOBYQA`   |
-| Two to ten variables with a nonsmooth or uncertain objective | `NLopt: LN_SBPLX`    |
-
-The settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. See the general description of the optimisation for the details of each setting.
-
-```json
-"optimisation": {
-    "run_optimisation": true,
-    "type": "Metaheuristics",
-    "algorithm": "ECA",
-    "max_runs": 100,
-    "refinement": {
-        "type": "NLopt",
-        "algorithm": "LN_BOBYQA",
-        "max_runs": 50
-    }
-}
-```
-
-Refinement is currently supported only for single-objective optimisation.
+Multi-objective optimisation is supported only by compatible optimisation algorithms (see the recommended algorithms  [here](optimisation_and_sensitivity.md#choosing-an-optimisation-algorithm)). It cannot be combined with parameter variation, global sensitivity or local sensitivity.
 
 ### Sensitivity analysis
 
-Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together.
+Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together. For details of the method and how to interpret the results, see [this chapter](optimisation_and_sensitivity.md#sensitivity-analysis)
 
 #### Global sensitivity
 
-Global sensitivity calculates first-order and total-order Sobol indices within the parameter bounds. Every parameter therefore requires `bounds_min` and `bounds_max`.
+Global sensitivity calculates first-order and total-order Sobol indices within the parameter bounds. Every parameter therefore requires `bounds_min` and `bounds_max`. Existing valid simulation results inside the selected bounds are reused where possible. Additional simulation runs are performed when more samples are required.
 
-Existing valid simulation results inside the selected bounds are reused where possible. Additional simulation runs are performed when more samples are required.
+The following parameters are available:
+
+* `run_global_sensitivity` (`Boolean`, optional): Enables global sensitivity analysis. Defaults to `false`.
+ * `max_runs` (`Integer`, optional): Limits the number of additional simulations used to calculate global sensitivity. No default.
+
+```json
+"sensitivity_analysis": {
+    "run_global_sensitivity": true,
+    "max_runs": 200
+}
+```
 
 #### Local sensitivity
 
-Local sensitivity changes one parameter at a time while keeping all other parameters at a reference point.
-
-The reference is selected with `local_reference`:
+Local sensitivity changes one parameter at a time while keeping all other parameters at a reference point. The reference point to start from is selected with `local_reference`:
 
 * `start` uses the configured parameter starting values;
 * `best_result` uses the best result of the optimisation.
@@ -769,8 +661,6 @@ Local sensitivity values are not restricted by `bounds_min` and `bounds_max` and
 
 ```json
 "sensitivity_analysis": {
-    "run_global_sensitivity": true,
-    "max_runs": 200,
     "run_local_sensitivity": true,
     "local_reference": "best_result",
     "local_variation": 0.1,
@@ -778,8 +668,6 @@ Local sensitivity values are not restricted by `bounds_min` and `bounds_max` and
 }
 ```
 
-* `run_global_sensitivity` (`Boolean`, optional): Enables global sensitivity analysis. Defaults to `false`.
- * `max_runs` (`Integer`, optional): Limits the number of additional simulations used for global sensitivity. No default.
 * `run_local_sensitivity` (`Boolean`, optional): Enables local sensitivity analysis. Defaults to `false`.
 * `local_reference` (`String`, optional): Defines the local-sensitivity reference. Options are `start` and `best_result`. Defaults to `start`.
 * `local_variation` (`Float`, optional): Defines the relative variation above and below the reference when explicit local-sensitivity values are not provided. Defaults to `0.1` meaning a variation of +/- 10%.
