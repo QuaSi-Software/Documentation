@@ -459,6 +459,16 @@ Optimisation can additionally use multiple separate objectives. This is describe
 
 The parameters to be changed are defined with `parameters` and follow the component structure of the input file. Every numeric input value can generally be used.
 
+Each entry below `parameters` identifies either a component or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `volume`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`.
+
+Examples:
+
+* `Building_heating_BFT → volume` refers to `components.Building_heating_BFT.volume`.
+* `Building_heating_BFT → economic_parameters.lifetime_years` refers to `components.Building_heating_BFT.economic_parameters.lifetime_years`.
+* `economic_parameters → observation_period_in_years` refers to `economic_parameters.observation_period_in_years`.
+
+The referenced parameter must already exist in the input file and must have a numeric value.
+
 The required fields depend on the selected workflow:
 
 * Parameter variation uses `values` or a range.
