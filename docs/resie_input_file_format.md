@@ -367,13 +367,13 @@ A complete optimisation followed by global and local sensitivity analyses can be
         "emissions": ["total_emissions"]
     },
     "parameters": {
-         "Battery": {
-                "capacity": {
-                    "bounds_min": 0,
-                    "bounds_max": 200000,
-                    "start": 100000,
-                },
-        "PV": {
+         "Battery_01": {
+            "capacity": {
+                "bounds_min": 0,
+                "bounds_max": 200000,
+                "start": 100000,
+            },
+        "PV_01": {
             "scale": {
                 "bounds_min": 0,
                 "bounds_max": 1000,
@@ -457,19 +457,36 @@ Optimisation can additionally use multiple separate objectives. This is describe
 
 ### Definition of parameters to be changed
 
-The parameters to be changed are defined with `parameters` and follow the component structure of the input file. Every numeric input value can generally be used.
+The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value.
 
-Each entry below `parameters` identifies either a component or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `volume`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`.
+Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`. See also the example below:
 
-Examples:
+```json
+"parameters": {
+    "Battery_01": {
+        "capacity": {
+            "start": 100000,
+            "bounds_min": 0,
+            "bounds_max": 200000
+        },
+        "economic_parameters.lifetime_years": {
+            ...
+        }
+    },
+    "emissions_parameters": {
+        "observation_period_in_years": {
+            ...
+        }
+    },
+    "PV_01": {
+        "scale": {
+            ...
+        }
+    }
+}
+```
 
-* `Building_heating_BFT → volume` refers to `components.Building_heating_BFT.volume`.
-* `Building_heating_BFT → economic_parameters.lifetime_years` refers to `components.Building_heating_BFT.economic_parameters.lifetime_years`.
-* `economic_parameters → observation_period_in_years` refers to `economic_parameters.observation_period_in_years`.
-
-The referenced parameter must already exist in the input file and must have a numeric value.
-
-The required fields depend on the selected workflow:
+The required fields of each selected parameter depend on the selected workflow:
 
 * Parameter variation uses `values` or a range.
 * Optimisation uses `bounds_min`, `bounds_max` and `start`.
@@ -502,14 +519,14 @@ A range is defined with:
 
 ```json
 "parameters": {
-    "BufferTank": {
-        "volume": {
-            "range_start": 1.0,
-            "range_stop": 5.0,
-            "range_length": 5
+    "Battery_01": {
+        "capacity": {
+            "range_start": 0,
+            "range_stop": 200000,
+            "range_length": 5,
         }
     },
-    "PV": {
+    "PV_01": {
         "scale": {
             "values": [250, 500, 750, 1000]
         }
@@ -535,18 +552,18 @@ Optimisation searches for the best parameter values within the configured bounds
 
 ```json
 "parameters": {
-    "BufferTank": {
-        "volume": {
-            "bounds_min": 0.5,
-            "bounds_max": 5.0,
-            "start": 2.0
+    "Battery_01": {
+        "capacity": {
+            "start": 100000,
+            "bounds_min": 0,
+            "bounds_max": 200000
         }
     },
-    "PV": {
+    "PV_01": {
         "scale": {
+            "start": 500,
             "bounds_min": 0,
-            "bounds_max": 1000,
-            "start": 500
+            "bounds_max": 1000
         }
     }
 },
