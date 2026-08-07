@@ -48,6 +48,7 @@
 | K            | Kelvin                                                                      |
 | LHV          | Lower Heating Value, also known as Net Calorific Value (NCV)                |
 | LMTD         | Logarithmic mean temperature difference                                     |
+| MILP         | Mixed integer linear programming                                            |
 | MB           | Middle Bus                                                                  |
 | MOT          | Minimum Operation Time                                                      |
 | MT           | Middle Transformer                                                          |

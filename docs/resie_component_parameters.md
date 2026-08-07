@@ -151,13 +151,15 @@ A definition of a control module with its control parameter can be done for exam
     "control_modules": [
         {
             "name": "storage_driven",
+            "control_mode": "charge",
             "high_threshold": 0.95,
             "low_threshold": 0.3,
             "storage_uac": "TST_TH_BFT_01"
         },
          {
             "name": "storage_driven",
-            "high_threshold": 0.99,
+             "control_mode": "charge",
+             "high_threshold": 0.99,
             "low_threshold": 0.5,
             "storage_uac": "TST_TH_BFT_02"
         }
@@ -177,15 +179,23 @@ This module is implemented for the following component types: `CHPP`, `Electroly
 | **profile_path** | File path to the profile with the limit values. Must be a `.prf` file. |
 
 #### Storage-driven
-Controls a component to only operate when the charge of a linked storage component falls below a certain threshold and keep operating until a certain higher threshold is reached and minimum operation time has passed. This is often used to avoid components switching on and off rapidly to keep a storage topped up, as realised systems often operate with this kind of hysteresis behaviour.
+Controls a component based on the charge level of a linked storage component. The module uses hysteresis to prevent rapid switching between operating and non-operating states.
 
-This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster`
+The switching behaviour depends on the configured `control_mode`:
 
-| | |
+- In `charge` mode, the component turns on when the storage level falls below `low_threshold` and turns off when it reaches `high_threshold`.
+- In `discharge` mode, the component turns on when the storage level rises above `high_threshold` and turns off when it falls below `low_threshold`.
+
+The component remains on for at least `min_run_time`, even if the relevant turn-off threshold is reached earlier. Physical storage limits can override the minimum run time.
+
+This module is implemented for the following component types: `CHPP`, `Electrolyser`, `FuelBoiler`, `HeatPump`, `ThermalBooster`.
+
+| |  |
 | --- | --- |
-| **name** | Name of the module. Fixed value of `storage_driven` |
-| **low_threshold** | The storage charge threshold below which operation is turned on. Defaults to `0.2`.
-| **high_treshold** | The storage charge threshold above which operation is turned off. Defaults to `0.95`.
+| **name** | Name of the module. Fixed value: `storage_driven`. |
+| **control_mode** | Defines how the controlled component interacts with the storage. Use `charge` when the component fills the storage and  `discharge` when the component consumes energy from the storage. Defaults to `charge`. |
+| **low_threshold** | Lower relative storage-level boundary. In `charge` mode, operation turns on at or below this value. In `discharge` mode, operation turns off at or below this value. Defaults to `0.2`. |
+| **high_threshold** | Upper relative storage-level boundary. In `charge` mode, operation turns off at or above this value. In `discharge` mode, operation turns on at or above this value. Defaults to `0.95`. |
 | **min_run_time** | Minimum run time for the "on" state. Absolute value in seconds. Defaults to `1800`.
 | **storage_uac** | The UAC of the storage component linked to the module.
 

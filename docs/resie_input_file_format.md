@@ -37,6 +37,7 @@ The overall structure of the project file is split several sections, each of whi
     "simulation_parameters": {...},
     "economic_parameters": {...},
     "emissions_parameters": {...},
+    "parameter_study": {...},
     "components": {...},
     "order_of_operation": {...}
 }
@@ -51,13 +52,13 @@ The overall structure of the project file is split several sections, each of whi
     "auxiliary_plots": true,
     "auxiliary_plots_path": "./output",
     "auxiliary_plots_formats": ["png", "svg"],
-    "sankey_plot_file": "./output/output_sankey.html",
+    "sankey_plot_file_path": "./output/output_sankey.html",
     "sankey_plot": "custom",
     "sankey_plot_spec": {
         "m_e_ac_230v": "darkyellow",
         ...
     },
-    "csv_output_file": "./output/out.csv",
+    "csv_output_file_path": "./output/out.csv",
     "csv_time_unit": "hours",
     "csv_output": "custom",
     "csv_output_keys": {
@@ -66,8 +67,8 @@ The overall structure of the project file is split several sections, each of whi
     },
     "csv_output_weather": true,
     "write_csv_continuously": false,
-    "write_summary_CSV": true,
-    "output_plot_file": "./output/output_plot.html",
+    "write_summary_csv": true,
+    "output_plot_file_path": "./output/output_plot.html",
     "output_plot_time_unit": "date",
     "plot_weather_data": true,
     "output_plot": "custom",
@@ -84,35 +85,40 @@ The overall structure of the project file is split several sections, each of whi
     "economic_plot_cashflows_file_path": "./output/economic_results_cashflows.html",
     "plot_economic_present_values": true,
     "economic_plot_present_values_file_path": "./output/economic_results_present_values.html",
-    "output_economic_CSV": true,
-    "economic_CSV_file_path": "./output/economic_results.csv",
+    "output_economic_csv": true,
+    "economic_csv_file_path": "./output/economic_results.csv",
     "plot_emission_results": true,
     "emissions_plot_file_path": "./output/emissions_plot.html",
-    "output_emissions_CSV": true,
-    "emissions_CSV_file_path": "./output/emissions_results.csv",
+    "output_emissions_csv": true,
+    "emissions_csv_file_path": "./output/emissions_results.csv",
     "plot_price_and_emission_profiles": false,
     "price_and_emission_profile_file_path":  "./output/price_and_emissions_profiles.html",
     "step_info_interval": 500,
-    "show_detailed_errors": false
+    "show_detailed_errors": false,
+    "output_parameter_study_csv": true,
+    "parameter_study_csv_path": "./output/parameter_study",
+    "write_parameter_study_csv_continuously": false,
+    "output_parameter_study_plots": true,
+    "parameter_study_plots_path": "./output/parameter_study_plots"
 },
 ```
 * `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
-* `csv_output_file` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
+* `csv_output_file_path` (`String`): (Optional) File path to where the CSV output will be written. Defaults to `./output/out.csv`.
 * `csv_time_unit` (`String`): (Optional) Time unit for the timestamp of the CSV output. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`.
 * `csv_output` (`String`): (Optional) Sets the mode of the CSV output, switching between several default and custom behaviour modes as well an option of not creating a CSV file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `nothing`.
 * `csv_output_keys` (`Dict{String, List{String}}`): (Optional) Specifications for the CSV output in custom mode. See [section "Output specification (CSV-file)"](resie_input_file_format.md#output-specification-csv-file) for details.
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
-* `write_summary_CSV` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
+* `write_summary_csv` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
 * `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
 * `auxiliary_plots_path` (`String`): (Optional) Directory path to where the additional plots will be saved. Defaults to `./output/`.
 * `auxiliary_plots_formats` (`Array{String}`): (Optional) Multiple selection of which file formats are used to create the auxiliary plots. Allowed formats are: `html`, `pdf`, `png`, `ps`, `svg`. Defaults to `[".png"]`.
-* `sankey_plot_file` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
+* `sankey_plot_file_path` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`String`): (Optional) Sets the mode of the sankey plot output, switching between default and custom behaviour as well an option of not creating a sankey plot file. Has to be one of: `default`, `custom`, `nothing`. Defaults to `default`.
 * `sankey_plot_spec` (`Dict{String, String}`): (Optional) Specifications for the colors of the sankey plot in custom mode. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. Only required if a custom sankey plot is set.
-* `output_plot_file`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
+* `output_plot_file_path`: (Optional) File path to where the output line plot will be written. Defaults to `./output/output_plot.html`.
 * `output_plot_time_unit` (`String`): (Optional) Unit for x-axis of the output plot. Has to be one of: `seconds`, `minutes`, `hours`, `date`. Defaults to `date`. Note that the plotted energies always refer to the simulation time step and not to the unit specified here!
 *  `plot_weather_data` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the line plot. Defaults to `false`.
 * `output_plot` (`String`): (Optional) Sets the mode of the output plot, switching between several default and custom behaviour modes as well an option of not creating a plot file at all. Has to be one of: `custom`, `all_excl_flows`, `all_incl_flows`, `nothing`. Defaults to `all_incl_flows`.
@@ -121,18 +127,22 @@ The overall structure of the project file is split several sections, each of whi
 * `economic_plot_cashflows_file_path` (`String`): (Optional) File path to where the economic cashflow plot will be written. Defaults to `./output/economic_results_cashflows.html`.
 * `plot_economic_present_values` (`Boolean`): (Optional) Toggle if the economic results as present values should be plotted. Defaults to `true`.
 * `economic_plot_present_values_file_path` (`String`): (Optional) File path to where the economic present value plot will be written. Defaults to `./output/economic_results_present_values.html`.
-* `output_economic_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
-* `economic_CSV_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
+* `output_economic_csv` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
+* `economic_csv_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
 * `plot_emission_results` (`Boolean`): (Optional) Toggle if the emission results should be plotted. Defaults to `true`.
 * `emissions_plot_file_path` (`String`): (Optional) File path to where the emissions plot will be written. Defaults to `./output/emissions_result.html`.
-* `output_emissions_CSV` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
-* `emissions_CSV_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
+* `output_emissions_csv` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
+* `emissions_csv_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
 * `plot_price_and_emission_profiles` (`Boolean`): (Optional) Toggle if a plot with the utilized price and emission profiles should be created. This can be used to double check if everything is scaled and imported correctly.  Note that this file can be very large! Therefore it defaults to `false`.
 * `price_and_emission_profile_file_path` (`String`): (Optional) File path to where the plot with price and emission profiles will be written. Defaults to `./output/price_and_emissions_profiles.html`.
 * `step_info_interval` (`Integer`): (Optional) Defines how often a progress report on the loop over the timesteps of the simulation is logged to the info channel. This is useful to get an estimation of how much longer the simulation requires (albeit that such estimation is always inaccurate). If no value is given, automatically sets a value such that 20 reports are printed over the course of the simulation. To deactivate these reports, set this to 0.
 * `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
 * `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many significant digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting in normal simulation. It's intended for making the output perfectly repeatable, which is useful for testing but changes the results.
-
+* `output_parameter_study_csv` (`Boolean`): (Optional) Toggle if CSV files with the parameter-study results should be created. Defaults to `true`.
+* `parameter_study_csv_path` (`String`): (Optional) Directory path to where the parameter-study CSV result files will be written. Defaults to `./output/parameter_study`.
+* `write_parameter_study_csv_continuously` (`Boolean`): (Optional) Toggle if parameter-study CSV output will be written continuously after every completed simulation run. Activating this functionality preserves partial output if the parameter study is stopped during execution. It incurs a slight performance penalty depending on the duration of an individual simulation and the number of parallel runs, since threads may have to wait for write access. Defaults to `false`.
+* `output_parameter_study_plots` (`Boolean`): (Optional) Toggle if plot files with the parameter-study results should be created. Defaults to `true`.
+* `parameter_study_plots_path` (`String`): (Optional) Directory path to where the parameter-study result plots will be written. Defaults to `./output/parameter_study_plots`.
 
 ### Output specification (Sankey)
 
@@ -194,7 +204,7 @@ To output the weather data read in from a provided weather file, the flag `csv_o
 
 **Summary output**
 
-Using the toggle `write_summary_CSV`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
+Using the toggle `write_summary_csv`, an additional summary CSV file is created from the regular CSV output. It contains one row for each numeric output and summarizes the values over the full simulation period.
 
 Energy-related outputs, such as `Demand`, `IN`, `OUT`, `Supply`, `Losses`, `Gains`, `EnergyFlow` and `Balance`, are summed. Columns containing `_sum` are treated as cumulative values and the last valid value is written. All other numeric outputs, such as temperatures, efficiencies or states of charge, are averaged.
 
@@ -325,6 +335,379 @@ The calculation of GHG emissions results, as described [in this chapter](resie_c
 * `observation_period_in_years` (`Integer`, optional, unit `a`): The period in consideration for the calculation of GHG emissions. Defaults to `20`.
 * `include_embodied_emissions` (`Boolean`, optional): If set to true, includes embodied emissions in the calculation. Defaults to `true`.
 * `repeat_method` (`String`, optional): Defines which period of the result data is repeated to fill up the remainder of the observation period. This can be equal or less than the simulation period, for example simulating three years, but only repeating the last year for the entire observation period. Has to be one of: `all`, `last_year`, `last_month`, `last_week`. Defaults to `last_year`.
+
+## Parameter study / Optimisation
+
+A parameter study runs multiple simulations with different input parameters. It can be used to evaluate and compare predefined parameter combinations, find an optimal component sizing, calculate global sensitivity indices or evaluate local sensitivities around a reference point. ReSiE implements existing optimisation packages as well as custom methods for parameter variation and sensitivity analysis.
+
+A parameter study is configured with the top-level `parameter_study` object. Its configuration consists of three parts:
+
+1. the objective to evaluate (`objective_params` together with `objective_function`, `objective_factors` and `objective_senses`)
+2. the parameters to change (`parameters`) and
+3. the workflow to perform.
+
+The objective and parameter definitions are shared between the workflows. Workflow-specific settings are placed in:
+
+* `parameter_variation`;
+* `optimisation`;
+* `sensitivity_analysis`.
+
+Parameter variation and optimisation cannot be enabled at the same time. Sensitivity analyses can be added to either workflow or run independently if the required parameter values are available.
+
+The optional setting `disable_all_simulation_outputs` disables outputs from individual simulation runs, such as Sankey diagrams and line plots. This is recommended for parameter studies with many simulations and defaults to `true`.
+
+A complete optimisation followed by global and local sensitivity analyses can be configured as follows:
+
+```json
+"parameter_study": {
+    "disable_all_simulation_outputs": true,
+    "objective_function": "sum",
+    "objective_params": {
+        "economic": ["total_annuity"],
+        "emissions": ["total_emissions"]
+    },
+    "parameters": {
+         "Battery_01": {
+            "capacity": {
+                "bounds_min": 0,
+                "bounds_max": 200000,
+                "start": 100000,
+            },
+        "PV_01": {
+            "scale": {
+                "bounds_min": 0,
+                "bounds_max": 1000,
+                "start": 500
+            }
+        }
+    },
+    "optimisation": {
+        "run_optimisation": true,
+        "type": "Metaheuristics",
+        "algorithm": "ECA",
+        "max_runs": 100,
+        "refinement": {
+            "type": "NLopt",
+            "algorithm": "LN_BOBYQA",
+            "max_runs": 50,
+            "x_tol_abs": 0.001
+        }
+    },
+    "sensitivity_analysis": {
+        "run_global_sensitivity": true,
+        "run_local_sensitivity": true,
+        "local_reference": "best_result",
+        "local_variation": 0.1,
+        "max_runs": 100
+    }
+}
+```
+
+### Objective definition
+
+The objective is defined with `objective_function` and `objective_params`. It is used as reporting output for `parameter_variation`, as result value for the `sensitivity_analysis` or as objective to minimise during `optimisation`.
+
+The `objective_params` work similarly to the [`csv_output_keys` definition](resie_input_file_format.md#output-specification-csv-file), with an additional layer that defines how the values are handled.
+
+The following objective categories and parameters are available:
+
+| Category    | Description                                                                 | Available Parameters                                                                                            |
+| ----------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `economic`  | Uses results from the economic calculation.                                 | `total_annuity`<br>`annuity_capex`<br>`annuity_opex` (without energy costs)<br>`annuity_opex_including_energies`<br>`annuity_energies` |
+| `emissions` | Uses results from the emissions calculation.                                | `total_emissions`<br>`emissions_energies`<br>`embodied_emissions`                                               |
+| `sum`       | Uses the sum of the selected simulation output<br>over the simulation period.  | Depends on the selected simulation output.                                                                      |
+| `mean`      | Uses the mean of the selected simulation output<br>over the simulation period. | Depends on the selected simulation output.                                                                      |
+
+For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`. With `sum`, all objective parameters are added together and the resulting value is minimised. With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
+
+```json
+"objective_function": "linear",
+"objective_params": {
+    "economic": ["total_annuity"],
+    "sum": {
+        "GridOut": ["m_e_ac_230v:IN"]
+    }
+},
+"objective_factors": {
+    "economic total_annuity": 1.0,
+    "sum GridOut m_e_ac_230v IN": -2.0
+}
+```
+
+The objective function in this example is:
+
+```text
+1 * total_annuity + (-2) * sum(GridOut m_e_ac_230v:IN)
+```
+
+During optimisation, the objective function is always minimised. Therefore, a positive factor minimises the corresponding value, while a negative factor maximises it.
+
+The keys in `objective_factors` must exactly match the flattened objective parameter names. Every objective parameter must have exactly one factor.
+
+For `sum` and `mean`, the flattened name is formed by joining the aggregation method, component name, medium and output key with spaces. For example:
+
+```text
+sum GridOut m_e_ac_230v IN
+```
+
+Here, `m_e_ac_230v:IN` becomes `m_e_ac_230v IN`.
+
+Optimisation can additionally use multiple separate objectives. This is described in [Multi-objective optimisation](#multi-objective-optimisation) below.
+
+
+### Definition of parameters to be changed
+
+The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value.
+
+Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`. See also the example below:
+
+```json
+"parameters": {
+    "Battery_01": {
+        "capacity": {
+            "start": 100000,
+            "bounds_min": 0,
+            "bounds_max": 200000
+        },
+        "economic_parameters.lifetime_years": {
+            ...
+        }
+    },
+    "emissions_parameters": {
+        "observation_period_in_years": {
+            ...
+        }
+    },
+    "PV_01": {
+        "scale": {
+            ...
+        }
+    }
+}
+```
+
+The required fields of each selected parameter depend on the selected workflow:
+
+* Parameter variation uses `values` or a range.
+* Optimisation uses `bounds_min`, `bounds_max` and `start`.
+* Global sensitivity uses `bounds_min` and `bounds_max`.
+* Standalone local sensitivity uses `start` and optionally `sensitivity_lower` and `sensitivity_upper`.
+
+The available fields are:
+
+* `bounds_min` (`Float`, conditionally required): Lower physical bound used by optimisation and global sensitivity.
+* `bounds_max` (`Float`, conditionally required): Upper physical bound used by optimisation and global sensitivity.
+* `start` (`Float`, conditionally required): Starting value for optimisation or reference value for standalone local sensitivity.
+* `values` (`Array`, optional): Explicit values used for parameter variation.
+* `range_start` (`Float`, conditionally required): First value of a parameter variation range.
+* `range_stop` (`Float`, conditionally required): Last value of a parameter variation range.
+* `range_step` (`Float`, conditionally required): Step size of a parameter variation range. Cannot be combined with `range_length`.
+* `range_length` (`Integer`, conditionally required): Number of values in a parameter variation range. Cannot be combined with `range_step`.
+* `sensitivity_lower` (`Float`, optional): Explicit lower value for local sensitivity. Must be provided together with `sensitivity_upper`.
+* `sensitivity_upper` (`Float`, optional): Explicit upper value for local sensitivity. Must be provided together with `sensitivity_lower`.
+
+
+### Parameter variation
+
+Parameter variation evaluates predefined parameter combinations. Each parameter can use either explicit `values` or a range.
+
+A range is defined with:
+
+* `range_start`;
+* `range_stop`;
+* exactly one of `range_step` or `range_length`.
+
+```json
+"parameters": {
+    "Battery_01": {
+        "capacity": {
+            "range_start": 0,
+            "range_stop": 200000,
+            "range_length": 5,
+        }
+    },
+    "PV_01": {
+        "scale": {
+            "values": [250, 500, 750, 1000]
+        }
+    }
+},
+"parameter_variation": {
+    "run_parameter_variation": true,
+    "algorithm": "product"
+}
+```
+
+* `run_parameter_variation` (`Boolean`, optional): Enables parameter variation. Defaults to `false`.
+* `algorithm` (`String`, optional): Defines which parameter combinations are simulated:
+    * `product`: Simulates every possible combination of the parameter values (default).
+    * `zip`: Simulates values at the same position together. For example, the first value of each parameter is used in the first simulation.
+    * `random_N`: Randomly selects `N` combinations from all possible combinations. For example, `random_100` selects 100 combinations.
+
+Parameter variation and optimisation cannot be enabled at the same time.
+
+### Optimisation
+
+Optimisation searches for the best parameter values within the configured bounds. Every optimised parameter requires `bounds_min`, `bounds_max` and `start`.
+
+```json
+"parameters": {
+    "Battery_01": {
+        "capacity": {
+            "start": 100000,
+            "bounds_min": 0,
+            "bounds_max": 200000
+        }
+    },
+    "PV_01": {
+        "scale": {
+            "start": 500,
+            "bounds_min": 0,
+            "bounds_max": 1000
+        }
+    }
+},
+"optimisation": {
+    "run_optimisation": true,
+    "type": "Metaheuristics",
+    "algorithm": "ECA",
+    "max_runs": 100
+}
+```
+
+* `run_optimisation` (`Boolean`, optional): Enables optimisation. Defaults to `false`.
+* `type` (`String`, optional): Defines the optimisation package. Options are `Optim`[^Optim], `BlackBoxOptim`[^BlackBoxOptim], `Metaheuristics`[^Metaheuristics], `NLopt`[^NLopt] and `NOMAD`[^NOMAD]. Defaults to `NLopt`.
+* `algorithm` (`String`, optional): Defines the optimisation algorithm. The available algorithms depend on the selected package. It is not required for `NOMAD`. Defaults to `LN_SBPLX`.
+* `max_runs` (`Integer`, optional): Limits the number of simulation runs. Some algorithms may only respect this limit approximately. No default.
+* `max_time` (`Number`, optional): Limits the optimisation runtime in seconds. No default.
+* `x_tol_abs` (`Float`, optional): Absolute tolerance for the decision parameters. Note: All decision parameters are normalised to the range [0,1] for optimisation! Used by supported `Optim`, `NLopt` and `NOMAD` algorithms. No default.
+* `f_tol_abs` (`Float`, optional): Absolute tolerance for the objective function. Used by supported `Optim` and `NLopt` algorithms. No default.
+*  `optim_kwargs` (`Dict{String,Any}`, optional): Additional keyword arguments passed to the selected optimisation algorithm. Defaults to `nothing`.
+* `refinement` (`Dict{String,Any}`, optional): Defines a second optimisation stage that starts from the best result of the primary optimisation.
+
+See  [this chapter](optimisation_and_sensitivity.md#choosing-an-optimisation-algorithm) for a detailed description on how to choose an appropriate optimisation algorithm for your energy system.
+
+#### Optional refinement
+
+A local refinement can be performed automatically after a global single-objective optimisation. It starts from the best valid result of the primary optimisation and uses the same objective, parameters and bounds.
+
+Suggested algorithms are:
+
+| Problem                                                      | Refinement algorithm |
+| ------------------------------------------------------------ | -------------------- |
+| Two to ten variables with an approximately smooth objective  | `NLopt: LN_BOBYQA`   |
+| Two to ten variables with a nonsmooth or uncertain objective | `NLopt: LN_NELDERMEAD`    |
+
+The settings `type`, `algorithm`, `max_runs`, `max_time`, `x_tol_abs` and `f_tol_abs` can be configured separately for the refinement stage. See the general description of the optimisation for the details of each setting.
+
+```json
+"optimisation": {
+    "run_optimisation": true,
+    "type": "Metaheuristics",
+    "algorithm": "ECA",
+    "max_runs": 100,
+    "refinement": {
+        "type": "NLopt",
+        "algorithm": "LN_BOBYQA",
+        "max_runs": 50
+    }
+}
+```
+
+Refinement is currently supported only for single-objective optimisation.
+
+#### Multi-objective optimisation
+
+By default, optimisation uses the same scalar objective definition as parameter variation and sensitivity analysis.
+
+If the selected optimisation algorithm supports multiple objectives, `objective_function` can instead be set to `multi-objective`. Every entry in `objective_params` is then treated as a separate objective.
+
+The direction of each objective can be configured with `objective_senses`:
+
+```json
+"objective_function": "multi-objective",
+"objective_params": {
+    "economic": ["total_annuity"],
+    "sum": {
+        "PV": ["m_e_ac_230v:OUT"]
+    }
+},
+"objective_senses": {
+    "economic total_annuity": "min",
+    "sum PV m_e_ac_230v OUT": "max"
+}
+```
+
+In this example, ReSiE minimises the total annuity and maximises the total PV output.
+
+The keys in `objective_senses` must exactly match the flattened objective parameter names. Allowed values are `min` and `max`.
+
+If `objective_senses` is omitted, all objectives are minimised. If it is provided, every objective must have exactly one direction.
+
+Multi-objective optimisation is supported only by compatible optimisation algorithms (see the recommended algorithms  [here](optimisation_and_sensitivity.md#choosing-an-optimisation-algorithm)). It cannot be combined with parameter variation, global sensitivity or local sensitivity.
+
+### Sensitivity analysis
+
+Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together. For details of the method and how to interpret the results, see [this chapter](optimisation_and_sensitivity.md#sensitivity-analysis)
+
+#### Global sensitivity
+
+Global sensitivity calculates first-order and total-order Sobol indices within the parameter bounds. Every parameter therefore requires `bounds_min` and `bounds_max`. Existing valid simulation results inside the selected bounds are reused where possible. Additional simulation runs are performed when more samples are required.
+
+The following parameters are available:
+
+* `run_global_sensitivity` (`Boolean`, optional): Enables global sensitivity analysis. Defaults to `false`.
+ * `max_runs` (`Integer`, optional): Limits the number of additional simulations used to calculate global sensitivity. No default.
+
+```json
+"sensitivity_analysis": {
+    "run_global_sensitivity": true,
+    "max_runs": 200
+}
+```
+
+#### Local sensitivity
+
+Local sensitivity changes one parameter at a time while keeping all other parameters at a reference point. The reference point to start from is selected with `local_reference`:
+
+* `start` uses the configured parameter starting values;
+* `best_result` uses the best result of the optimisation.
+
+If `sensitivity_lower` and `sensitivity_upper` are provided for a parameter, these values are used directly. Both values must be provided together.
+
+Otherwise, the lower and upper values are calculated using `local_variation`:
+
+```text
+lower = reference - abs(reference) * local_variation
+upper = reference + abs(reference) * local_variation
+```
+
+If the reference value is zero, explicit `sensitivity_lower` and `sensitivity_upper` values are required.
+
+Local sensitivity values are not restricted by `bounds_min` and `bounds_max` and may therefore distort the optimization results shown in the figures if `include_local_sensitivity_results_in_figures` is enabled. 
+
+```json
+"sensitivity_analysis": {
+    "run_local_sensitivity": true,
+    "local_reference": "best_result",
+    "local_variation": 0.1,
+    "include_local_sensitivity_results_in_figures": true
+}
+```
+
+* `run_local_sensitivity` (`Boolean`, optional): Enables local sensitivity analysis. Defaults to `false`.
+* `local_reference` (`String`, optional): Defines the local-sensitivity reference. Options are `start` and `best_result`. Defaults to `start`.
+* `local_variation` (`Float`, optional): Defines the relative variation above and below the reference when explicit local-sensitivity values are not provided. Defaults to `0.1` meaning a variation of +/- 10%.
+* `include_local_sensitivity_results_in_figures` (`Boolean`, optional): Defines if simulation results generated during local sensitivity analysis are included in the general parameter-study result figures. Defaults to `true`.
+
+Sensitivity analysis currently supports only single-objective parameter studies.
+
+[^Optim]: [https://julianlsolvers.github.io/Optim.jl/stable/](https://julianlsolvers.github.io/Optim.jl/stable/)
+[^BlackBoxOptim]: [https://github.com/SciML/BlackBoxOptim.jl](https://github.com/SciML/BlackBoxOptim.jl)
+[^Metaheuristics]: [https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/); Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, [https://doi.org/10.21105/joss.04723](https://doi.org/10.21105/joss.04723)
+[^NLopt]: [https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/](https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/)
+[^NOMAD]: [https://bbopt.github.io/NOMAD.jl/stable/](https://bbopt.github.io/NOMAD.jl/stable/)
+
 
 ## Components
 
