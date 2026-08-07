@@ -3,13 +3,13 @@ ReSiE is written in Julia and shipped as a Julia codebase. This means that it ca
 
 **Requirements:**
 
-* Julia, minimum v1.8.5 and tested up to v1.12.2. You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
+* Julia, minimum v1.10.0 and tested up to v1.12.2. You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
 * Internet access during installation, as the dependencies have to be downloaded
 
 **Installation of ReSiE:**
 
-1. Get a copy: `git clone https://github.com/QuaSi-Software/resie.git`
-    * As an alternative to Git, you can also download the repository [from one of the releases on GitHub](https://github.com/QuaSi-Software/resie/releases). Download the source code as a `.zip` file and unpack it to the target directory.
+1. Get a copy: `git clone https://github.com/QuaSi-Software/ResieQuasi.jl.git`
+    * As an alternative to Git, you can also download the repository [from one of the releases on GitHub](https://github.com/QuaSi-Software/ResieQuasi.jl/releases). Download the source code as a `.zip` file and unpack it to the target directory.
 2. Switch into the ReSiE root directory: `cd /path/to/resie`
 3. Start the julia REPL with `julia`
 4. Switch to the package REPL with `]` (no enter necessary)

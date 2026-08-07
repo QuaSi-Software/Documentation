@@ -11,7 +11,7 @@ The first version of QuaSi was developed as part of a research project in Esslin
 ## Tools of the QuaSi project
 This is a quick overview of the tools of the QuaSi project. You can find more details in the other chapters of the documentation.
 
-- **ReSiE** (acronym for "computational engine for the simulation of energy systems", in German "Rechenkern für die Simulation von Energiesystemen"), a simulation tool for the simulation and optimization of different energy supply systems with a focus on operational strategies that can be used in early planning stages ([GitHub Repository](https://github.com/QuaSi-Software/resie))
+- **ReSiE** (acronym for "computational engine for the simulation of energy systems", in German "Rechenkern für die Simulation von Energiesystemen"), a simulation tool for the simulation and optimization of different energy supply systems with a focus on operational strategies that can be used in early planning stages ([GitHub Repository](https://github.com/QuaSi-Software/ResieQuasi.jl))
   
     <figure markdown>
         ![ReSiE Logo](img/230505_Resie.jpg){ width="300" }
