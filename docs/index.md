@@ -5,8 +5,6 @@ The QuaSi simulation software bundle focuses on the energy supply and demand of 
 
 In particular, this documentation is on the open source project QuaSi. As part of the research projects in which the tools were developed, more software was created, which will not be described here. You can check out our [project homepage](http://www.quasi-software.org) for more information and updates as we continue to work on QuaSi.
 
-**DISCLAIMER:** The current version of the documentation is a work in progress as we move towards the first full release of our various tools and software components. Please be aware that some parts of the documentation do not reflect the current state of what they are documenting.
-
 ## What's with the name?
 The first version of QuaSi was developed as part of a research project in Esslingen - Germany. As the tool grew useful, it needed a catchy name, which is the source of "QuaSi" as an abbreviation of "Quartier" (German for city quarter / district) and "Simulation". Although additional components were added over time and the project is now developed with an international audience in mind, the name stuck around. 
 
