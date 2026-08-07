@@ -60,8 +60,8 @@ For other equipment this is not the case. For example an electrolyser requires s
 
 Components can be classified into seven categories, which are:
 
-* `Flexible sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid output with unlimited power.
-* `Flexible source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid input with unlimited power.
+* `Flexible sink`: A component taking in a flexible amount of energy. For example a chiller taking in waste heat that is a by-product of the processing of other components, or a grid sink with unlimited power.
+* `Flexible source`: A component outputting a flexible amount of energy, drawing it from outside the system boundary. For example drawing in heat from the ambient environment, or a grid supply with unlimited power.
 * `Fixed sink`: A component consuming an amount of energy fixed within a time step. For example a demand of hot water for heating.
 * `Fixed source`: A component outputting an amount of energy fixed within a time step. For example a photovoltaic power plant.
 * `Transformer`: A component transforming energy in at least one medium to energy in at least one medium. For example a heat pump using electricity to elevate heat to a higher temperature.
@@ -121,11 +121,11 @@ Determining the order of operations follow an algorithm consisting of a base ord
     4. `Potential`: `Transformer`
     5. `Process`: `Transformer`, `Storage`
     6. `Load`: `Storage`
-    7. `Process`: `Flexible source`, `Flexible sink`  (first general flexible sources/sinks, then grid inputs/outputs)
+    7. `Process`: `Flexible source`, `Flexible sink`  (first general flexible sources/sinks, then grid supplies/sinks)
     8. `Distribute`: `Bus`
 2. The `Potential` and `Process` operations of transformers are ordered by a complex algorithm [described here](resie_energy_systems.md#transformer-chains) in more detail. This is technically not a rearrangement, as it happens during establishing the base order.
 3. Reorder the `Control` operations to make sure that components that require temperature information during their control operation from other components comes last: First the components that require this information in their output (geothermal probe, solar thermal collector), then the components that require the temperature information in their input interface (seasonal thermal store).
-4. Reorder the `Process` operation of components connected to the input and output interfaces of busses to ensure they follow the priorities on the bus. This acts as an addition to the initial order determined by the algorithm of 2. and applies only if there is no grid input/output at this bus, as with grid input/output, the output/input priorities of connected components do not matter.  
+4. Reorder the `Process` operation of components connected to the input and output interfaces of busses to ensure they follow the priorities on the bus. This acts as an addition to the initial order determined by the algorithm of 2. and applies only if there is no grid supply/sink at this bus, as with grid supply/sink, the output/input priorities of connected components do not matter.  
 5. Reorder the `Distribute` operation of all busses in a chain of busses to come after that of their [proxy bus](resie_energy_systems.md#bus-chains). This is necessary only for technical reasons and does not strictly matter for the algorithm.
 6. Reorder the `Process` and `Load` operations of storages such that the loading (and unloading) of storages follows the priorities on busses.
 7. Reorder the `Process` step of flexible sources and flexible sinks and the `Process` / `Load` step of storages that are connected to transformers (directly or via one ore more buses) such that their steps always come after the `Process` step of the connected transformer.

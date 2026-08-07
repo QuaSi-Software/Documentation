@@ -704,11 +704,11 @@ Energy-related parameters:
 | `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
 | `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
 
-### Grid input
+### Grid supply
 | | |
 | --- | --- |
-| **Type name** | `GridInput`|
-| **File** | `energy_systems/connections/grid_input.jl` |
+| **Type name** | `GridSupply`|
+| **File** | `energy_systems/connections/grid_supply.jl` |
 | **System function** | `flexible_source` |
 | **Medium** | `medium`/`None` |
 | **Input media** | |
@@ -772,11 +772,11 @@ Energy-related parameters:
 | `energy_emissions_profile_scale` | `Float` | N/Y | 1.0 | [-] | Scale factor for the energy emissions profile. Only applies to profiles. |
 | `energy_emissions_change_rate_per_year` | `Float` | N/Y | 0.0 | [1/a] | Yearly change rate of specific energy emissions. |
 
-### Grid output
+### Grid sink
 | | |
 | --- | --- |
-| **Type name** | `GridOutput`|
-| **File** | `energy_systems/connections/grid_input.jl` |
+| **Type name** | `GridSink`|
+| **File** | `energy_systems/connections/grid_sink.jl` |
 | **System function** | `flexible_sink` |
 | **Medium** | `medium`/`None` |
 | **Input media** | `None`/`auto` |
