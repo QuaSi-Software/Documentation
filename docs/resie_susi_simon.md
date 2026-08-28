@@ -3,11 +3,11 @@ Because ReSiE is a simulation engine usable via CLI, there is the need for addit
 
 ## Simple UI for Simulation Input (SUSI)
 
-**Note: SUSI is currently in development and no instance is publically available. We intend to run a public instance in the future once development is in a mostly complete state.**
-
 SUSI is the tool to create the energy system input file as described in detail [in this chapter](resie_input_file_format.md) as well as the component parameters as described [in this chapter](resie_component_parameters.md). It provides a GUI for adding components to the energy system, connecting the components via their input and/or output handles and setting parameters to desired values, while providing guidance via default parameter values and allowed value ranges. Here is a screenshot demonstrating how SUSI looks like in use:
 
-![Screenshot of SUSI with an energy system in the process of being configured](fig/260421_susi_screen.png)
+![Screenshot of SUSI with an energy system in the process of being configured](fig/260828_susi_screen.png)
+
+You can find an online instance of SUSI here: [https://quasi-susi.dbi-cloud.com/](https://quasi-susi.dbi-cloud.com/)
 
 At time of writing the profiles (time series data) used by various components and the weather data are external to the input file and are linked via file paths. It is currently not possible to create these profiles, as described [in this chapter](resie_input_file_format.md#profile-file-format), within SUSI. This feature might be developed in the future.
 
