@@ -1019,6 +1019,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 | Name | Type | R/D |  Example | Unit | Description |
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `m_fuel_in` | `String` | Y/N | `m_c_g_natgas` | [-] | The medium of the fuel intake. |
+| `m_heat_out` | `String` | Y/N | `m_h_w_ht1` | [-] | The medium of the heat output. |
 | `power_th` | `Float` | Y/N | 4000.0 | [W] | The maximum thermal design power output. |
 | `min_power_fraction` | `Float` | Y/Y | 0.1 | [-] | The minimum fraction of the design power_th that is required for the plant to run. |
 | `output_temperature` | `Temperature` | N/N | 90.0 | [°C] | The temperature of the heat output. |
@@ -1056,6 +1057,7 @@ This needs to be parameterized with the medium of the fuel intake as the impleme
 "TST_FB_01": {
     "type": "FuelBoiler",
     "m_fuel_in": "m_c_g_natgas",
+    "m_heat_out": "m_h_w_ht1",
     "output_refs": ["DEM_01"],
     "power_th":  4000.0,
     "min_power_fraction": 0.1,
