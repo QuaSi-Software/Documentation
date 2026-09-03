@@ -542,7 +542,7 @@ Overall, ReSiE is fully in line with the other simulation environments for typic
 
 ## Battery
 To validate the battery model two comparisons where choosen. One is the battery model implemented in the System Advisor Model&trade; (SAM&trade;) by the National Laboratory of the Rockies (NLR) and the second comparison is to mesaured data from the M5BAT[^M5BAT_Webside] project. For the validation a Lithium Iron Phosphate (LFP) cell is chosen and the battery parameters are taken from the M5BAT LFP battery while the specific cell parameters are left to the default LFP parameters for ReSiE and SAM&trade;.
-The comparison to SAM&trade; was chosen since it uses a very similar model which is based on Tremblay2007[^Tremblay2007] and uses a different way to include the effects of cyclic aging. 
+The comparison to SAM&trade; was chosen since it uses a very similar model which is based on Tremblay2007[^Tremblay2007] but calculates the effects of cyclic aging in a different way.
 For measurement data from M5BAT the data from Koltermann2024[^Koltermann2024] is used which covers the whole month of April in 2023 with a resolution of one second.
 The ReSiE model uses the model_type `Li-LFP` which sets the cell parameters as described in the following table.
 
@@ -564,17 +564,29 @@ The ReSiE model uses the model_type `Li-LFP` which sets the cell parameters as d
 | `I_ref` | 100 A |
 | `T_ref` | 25 °C |
 
-To compare the models the charging and discharging power from the measurement data ist taken and set for the two models. If the can't be added to the battery because of model limitations (e.g. battery is full/empty) the power is ignored. 
+To compare the models the charging and discharging power from the measurement data ist taken and set for the two models. If the energy can't be added to the battery because of model limitations (e.g. battery is full/empty) the not usable power is ignored. 
 
-The sizing of the battery is taken from Koltermann2024[^Koltermann2024] which gives two values of the capacity of 738 kWh and 923 kWh which are assumed to be the total and usable capacity where the usable capacity is limited from 10% to 90% of the total capacity. For the models the total capacity is used. All SOC values are recalcuated in relation to the usable capacity of 738 kWh since the SOC for the measurement is related to that value.
+The sizing of the battery is taken from Koltermann2024[^Koltermann2024] which gives two values of the capacity of 738 kWh and 923 kWh which are assumed to be the usable and total capacity where the usable capacity is limited from 10% to 90% of the total capacity. For the models the total capacity is used. All SOC values are recalcuated in relation to the usable capacity of 738 kWh since the SOC for the measurement is related to that value.
 
-Another issue with measurement data of batteries is that they often have jumps in the SOC even if no energy is added or removed. This change in SOC is done to correct for errors that occur in between SOC calculation and expected voltages. Since this effect is not present in the models we need to make clear how to handle those SOC jumps. For this validation two approaches are used. One is not to do any correction and use the values as is which is labeled just as \(SOC\). The second approach is to take the SOC jumps and distribute them across the time range between now and the last SOC jump. The distribution is weighted by the absolute power added or removed. This adjusted SOC is labeled as \(SOC_adj\). While the SOC is an easy to grasp value it is flawed for comparison since the actually charge that a battery has can vary heavily with different C-rates, temperatures and aging and SOC usually just gives an estimate and is not a accurate value.  While we will still you use it in the following comparison the cell voltage  \(V_cell\) is the better estimate of model quality, since it also heavily influences the efficiency.
+Another issue with measurement data of batteries is that they often have jumps in the SOC even if no energy is added or removed. This change in SOC is done to correct for errors that occur in between SOC calculation and expected voltages. Since this effect is not present in the models we need to make clear how to handle those SOC jumps. For this validation two approaches are used. One is not to do any correction and use the values as is which is labeled just as \(SOC\). The second approach is to take the SOC jumps and distribute them across the time range between now and the last SOC jump. This is based on the assumption that the SOC jump is caused by errors in the calculation in previous time steps. The distribution is weighted by the absolute power added or removed. This adjusted SOC is labeled as \(SOC_adj\). While the SOC is an easy to grasp value it is flawed for comparison since the actually charge that a battery has can vary heavily with different C-rates, temperatures and aging and SOC usually just gives an estimate of the available charge of the battery.  While we will still you use it in the following comparison, the cell voltage \(V_cell\) is the better estimate of model quality, since it also heavily influences the efficiency.
 
 Additionally we need the battery temperature and the charge cycles that the battery already experienced. It was possible to estimate the charge cycles from other publications of M5BAT as 769 between the 06.2017 and 04.2024. It is assumed to also relate to the usable capacity which means for ReSiE it will be set to 769 * 80% = 615 cycles. 
 The battery temperature wasn't available from the measurement data and since ReSiE currently only supports a constant temperature the temperature was varied to get a good fit to the measurement and a value of 35 °C seamed to get good results, while being in a realistic range.
 
 In the first step ReSiE was run with a time step of one second to show the behaviour if all the peaks and fast changes are present in the data. Additionally ReSiE and SAM&trade; were run with 15 minutes and one hour timesteps to show the behaviour in a more realistic usecase.
-In table xxx you can see the mean error (ME) for the cell voltage \(V_cell\) and the \(SOC\) as well as the round trip efficiency \(\eta_{rte}\) between two points with the same SOC at the beginning and the end of the month.
+In table below you can see the results for the comparission of ReSiE and the measurement data. It shows the mean error (ME) for the cell voltage \(V_cell\) and the \(SOC\) during operation as well as the difference in round trip efficiency \(\eta_{rte}\) between two points with the same SOC at the beginning and the end of the month.
+
+| time step | ME \(V_cell\)  | ME \(SOC\)  | \(\eta_{rte,M5BAT}\) - \(\eta_{rte,ReSiE}\) |
+| --------- | --- | --- | --- |
+| 1 s | 0.0309 V | 6.81 %pt. | 0.32 %pt. |
+| 1 min | 0.0341 V | 4.62 %pt. | 0.017 %pt. |
+| 5 min | 0.0413 V | 5.70 %pt. | -0.26 %pt. |
+| 15 min | 0.0459 V | 8.40 %pt. | -0.55 %pt. |
+| 60 min |0.0482 V | 13.05 %pt. | -1.52 %pt. |
+
+The results show a good agreement between the ReSiE model and the measurement data. The error increases with bigger timesteps. This is to be expected since the measurement data has a lot of variation of charging and discharging every second. With bigger timesteps those variations get smoothed out and some less efficient power peaks get replaced by a lower more efficient average power. At the same time the model is not designed to show effects that happen on a second or even subsecond scale. So while the general behaviour of the model is good, it wasn't designed to run with a time step of 1 s. I suspect the slight smoothing effect might explain the improvement of the model performance at the time step of 1 min.
+So while a smaller time step is beneficial to model performance, it still performs well enough even at a time step of 1 h to be usable. This is especially true if the use case is a more consistent charging and discharging profile with less fluctuation.
+
 
 [^M5BAT_Webside]: [https://battery-charts.de/de/m5bat-de/](https://battery-charts.de/de/m5bat-de/)
 [^Tremblay2007]: O. Tremblay, L.-A. Dessaint und A.-I. Dekkiche, "A Generic Battery Model for the Dynamic Simulation of Hybrid Electric Vehicles," in 2007 IEEE Vehicle Power and Propulsion Conference, Arlington, TX, USA, Sep. 2007 - Sep. 2007, S. 284–289, doi: [10.1109/VPPC.2007.4544139](https://doi.org/10.1109/VPPC.2007.4544139).
