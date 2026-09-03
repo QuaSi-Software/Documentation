@@ -1311,7 +1311,7 @@ As a result, the heat capacity significantly increases during the phase change, 
 
 The volume element has a mass of 1000 kg and is cooled down from 5 to -5 °C. The specific heat capacity is \( c_{soil,\ fr} = c_{soil,\ unfr} = 850 \ J/(kgK)\)  in frozen and unfrozen state with an energy of fusion of \(h_{lat} = 90 \, 000 \ J/kg \) . This results in a total energy of 27 361 Wh that is taken out of the element (54.7 W for 500 hours).
 
-### Technical description – Symbols and units
+#### Technical description – Symbols and units
 
 Symbol | Description | Unit
 -------- | -------- | --------

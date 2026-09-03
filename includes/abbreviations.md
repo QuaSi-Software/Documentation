@@ -12,6 +12,7 @@
 *[C-rate]:  Charging rate (of storage)
 *[CC]:      Compression Chiller
 *[CDT]:     Cool-Down Time 
+*[CEC]:     California Energy Commission
 *[CHPP]:    Combined Heat and Power Plant
 *[CLI]:     Command-line interface
 *[COP]:     Coefficient of Performance 
@@ -42,6 +43,7 @@
 *[JSON]:    JavaScript Object Notation [data format]
 *[K]:       Kelvin
 *[LHV]:     Lower Heating Value, also known as Net Calorific Value (NCV)
+*[MILP]:    Mixed integer linear programming
 *[MB]:      Middle Bus
 *[MOT]:     Minimum Operation Time 
 *[MT]:      Middle Transformer
