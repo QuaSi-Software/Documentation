@@ -1992,7 +1992,7 @@ Inputs can include orientation, tilt, ambient albedo, type of installation (e.g.
 
 ![Energy flow of battery](fig/221025_battery.svg)
 
-The battery component is designed to store electric energy as chemical energy. It models losses during charging and discharging as well as self-discharging if no energy exchange is happening. The component is designed to model just the battery without inverters to be flexible enough to implement it in different systems. Inverters can be modelled with the  [UTIR](resie_component_parameters/#unified-electric-transformer-inverter-and-rectifier-utir) component or with reduced efficiencies in the simplified battery model. 
+The battery component is designed to store electric energy as chemical energy. It models losses during charging and discharging as well as self-discharging if no energy exchange is happening. The component is designed to model just the battery without inverters to be flexible enough to implement it in different systems. Inverters can be modelled with the  [UTIR](resie_component_parameters.md#unified-electric-transformer-inverter-and-rectifier-utir) component or with reduced efficiencies in the simplified battery model.
 Generally the battery component has a simplified and a detailed model. The simplified model uses fixed losses and assumes the battery is a pure energy storage with only a state of charge (SOC). The detailed model on the other hand represents the specific cell chemistry with a generic model based on Song2018[^Song2018], an enhanced version of the model in Tremblay2007[^Tremblay2007] which is in itself based on Shepherd1965[^Shepherd1965].
 The losses of the battery model can optionally be made available as heat which can be integrated in the energy system as a cooling need or heat source for other components.
 
@@ -2085,10 +2085,11 @@ $$ E_{BA,max,current} = E_{BA,rated} \ (1-r_{BA,CapReduction}) ^{ n_{cycles \ pe
 $$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{BA,rated}} $$
 
 #### Assumptions and scope
-Current model assumptions and limitations are
-    - Detailed model performs best in between the values used for parametrization regarding temperature, C-rate and cycles
-    - The temperature of the cells is set to a constant value under the assumption that the whole battery is temperature regulated. This might change in the future.
-    - Calendaric aging not considered yet but only cyclic aging
+Current model assumptions and limitations are:
+
+* The detailed model performs best in between the values used for parametrization regarding temperature, C-rate and cycles
+* The temperature of the cells is set to a constant value under the assumption that the whole battery is temperature regulated. This might change in the future.
+* Calendaric aging is not considered yet, only cyclic aging
 
 [^Song2018]: D. Song, C. Sun, Q. Wang und D. Jang, "A Generic Battery Model and Its Parameter Identification," EPE, Jg. 10, Nr. 01, S. 10–27, 2018, doi: [10.4236/epe.2018.101002](https://doi.org/10.4236/epe.2018.101002).
 [^Tremblay2007]: O. Tremblay, L.-A. Dessaint und A.-I. Dekkiche, "A Generic Battery Model for the Dynamic Simulation of Hybrid Electric Vehicles," in 2007 IEEE Vehicle Power and Propulsion Conference, Arlington, TX, USA, Sep. 2007 - Sep. 2007, S. 284–289, doi: [10.1109/VPPC.2007.4544139](https://doi.org/10.1109/VPPC.2007.4544139).
