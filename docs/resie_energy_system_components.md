@@ -2072,14 +2072,6 @@ where \(t_{empty}\) is the time for which \(\int I_{dis,max} dt\) equals \(Q(I_{
 
 If the maximum and minimum SOC gets changed \(V_{cell,min}\) gets calculated accordingly by reducing finding \(t_{empty}\) for  \(\int I_{dis,max} dt\) equals \(SOC_{max} * Q(I_{dis,max}, N_{start}, T_{start})\).
 
-
-- Implementation difficulties
-    - dynamic capacity (especially current dependent) leads to unwanted behaviour in simulation
-    - Handeling of V_cell if current=0 -> ignore V_cell_last if current_last=0 || sign(current_last) != sign(current)
-    - Behaviour close to empty and full
-        - full can be charge until SOC_max @ max voltage and reducing current -> CV charging
-        - empty cuts off as soon as V_cell < V_cell_min, even if SOC > SOC_min close to realistic behaviour and considering how SOC is calculated
-
 Current maximum capacity of the battery:
 $$ E_{BA,max,current} = E_{BA,rated} \ (1-r_{BA,CapReduction}) ^{ n_{cycles \ performed}} $$
 $$ \text{with} \ n_{cycles \ performed} = \frac{\int_{start}^{current} P_{el,BA,in} dt}{E_{BA,rated}} $$
