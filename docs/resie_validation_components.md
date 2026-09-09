@@ -17,7 +17,7 @@ The 36 probes of the irregular shaped probe field were approximated using a rect
 The results showed a high sensibility to the soil parameters and the thermal borehole resistance (or the parameters required to calculate it). The different probe field configuration in EED, a double L-configuration, compared to a rectangle in ReSiE, has almost no effect on the results.
 The undisturbed ground temperature and also the temperature spread, that is assumed for the energy loading and unloading of the probe field, are also quite sensitive to the resulting average fluid temperature in the detailed model in ReSiE, as this directly affects the velocity of the fluid in the pipes and therefore the thermal resistance of the borehole. In the case study investigated, the power of the regeneration was much higher than the power of heat extraction, and therefore the temperature spread of loading had to be adjusted to meet the reality. The maximal output and input power was set very high to not limit the external energy sink and source into and out of the probe field. The thermal borehole resistance was calculated with the detailed model in ReSiE, but the simplified model with a constant thermal borehole resistance of \(0.1~W/(Km)\) shows also very good results in the comparison given the highly reduced amount of required input parameters.
 
-For a better overview, the daily averaged mean temperature within the probe field is compared between ReSiE (both simplified and detailed model), EED and the measurement data in the figure below. In the following table, the mean and the maximum absolute temperature differences are given, calculated for a timestep of one hour. Below, a line plot is comparing the daily averaged temperature of all four variants for an exemplary week.
+For a better overview, the daily averaged mean temperature within the probe field is compared between ReSiE (both simplified and detailed model), EED and the measurement data in the figure below. In the following table, the mean and the maximum absolute temperature differences are given, calculated for a time step of one hour. Below, a line plot is comparing the daily averaged temperature of all four variants for an exemplary week.
 
 | compared variants                   | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
 | ----------------------------------- | ------------------------- | ------------------------- | 
@@ -204,7 +204,7 @@ The used parameters are shown in this table:
 
 In comparison to TRNSYS ReSiE shows -3.8 % difference in produced heat. This can be largely attributed to the different model used for the diffuse irradiance which results in -6.2 % reduced diffuse irradiance and -2.9 % total irradiance in the collector plane. When the ReSiE model is run with given irradiances from TRNSYS the difference in produced heat is reduced to 0.8 %.
 If we take a more detailed look at the model behaviour in an example of three summer days in the following figures we notice two main effects. 
-The first one is, that at the start of the collector operation (first time step with flow rate >0) the ReSiE model shows a less strong dynamic reaction. The produced heat in the first time step is usually lower than TRNSYS but dropping less in the next time step. This effect might be connected to TRNSYS using subtimesteps for simulation and modelling a collector array with multiple collectors in series.
+The first one is, that at the start of the collector operation (first time step with flow rate >0) the ReSiE model shows a less strong dynamic reaction. The produced heat in the first time step is usually lower than TRNSYS but dropping less in the next time step. This effect might be connected to TRNSYS using sub time steps for simulation and modelling a collector array with multiple collectors in series.
 The second effect is that the output temperature of the ReSiE model is higher during  the middle of the day (e.g. at 30.07 12:00), which can be attributed to the difference in the diffuse irradiance model, which is visible in the second figure.
 
 ![Validation of solar thermal collector model with TRNSYS: Output temperature and produced heat of the collector](fig/validation_solar_thermal/temperatur_trnsys.png)
@@ -213,7 +213,7 @@ The second effect is that the output temperature of the ReSiE model is higher du
 
 In the next table are the mean and the maximum absolute temperature differences given for a few different cases. 
 - w/o irradiance means that the irradiance values of TRNSYS is used instead of it's own irradiance calculation. 
-- w/o operation start means that the first timestep after the start of operation is ignored.
+- w/o operation start means that the first time step after the start of operation is ignored.
 - in operation means that all values are ignored if the flow rate is 0.
 
 | compared variants               | mean abs. temp. diff. [K] | max. abs. temp. diff. [K] |
@@ -246,7 +246,7 @@ In the second step the model is validated against measurement data. For this cas
 The difference in produced heat between measurements and ReSiE is +8.5 % for ReSiE. This is a very good result, if we take into consideration the irradiance and wind speed data is wasn't available as locally measured values but only from the closest weather station. It brings a high uncertainty considering local effects on wind speed through surrounding buildings and on irradiance through clouds. Another effect to take into consideration is the difference in measuring the output temperature at the collector and the input temperature and flow rate in the building basement. This decouples the values slightly considering the long pipes running from the basement to the roof.
 
 The figure below shows 5 days in the beginning of June highlighting the differences between simulation and measurement. 
-The biggest difference can be seen when the operation is only active for one timestep for example on the 03.06 or at the beginning and end of the operation. This can be attributed to misleading measurements. The measurements are only available in 15 minute timesteps but internally the sensors create a mean value over those 15 minutes. So if the water flow is active for only 5 minutes the flow rate is reported as 1/3 over the whole timestep. The same is true for the temperature. When the water flow is active, usually fresh cold water is replacing the warmed up stale water in the pipes, which shows up as a temperature drop in the input temperature. If the water flow is active only for the last 5 minutes of a timestep the temperature is average with the higher values from the first 10 minutes, leading to a higher mean value and a wrong response from the simulation model.
+The biggest difference can be seen when the operation is only active for one time step for example on the 03.06 or at the beginning and end of the operation. This can be attributed to misleading measurements. The measurements are only available in 15 minute time steps but internally the sensors create a mean value over those 15 minutes. So if the water flow is active for only 5 minutes the flow rate is reported as 1/3 over the whole time step. The same is true for the temperature. When the water flow is active, usually fresh cold water is replacing the warmed up stale water in the pipes, which shows up as a temperature drop in the input temperature. If the water flow is active only for the last 5 minutes of a time step the temperature is average with the higher values from the first 10 minutes, leading to a higher mean value and a wrong response from the simulation model.
 
 ![Validation of solar thermal collector model with TRNSYS: Output temperature and produced heat of the collector](fig/validation_solar_thermal/temperatur_RSTV.png)
 
@@ -302,7 +302,7 @@ The measurements are from the time period from 2022-11-15 to 2025-03-31. Some co
 | CV(RMSE) 60 min | 0.70621 | 1.2587 |
 | NMBE 60 min | 1.8709 % | 11.967 % |
 
-The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity and heat input in both the original and aggregated timestep.
+The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity and heat input in both the original and aggregated time step.
 
 Of note is that in the measurements the electricity and heat inputs do not sum up to the produced heat output, with a difference of -17.14 MWh or -5.33 %. Due to losses occuring within the heat pump, it would be expected that the sum of the inputs is slightly larger than the output, but the opposite is the case here. It is generally the case that meters measuring heat transport are inherently inaccurate. Given that both the heat input and heat output meters must be assumed inaccurate, one possible explanation is that the heat input is undercounting and the heat output is overcounting. As the heat output values are used as the exact demand values for the simulation and the electricity input meter can assumed to be very accurate, the unknown margin of the energy balance equation falls entirely on the heat input. For the comparison between measurement and simulation data of the overall sums, the missing margin of 17.14 MWh has beed added to the heat input to serve as a lower bound of the unknown real value.
 
@@ -310,7 +310,7 @@ The COP data for the real heat pump is not known. For the simulation model data 
 
 ![Validation of heat pump model, case 1: COP analysis of measurements vs simulation data](fig/validation_heat_pump/case_1_cop_analysis.png)
 
-The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original timestep of 15 minutes and for aggregated values of 60 minutes. From measurements in the original timestep, not much can be infered. In the aggregated case a clearer picture emerges, as the inverse relation between COP and temperature difference is visible in the shape and density of the point cloud. Visually comparing the aggregated measurement data with the simulation data, a reasonable match can be observed. In all four plots only data points that are active and have an absolute residual of less than 0.5 were used, where "active" refers to having both non-zero electricity input and non-zero heat output, and the absolute residual is defined as \(\left| \frac{Q_{heat,in} + E_{el,in}}{Q_{heat,out}} - 1 \right|\).
+The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original time step of 15 minutes and for aggregated values of 60 minutes. From measurements in the original time step, not much can be infered. In the aggregated case a clearer picture emerges, as the inverse relation between COP and temperature difference is visible in the shape and density of the point cloud. Visually comparing the aggregated measurement data with the simulation data, a reasonable match can be observed. In all four plots only data points that are active and have an absolute residual of less than 0.5 were used, where "active" refers to having both non-zero electricity input and non-zero heat output, and the absolute residual is defined as \(\left| \frac{Q_{heat,in} + E_{el,in}}{Q_{heat,out}} - 1 \right|\).
 
 ![Validation of heat pump model, case 1: Measurements vs simulation data aggregated to daily values for the full period](fig/validation_heat_pump/case_1_daily_data_full_period.png)
 
@@ -334,9 +334,9 @@ It is assumed the documentation describes the COP for the steady-state operation
 
 **Power curve and PLF function**
 
-The documentation also describes the power curve for the thermal output power of the heat pump depending on air and demand temperatures. The influence of the demand temperature is negligible, while the source temperature is the main driver of the power curve. While the curve in the documentation shows slight non-linear behaviour, given the uncertainties it can be reasonably linearly approximated as \(\dot{Q}_{th,out} = \dot{Q}_{th,max} \cdot (0.0105769 \cdot T_{source,in} + 0.576923) \). The documentation lists \(\dot{Q}_{th,max}\) as 26 kW, however using this in the simulation leads to a significant fraction of unmet demand. This is likely caused by the measurements being based on meter values with a minimum accuracy of 1.0 kWh. Therefore the demand values in the measurements can differ up to 1.0 kWh from the actual demand during a timestep.
+The documentation also describes the power curve for the thermal output power of the heat pump depending on air and demand temperatures. The influence of the demand temperature is negligible, while the source temperature is the main driver of the power curve. While the curve in the documentation shows slight non-linear behaviour, given the uncertainties it can be reasonably linearly approximated as \(\dot{Q}_{th,out} = \dot{Q}_{th,max} \cdot (0.0105769 \cdot T_{source,in} + 0.576923) \). The documentation lists \(\dot{Q}_{th,max}\) as 26 kW, however using this in the simulation leads to a significant fraction of unmet demand. This is likely caused by the measurements being based on meter values with a minimum accuracy of 1.0 kWh. Therefore the demand values in the measurements can differ up to 1.0 kWh from the actual demand during a time step.
 
-Furthermore, the temperature values and thus the output power of the heat pump vary over a timestep and are not as constant as the simulation assumes. In addition the source temperature values were taken from a weather station, not a temperature sensor at the evaporator inlet, further increasing the inaccuracy of the calculated thermal output power. To compensate for both effects \(\dot{Q}_{th,max}\) has been assumed as 32 kW for the simulation. This results in an unmet demand of 740 kWh (0.28 %) over the entire timeframe.
+Furthermore, the temperature values and thus the output power of the heat pump vary over a time step and are not as constant as the simulation assumes. In addition the source temperature values were taken from a weather station, not a temperature sensor at the evaporator inlet, further increasing the inaccuracy of the calculated thermal output power. To compensate for both effects \(\dot{Q}_{th,max}\) has been assumed as 32 kW for the simulation. This results in an unmet demand of 740 kWh (0.28 %) over the entire timeframe.
 
 Because the heat pump is modelled as on-off control, based on the documentation, the simulation requires choosing a PLF function to model the cycling losses incurred by the heat pump repeatedly switching on and off when the demand is less than the full available power. This is not a real technical effect and is a model assumption, therefore there is no data in the documentation to serve as a basis. An attempt to determine a PLF function from measurements was done and is described in the following. In the results section for case 2 the limitations of this approach are described.
 
@@ -359,7 +359,7 @@ This section discusses the results of a manually determined parameter fit. The f
 
 ![Validation of heat pump model, case 2: Scatter plot of COP vs temperature difference for both measurements and simulation in both 15 min and 60 min time steps](fig/validation_heat_pump/case_2_cop_analysis.png)
 
-The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original timestep of 15 minutes and for aggregated values of 60 minutes. In all four plots only active data values were used. All four plots clearly show the expected behaviour, in that a higher temperature difference leads to a lower COP. Banding effects are visible in both measurements and simulation data for the 15 minute timestep. One known cause of this is the heat demand being measured in discrete values, leading to discrete PLR values and reduction through the PLF. When the PLF is simulated as being constant, the banding in the simulation data is reduced significantly. Another possible cause is the condenser outlet temperatures being clustered around two typical ranges, one for the underfloor heating demand and one for the DHW demand, while the air temperature varies independently of that. This leads to banding when the varying air temperature values trace two different paths over the COP field data for the relatively constant output temperatures. Overall, a visual comparison of the measurements and simulation data suggests a reasonable match between them.
+The figure above shows the values of COP over temperature difference for both measurement and simulation data, both for the original time step of 15 minutes and for aggregated values of 60 minutes. In all four plots only active data values were used. All four plots clearly show the expected behaviour, in that a higher temperature difference leads to a lower COP. Banding effects are visible in both measurements and simulation data for the 15 minute time step. One known cause of this is the heat demand being measured in discrete values, leading to discrete PLR values and reduction through the PLF. When the PLF is simulated as being constant, the banding in the simulation data is reduced significantly. Another possible cause is the condenser outlet temperatures being clustered around two typical ranges, one for the underfloor heating demand and one for the DHW demand, while the air temperature varies independently of that. This leads to banding when the varying air temperature values trace two different paths over the COP field data for the relatively constant output temperatures. Overall, a visual comparison of the measurements and simulation data suggests a reasonable match between them.
 
 |  | Electricity [MWh] | Heat input [MWh] | Heat output [MWh] | Losses [MWh]
 | --------- | --- | --- | --- | --- |
@@ -377,7 +377,7 @@ The figure above shows the values of COP over temperature difference for both me
 | CV(RMSE) 1 d | 7.7609e-2 | 4.6876e-3 |
 | NMBE 1 d | -1.8938 % | -0.27117 % |
 
-The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity input and heat output in timesteps of 15 minutes, 60 minutes and one day.
+The first part of the table above show the values of inputs and outputs summed up over the entire time period. The second part lists the coefficient of variation (CV) of the root mean square error (RMSE) and the normalized mean bias error (NMBE) for both electricity input and heat output in time steps of 15 minutes, 60 minutes and one day.
 
 For reasons mentioned in the section on the power curve there is an unmet demand of 740 kWh or 0.28 %. The electricity input is 1.89 % lower than in the measurements. This number can be reduced close to zero by fine-tuning the scaling factor for the COP field data, which was not done as it provides no additional information on the validity of the model. This becomes much clearer when the data sets are compared time-resolved, as described in the following.
 
@@ -538,3 +538,74 @@ Overall, ReSiE is fully in line with the other simulation environments for typic
 [^IEA_ES_39]: International Energy Agency - Energy Storage - Task 39:  Large Thermal Energy Storages for District Heating.  Website: [https://iea-es.org/task-39/](https://iea-es.org/task-39/)
 
 [^IEA_ES_39_Testcases]: Wim van Helden et al.: IEA ES Task 39 - Large Thermal Energy Storages for District Heating. Subtask C: Round Robin Simulations. Deliverable C2a: Modelling guidelines - Round robin test case description (for comparative simulations). 2024. Available at [https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf](https://iea-es.org/task-39/wp-content/uploads/sites/21/IEA-ES_Task39_WPC_Deliverable_C2a_Modelling_guidelines-Round_robin_test_case_description.pdf)
+
+
+## Battery
+To validate the battery model two comparisons were choosen. One is the battery model implemented in the System Advisor Model&trade; (SAM&trade;) by the National Laboratory of the Rockies (NLR) and the second comparison is to measurements from the M5BAT[^M5BAT_Webside] project. For the validation a Lithium Iron Phosphate (LFP) cell is chosen and the battery parameters are taken from the M5BAT LFP battery model, while the specific cell parameters are left to the default LFP parameters for ReSiE and SAM&trade;.
+The comparison to SAM&trade; was chosen since it uses a very similar model, which is based on Tremblay2007[^Tremblay2007], but calculates the effects of cyclic aging in a different way.
+For measurement data from M5BAT the data from Koltermann2024[^Koltermann2024] is used which covers the whole month of April in 2023 with a resolution of one second.
+The ReSiE model uses the model_type `Li-LFP` which sets the cell parameters as described in the following table.
+
+| Parameter                      | Value ReSiE |
+| ----------------------------- | ---------------- |
+| `V_n` |  3.2 V |
+| `r_i` | 0.00016 \(\varOmega\) |
+| `V_0` | 3.36964 V |
+| `K` | 0.03546 V |
+| `A` | 0.08165 V |
+| `B` | 0.1003 1/(Ah) |
+| `capacity_cell_Ah` | 1090 Ah |
+| `m` | 1.0269 |
+| `alpha` | -0.01212 |
+| `k_qn` | [-1.27571e-7, 1.22095e-11] |
+| `k_qT` | [1.32729e-3, -7.9763e-6] |
+| `k_n` | [9.71249e-6, 7.51635e-4, -8.59363e-5, -2.92489e-4] |
+| `k_T` | [1.05135e-3, 1.83721e-2, -7.72438e-3, -4.31833e-2] |
+| `I_ref` | 100 A |
+| `T_ref` | 25 °C |
+
+To compare the models, the charging and discharging power from the measurement data is taken and set as fixed input / output for the two models. If the energy can't be added to the battery because of model limitations (e.g. battery is full/empty), the unusable power is ignored. 
+
+The sizing of the battery is taken from Koltermann2024[^Koltermann2024], which gives two values of the capacity of 738 kWh and 923 kWh, which are assumed to be the usable and total capacity, where the usable capacity is limited from 10 % to 90 % of the total capacity. For the models the total capacity is used. All SOC values are recalcuated in relation to the usable capacity of 738 kWh since the SOC for the measurement is related to that value.
+
+Another issue with measurement data of batteries is that they often have jumps in the SOC even if no energy is added or removed. This change in SOC is done to correct for errors that occur in between SOC calculation and expected voltages. Since this effect is not present in the models we need to make clear how to handle those SOC jumps. For this validation two approaches are used. One is not to do any correction and use the values as is, which is labeled just as \(SOC\). The second approach is to take the SOC jumps and distribute the difference across the time range between now and the last SOC jump. This is based on the assumption that the SOC jump is caused by errors in the calculation in previous time steps. The distribution is weighted by the absolute power added or removed. This adjusted SOC is labeled as \(SOC_{adj}\).
+
+While the SOC is an easy to grasp value, it is flawed for comparison since the actual charge that a battery has can vary heavily with different C-rates, temperatures and aging. The SOC usually just gives an estimate of the available charge of the battery. While the SOC is used in the following comparison, the cell voltage \(V_{cell}\) is the better estimate of model quality, since it also heavily influences the efficiency.
+
+Additionally, need the battery temperature and the charge cycles, that the battery already experienced, is required. It was possible to estimate the charge cycles from other publications of M5BAT as 769 between June 2017 and April 2024. It is assumed to also relate to the usable capacity, which means for ReSiE it will be set to 769 * 80 % = 615 cycles. The battery temperature wasn't available from the measurement data and since ReSiE currently only supports a constant temperature, the temperature was varied to get a good fit to the measurement. A value of 35 °C seems to get good results, while being in a realistic range. The tests also showed a high impact of the temperature on the model results, so it should be chosen carefully.
+
+In the first step ReSiE was run with a time step of one second to show the behaviour if all the peaks and fast changes are present in the data. Additionally ReSiE and SAM&trade; were run with 5 minutes, 15 minutes and 1 hour time steps to show the behaviour in a more realistic use case.
+In the table below you can see the results for the comparison of ReSiE and the measurement data. It shows the mean error (ME) for the cell voltage \(V_{cell}\) and the \(SOC_{adj}\) during operation as well as the difference in round trip efficiency \(\eta_{rte}\) between two points with the same SOC_{adj} at the beginning and the end of the month.
+
+| time step | ME \(V_{cell}\)  | ME \(SOC_{adj}\)  | \(\eta_{rte,M5BAT}\) - \(\eta_{rte,ReSiE}\) |
+| --------- | --- | --- | --- |
+| 1 s | 0.0316 V | 5.52 %pt. | 0.558 %pt. |
+| 1 min | 0.0341 V | 4.62 %pt. | 0.18 %pt. |
+| 5 min | 0.0413 V | 5.70 %pt. | 0.142 %pt. |
+| 15 min | 0.0459 V | 8.40 %pt. | -1.83 %pt. |
+| 1 h |0.0466 V | 10.94 %pt. | -1.57 %pt. |
+
+The results show a good agreement between the ReSiE model and the measurement data. The error increases with bigger time steps. This is to be expected since the measurement data has a lot of variation of charging and discharging every second. With bigger time steps those variations get smoothed out and some less efficient power peaks get replaced by a lower more efficient average power. At the same time the model is not designed to show effects that happen on a second or even subsecond scale. So while the general behaviour of the model is good, it wasn't designed to run with a time step of 1 s. We suspect the slight smoothing effect might explain the improvement of the model performance at the time step of 1 min.
+While a smaller time step is beneficial to model performance, it still performs well enough even at a time step of 1 h to be usable. This is especially true if the use case is a more consistent charging and discharging profile with fewer fluctuations. Another reason for discrepancies between measurements and ReSiE could be the use of a constant temperature. In reality the temperatures of the cells are changing even if they are temperature controlled. This might be improved in future versions of ReSiE.
+
+In the figure below you can see the comparison between ReSiE and the measurement data at a 1 second time step. On the left axis is the \(SOC\) and on the right axis \(V_{cell}\). It can be clearly seen how much variance there is in the charging and discharging power, leading to many fluctuations in the cell voltage. ReSiE is able to follow that quite closely. It is also visible that the voltage relaxation is not modeled in ReSiE (e.g. after 03.04.2023 12:15). In ReSiE the voltage immediately becomes stable after the power goes to 0, compared to the measurement data, where the voltage slowly falls off. Since this happens only during times without charging or discharging power, it doesn't have much impact on the battery efficiency.
+
+![Comparison of the battery model with measurement data at a time step of 1 second](fig/validation_battery/260904_battery_soc_vcell_1s.svg)
+
+For the comparison with SAM&trade; the values for \(V_{cell}\) will be ignored, since they are significantly higher than in ReSiE or the measurements. The assumption is that those values might represent Open-Circuit-Voltage (OCV) instead of actual cell voltage.
+
+| time step | ME M5BAT SAM \(SOC_{adj}\) | ME ReSiE SAM \(SOC_{adj}\) | \(\eta_{rte,M5BAT}\) - \(\eta_{rte,SAM}\) | \(\eta_{rte,ReSiE}\) - \(\eta_{rte,SAM}\) |
+| --------- | --- | --- | --- | --- |
+| 5 min | 11.6 %pt. | 6.97 %pt. | -1.32 %pt. | -1.46 %pt. |
+| 15 min | 11.5 %pt. | 3.25 %pt. | -2.53 %pt. | -0.81 %pt. |
+| 1 h | 11.7 %pt. | 0.78 %pt. | -1.55 %pt. | 0.013 %pt. |
+
+The results show that SAM&trade; has a worse performance compared to ReSiE while being overall more consistent between different time steps. This can be attributed to the current-dependent capacity in ReSiE which has a greater impact at smaller time steps with higher variability in the charging and discharging power. At a time step of 1 h the two models perform almost identical, even though each model uses its own parameters for the LFP cell chemistry. This shows that the impact of differences in specific cells is negligible and as long as the right general chemistry is selected.
+
+The figure below shows the comparison for the 15 min time step for the \(SOC_{adj}\).
+
+![Comparison of the battery model with SAM and measurement data for the SOC at a time step of 15 minutes](fig/validation_battery/260904_battery_soc_15min.svg)
+
+[^M5BAT_Webside]: [https://battery-charts.de/de/m5bat-de/](https://battery-charts.de/de/m5bat-de/)
+[^Tremblay2007]: O. Tremblay, L.-A. Dessaint und A.-I. Dekkiche, "A Generic Battery Model for the Dynamic Simulation of Hybrid Electric Vehicles," in 2007 IEEE Vehicle Power and Propulsion Conference, Arlington, TX, USA, Sep. 2007 - Sep. 2007, S. 284–289, doi: [10.1109/VPPC.2007.4544139](https://doi.org/10.1109/VPPC.2007.4544139).
+[^Koltermann2024]: L. Koltermann, M. E. Celi Cortés, S. Zurmühlen, J. van Ouwerkerk und D. U. Sauer, "M5BAT Large-Scale Battery Storage System Dataset: Evaluation Operation Report 04/2023," 2024, doi: 10.18154/RWTH-2024-04895.
