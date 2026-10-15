@@ -458,7 +458,7 @@ Optimisation can additionally use multiple separate objectives. This is describe
 
 ### Definition of parameters to be changed
 
-The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value.
+The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value. For integer parameters, non-integer values generated from ranges or proposed by optimisation algorithms are rounded to the nearest valid integer. Explicitly specified values, however, must already be valid integers.
 
 Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`. See also the example below:
 
@@ -650,6 +650,8 @@ Multi-objective optimisation is supported only by compatible optimisation algori
 ### Sensitivity analysis
 
 Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together. For details of the method and how to interpret the results, see [this chapter](optimisation_and_sensitivity.md#sensitivity-analysis)
+
+During sensitivity analysis, integer parameters are varied using whole-number steps. Consequently, the actual relative variation may differ from the requested percentage (e.g., ±10%). The sensitivity plots and CSV results show the actual parameter values and relative changes used in the simulations.
 
 #### Global sensitivity
 
