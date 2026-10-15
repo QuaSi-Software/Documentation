@@ -265,7 +265,7 @@ To plot the weather data read in from a provided weather file to the interactive
 "simulation_parameters": {
     "start": "01.01.2024 00:00",
     "end": "31.12.2024 23:00",
-    "start_end_unit": "dd.mm.yyyy HH:MM",
+    "start_date_format": "dd.mm.yyyy HH:MM",
     "time_step": 60,
     "time_step_unit": "minutes",
     "__OPTIONAL PARAMETER__": "",
@@ -284,7 +284,7 @@ To plot the weather data read in from a provided weather file to the interactive
 * `start` (`String`): Start time of the simulation as datetime format. 
 * `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are printed. The energies in the various output files are starting at the time specified in `start_output`.
 * `end` (`String`): End time (inclusive) of the simulation as datetime format. Will be rounded down to the nearest multiple of the time step.
-* `start_end_unit` (`String`): Datetime format specifier for parameters `start`, `start_output` and `end`.
+* `start_date_format` (`String`): Datetime format specifier for parameters `start`, `start_output` and `end`.
 * `time_step` (`Integer`, optional): Time step for the simulation. The parameter `time_step_unit` determines what the value in `time_step` means. Defaults to 900.
 * `time_step_unit` (`String`, optional): Unit for the value given in parameter `time_step`. Has to be one of: `seconds`, `minutes`, `hours`. Defaults to `seconds`.
 * `weather_file_path` (`String`, optional): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
