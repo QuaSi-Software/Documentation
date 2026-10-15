@@ -417,6 +417,7 @@ The following objective categories and parameters are available:
 | `emissions` | Uses results from the emissions calculation.                                | `total_emissions`<br>`emissions_energies`<br>`embodied_emissions`                                               |
 | `sum`       | Uses the sum of the selected simulation output<br>over the simulation period.  | Depends on the selected simulation output.                                                                      |
 | `mean`      | Uses the mean of the selected simulation output<br>over the simulation period. | Depends on the selected simulation output.                                                                      |
+| `last`      | Uses the last value of the selected simulation output<br>at the end of the simulation period. | Depends on the selected simulation output.                                                                      |
 
 For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`. With `sum`, all objective parameters are added together and the resulting value is minimised. With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
 
