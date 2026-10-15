@@ -2358,6 +2358,8 @@ If a `g_function_file_path` is specified, the following parameters are not used 
 | `unloading_temperature_spread` | `Float` | Y/Y | 3 | [K] | temperature spread between forward and return flow during unloading |
 | `soil_undisturbed_ground_temperature` | `Float` | Y/Y | 11 | [°C] | undisturbed ground temperature as average over the depth of the probe, considered as constant over time |
 | `boreholewall_start_temperature` | `Float` | Y/Y | 4 | [°C] | borehole wall starting temperature |
+| `use_load_aggregation` | `Bool` | Y/Y | true | [-] | Use Claesson-Javed load aggregation for the temporal superposition of the g-function. This makes the simulation significantly faster. The resulting deviations from full temporal superposition depend on 'load_aggregation_cells_per_level'.  |
+| `load_aggregation_cells_per_level` | `Int` | Y/Y | 200  | [-] | Number of aggregation cells per level for the Claesson-Javed load aggregation. Higher values increase the temporal resolution of the load history and improve agreement with full temporal superposition, at the cost of additional computation time. For faster simulations, use values around 20. The default of 200 is a good compromise between computational speed and accuracy.  |
 | `limit_max_output_energy_to_avoid_pulsing` | `Bool` | Y/Y | false | [-] | Bool that specifies whether an attempt should be made to avoid pulsing when calculating the output energy in a time step. See section "Control" below for more information! |
 
 **Parameter for simple model only**
