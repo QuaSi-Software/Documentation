@@ -390,9 +390,9 @@ Can be given a profile for the maximum power it can take in, which is scaled by 
 | `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the input to the ambient air temperature of the weather file. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -462,9 +462,9 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the output to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the output to the ambient air temperature of the weather file. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -557,12 +557,12 @@ The profile values can also be treated as volume flow. Then, a density and therm
 | `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the input to the ambient air temperature of the weather file. |
 | `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant demand, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
 | `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 | `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -647,12 +647,12 @@ The profile values can also be treated as volume flow. Then, a density and therm
 | `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the energy profile values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°c] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°c] | If given, sets the temperature of the output to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the output to the ambient air temperature of the weather file. |
 | `treat_profile_as_volume_flow_in_qm_per_hour` | `Bool` | N/Y | `false` | [-] | If set to true, the value given in the profile will be treated as volume flow in m^3/h . ONLY for profiles, not for constant supply, and only if a STES is directly connected! If given, `rho_medium` and `cp_medium` have to be given as well. | 
 | `rho_medium` | `Float` | N/N | 1000.0 | [kg/m^3] | Density of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 | `cp_medium` | `Float` | N/N | 4180.0 | [J/(kgK)] | Specific heat capacity of the medium, only required if `treat_profile_as_volume_flow_in_qm_per_hour` is activated. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -723,9 +723,9 @@ Used as a source with no limit, which gives off energy from outside the system b
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the output temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the output to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the output to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the output to the ambient air temperature of the weather file. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -791,9 +791,9 @@ Used as a sink with no limit, which receives energy and removes it from the syst
 | ----------- | ------- | --- | ------------------------ | ------ | ------------------------ |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 12.0 | [°C] | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [°C] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true, sets the temperature of the input to the ambient air temperature of the weather file. |
 
-Note that either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` (or none of them) should be given!
+Note that either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` (or none of them) should be given!
 
 **Parameter for economic calculation**
 
@@ -1758,9 +1758,9 @@ Note that no losses are applied when the storage is completely empty, meaning at
 | `ground_temperature` | `Temperature` | Y/Y | 12.0 | [°C] | constant ground temperature, to calculate losses through the bottom of the tank, for model_type `ideally_mixed` only |
 | `ambient_temperature_profile_file_path` | `String` | N/N | `profiles/district/ambient_temperature.prf` | [°C] | path to the profile for the surrounding air temperature |
 | OR: `constant_ambient_temperature` | `Temperature` | N/N | 18.0 | [°C] | if given, sets the surrounding air temperature to a constant value |
-| OR: `ambient_temperature_from_global_file` | `String` | N/N | ` temp_ambient_air` | [-] | if given, sets the surrounding air temperature to the ambient air temperature of the global weather file |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | if true, use the ambient air temperature of the weather file as the surrounding air temperature |
 
-Note that either `ambient_temperature_profile_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `use_ambient_temperature_from_weather_file` should be given!
 
 **Parameter for economic calculation**
 
@@ -1907,14 +1907,14 @@ A note on the 3D-model of the geometry: The current Plotly version used to creat
 | `thermal_transmission_bottom` | `Float` | Y/Y | 0.375 | [W/(m²·K)] | effective U-value through the base (always to the ground) |
 | `ambient_temperature_profile_file_path` | `String` | Y/N | `profiles/ambient_temperature.prf` | [°C] | ambient temperature time series profile (choose only one ambient option) |
 | OR: `constant_ambient_temperature` | `Temperature` | Y/N | 18.0 | [°C] | constant ambient temperature (choose only one ambient option) |
-| OR: `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | ambient dry-bulb temperature from the global weather file (choose only one ambient option) |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, use the ambient dry-bulb temperature from the weather file (choose only one ambient option) |
 | `ground_temperature_profile_file_path` | `String` | Y/N | `profiles/ground_temperature.prf` | [°C] | ground temperature profile (used by `simplified` and as reference/deep boundary temperature in `FVM` ground model) |
 | OR: `constant_ground_temperature` | `Temperature` | Y/N | 10.0 | [°C] | constant ground temperature (same usage as above) |
 | `output_layer_from_top` | `Int` | Y/Y | 1 | [-] | layer index for extraction, counted from the top (1 = topmost layer) |
 | `reproduce_IEA_ES_Task39` | `String` | N/N | `PTES-1-UG` | [-] | optional compatibility mode for IEA ES Task 39 cases (enables additional outputs and set constant temperature of 30°C for input flow during discharge). Can be one of `PTES-1-C`, `PTES-1-P`, `TTES-1-AG`, `TTES-1-UG` corresponding to the test cases.|
 
 
-Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `ambient_temperature_from_global_file` should be given!
+Note that either `ambient_temperature_profile_file_path`, `constant_ambient_temperature` **or** `use_ambient_temperature_from_weather_file` should be given!
 Also either `ground_temperature_profile_file_path` **or** `constant_ground_temperature` should be given!
 
 **Ground coupling model `FVM` (only if `ground_model="FVM"`)**
@@ -1992,7 +1992,7 @@ Higher accuracy increases the number of ground cells (especially near the wall a
     "output_refs": ["TST_DEM_01"],		
     "volume": 50000,
     "initial_load": 0.0,
-    "ambient_temperature_from_global_file": "temp_ambient_air",
+    "use_ambient_temperature_from_weather_file": true,
     "constant_ground_temperature": 10.0,
     "___GEOMETRY_AND_PHYSICS___": "",
     "hr_ratio": 0.55,
@@ -2066,7 +2066,7 @@ The mathematical description of the generic heat source is provided [here](resie
 
 A generic heat source for various sources of heat.
 
-Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `temperature_from_global_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
+Can be given a profile for the maximum power it can provide, which is scaled by the given scale factor. For the temperature either `temperature_profile_file_path`, `constant_temperature` **or** `use_ambient_temperature_from_weather_file` **must** be given! The given temperature is considered the input source temperature and an optional reduction is applied (compare with [model description](resie_energy_system_components.md#generic-heat-source)). If the `lmtd` model is used and no min/max temperatures are given, tries to read them from the given profile.
 
 **General parameter**
 
@@ -2077,7 +2077,7 @@ Can be given a profile for the maximum power it can provide, which is scaled by 
 | `scale` | `Float` | N/Y | 1.0 | [-] | Factor by which the max power values are multiplied. Only applies to profiles. |
 | `temperature_profile_file_path` | `String` | N/N | `profiles/district/temperature.prf` | [°C] | Path to the profile for the input temperature. |
 | OR: `constant_temperature` | `Temperature` | N/N | 65.0 | [°C] | If given, sets the temperature of the input to a constant value. |
-| OR: `temperature_from_global_file` | `String` | N/N | `temp_ambient_air` | [-] | If given, sets the temperature of the input to the ambient air temperature of the global weather file. |
+| OR: `use_ambient_temperature_from_weather_file` | `Bool` | N/N | `false` | [-] | If set to true,  the temperature is set to the ambient air temperature of the weather file. |
 | `temperature_reduction_model` | `String` | Y/Y | `none` | [-] | Which temperature reduction model is used. Should be one of: `none`, `constant`, `lmtd` |
 | `min_source_in_temperature` | `Float` | N/N | -10.0 | [°C] | Minimum source input temperature. |
 | `max_source_in_temperature` | `Float` | N/N | 40.0 | [°C] | Maximum source input temperature. |
@@ -2534,15 +2534,15 @@ In theory, the model of the geothermal collector could also be used to simulate 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | --- | ------------------------ | ------------------------ |
 | `model_type` | `String` | Y/Y | `simplified` | [-] | type of collector model: "simplified" with constant or "detailed" with calculated thermal resistance (fluid -> pipe) in every time step. |
-| `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_profile_file_path or constant_temperature) |
-| OR: `ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or temperature_from_global_file or constant_temperature)  |
-| OR: `constant_ambient_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or temperature_from_global_file or temperature_profile_file_path)  |
-| `global_solar_radiation_from_global_file` | `String` | Y/N | `globHorIrr` | [W/m²] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
-| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or constant_global_solar_radiation)  |
-| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m²] | constant value for global solar horizontal radiation (provide either this or global_solar_radiation_from_global_file or global_solar_radiation_profile_file_path)  |
-| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | [W/m²] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
-| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation)  |
-| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m²] | constant value for infrared sky radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path)  |
+| `use_ambient_temperature_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the ambient dry bulb temperature is taken from the weather file (provide either this or ambient_temperature_profile_file_path or constant_ambient_temperature) |
+| OR: `ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or use_ambient_temperature_from_weather_file or constant_ambient_temperature)  |
+| OR: `constant_ambient_temperature` | `Float` | Y/N | 13 | [°C] | constant value for ambient dry bulb temperature (provide either this or use_ambient_temperature_from_weather_file or ambient_temperature_profile_file_path)  |
+| `use_global_solar_radiation_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the global solar radiation is taken from the weather file (provide either this or global_solar_radiation_profile_file_path or constant_global_solar_radiation) |
+| OR: `global_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for global solar horizontal radiation (provide either this or use_global_solar_radiation_from_weather_file or constant_global_solar_radiation)  |
+| OR: `constant_global_solar_radiation` | `Float` | Y/N | 400 | [W/m²] | constant value for global solar horizontal radiation (provide either this or use_global_solar_radiation_from_weather_file or global_solar_radiation_profile_file_path)  |
+| `use_infrared_sky_radiation_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the infrared sky radiation is taken from the weather file (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR: `infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for infrared sky radiation (provide either this or use_infrared_sky_radiation_from_weather_file or constant_infrared_sky_radiation)  |
+| OR: `constant_infrared_sky_radiation` | `Float` | Y/N | 500 | [W/m²] | constant value for infrared sky radiation (provide either this or use_infrared_sky_radiation_from_weather_file or infrared_sky_radiation_profile_file_path)  |
 | `accuracy_mode` | `String` | Y/Y | `normal` | [-] | can be one of: `very_rough`, `rough`, `normal`, `high`, `very_high`. Note that `very_rough` can have significant errors compared to higher resolution while `very_high` requires significant computational effort!  |
 | `max_picard_iter` | `Int` | Y/Y | 3 | [-] | maximum number of iterations during implicit solving to find correct temperature-dependent thermal conductivity of the soil |
 | `picard_tol` | `Float` | Y/Y | 1e-3 | [K] | tolerance for picard iteration: absolute temperature difference between two iterations |
@@ -2631,9 +2631,9 @@ To perform this calculation in every timestep, the following input parameters ar
     "output_refs": ["TST_DEM_01"],
     "model_type": "detailed",
     "___GENERAL PARAMETER___": "",
-    "ambient_temperature_from_global_file": "temp_ambient_air",
-    "global_solar_radiation_from_global_file": "globHorIrr",
-    "infrared_sky_radiation_from_global_file": "longWaveIrr",
+    "use_ambient_temperature_from_weather_file": true,
+    "use_global_solar_radiation_from_weather_file": true,
+    "use_infrared_sky_radiation_from_weather_file": true,
     "accuracy_mode": "normal",
     "regeneration": false,
     "max_output_power": 25,
@@ -2710,36 +2710,36 @@ Solarthermal collector producing heat depending on weather conditions. The colle
 
 | Name | Type | R/D | Example | Unit | Description |
 | ----------- | ------- | --- | ---|--------------------- | ------------------------ |
-| `ambient_temperature_from_global_file` | `String` | Y/N | `temp_ambient_air` | W/m² | profile for ambient dry bulb temperature (provide either this or ambient_temperature_profile_file_path or constant_temperature) |
-| OR:`ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for ambient dry bulb temperature (provide either this or ambient_temperature_from_global_file or constant_temperature) |
-| OR:`constant_ambient_temperature` | `Float` | Y/N | 10.0 | W/m² | constant value for ambient dry bulb temperature (provide either this or ambient_temperature_from_global_file or ambient_temperature_profile_file_path) |
-| `beam_solar_radiation_from_global_file` | `String` | Y/N | `beamHorIrr` | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_profile_file_path or constant_beam_solar_radiation) |
-| OR:`beam_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_from_global_file or constant_beam_solar_radiation) |
-| OR:`constant_beam_solar_radiation` | `Float` | Y/N | 850.0 | W/m² | profile for beam solar horizontal radiation (provide either this or beam_solar_radiation_from_global_file or beam_solar_radiation_profile_file_path) |
-| `diffuse_solar_radiation_from_global_file` | `String` | Y/N | `difHorIrr` | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_profile_file_path or constant_diffuse_solar_radiation) |
-| OR:`diffuse_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_from_global_file or constant_diffuse_solar_radiation) |
-| OR:`constant_diffuse_solar_radiation` | `Float` | Y/N | 150.0 | W/m² | profile for diffuse solar horizontal radiation (provide either this or diffuse_solar_radiation_from_global_file or diffuse_solar_radiation_profile_file_path) |
-| `infrared_sky_radiation_from_global_file` | `String` | Y/N | `longWaveIrr` | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
-| OR:`infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or constant_infrared_sky_radiation) |
-| OR:`constant_infrared_sky_radiation` | `Float` | Y/N | 350.0 | W/m² | profile for long wave solar radiation (provide either this or infrared_sky_radiation_from_global_file or infrared_sky_radiation_profile_file_path) |
-| `wind_speed_from_global_file` | `String` | Y/N | `wind_speed` | m/s | profile for wind speed (provide either this or wind_speed_file_path or constant_wind_speed) |
-| OR:`wind_speed_profile_file_path` | `String` | Y/N | `path/to/file` | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or constant_wind_speed) |
-| OR:`constant_wind_speed` | `Float` | Y/N | 5.2 | m/s | profile for wind speed (provide either this or wind_speed_from_global_file or wind_speed_file_path) |
-| `collector_gross_area` | `Float` | Y/N | 40.0 | m² | Gross area of the solarthermal collector |
-| `tilt_angle` | `Float` | Y/N | 30 | ° | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
-| `azimuth_angle` | `Float` | Y/N | 90 | ° | Azimuth angle or orientation of the collector between -180 and 180° with 0°=south, -90°=east, 90°=west. 
-| `ground_reflectance` | `Float` | Y/Y | 0.2 | m² | Reflectance of the ground around the collector which can be approximated by the albedo of the ground |
-| `eta_0_b` | `Float` | Y/N | 0.734 | - | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\). A good source for values is the solar keymark database[^SolarKeymark] |
-| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
-| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | - | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
-| `K_d` | `Float` | Y/N | 0.97 | - | Incidence angle modifier for diffuse irradiance. A good source for values is the solar keymark database[^SolarKeymark]|
+| `use_ambient_temperature_from_weather_file` | `Bool` | Y/N | false | [-] | if true, the ambient dry bulb temperature is taken from the weather file (provide either this or ambient_temperature_profile_file_path or constant_ambient_temperature) |
+| OR:`ambient_temperature_profile_file_path` | `String` | Y/N | `path/to/file` | [°C] | profile for ambient dry bulb temperature (provide either this or use_ambient_temperature_from_weather_file or constant_ambient_temperature) |
+| OR:`constant_ambient_temperature` | `Float` | Y/N | 10.0 | [°C] | constant value for ambient dry bulb temperature (provide either this or use_ambient_temperature_from_weather_file or ambient_temperature_profile_file_path) |
+| `use_beam_solar_radiation_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the beam solar radiation is taken from the weather file (provide either this or beam_solar_radiation_profile_file_path or constant_beam_solar_radiation) |
+| OR:`beam_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for beam solar horizontal radiation (provide either this or use_beam_solar_radiation_from_weather_file or constant_beam_solar_radiation) |
+| OR:`constant_beam_solar_radiation` | `Float` | Y/N | 850.0 | [W/m²] | profile for beam solar horizontal radiation (provide either this or use_beam_solar_radiation_from_weather_file or beam_solar_radiation_profile_file_path) |
+| `use_diffuse_solar_radiation_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the diffuse solar radiation is taken from the weather file (provide either this or diffuse_solar_radiation_profile_file_path or constant_diffuse_solar_radiation) |
+| OR:`diffuse_solar_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for diffuse solar horizontal radiation (provide either this or use_diffuse_solar_radiation_from_weather_file or constant_diffuse_solar_radiation) |
+| OR:`constant_diffuse_solar_radiation` | `Float` | Y/N | 150.0 | [W/m²] | profile for diffuse solar horizontal radiation (provide either this or use_diffuse_solar_radiation_from_weather_file or diffuse_solar_radiation_profile_file_path) |
+| `use_infrared_sky_radiation_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the infrared sky radiation is taken from the weather file (provide either this or infrared_sky_radiation_profile_file_path or constant_infrared_sky_radiation) |
+| OR:`infrared_sky_radiation_profile_file_path` | `String` | Y/N | `path/to/file` | [W/m²] | profile for long wave solar radiation (provide either this or use_infrared_sky_radiation_from_weather_file or constant_infrared_sky_radiation) |
+| OR:`constant_infrared_sky_radiation` | `Float` | Y/N | 350.0 | [W/m²] | profile for long wave solar radiation (provide either this or use_infrared_sky_radiation_from_weather_file or infrared_sky_radiation_profile_file_path) |
+| `use_wind_speed_from_weather_file` | `Bool` | Y/N | `false` | [-] | if true, the wind speed is taken from the weather file (provide either this or wind_speed_profile_file_path or constant_wind_speed) |
+| OR:`wind_speed_profile_file_path` | `String` | Y/N | `path/to/file` | [m/s] | profile for wind speed (provide either this or use_wind_speed_from_weather_file or constant_wind_speed) |
+| OR:`constant_wind_speed` | `Float` | Y/N | 5.2 | [m/s] | profile for wind speed (provide either this or use_wind_speed_from_weather_file or wind_speed_profile_file_path) |
+| `collector_gross_area` | `Float` | Y/N | 40.0 | [m²] | Gross area of the solarthermal collector |
+| `tilt_angle` | `Float` | Y/N | 30 | [°] | Tilt angle of the collector between 0° and 90° with 0°=horizontal and 90°=vertical. |
+| `azimuth_angle` | `Float` | Y/N | 90 | [°] | Azimuth angle or orientation of the collector between -180 and 180° with 0°=south, -90°=east, 90°=west. 
+| `ground_reflectance` | `Float` | Y/Y | 0.2 | [m²] | Reflectance of the ground around the collector which can be approximated by the albedo of the ground |
+| `eta_0_b` | `Float` | Y/N | 0.734 | [-] | zero-loss efficiency at \((\vartheta_{\text{m}} - \vartheta_{\text{a}})=0\)K based on the beam solar irradiance \(G_{\text{b}}\). A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_b_t_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] | [-] | Array with the transversal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_b_l_array` | `Array` | Y/N | [1.00, 1.00, 0.99, 0.98, 0.96, 0.89, 0.71, 0.36, 0.00] |[ -] | Array with the longitudinal incidence angle modifier values from 10° to 90°. If a value is not known null can be used instead and the value will be interpolated. A good source for values is the solar keymark database[^SolarKeymark] |
+| `K_d` | `Float` | Y/N | 0.97 | [-] | Incidence angle modifier for diffuse irradiance. A good source for values is the solar keymark database[^SolarKeymark]|
 | `a_params` | `Array` | Y/N | [3.96, 0.011, 0.000, 0.00, 11450, 0.000, 0.00, 0.0] | [W/m, W/(m²K²), J/(m³K), -, J/(m²K), s/m, W/(m²K<sup>4</sup>), W/(m²K<sup>4</sup>)] | Parameters that define the solarthermal collector according to DIN EN ISO 9806:2017[^ISO9806]. A good source for values is the solar keymark database[^SolarKeymark]  |
-| `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | J/(m³K) | Volumetric heat capacity of the fluid in the collector. |
-| `wind_speed_reduction` | `Float` | Y/Y | 1.0 | - | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
-| `delta_T` | `Float` | Y/N | 6.0 | K | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
-| OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | m³/s/m² | Constant specific flow rate per m² collector_gross_area. Either delta_T or spec_flow_rate has to be defined. |
-| `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | m³/s/m² | Minimal spec_flow_rate to start producing energy; used together with delta_T |
-| OR:`delta_T_min` | `Float` | N/Y | 2.0 | K | Minimal delta_T to start producing energy; used together with spec_flow_rate |
+| `vol_heat_capacity` | `Float` | Y/Y | 4.2e6 | [J/(m³K)] | Volumetric heat capacity of the fluid in the collector. |
+| `wind_speed_reduction` | `Float` | Y/Y | 1.0 | [-] | Adjust the wind speed by this factor to account for different wind conditions compared to measured wind speed at 10 m height |
+| `delta_T` | `Float` | Y/N | 6.0 | [K] | Constant temperature difference between collector input and output. Either delta_T or spec_flow_rate has to be defined. |
+| OR:`spec_flow_rate` | `Float` | Y/N | 2.0e-5 | [m³/s/m]² | Constant specific flow rate per m² collector_gross_area. Either delta_T or spec_flow_rate has to be defined. |
+| `spec_flow_rate_min` | `Float` | N/Y | 2.0e-6 | [m³/s/m²] | Minimal spec_flow_rate to start producing energy; used together with delta_T |
+| OR:`delta_T_min` | `Float` | N/Y | 2.0 | [K] | Minimal delta_T to start producing energy; used together with spec_flow_rate |
 
 **Parameter for economic calculation**
 
@@ -2774,11 +2774,11 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "m_heat_out": "m_h_w_lt1",
     "output_refs": ["TST_DEM_01"],
 
-    "ambient_temperature_from_global_file": "temp_ambient_air",
-    "beam_solar_radiation_from_global_file": "beamHorIrr",
-    "diffuse_solar_radiation_from_global_file": "difHorIrr",
-    "infrared_sky_radiation_from_global_file": "longWaveIrr",
-    "wind_speed_from_global_file": "wind_speed",
+    "use_ambient_temperature_from_weather_file": true,
+    "use_beam_solar_radiation_from_weather_file": true,
+    "use_diffuse_solar_radiation_from_weather_file": true,
+    "use_infrared_sky_radiation_from_weather_file": true,
+    "use_wind_speed_from_weather_file": true,
 
     "collector_gross_area": 2.34,
     "tilt_angle": 30,
@@ -2824,11 +2824,11 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "m_heat_out": "m_h_w_lt1",
     "output_refs": ["TST_DEM_01"],
 
-    "ambient_temperature_from_global_file": "temp_ambient_air",
-    "beam_solar_radiation_from_global_file": "beamHorIrr",
-    "diffuse_solar_radiation_from_global_file": "difHorIrr",
-    "infrared_sky_radiation_from_global_file": "longWaveIrr",
-    "wind_speed_from_global_file": "wind_speed",
+    "use_ambient_temperature_from_weather_file": true,
+    "use_beam_solar_radiation_from_weather_file": true,
+    "use_diffuse_solar_radiation_from_weather_file": true,
+    "use_infrared_sky_radiation_from_weather_file": true,
+    "use_wind_speed_from_weather_file": true,
 
     "collector_gross_area": 2.56,
     "tilt_angle": 5,
@@ -2856,11 +2856,11 @@ Solarthermal collector producing heat depending on weather conditions. The colle
     "m_heat_out": "m_h_w_lt1",
     "output_refs": ["TST_DEM_01"],
 
-    "ambient_temperature_from_global_file": "temp_ambient_air",
-    "beam_solar_radiation_from_global_file": "beamHorIrr",
-    "diffuse_solar_radiation_from_global_file": "difHorIrr",
-    "infrared_sky_radiation_from_global_file": "longWaveIrr",
-    "wind_speed_from_global_file": "wind_speed",
+    "use_ambient_temperature_from_weather_file": true,
+    "use_beam_solar_radiation_from_weather_file": true,
+    "use_diffuse_solar_radiation_from_weather_file": true,
+    "use_infrared_sky_radiation_from_weather_file": true,
+    "use_wind_speed_from_weather_file": true,
 
     "collector_gross_area": 3.35,
     "tilt_angle": 30,
