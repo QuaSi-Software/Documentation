@@ -2179,7 +2179,7 @@ Energy-related parameters:
 | **Medium** |  |
 | **Input media** | `m_heat_in`/`m_h_w_ht1` |
 | **Output media** | `m_heat_out`/`m_h_w_lt1` |
-| **Tracked values** | `IN`, `OUT`, `new_fluid_temperature`, `current_max_output_temperature`, `current_min_input_temperature`, `fluid_reynolds_number` |
+| **Tracked values** | `IN`, `OUT`, `mean_fluid_temperature`, `current_max_output_temperature`, `current_min_input_temperature`,  `current_mean_output_temperature`, `fluid_reynolds_number` |
 | **Auxiliary Plots** | G-function values for probe field, Geometry/layout of probe field  |
 
 The mathematical description of the geothermal probes is provided [here](resie_energy_system_components.md/#geothermal-probes).
