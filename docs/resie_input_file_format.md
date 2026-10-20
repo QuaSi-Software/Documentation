@@ -47,8 +47,10 @@ The overall structure of the project file is split several sections, each of whi
 ```json
 "io_settings": {
     "base_path": "/path/to/project_dir",
+    "general_logfile_file_path": "./output/logfile_general.log",
+    "balance_warn_logfile_file_path": "./output/logfile_balanceWarn.log",
     "auxiliary_info": true,
-    "auxiliary_info_file_path": "./auxiliary_info.md",
+    "auxiliary_info_file_path": "./output/auxiliary_info.md",
     "auxiliary_plots": true,
     "auxiliary_plots_directory": "./output",
     "auxiliary_plots_formats": ["png", "svg"],
@@ -110,6 +112,8 @@ The overall structure of the project file is split several sections, each of whi
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
 * `write_summary_csv` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
+* `general_logfile_file_path` (`String`): (Optional) File path to where the logfile for general logs will be written. Defaults to `./output/logfile_general.log`.
+* `balance_warn_logfile_file_path` (`String`): (Optional) File path to where the balance warn logfile will be written. Defaults to `./output/logfile_balanceWarn.log`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
 * `auxiliary_info_file_path` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
