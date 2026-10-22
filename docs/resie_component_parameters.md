@@ -2339,6 +2339,8 @@ The first column has to hold the normalized logarithmic time, \(ln(\text{real ti
 The second column, separatey by a semicolon, holds the g-function values.
 Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/validation_geothermal_probe/custom_g-function_geothermal_probe.txt).
 
+A python-based helper script to calculate the g-function of a probe field from a shape file using pygfunction is provided in the ReSiE repository: [/helper_functions/calculate_g_function_from_shape_file](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/helper_functions/calculate_g_function_from_shape_file)
+
 If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
 
 **General parameter**
