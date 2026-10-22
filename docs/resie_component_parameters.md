@@ -2313,10 +2313,7 @@ key_2 = ""
 
 **Import g-function from txt-file**
 
-A custom g-function for a specific probe field with specific soil conditions can be calculated e.g. using the python package [pygfunction
-](https://github.com/MassimoCimmino/pygfunction) and imported as a text file to ReSiE.
-
-The file needs to have the following structure (without the notes):
+A custom g-function for a specific probe field with specific soil conditions can also be imported as a text file to ReSiE (to calculate your own g-function, see details below). The file needs to have the following structure (without the notes):
 
 ```txt
 comment1                // comments can be given without limitation
@@ -2335,13 +2332,17 @@ number_of_probes: 42    // required variable
 
 The first column has to hold the normalized logarithmic time, \(ln(\text{real time} [s] / t_S)\) with 
 \(t_S = \text{borewhole_depth}^2 / (9 * \text{ground thermal diffusivity [m²/s]})\) as the steady-state time defined by Eskilson.
-
 The second column, separatey by a semicolon, holds the g-function values.
 Note that the number of probes has to be given as well in the header of the file. An example file can be found [here](data/validation_geothermal_probe/custom_g-function_geothermal_probe.txt).
 
-A python-based helper script to calculate the g-function of a probe field from a shape file using pygfunction is provided in the ReSiE repository: [/helper_functions/calculate_g_function_from_shape_file](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/helper_functions/calculate_g_function_from_shape_file)
-
 If a `g_function_file_path` is specified, the following parameters are not used within ReSie: `probe_field_geometry`, `number_of_probes_x`, `number_of_probes_y`, `probe_field_key_2`, `borehole_spacing`,  `soil_density`, `soil_specific_heat_capacity`.
+
+**Generating a custom g-function from borehole coordinates**
+
+For irregular geothermal borehole fields, the g-function can be calculated prior to the simulation, e.g. using the python package [pygfunction
+](https://github.com/MassimoCimmino/pygfunction). Therefore, a python-based helper script is available in the ReSiE repository at  [/helper_functions/calculate_g_function_from_shape_file](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/helper_functions/calculate_g_function_from_shape_file). It reads borehole point coordinates from an ESRI Shapefile, calculates the thermal response of the field using pygfunction, and exports a custom g_function.prf file in the ReSiE import format. It also writes a CSV containing the computed values and three diagnostic plots.
+
+The helper requires Python and the optional dependencies listed in its requirements.txt; it is not needed to run ReSiE. Refer to the helper's README.md for Shapefile requirements, configuration, execution, and modeling assumptions. In the ReSiE component configuration, set `g_function_file_path` to the generated g_function.prf file. Ensure that the borehole length (probe_depth) used by ReSiE matches the thermally active borehole length used to normalize the time axis during g-function calculation.
 
 **General parameter**
 
