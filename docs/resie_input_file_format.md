@@ -47,10 +47,12 @@ The overall structure of the project file is split several sections, each of whi
 ```json
 "io_settings": {
     "base_path": "/path/to/project_dir",
+    "general_logfile_file_path": "./output/logfile_general.log",
+    "balance_warn_logfile_file_path": "./output/logfile_balanceWarn.log",
     "auxiliary_info": true,
-    "auxiliary_info_file": "./auxiliary_info.md",
+    "auxiliary_info_file_path": "./output/auxiliary_info.md",
     "auxiliary_plots": true,
-    "auxiliary_plots_path": "./output",
+    "auxiliary_plots_directory": "./output",
     "auxiliary_plots_formats": ["png", "svg"],
     "sankey_plot_file_path": "./output/output_sankey.html",
     "sankey_plot": "custom",
@@ -96,10 +98,10 @@ The overall structure of the project file is split several sections, each of whi
     "step_info_interval": 500,
     "show_detailed_errors": false,
     "output_parameter_study_csv": true,
-    "parameter_study_csv_path": "./output/parameter_study",
+    "parameter_study_csv_path_prefix": "./output/parameter_study",
     "write_parameter_study_csv_continuously": false,
     "output_parameter_study_plots": true,
-    "parameter_study_plots_path": "./output/parameter_study_plots"
+    "parameter_study_plots_path_prefix": "./output/parameter_study_plots"
 },
 ```
 * `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
@@ -110,11 +112,13 @@ The overall structure of the project file is split several sections, each of whi
 * `csv_output_weather` (`Boolean`): (Optional) Toggle if the weather data read in from the given weather file should be included in the CSV output. Defaults to `false`.
 * `write_csv_continuously` (`Boolean`): (Optional) Toggle if CSV output will be written continuously, meaning in every time step. Activating this functionality will ensure partial output if the simulation fails during execution, however it also incurs a substantial performance penalty due to frequent file access. Defaults to `false`.
 * `write_summary_csv` (`Boolean`): (Optional) Toggle if a CSV summary output with sum/mean values should be created additionally to the timestep-wise CSV output. Defaults to `true`.
+* `general_logfile_file_path` (`String`): (Optional) File path to where the logfile for general logs will be written. Defaults to `./output/logfile_general.log`.
+* `balance_warn_logfile_file_path` (`String`): (Optional) File path to where the balance warn logfile will be written. Defaults to `./output/logfile_balanceWarn.log`.
 * `auxiliary_info` (`Boolean`): (Optional) Toggle if auxiliary info about the current run should be written to markdown file. Defaults to `false`.
-* `auxiliary_info_file` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
+* `auxiliary_info_file_path` (`String`): (Optional) File path to where the auxiliary information will be written. Defaults to `./output/auxiliary_info.md`.
 * `auxiliary_plots` (`Boolean`): (Optional) Toggle if additional plots of components, if they are available, are created. Defaults to `false`.
-* `auxiliary_plots_path` (`String`): (Optional) Directory path to where the additional plots will be saved. Defaults to `./output/`.
-* `auxiliary_plots_formats` (`Array{String}`): (Optional) Multiple selection of which file formats are used to create the auxiliary plots. Allowed formats are: `html`, `pdf`, `png`, `ps`, `svg`. Defaults to `[".png"]`.
+* `auxiliary_plots_directory` (`String`): (Optional) Directory path to where the additional plots will be saved. Defaults to `./output/`.
+* `auxiliary_plots_formats` (`Array{String}`): (Optional) Multiple selection of which file formats are used to create the auxiliary plots. Allowed formats are: `html`, `pdf`, `png`, `ps`, `svg`. Defaults to `["png"]`.
 * `sankey_plot_file_path` (`String`): (Optional) File path to where the Sankey plot will be written. Defaults to `./output/output_sankey.html`.
 * `sankey_plot` (`String`): (Optional) Sets the mode of the sankey plot output, switching between default and custom behaviour as well an option of not creating a sankey plot file. Has to be one of: `default`, `custom`, `nothing`. Defaults to `default`.
 * `sankey_plot_spec` (`Dict{String, String}`): (Optional) Specifications for the colors of the sankey plot in custom mode. See [section "Output specification (Sankey)"](resie_input_file_format.md#output-specification-sankey) for details. Only required if a custom sankey plot is set.
@@ -130,7 +134,7 @@ The overall structure of the project file is split several sections, each of whi
 * `output_economic_csv` (`Boolean`): (Optional) Toggle if a CSV file with the economic results should be created. Defaults to `true`.
 * `economic_csv_file_path` (`String`): (Optional) File path to where the economic results CSV will be written. Defaults to `./output/economic_results.csv`.
 * `plot_emission_results` (`Boolean`): (Optional) Toggle if the emission results should be plotted. Defaults to `true`.
-* `emissions_plot_file_path` (`String`): (Optional) File path to where the emissions plot will be written. Defaults to `./output/emissions_result.html`.
+* `emissions_plot_file_path` (`String`): (Optional) File path to where the emissions plot will be written. Defaults to `./output/emissions_plot.html`.
 * `output_emissions_csv` (`Boolean`): (Optional) Toggle if a CSV file with the emission results should be created. Defaults to `true`.
 * `emissions_csv_file_path` (`String`): (Optional) File path to where the emissions results CSV will be written. Defaults to `./output/emissions_results.csv`.
 * `plot_price_and_emission_profiles` (`Boolean`): (Optional) Toggle if a plot with the utilized price and emission profiles should be created. This can be used to double check if everything is scaled and imported correctly.  Note that this file can be very large! Therefore it defaults to `false`.
@@ -139,10 +143,10 @@ The overall structure of the project file is split several sections, each of whi
 * `show_detailed_errors` (`Boolean`): (Optional) Toggle if errors should show a more detailed message. Only affects some errors. Defaults to `false`.
 * `fixed_output_precision` (`Integer`): (Optional) If given a non-zero value, uses this many significant digits as the fixed precision for float outputs in CSV and plot files. It is not recommended to use this setting in normal simulation. It's intended for making the output perfectly repeatable, which is useful for testing but changes the results.
 * `output_parameter_study_csv` (`Boolean`): (Optional) Toggle if CSV files with the parameter-study results should be created. Defaults to `true`.
-* `parameter_study_csv_path` (`String`): (Optional) Directory path to where the parameter-study CSV result files will be written. Defaults to `./output/parameter_study`.
+* `parameter_study_csv_path_prefix` (`String`): (Optional) Directory path with file prefix to where the parameter-study CSV result files will be written. Defaults to `./output/parameter_study`.
 * `write_parameter_study_csv_continuously` (`Boolean`): (Optional) Toggle if parameter-study CSV output will be written continuously after every completed simulation run. Activating this functionality preserves partial output if the parameter study is stopped during execution. It incurs a slight performance penalty depending on the duration of an individual simulation and the number of parallel runs, since threads may have to wait for write access. Defaults to `false`.
 * `output_parameter_study_plots` (`Boolean`): (Optional) Toggle if plot files with the parameter-study results should be created. Defaults to `true`.
-* `parameter_study_plots_path` (`String`): (Optional) Directory path to where the parameter-study result plots will be written. Defaults to `./output/parameter_study_plots`.
+* `parameter_study_plots_path_prefix` (`String`): (Optional) Directory path with file prefix to where the parameter-study result plots will be written. Defaults to `./output/parameter_study_plots`.
 
 ### Output specification (Sankey)
 
@@ -265,7 +269,7 @@ To plot the weather data read in from a provided weather file to the interactive
 "simulation_parameters": {
     "start": "01.01.2024 00:00",
     "end": "31.12.2024 23:00",
-    "start_end_unit": "dd.mm.yyyy HH:MM",
+    "start_date_format": "dd.mm.yyyy HH:MM",
     "time_step": 60,
     "time_step_unit": "minutes",
     "__OPTIONAL PARAMETER__": "",
@@ -284,7 +288,7 @@ To plot the weather data read in from a provided weather file to the interactive
 * `start` (`String`): Start time of the simulation as datetime format. 
 * `start_output` (`String`, optional): The start time as datetime format at which the simulation begins to output the simulation results. Has to be equal or later than `start`. Can be used to perform heat-up simulation ahead of the actual simulation. Note that during heat-up, no warnings are printed. The energies in the various output files are starting at the time specified in `start_output`.
 * `end` (`String`): End time (inclusive) of the simulation as datetime format. Will be rounded down to the nearest multiple of the time step.
-* `start_end_unit` (`String`): Datetime format specifier for parameters `start`, `start_output` and `end`.
+* `start_date_format` (`String`): Datetime format specifier for parameters `start`, `start_output` and `end`.
 * `time_step` (`Integer`, optional): Time step for the simulation. The parameter `time_step_unit` determines what the value in `time_step` means. Defaults to 900.
 * `time_step_unit` (`String`, optional): Unit for the value given in parameter `time_step`. Has to be one of: `seconds`, `minutes`, `hours`. Defaults to `seconds`.
 * `weather_file_path` (`String`, optional): File path to the project-wide weather file. Can either be an EnergyPlus Weather File (EPW, time step has to be one hour, without leap day or DST) or a .dat file from the DWD (see [https://kunden.dwd.de/obt/](https://kunden.dwd.de/obt/), free registration is required). See the component parameters on how to link weather file data to a component.
@@ -417,6 +421,9 @@ The following objective categories and parameters are available:
 | `emissions` | Uses results from the emissions calculation.                                | `total_emissions`<br>`emissions_energies`<br>`embodied_emissions`                                               |
 | `sum`       | Uses the sum of the selected simulation output<br>over the simulation period.  | Depends on the selected simulation output.                                                                      |
 | `mean`      | Uses the mean of the selected simulation output<br>over the simulation period. | Depends on the selected simulation output.                                                                      |
+| `last`      | Uses the last value of the selected simulation output<br>at the end of the simulation period. | Depends on the selected simulation output.                                                                      |
+| `min`      | Uses the minimum value of the selected simulation output<br>that arises during the simulation period. | Depends on the selected simulation output.                                                                      |
+| `min`      | Uses the maximum value of the selected simulation output<br>that arises during the  simulation period. | Depends on the selected simulation output.                                                                      |
 
 For parameter variation and sensitivity analysis, the objective must be scalar. It can be defined with `objective_function: "sum"` or `objective_function: "linear"`. With `sum`, all objective parameters are added together and the resulting value is minimised. With `linear`, the coefficient of each objective parameter is defined with `objective_factors`. The complete weighted objective is then minimised.
 
@@ -457,7 +464,7 @@ Optimisation can additionally use multiple separate objectives. This is describe
 
 ### Definition of parameters to be changed
 
-The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value.
+The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value. For integer parameters, non-integer values generated from ranges or proposed by optimisation algorithms are rounded to the nearest valid integer. Explicitly specified values, however, must already be valid integers.
 
 Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`. See also the example below:
 
@@ -650,6 +657,8 @@ Multi-objective optimisation is supported only by compatible optimisation algori
 
 Sensitivity analysis determines how changes in the selected parameters affect the objective. Global and local sensitivity analyses are configured in `sensitivity_analysis` and can be enabled independently or together. For details of the method and how to interpret the results, see [this chapter](optimisation_and_sensitivity.md#sensitivity-analysis)
 
+During sensitivity analysis, integer parameters are varied using whole-number steps. Consequently, the actual relative variation may differ from the requested percentage (e.g., ±10%). The sensitivity plots and CSV results show the actual parameter values and relative changes used in the simulations.
+
 #### Global sensitivity
 
 Global sensitivity calculates first-order and total-order Sobol indices within the parameter bounds. Every parameter therefore requires `bounds_min` and `bounds_max`. Existing valid simulation results inside the selected bounds are reused where possible. Additional simulation runs are performed when more samples are required.
@@ -833,7 +842,7 @@ A few important notes on this feature that need to be kept in mind:
 
 ## Order of operation
 
-The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `auxiliary_info` flag and the `auxiliary_info_file` path in the [Input/Output section](resie_input_file_format.md#input-output-settings) described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
+The order of operation is usually calculated by a heuristic according to the control strategies defined in the input file and the interconnection of all components. This should usually work well and result in a correct order of operation which is then executed at each time step. The calculated operating sequence can be exported as a text file using the `auxiliary_info` flag and the `auxiliary_info_file_path` in the [Input/Output section](resie_input_file_format.md#input-output-settings) described above. In some cases, a custom order of operations may be required or desired. This can be done using the `order_of_operation` section in the input file. If this section is not specified or if it is empty, the order of operations will be calculated internally. If this section is not empty, the specified list will be read in and used as the calculation order. Note that the order of operations has a great influence on the simulation result and should be changed only by experienced users!
 
 It may be convenient to first export the `auxiliary_info` without a specification in `order_of_operation` to first calculate the default order or operation. The text provided in the exported `auxiliary_info_file` can then be copied into `order_of_operation` in the input file and can be customized. The `order_of_operation` has to be a vector of strings each containing the UAC of a component and the desired operation, separated by a whitespace. The UAC has to match exactly one of the UACs of the components defined in the section `components`. For a further description of the available operations, see [this section on the simulation sequence](resie_fundamentals.md#determining-order-of-operations).
 
