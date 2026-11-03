@@ -17,7 +17,11 @@ using ResieQuasi
 simulate("examples/name_of_example.json")
 ```
 
-The function `simulate()` can also be used to control the logging. The parameter `log_level` can be set to "Auto" or one of "Debug", "Info", "BalanceWarning", "GlobalInfo", "Warn", "Error".  "Auto" sets the log_level to "Info" for a single simulation and "GlobalInfo" for multiple simulations, e.g. in a parameter study. Additionally the boolean parameters `log_to_console` and `log_to_file` define if logging should be output into the terminal or saved into the log file. Both default to `true`.
+The function `simulate()` can also be used to control the logging with the optional parameters:
+
+* `log_level` (`String`): Can be one of `Auto`, `Debug`, `Info`, `BalanceWarning`, `Warn`, `Error`. Defaults to `Auto`, which sets the log_level to `Info` for a single simulation and `GlobalInfo` for multiple simulations, e.g. in a parameter study.
+* `log_to_console` (`Bool`): Set if logging should be output into the terminal. Defaults to `true`.
+* `log_to_file` (`Bool`): Set if output should be saved to the log file. Defaults to `true`.
 
 More information on how to use the CLI or the package the can be found [in this chapter](resie_installation.md). 
 
