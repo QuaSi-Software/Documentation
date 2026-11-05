@@ -2,13 +2,30 @@
 
 In this chapter, some exemplary energy systems will be described and discussed. This may help to understand the capabilities, limitations and usage of ReSiE.
 
-For all examples the required input files are shipped together with ReSiE as JSON files in the [subdirectory `examples`](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/examples). The project files may link to profile files (as `.prf`), which are also shipped alongside ReSiE in the [`profiles` subdirectory](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/profiles). The examples can be executed with
+For all examples the required input files are shipped together with ReSiE as JSON files in the [subdirectory `examples`](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/examples). The project files may link to profile files (as `.prf`), which are also shipped alongside ReSiE in the [`profiles` subdirectory](https://github.com/QuaSi-Software/ResieQuasi.jl/tree/master/profiles). The examples can be executed with the CLI in the ReSiE directory as
 
 ```bash
 julia --project=. --threads=auto src/resie-cli.jl run --exit-after-run examples/name_of_example.json
 ```
 
-in the ReSiE directory. More information on how to use the CLI can be found [in this chapter](resie_installation.md). The outputs are written to the `output` subdirectory by default. Please note that output files from multiple simulation runs (including different examples) are not deleted, but are overwritten.
+or as a package in the Julia REPL as
+
+```bash
+julia --threads=auto
+] add ResieQuasi
+using ResieQuasi
+simulate("examples/name_of_example.json")
+```
+
+The function `simulate()` can also be used to control the logging with the optional parameters:
+
+* `log_level` (`String`): Can be one of `Auto`, `Debug`, `Info`, `BalanceWarning`, `Warn`, `Error`. Defaults to `Auto`, which sets the log_level to `Info` for a single simulation and `GlobalInfo` for multiple simulations, e.g. in a parameter study.
+* `log_to_console` (`Bool`): Set if logging should be output into the terminal. Defaults to `true`.
+* `log_to_file` (`Bool`): Set if output should be saved to the log file. Defaults to `true`.
+
+More information on how to use the CLI or the package the can be found [in this chapter](resie_installation.md). 
+
+The outputs are written to the `output` subdirectory by default. Please note that output files from multiple simulation runs (including different examples) are not deleted, but are overwritten.
 
 All examples will produce an interactive plot of interesting result data (default `output/output_plot.html`) and a sankey plot of yearly sums of energy (default `output/output_sankey.html`). You can customize both plots as described in [the chapter on the input file format](resie_input_file_format.md). The log files (default `output/logfile_general.log` and `output/logfile_balanceWarn.log`) are of interest as well, particularly if the example generates warnings on purpose.
 

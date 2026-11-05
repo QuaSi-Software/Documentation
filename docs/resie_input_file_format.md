@@ -101,7 +101,9 @@ The overall structure of the project file is split several sections, each of whi
     "parameter_study_csv_path_prefix": "./output/parameter_study",
     "write_parameter_study_csv_continuously": false,
     "output_parameter_study_plots": true,
-    "parameter_study_plots_path_prefix": "./output/parameter_study_plots"
+    "parameter_study_plots_path_prefix": "./output/parameter_study_plots",
+    "enable_plot_downsampling": true,
+    "plot_downsampling_max_number_values": 10e6
 },
 ```
 * `base_path` (`String`): (Optional) If given, this path will be used as the base path for all relative paths used in the config file. If not given it defaults to the current working directory for the Julia process running ReSiE, which in almost all cases is the directory from which ReSiE is started.
@@ -147,6 +149,8 @@ The overall structure of the project file is split several sections, each of whi
 * `write_parameter_study_csv_continuously` (`Boolean`): (Optional) Toggle if parameter-study CSV output will be written continuously after every completed simulation run. Activating this functionality preserves partial output if the parameter study is stopped during execution. It incurs a slight performance penalty depending on the duration of an individual simulation and the number of parallel runs, since threads may have to wait for write access. Defaults to `false`.
 * `output_parameter_study_plots` (`Boolean`): (Optional) Toggle if plot files with the parameter-study results should be created. Defaults to `true`.
 * `parameter_study_plots_path_prefix` (`String`): (Optional) Directory path with file prefix to where the parameter-study result plots will be written. Defaults to `./output/parameter_study_plots`.
+* `enable_plot_downsampling` (`Boolean`): (Optional) Toggle if big plots should be downsampled to keep the size of the html file low enough to handle. This simply removes values from the plot but does not recalculate them to a new time step. Defaults to `true`
+* `plot_downsampling_max_number_values` (`Integer`) (Optional) Defines the maximum number of values that are allowed in a plot. Works together with plot downsampling. Defaults to `10e6` which should keep file size below 50 MB.
 
 ### Output specification (Sankey)
 
@@ -220,7 +224,8 @@ The output values of each component and the energy (and temperature if present) 
 
 If one of `all_incl_flows` or `all_excl_flows` is set, the order of lines in the plot is sorted alphabetically. With `all_incl_flows`, the energy and temperature flows are placed behind the component outputs. In addition, the flows are filtered so that no flows are output that are denied by the energy flow matrix in the bus. Temperatures are excluded if they are not used during the simulation time. Note that temperatures only display values during the times when energy is being transferred, as they may not be defined outside of these times.
 
-The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series.
+The results will be saved by default in `./output/output_plot.html`. The plot can be opened with any browser and offers some interactivity like zooming or hiding data series. 
+The html file can become very big for multi year simulations with many output entries and cause issues with displaying them in the browser. To combat that the parameters `enable_plot_downsampling` and `plot_downsampling_max_number_values` reduce the size by dropping every nth value. This only affects the plots and not the csv output file. The values don't get recalculated in any way and still correspond to the original time step. `plot_downsampling_max_number_values` defaults to `10e6` which should keep file size below 50 MB.
 
 A custom output does not sort alphabetically, but uses the order specified in the input file. It filters temperature flows if they contain no data, e.g. for non-thermal media or if no energy has been transferred. To specify a custom selection of outputs, use the following syntax for the parameter `output_plot_spec`:
 
