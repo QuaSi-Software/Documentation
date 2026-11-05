@@ -1,12 +1,12 @@
 # Installation and usage instructions
 ReSiE is written in Julia and shipped as a Julia codebase. This means that it can be run on any machine that can run Julia. At the moment no compiled binaries are availabe for any platform. The following instructions help you to install and use ReSiE. There are two tools that help with creating the required input files for ReSiE and running simulations, described [in this chapter](resie_susi_simon.md).
 
-## Requirements
+## Requirements: Installing Julia
 
 * Julia, minimum v1.10.0 and tested up to v1.13.3. You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
 * Internet access during installation, as the dependencies have to be downloaded
 
-## Installation
+## Installation of ReSiE from Github
 
 1. Get a copy: `git clone https://github.com/QuaSi-Software/ResieQuasi.jl.git`
     * As an alternative to Git, you can also download the repository [from one of the releases on GitHub](https://github.com/QuaSi-Software/ResieQuasi.jl/releases). Download the source code as a `.zip` file and unpack it to the target directory.
@@ -27,7 +27,7 @@ To use profiles with a time-zone-aware datetime index beyond 2038, follow these 
 
 ## Usage
 
-A full description of how to use ReSiE on the examples it ships with can be found [in this chapter](resie_exemplary_energy_systems.md). In the following the standalone use via the CLI or VSCode and the use as a package is descriped.
+A full description of how to use ReSiE on the examples it ships with can be found [in this chapter](resie_exemplary_energy_systems.md). ReSiE can be used in different ways: Standalone use via the CLI, integrated into VSCode or as a Julia package. All variants are described below. If you are new to Julia and ReSiE, use the CLI. 
 
 ### CLI
 
@@ -71,6 +71,9 @@ In Visual Studio Code, you can make configuration in the file `.vscode/launch.js
 ```
 
 ### Package
+
+ReSiE can also be installed directly in a local Julia instance as a Julia package:
+
 1. Start the julia REPL with `julia --threads=auto` (usage of --threads see [description above](#cli))
 2. Switch to the package REPL with `]` (no enter necessary)
 3. Add the package with `add ResieQuasi`

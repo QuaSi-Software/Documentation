@@ -8,7 +8,7 @@ For all examples the required input files are shipped together with ReSiE as JSO
 julia --project=. --threads=auto src/resie-cli.jl run --exit-after-run examples/name_of_example.json
 ```
 
-or as a package in the Julia REPL as
+or, if ReSiE has been installed as a Julia package,  in the Julia REPL using
 
 ```bash
 julia --threads=auto
@@ -17,13 +17,7 @@ using ResieQuasi
 simulate("examples/name_of_example.json")
 ```
 
-The function `simulate()` can also be used to control the logging with the optional parameters:
-
-* `log_level` (`String`): Can be one of `Auto`, `Debug`, `Info`, `BalanceWarning`, `Warn`, `Error`. Defaults to `Auto`, which sets the log_level to `Info` for a single simulation and `GlobalInfo` for multiple simulations, e.g. in a parameter study.
-* `log_to_console` (`Bool`): Set if logging should be output into the terminal. Defaults to `true`.
-* `log_to_file` (`Bool`): Set if output should be saved to the log file. Defaults to `true`.
-
-More information on how to use the CLI or the package the can be found [in this chapter](resie_installation.md). 
+More information on how to use the CLI or the package and the requirements can be found [in this chapter](resie_installation.md). 
 
 The outputs are written to the `output` subdirectory by default. Please note that output files from multiple simulation runs (including different examples) are not deleted, but are overwritten.
 
