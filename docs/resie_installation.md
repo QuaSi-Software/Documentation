@@ -3,7 +3,7 @@ ReSiE is written in Julia and shipped as a Julia codebase. This means that it ca
 
 ## Requirements: Installing Julia
 
-* Julia, minimum v1.10.0 and tested up to v1.13.3. You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
+* Julia, minimum v1.12.2 und tested up to v1.13.3 (recommended version is v1.13.3). You can find installation instructions [here](https://julialang.org/install/). Works best using Juliaup instead of precompiled binary files.
 * Internet access during installation, as the dependencies have to be downloaded
 
 ## Installation of ReSiE from Github
