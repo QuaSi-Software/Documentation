@@ -42,7 +42,7 @@ This is a quick overview of the tools of the QuaSi project. You can find more de
     </figure>
 
 ## Funding
-This project is funded in majority by a research initiative of the German government through the German Federal Ministry for Economic Affairs and Energy (BMWE), formerly known as German Federal Ministry for Economic Affairs and Climate Action (BMWK), in research grant **03EN3053**.
+This project is funded in majority by a research initiative of the German government through the German Federal Ministry for Economic Affairs and Energy (BMWE), formerly known as German Federal Ministry for Economic Affairs and Climate Action (BMWK), in research grant **03EN3053**. The final report is available [here (German only)](https://doi.org/10.34657/44100).
 
 Previous work has also been funded within the same research initiative through the German Federal Ministry for Education and Research (BMBF) in research grant **03SBE115**.
 
