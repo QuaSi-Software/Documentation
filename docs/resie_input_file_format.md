@@ -471,7 +471,7 @@ Optimisation can additionally use multiple separate objectives. This is describe
 
 The parameters to be changed are defined with `parameters` and follow the component structure of the input file. The referenced parameter must already exist in the input file and must have a numeric value. For integer parameters, non-integer values generated from ranges or proposed by optimisation algorithms are rounded to the nearest valid integer. Explicitly specified values, however, must already be valid integers.
 
-Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.lifetime_years`. See also the example below:
+Each entry below `parameters` identifies either a component using its UAC or a top-level input section. Parameter names are relative to that entry. Direct parameters use their normal key, for example `capacity`. Nested parameters use a dot-separated path, for example `economic_parameters.economic_lifetime_years`. See also the example below:
 
 ```json
 "parameters": {
@@ -481,7 +481,7 @@ Each entry below `parameters` identifies either a component using its UAC or a t
             "bounds_min": 0,
             "bounds_max": 200000
         },
-        "economic_parameters.lifetime_years": {
+        "economic_parameters.economic_lifetime_years": {
             ...
         }
     },
